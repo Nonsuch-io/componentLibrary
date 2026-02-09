@@ -1,0 +1,66 @@
+{
+  "name": "@nonsuch/component-library",
+  "version": "0.1.0",
+  "description": "A Vue 3 component library built on Quasar with opinionated defaults and custom components.",
+  "type": "module",
+  "sideEffects": false,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nonsuch/componentLibrary.git"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/nonsuch-components.js",
+  "module": "./dist/nonsuch-components.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/nonsuch-components.js"
+    },
+    "./style.css": "./dist/style.css"
+  },
+  "scripts": {
+    "dev": "storybook dev -p 6006",
+    "build": "vite build && vue-tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "build:storybook": "storybook build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "preview": "vite preview"
+  },
+  "peerDependencies": {
+    "@quasar/vite-plugin": "^1.8.0",
+    "quasar": "^2.17.0",
+    "vue": "^3.5.0"
+  },
+  "peerDependenciesMeta": {
+    "@quasar/vite-plugin": {
+      "optional": true
+    }
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  },
+  "devDependencies": {
+    "@quasar/extras": "^1.17.0",
+    "@quasar/vite-plugin": "^1.10.0",
+    "@storybook/vue3-vite": "^10.2.7",
+    "@vitejs/plugin-vue": "^6.0.4",
+    "@vue/test-utils": "^2.4.6",
+    "happy-dom": "^20.5.3",
+    "quasar": "^2.18.6",
+    "sass-embedded": "^1.97.3",
+    "storybook": "^10.2.7",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vitest": "^4.0.18",
+    "vue": "^3.5.27",
+    "vue-tsc": "^3.2.4"
+  },
+  "packageManager": "pnpm@10.29.2"
+}
