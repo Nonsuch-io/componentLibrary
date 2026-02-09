@@ -39,15 +39,4 @@ export default defineConfig({
       },
     },
   },
-  test: {
-    globals: true,
-    environment: 'happy-dom',
-    setupFiles: ['./test/setup.ts'],
-    include: ['src/**/*.test.ts'],
-    coverage: {
-      provider: 'v8',
-      include: ['src/components/**/*.vue', 'src/components/**/*.ts'],
-      exclude: ['**/*.stories.ts', '**/*.test.ts'],
-    },
-  },
 })

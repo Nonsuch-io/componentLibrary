@@ -75,7 +75,7 @@ pnpm build:storybook
 
 ## Project Structure
 
-```
+```markdown
 src/
   index.ts                      # Library entry — exports all custom components
   components/
