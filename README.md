@@ -100,6 +100,10 @@ Each custom component lives in its own directory with co-located story and test 
 - **Vite library mode** — builds to ES modules with externalized `vue` and `quasar`
 - **TypeScript** — strict mode with emitted `.d.ts` declarations
 
+## Contributing
+
+Want to add or improve components? Check out [CONTRIBUTING.md](./CONTRIBUTING.md) for a friendly step-by-step guide — no deep Vue experience required!
+
 ## License
 
 MIT — see [LICENSE](./LICENSE)
