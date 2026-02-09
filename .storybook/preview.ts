@@ -6,6 +6,9 @@ import { Quasar } from 'quasar'
 import 'quasar/src/css/index.sass'
 import '@quasar/extras/material-icons/material-icons.css'
 
+// Nonsuch fonts (Fixel)
+import '../fonts/fonts.css'
+
 // Register Quasar plugin for all stories
 setup((app) => {
   app.use(Quasar, {

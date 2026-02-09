@@ -44,6 +44,16 @@ Then import custom components as needed:
 import { NsButton } from '@nonsuch/component-library'
 ```
 
+### Fonts (Optional)
+
+The library includes [Fixel](https://fixel.macpaw.com/) as the Nonsuch brand font with Roboto as a fallback. To use it, add one import to your app entry:
+
+```ts
+import '@nonsuch/component-library/fonts.css'
+```
+
+This loads `Fixel Text` (for UI elements) and `Fixel Display` (for headings). Components will use Fixel automatically when the font CSS is loaded, falling back to Roboto if it isn't.
+
 Or use Quasar components directly — they aren't re-exported through this library, so you import them from `quasar` as normal:
 
 ```ts

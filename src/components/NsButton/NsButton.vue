@@ -44,6 +44,7 @@ withDefaults(defineProps<NsButtonProps>(), {
 
 <style lang="sass" scoped>
 .ns-button
+  font-family: 'Fixel Text', 'Roboto', sans-serif
   font-weight: 500
   letter-spacing: 0.02em
 </style>

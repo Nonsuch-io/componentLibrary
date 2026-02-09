@@ -1,0 +1,115 @@
+/*
+ * Fixel Font — @font-face declarations
+ * https://fixel.macpaw.com/
+ *
+ * Import this file in your app entry:
+ *   import '@nonsuch/component-library/fonts.css'
+ *
+ * Then use the font families in your CSS:
+ *   font-family: 'Fixel Text', 'Roboto', sans-serif;
+ *   font-family: 'Fixel Display', 'Roboto', sans-serif;
+ */
+
+/* ========================================================================
+   Fixel Text — body text, buttons, labels, UI elements
+   ======================================================================== */
+
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./files/FixelText-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./files/FixelText-RegularItalic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./files/FixelText-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./files/FixelText-MediumItalic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./files/FixelText-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./files/FixelText-SemiBoldItalic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./files/FixelText-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./files/FixelText-BoldItalic.woff2') format('woff2');
+}
+
+/* ========================================================================
+   Fixel Display — headings and large text
+   ======================================================================== */
+
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./files/FixelDisplay-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./files/FixelDisplay-Medium.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./files/FixelDisplay-SemiBold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./files/FixelDisplay-Bold.woff2') format('woff2');
+}

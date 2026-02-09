@@ -260,6 +260,24 @@ Ask yourself: **"Does this component need Nonsuch-specific defaults, styles, or 
 - Keep styles minimal — rely on Quasar's built-in theming where possible
 - Avoid `!important` unless absolutely necessary
 
+### Fonts
+
+We use [Fixel](https://fixel.macpaw.com/) as the Nonsuch brand font with Roboto as fallback. When styling components, use:
+
+```sass
+.ns-my-component
+  font-family: 'Fixel Text', 'Roboto', sans-serif
+```
+
+For headings or large display text, use `Fixel Display` instead:
+
+```sass
+.ns-hero-title
+  font-family: 'Fixel Display', 'Roboto', sans-serif
+```
+
+Font files live in `fonts/files/` — see the README there for details on adding weights.
+
 ## Running Quality Checks
 
 Before opening a pull request, make sure everything passes:
@@ -294,6 +312,9 @@ src/
       ...
 
 .storybook/                       # Storybook configuration
+fonts/
+  fonts.css                       # @font-face declarations
+  files/                          # .woff2 font files (Fixel)
 test/
   setup.ts                        # Test setup (registers Quasar globally)
 ```

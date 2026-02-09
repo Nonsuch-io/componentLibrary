@@ -10,7 +10,8 @@
     "url": "https://github.com/nonsuch/componentLibrary.git"
   },
   "files": [
-    "dist"
+    "dist",
+    "fonts"
   ],
   "main": "./dist/nonsuch-components.js",
   "module": "./dist/nonsuch-components.js",
@@ -20,7 +21,8 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/nonsuch-components.js"
     },
-    "./style.css": "./dist/style.css"
+    "./style.css": "./dist/style.css",
+    "./fonts.css": "./fonts/fonts.css"
   },
   "scripts": {
     "dev": "storybook dev -p 6006",
