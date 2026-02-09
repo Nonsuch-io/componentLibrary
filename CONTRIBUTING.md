@@ -37,12 +37,13 @@ This is the most common task. Let's say you want to add an `NsCard` component.
 
 ### 1. Create the component folder
 
-```markdown
+<!-- prettier-ignore -->
+```
 src/components/NsCard/
-NsCard.vue # The component itself
-NsCard.stories.ts # Visual examples for Storybook
-NsCard.test.ts # Automated tests
-index.ts # Re-export file
+  NsCard.vue            # The component itself
+  NsCard.stories.ts     # Visual examples for Storybook
+  NsCard.test.ts        # Automated tests
+  index.ts              # Re-export file
 ```
 
 ### 2. Write the component (`NsCard.vue`)
@@ -281,21 +282,22 @@ pnpm format        # Auto-format all files
 
 ## Project Structure at a Glance
 
-```markdown
+<!-- prettier-ignore -->
+```
 src/
-index.ts # Library entry — exports all components
-components/
-NsButton/
-NsButton.vue # Component
-NsButton.stories.ts # Storybook stories
-NsButton.test.ts # Tests
-index.ts # Re-export
-NsCard/ # (your new component follows the same pattern)
-...
+  index.ts                        # Library entry — exports all components
+  components/
+    NsButton/
+      NsButton.vue                # Component
+      NsButton.stories.ts         # Storybook stories
+      NsButton.test.ts            # Tests
+      index.ts                    # Re-export
+    NsCard/                       # (your new component follows the same pattern)
+      ...
 
-.storybook/ # Storybook configuration
+.storybook/                       # Storybook configuration
 test/
-setup.ts # Test setup (registers Quasar globally)
+  setup.ts                        # Test setup (registers Quasar globally)
 ```
 
 ## Helpful Links
