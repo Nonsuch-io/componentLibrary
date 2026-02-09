@@ -18,5 +18,6 @@
   "references": [
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.build.json" }
-  ]
+  ],
+  "exclude": ["dist", "node_modules"]
 }

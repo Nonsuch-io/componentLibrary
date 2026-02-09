@@ -2,8 +2,9 @@ import type { Preview } from '@storybook/vue3-vite'
 import { setup } from '@storybook/vue3-vite'
 import { Quasar } from 'quasar'
 
-// Quasar CSS
+// Quasar CSS + Material Icons
 import 'quasar/src/css/index.sass'
+import '@quasar/extras/material-icons/material-icons.css'
 
 // Register Quasar plugin for all stories
 setup((app) => {

@@ -26,6 +26,7 @@
     "dev": "storybook dev -p 6006",
     "build": "vite build && vue-tsc -p tsconfig.build.json --emitDeclarationOnly",
     "build:storybook": "storybook build",
+    "typecheck": "vue-tsc -p tsconfig.app.json --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
