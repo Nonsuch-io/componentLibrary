@@ -21,10 +21,7 @@ import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 import vue from '@vitejs/plugin-vue'
 
 export default defineConfig({
-  plugins: [
-    vue({ template: { transformAssetUrls } }),
-    quasar(),
-  ],
+  plugins: [vue({ template: { transformAssetUrls } }), quasar()],
 })
 ```
 
@@ -77,13 +74,13 @@ pnpm build:storybook
 
 ```markdown
 src/
-  index.ts                      # Library entry — exports all custom components
-  components/
-    NsButton/
-      NsButton.vue              # Component implementation
-      NsButton.stories.ts       # Storybook story
-      NsButton.test.ts          # Vitest unit test
-      index.ts                  # Re-export
+index.ts # Library entry — exports all custom components
+components/
+NsButton/
+NsButton.vue # Component implementation
+NsButton.stories.ts # Storybook story
+NsButton.test.ts # Vitest unit test
+index.ts # Re-export
 ```
 
 Each custom component lives in its own directory with co-located story and test files. The `Ns` prefix distinguishes library components from Quasar's `Q` prefix.

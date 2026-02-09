@@ -36,7 +36,7 @@ type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
   args: {},
-  render: (args: any) => ({
+  render: (args) => ({
     components: { NsButton },
     setup() {
       return { args }

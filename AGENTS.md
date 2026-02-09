@@ -22,6 +22,7 @@ bd sync               # Sync with git
 2. **Run quality gates** (if code changed):
    - `pnpm test` - All tests must pass
    - `pnpm typecheck` - No type errors allowed
+   - `pnpm lint` - No lint errors
    - `pnpm build` - Build must succeed
 3. **Update issue status** - Close finished work, update in-progress items
 4. **PUSH TO REMOTE** - This is MANDATORY:
