@@ -37,8 +37,7 @@ This is the most common task. Let's say you want to add an `NsCard` component.
 
 ### 1. Create the component folder
 
-<!-- prettier-ignore -->
-```
+```text
 src/components/NsCard/
   NsCard.vue            # The component itself
   NsCard.stories.ts     # Visual examples for Storybook
@@ -282,8 +281,7 @@ pnpm format        # Auto-format all files
 
 ## Project Structure at a Glance
 
-<!-- prettier-ignore -->
-```
+```text
 src/
   index.ts                        # Library entry — exports all components
   components/
