@@ -31,4 +31,4 @@ jobs:
         run: pnpm build
 
       - name: Publish to npm (Trusted Publishing via OIDC)
-        run: pnpm publish --access public --no-git-checks --provenance
+        run: npm publish --access public --provenance
