@@ -2,18 +2,70 @@
  * Fixel Font — @font-face declarations
  * https://fixel.macpaw.com/
  *
- * Import this file in your app entry:
+ * Import this file to load the font faces without applying them globally:
  *   import '@nonsuch/component-library/fonts.css'
  *
- * Then use the font families in your CSS:
- *   font-family: 'Fixel Text', 'Roboto', sans-serif;
- *   font-family: 'Fixel Display', 'Roboto', sans-serif;
+ * Or use global.css to also set Fixel as the default body/heading font:
+ *   import '@nonsuch/component-library/fonts/global.css'
+ *
+ * Font families available after import:
+ *   font-family: 'Fixel Text', 'Roboto', sans-serif;   — body, UI elements
+ *   font-family: 'Fixel Display', 'Roboto', sans-serif; — headings, hero text
  */
 
 /* ========================================================================
    Fixel Text — body text, buttons, labels, UI elements
    ======================================================================== */
 
+/* Thin (100) */
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url('./files/FixelText-Thin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: italic;
+  font-weight: 100;
+  font-display: swap;
+  src: url('./files/FixelText-ThinItalic.woff2') format('woff2');
+}
+
+/* ExtraLight (200) */
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url('./files/FixelText-ExtraLight.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: italic;
+  font-weight: 200;
+  font-display: swap;
+  src: url('./files/FixelText-ExtraLightItalic.woff2') format('woff2');
+}
+
+/* Light (300) */
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('./files/FixelText-Light.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url('./files/FixelText-LightItalic.woff2') format('woff2');
+}
+
+/* Regular (400) */
 @font-face {
   font-family: 'Fixel Text';
   font-style: normal;
@@ -21,7 +73,6 @@
   font-display: swap;
   src: url('./files/FixelText-Regular.woff2') format('woff2');
 }
-
 @font-face {
   font-family: 'Fixel Text';
   font-style: italic;
@@ -30,6 +81,7 @@
   src: url('./files/FixelText-RegularItalic.woff2') format('woff2');
 }
 
+/* Medium (500) */
 @font-face {
   font-family: 'Fixel Text';
   font-style: normal;
@@ -37,7 +89,6 @@
   font-display: swap;
   src: url('./files/FixelText-Medium.woff2') format('woff2');
 }
-
 @font-face {
   font-family: 'Fixel Text';
   font-style: italic;
@@ -46,6 +97,7 @@
   src: url('./files/FixelText-MediumItalic.woff2') format('woff2');
 }
 
+/* SemiBold (600) */
 @font-face {
   font-family: 'Fixel Text';
   font-style: normal;
@@ -53,7 +105,6 @@
   font-display: swap;
   src: url('./files/FixelText-SemiBold.woff2') format('woff2');
 }
-
 @font-face {
   font-family: 'Fixel Text';
   font-style: italic;
@@ -62,6 +113,7 @@
   src: url('./files/FixelText-SemiBoldItalic.woff2') format('woff2');
 }
 
+/* Bold (700) */
 @font-face {
   font-family: 'Fixel Text';
   font-style: normal;
@@ -69,7 +121,6 @@
   font-display: swap;
   src: url('./files/FixelText-Bold.woff2') format('woff2');
 }
-
 @font-face {
   font-family: 'Fixel Text';
   font-style: italic;
@@ -78,10 +129,91 @@
   src: url('./files/FixelText-BoldItalic.woff2') format('woff2');
 }
 
+/* ExtraBold (800) */
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('./files/FixelText-ExtraBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: italic;
+  font-weight: 800;
+  font-display: swap;
+  src: url('./files/FixelText-ExtraBoldItalic.woff2') format('woff2');
+}
+
+/* Black (900) */
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('./files/FixelText-Black.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fixel Text';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url('./files/FixelText-BlackItalic.woff2') format('woff2');
+}
+
 /* ========================================================================
    Fixel Display — headings and large text
    ======================================================================== */
 
+/* Thin (100) */
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: normal;
+  font-weight: 100;
+  font-display: swap;
+  src: url('./files/FixelDisplay-Thin.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: italic;
+  font-weight: 100;
+  font-display: swap;
+  src: url('./files/FixelDisplay-ThinItalic.woff2') format('woff2');
+}
+
+/* ExtraLight (200) */
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+  src: url('./files/FixelDisplay-ExtraLight.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: italic;
+  font-weight: 200;
+  font-display: swap;
+  src: url('./files/FixelDisplay-ExtraLightItalic.woff2') format('woff2');
+}
+
+/* Light (300) */
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('./files/FixelDisplay-Light.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: url('./files/FixelDisplay-LightItalic.woff2') format('woff2');
+}
+
+/* Regular (400) */
 @font-face {
   font-family: 'Fixel Display';
   font-style: normal;
@@ -89,7 +221,15 @@
   font-display: swap;
   src: url('./files/FixelDisplay-Regular.woff2') format('woff2');
 }
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./files/FixelDisplay-RegularItalic.woff2') format('woff2');
+}
 
+/* Medium (500) */
 @font-face {
   font-family: 'Fixel Display';
   font-style: normal;
@@ -97,7 +237,15 @@
   font-display: swap;
   src: url('./files/FixelDisplay-Medium.woff2') format('woff2');
 }
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('./files/FixelDisplay-MediumItalic.woff2') format('woff2');
+}
 
+/* SemiBold (600) */
 @font-face {
   font-family: 'Fixel Display';
   font-style: normal;
@@ -105,11 +253,58 @@
   font-display: swap;
   src: url('./files/FixelDisplay-SemiBold.woff2') format('woff2');
 }
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: italic;
+  font-weight: 600;
+  font-display: swap;
+  src: url('./files/FixelDisplay-SemiBoldItalic.woff2') format('woff2');
+}
 
+/* Bold (700) */
 @font-face {
   font-family: 'Fixel Display';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
   src: url('./files/FixelDisplay-Bold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./files/FixelDisplay-BoldItalic.woff2') format('woff2');
+}
+
+/* ExtraBold (800) */
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('./files/FixelDisplay-ExtraBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: italic;
+  font-weight: 800;
+  font-display: swap;
+  src: url('./files/FixelDisplay-ExtraBoldItalic.woff2') format('woff2');
+}
+
+/* Black (900) */
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: normal;
+  font-weight: 900;
+  font-display: swap;
+  src: url('./files/FixelDisplay-Black.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fixel Display';
+  font-style: italic;
+  font-weight: 900;
+  font-display: swap;
+  src: url('./files/FixelDisplay-BlackItalic.woff2') format('woff2');
 }

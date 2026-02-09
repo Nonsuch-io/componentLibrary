@@ -1,0 +1,34 @@
+/*
+ * Fixel Font — Global application defaults
+ *
+ * Import this ONE file to load Fixel AND apply it as the default font:
+ *   import '@nonsuch/component-library/fonts/global.css'
+ *
+ * This sets:
+ *   - body / all UI text → Fixel Text
+ *   - h1–h6 headings    → Fixel Display
+ *   - Roboto fallback for both
+ */
+
+@import './fonts.css';
+
+/* Apply Fixel Text as the default body font */
+body {
+  font-family: 'Fixel Text', 'Roboto', sans-serif;
+}
+
+/* Apply Fixel Display to headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.text-h1,
+.text-h2,
+.text-h3,
+.text-h4,
+.text-h5,
+.text-h6 {
+  font-family: 'Fixel Display', 'Roboto', sans-serif;
+}

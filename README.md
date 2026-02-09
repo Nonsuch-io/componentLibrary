@@ -46,13 +46,39 @@ import { NsButton } from '@nonsuch/component-library'
 
 ### Fonts (Optional)
 
-The library includes [Fixel](https://fixel.macpaw.com/) as the Nonsuch brand font with Roboto as a fallback. To use it, add one import to your app entry:
+The library ships [Fixel](https://fixel.macpaw.com/) as the Nonsuch brand font with Roboto as a fallback. Three integration options:
+
+**Option 1: Global CSS (recommended)** — makes Fixel the default for your entire app:
+
+```ts
+import '@nonsuch/component-library/fonts/global.css'
+```
+
+This loads all `@font-face` declarations and sets `Fixel Text` on `body` and `Fixel Display` on headings.
+
+**Option 2: Font faces only** — load the fonts without applying them globally, then use them where you choose:
 
 ```ts
 import '@nonsuch/component-library/fonts.css'
 ```
 
-This loads `Fixel Text` (for UI elements) and `Fixel Display` (for headings). Components will use Fixel automatically when the font CSS is loaded, falling back to Roboto if it isn't.
+```css
+.my-element {
+  font-family: 'Fixel Text', 'Roboto', sans-serif;
+}
+```
+
+**Option 3: Quasar Sass variables** — integrates with Quasar's typography system:
+
+```sass
+// src/quasar-variables.sass
+@use '@nonsuch/component-library/fonts/quasar-overrides' as *
+```
+
+```ts
+// vite.config.ts
+quasar({ sassVariables: 'src/quasar-variables.sass' })
+```
 
 Or use Quasar components directly — they aren't re-exported through this library, so you import them from `quasar` as normal:
 

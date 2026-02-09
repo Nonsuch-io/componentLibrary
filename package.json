@@ -22,7 +22,9 @@
       "import": "./dist/nonsuch-components.js"
     },
     "./style.css": "./dist/style.css",
-    "./fonts.css": "./fonts/fonts.css"
+    "./fonts.css": "./fonts/fonts.css",
+    "./fonts/global.css": "./fonts/global.css",
+    "./fonts/quasar-overrides": "./fonts/_quasar-overrides.sass"
   },
   "scripts": {
     "dev": "storybook dev -p 6006",
