@@ -31,6 +31,4 @@ jobs:
         run: pnpm build
 
       - name: Publish to npm (Trusted Publishing via OIDC)
-        run: pnpm publish --access public --no-git-checks --provenance
-        env:
-          NPM_CONFIG_PROVENANCE: true
+        run: pnpm publish --access public --no-git-checks
