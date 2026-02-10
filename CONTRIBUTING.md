@@ -307,7 +307,6 @@ Publishing to npm is fully automated via GitHub Actions using
 1. **Make sure `main` is clean** — all quality checks should pass.
 
 2. **Bump the version** in `package.json` following [semver](https://semver.org/):
-
    - **Patch** (`0.2.1` → `0.2.2`) — bug fixes
    - **Minor** (`0.2.2` → `0.3.0`) — new components or features (backwards-compatible)
    - **Major** (`0.3.0` → `1.0.0`) — breaking API changes
