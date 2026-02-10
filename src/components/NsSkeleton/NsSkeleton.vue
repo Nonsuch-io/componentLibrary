@@ -36,7 +36,14 @@ export type NsSkeletonType =
   | 'QInput'
   | 'QAvatar'
 
-export type NsSkeletonAnimation = 'wave' | 'pulse' | 'pulse-x' | 'pulse-y' | 'fade' | 'blink' | 'none'
+export type NsSkeletonAnimation =
+  | 'wave'
+  | 'pulse'
+  | 'pulse-x'
+  | 'pulse-y'
+  | 'fade'
+  | 'blink'
+  | 'none'
 
 export interface NsSkeletonProps {
   /** Shape type — use component names for accurate matching */
