@@ -297,6 +297,43 @@ pnpm lint:fix      # Auto-fix lint issues
 pnpm format        # Auto-format all files
 ```
 
+## Releasing a New Version
+
+Publishing to npm is fully automated via GitHub Actions using
+[Trusted Publishing](https://docs.npmjs.com/trusted-publishers) (OIDC — no tokens or secrets needed).
+
+### Steps
+
+1. **Make sure `main` is clean** — all quality checks should pass.
+
+2. **Bump the version** in `package.json` following [semver](https://semver.org/):
+
+   - **Patch** (`0.2.1` → `0.2.2`) — bug fixes
+   - **Minor** (`0.2.2` → `0.3.0`) — new components or features (backwards-compatible)
+   - **Major** (`0.3.0` → `1.0.0`) — breaking API changes
+
+3. **Commit, tag, and push:**
+
+   ```bash
+   git add package.json
+   git commit -m "release: v0.3.0"
+   git tag v0.3.0
+   git push && git push origin v0.3.0
+   ```
+
+4. **The `Publish` workflow runs automatically** when the `v*` tag is pushed. It
+   builds the library and publishes to npm under `@nonsuch/component-library`.
+
+5. **Verify** the new version on [npmjs.com](https://www.npmjs.com/package/@nonsuch/component-library).
+
+### What if the publish fails?
+
+Check the [Actions tab](https://github.com/Nonsuch-io/componentLibrary/actions) for logs. Common issues:
+
+- **Version already exists** — you need to bump to a new version number.
+- **Authentication error** — verify the Trusted Publisher config on npmjs.com matches
+  the workflow filename (`publish.yml`), org (`Nonsuch-io`), and repo (`componentLibrary`).
+
 ## Project Structure at a Glance
 
 ```text
