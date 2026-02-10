@@ -6,13 +6,21 @@
     :unelevated="unelevated"
     :no-caps="noCaps"
     :rounded="rounded"
+    :loading="loading"
     class="ns-button"
   >
     <slot />
+    <template #loading>
+      <slot name="loading">
+        <q-spinner-dots color="white" />
+      </slot>
+    </template>
   </q-btn>
 </template>
 
 <script setup lang="ts">
+import { QSpinnerDots } from 'quasar'
+
 /**
  * NsButton - A styled button wrapping Quasar's QBtn.
  *
@@ -31,6 +39,8 @@ export interface NsButtonProps {
   noCaps?: boolean
   /** Apply rounded border-radius */
   rounded?: boolean
+  /** Show a loading spinner overlay */
+  loading?: boolean
 }
 
 withDefaults(defineProps<NsButtonProps>(), {
@@ -39,6 +49,7 @@ withDefaults(defineProps<NsButtonProps>(), {
   unelevated: true,
   noCaps: true,
   rounded: true,
+  loading: false,
 })
 </script>
 

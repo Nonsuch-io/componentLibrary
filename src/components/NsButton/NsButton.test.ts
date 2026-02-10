@@ -42,4 +42,16 @@ describe('NsButton', () => {
     const qBtn = wrapper.find('.q-btn')
     expect(qBtn.classes()).toContain('disabled')
   })
+
+  it('shows loading state when loading prop is true', () => {
+    const wrapper = mountButton({ loading: true })
+    // QBtn renders a loading indicator element when loading
+    expect(wrapper.find('.q-spinner').exists() || wrapper.find('.q-spinner-dots').exists()).toBe(true)
+  })
+
+  it('does not show loading state by default', () => {
+    const wrapper = mountButton()
+    const qBtn = wrapper.find('.q-btn')
+    expect(qBtn.attributes('aria-disabled')).toBeUndefined()
+  })
 })

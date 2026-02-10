@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import NsButton from './NsButton.vue'
+import { NsSkeleton } from '../NsSkeleton'
 
 const meta = {
   title: 'Components/NsButton',
@@ -27,6 +28,10 @@ const meta = {
     rounded: {
       control: 'boolean',
       description: 'Apply rounded border-radius',
+    },
+    loading: {
+      control: 'boolean',
+      description: 'Show loading spinner overlay',
     },
   },
 } satisfies Meta<typeof NsButton>
@@ -81,5 +86,46 @@ export const WithIcon: Story = {
   render: () => ({
     components: { NsButton },
     template: '<NsButton icon="send">Send</NsButton>',
+  }),
+}
+
+export const Loading: Story = {
+  args: {
+    loading: true,
+  },
+  render: (args) => ({
+    components: { NsButton },
+    setup() {
+      return { args }
+    },
+    template: '<NsButton v-bind="args">Submit</NsButton>',
+  }),
+}
+
+export const LoadingSizes: Story = {
+  render: () => ({
+    components: { NsButton },
+    template: `
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <NsButton size="xs" loading>Extra Small</NsButton>
+        <NsButton size="sm" loading>Small</NsButton>
+        <NsButton size="md" loading>Medium</NsButton>
+        <NsButton size="lg" loading>Large</NsButton>
+        <NsButton size="xl" loading>Extra Large</NsButton>
+      </div>
+    `,
+  }),
+}
+
+export const SkeletonPlaceholder: Story = {
+  render: () => ({
+    components: { NsSkeleton },
+    template: `
+      <div style="display: flex; gap: 8px; align-items: center;">
+        <NsSkeleton type="QBtn" />
+        <NsSkeleton type="QBtn" width="120px" />
+        <NsSkeleton type="QBtn" width="160px" />
+      </div>
+    `,
   }),
 }
