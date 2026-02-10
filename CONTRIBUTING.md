@@ -278,6 +278,63 @@ For headings or large display text, use `Fixel Display` instead:
 
 Font files live in `fonts/files/` — see the README there for details on adding weights.
 
+### Strings & i18n
+
+The library **does not depend on vue-i18n**. Instead we follow the same pattern as Quasar, Vuetify, and PrimeVue — we ship our own locale system and let consuming apps integrate it.
+
+**The rule:** Every user-visible string a component introduces should:
+
+1. Be accepted as an **optional prop** (highest priority)
+2. Fall back to the **injected Ns locale** (via `provideNsLocale`)
+3. Fall back to the **built-in English default** (`nsLocaleEnCA`)
+
+For Quasar-originated strings (e.g. "Close", "Clear"), use `$q.lang.*` directly — don't duplicate them.
+
+**Adding a new Ns string:**
+
+1. Add the key to the `NsLocaleMessages` interface in `src/locale/NsLocaleMessages.ts`
+2. Add the English default to `src/locale/en-CA.ts` (and French to `src/locale/fr-CA.ts`)
+3. In your component, use the `useNsDefault` composable:
+
+```ts
+import { useNsDefault } from '../../composables/useNsDefaults'
+
+const props = defineProps<{ addToCartLabel?: string }>()
+const addToCartText = useNsDefault(() => props.addToCartLabel, 'product.addToCart')
+// In the template: {{ addToCartText }}
+```
+
+**Consuming apps** provide translations like this:
+
+```ts
+import { provideNsLocale } from '@nonsuch/component-library'
+provideNsLocale(myFrenchLocale)
+```
+
+Or pass translated strings directly as props: `<NsProductCard add-to-cart-label="Ajouter" />`.
+
+### RTL Support
+
+We use `postcss-rtlcss` to generate `[dir=rtl]` CSS variants in the build output. Quasar activates RTL automatically when an RTL language pack is loaded.
+
+**When writing component CSS:**
+
+- **Prefer logical properties** over physical ones:
+  - `margin-inline-start` instead of `margin-left`
+  - `padding-inline-end` instead of `padding-right`
+  - `inset-inline-start` instead of `left`
+  - `border-inline-start` instead of `border-left`
+- If you must use physical properties, `postcss-rtlcss` will auto-generate RTL variants
+- To opt a rule out of RTL flipping, add `/* rtl:ignore */`:
+
+```sass
+.ns-my-component
+  margin-left: 10px /* rtl:ignore */
+```
+
+- For directional icons, check `$q.lang.rtl` to flip them
+- Test your component in the **Utilities / RTL Support** Storybook page
+
 ## Running Quality Checks
 
 Before opening a pull request, make sure everything passes:

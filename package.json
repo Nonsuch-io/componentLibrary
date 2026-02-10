@@ -67,6 +67,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^10.7.0",
     "happy-dom": "^20.5.3",
+    "postcss-rtlcss": "^5.7.1",
     "prettier": "^3.8.1",
     "quasar": "^2.18.6",
     "sass-embedded": "^1.97.3",
