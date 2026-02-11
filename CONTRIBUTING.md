@@ -257,23 +257,59 @@ Ask yourself: **"Does this component need Nonsuch-specific defaults, styles, or 
 
 - Use `<style lang="sass" scoped>` to avoid leaking styles
 - Prefix custom classes with `ns-` (e.g., `.ns-card`, `.ns-button`)
+- **Use design tokens** (`var(--ns-*)`) instead of hardcoded values — see [Design Tokens](#design-tokens) below
 - Keep styles minimal — rely on Quasar's built-in theming where possible
 - Avoid `!important` unless absolutely necessary
 
+### Design Tokens
+
+We use CSS custom properties (prefixed `--ns-`) for all shared design values. This keeps components consistent and makes future theming/dark-mode trivial.
+
+**Importing tokens in a consumer app:**
+
+```ts
+import '@nonsuch/component-library/tokens.css'
+```
+
+**Using tokens in component styles:**
+
+```sass
+.ns-card
+  border-radius: var(--ns-radius-md)
+  box-shadow: var(--ns-shadow-sm)
+  font-family: var(--ns-font-family-text)
+  padding: var(--ns-space-4)
+```
+
+**Token categories:** colours, typography, spacing (4px grid), border-radius, shadows, motion/transitions.
+
+**Naming convention:** `--ns-{category}-{name}` — e.g. `--ns-color-primary`, `--ns-font-size-lg`, `--ns-space-4`.
+
+**Dark mode:** Dark variants are defined under `:root.dark`, `[data-theme="dark"]`, `.q-dark`, and `@media (prefers-color-scheme: dark)`. Only colour and shadow tokens change between modes.
+
+**Adding a new token:**
+
+1. Add the custom property to `src/tokens/tokens.css` under `:root` (and the dark selectors if it's a colour/shadow)
+2. Add the name to the `NsToken` union type in `src/tokens/index.ts`
+3. Add a test assertion in `src/tokens/tokens.test.ts`
+4. Update the Storybook Design Tokens page if it's a new category
+
+> **Note:** Current token values are **placeholders**. Token _names_ are stable — values will be updated when brand designs are finalised.
+
 ### Fonts
 
-We use [Fixel](https://fixel.macpaw.com/) as the Nonsuch brand font with Roboto as fallback. When styling components, use:
+We use [Fixel](https://fixel.macpaw.com/) as the Nonsuch brand font with Roboto as fallback. When styling components, use design tokens:
 
 ```sass
 .ns-my-component
-  font-family: 'Fixel Text', 'Roboto', sans-serif
+  font-family: var(--ns-font-family-text)
 ```
 
-For headings or large display text, use `Fixel Display` instead:
+For headings or large display text, use the display token:
 
 ```sass
 .ns-hero-title
-  font-family: 'Fixel Display', 'Roboto', sans-serif
+  font-family: var(--ns-font-family-display)
 ```
 
 Font files live in `fonts/files/` — see the README there for details on adding weights.

@@ -1,0 +1,236 @@
+/*
+ * Nonsuch Design Tokens
+ *
+ * CSS custom properties for the Nonsuch component library.
+ * All tokens use the `--ns-` prefix to avoid collisions with
+ * Quasar's `--q-` namespace and app-level variables.
+ *
+ * Import in your app:
+ *   import '@nonsuch/component-library/tokens.css'
+ *
+ * Current values are PLACEHOLDERS — they will be updated
+ * when brand designs are finalised. Token *names* are stable.
+ */
+
+/* --------------------------------------------------------
+ * LIGHT MODE (default)
+ * ------------------------------------------------------ */
+:root {
+  /* — Brand colours — */
+  --ns-color-primary: #3b82f6; /* PLACEHOLDER */
+  --ns-color-primary-hover: #2563eb; /* PLACEHOLDER */
+  --ns-color-secondary: #8b5cf6; /* PLACEHOLDER */
+  --ns-color-secondary-hover: #7c3aed; /* PLACEHOLDER */
+  --ns-color-accent: #f59e0b; /* PLACEHOLDER */
+  --ns-color-accent-hover: #d97706; /* PLACEHOLDER */
+
+  /* — Semantic colours — */
+  --ns-color-success: #22c55e; /* PLACEHOLDER */
+  --ns-color-warning: #f59e0b; /* PLACEHOLDER */
+  --ns-color-error: #ef4444; /* PLACEHOLDER */
+  --ns-color-info: #3b82f6; /* PLACEHOLDER */
+
+  /* — Surface / background — */
+  --ns-color-background: #ffffff; /* PLACEHOLDER */
+  --ns-color-surface: #ffffff; /* PLACEHOLDER */
+  --ns-color-surface-variant: #f8fafc; /* PLACEHOLDER */
+
+  /* — On-colours (text/icons on top of the corresponding colour) — */
+  --ns-color-on-primary: #ffffff; /* PLACEHOLDER */
+  --ns-color-on-secondary: #ffffff; /* PLACEHOLDER */
+  --ns-color-on-accent: #000000; /* PLACEHOLDER */
+  --ns-color-on-background: #0f172a; /* PLACEHOLDER */
+  --ns-color-on-surface: #0f172a; /* PLACEHOLDER */
+
+  /* — Neutral scale — */
+  --ns-color-neutral-50: #f8fafc; /* PLACEHOLDER */
+  --ns-color-neutral-100: #f1f5f9; /* PLACEHOLDER */
+  --ns-color-neutral-200: #e2e8f0; /* PLACEHOLDER */
+  --ns-color-neutral-300: #cbd5e1; /* PLACEHOLDER */
+  --ns-color-neutral-400: #94a3b8; /* PLACEHOLDER */
+  --ns-color-neutral-500: #64748b; /* PLACEHOLDER */
+  --ns-color-neutral-600: #475569; /* PLACEHOLDER */
+  --ns-color-neutral-700: #334155; /* PLACEHOLDER */
+  --ns-color-neutral-800: #1e293b; /* PLACEHOLDER */
+  --ns-color-neutral-900: #0f172a; /* PLACEHOLDER */
+
+  /* — Typography — */
+  --ns-font-family-text: 'Fixel Text', 'Roboto', sans-serif; /* PLACEHOLDER */
+  --ns-font-family-display: 'Fixel Display', 'Roboto', sans-serif; /* PLACEHOLDER */
+
+  --ns-font-size-xs: 0.75rem; /* 12px — PLACEHOLDER */
+  --ns-font-size-sm: 0.875rem; /* 14px — PLACEHOLDER */
+  --ns-font-size-md: 1rem; /* 16px — PLACEHOLDER */
+  --ns-font-size-lg: 1.125rem; /* 18px — PLACEHOLDER */
+  --ns-font-size-xl: 1.25rem; /* 20px — PLACEHOLDER */
+  --ns-font-size-2xl: 1.5rem; /* 24px — PLACEHOLDER */
+  --ns-font-size-3xl: 1.875rem; /* 30px — PLACEHOLDER */
+
+  --ns-font-weight-regular: 400; /* PLACEHOLDER */
+  --ns-font-weight-medium: 500; /* PLACEHOLDER */
+  --ns-font-weight-semibold: 600; /* PLACEHOLDER */
+  --ns-font-weight-bold: 700; /* PLACEHOLDER */
+
+  --ns-line-height-tight: 1.25; /* PLACEHOLDER */
+  --ns-line-height-normal: 1.5; /* PLACEHOLDER */
+  --ns-line-height-relaxed: 1.75; /* PLACEHOLDER */
+
+  --ns-letter-spacing-tight: -0.01em; /* PLACEHOLDER */
+  --ns-letter-spacing-normal: 0; /* PLACEHOLDER */
+  --ns-letter-spacing-wide: 0.02em; /* PLACEHOLDER */
+
+  /* — Spacing (4px grid) — */
+  --ns-space-1: 0.25rem; /* 4px */
+  --ns-space-2: 0.5rem; /* 8px */
+  --ns-space-3: 0.75rem; /* 12px */
+  --ns-space-4: 1rem; /* 16px */
+  --ns-space-5: 1.25rem; /* 20px */
+  --ns-space-6: 1.5rem; /* 24px */
+  --ns-space-8: 2rem; /* 32px */
+  --ns-space-10: 2.5rem; /* 40px */
+  --ns-space-12: 3rem; /* 48px */
+  --ns-space-16: 4rem; /* 64px */
+
+  /* — Border radius — */
+  --ns-radius-none: 0;
+  --ns-radius-sm: 0.25rem; /* 4px — PLACEHOLDER */
+  --ns-radius-md: 0.5rem; /* 8px — PLACEHOLDER */
+  --ns-radius-lg: 0.75rem; /* 12px — PLACEHOLDER */
+  --ns-radius-xl: 1rem; /* 16px — PLACEHOLDER */
+  --ns-radius-full: 9999px;
+
+  /* — Shadows / elevation — */
+  --ns-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* PLACEHOLDER */
+  --ns-shadow-md:
+    0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* PLACEHOLDER */
+  --ns-shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* PLACEHOLDER */
+  --ns-shadow-xl:
+    0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); /* PLACEHOLDER */
+
+  /* — Motion / transitions — */
+  --ns-duration-fast: 100ms; /* PLACEHOLDER */
+  --ns-duration-normal: 200ms; /* PLACEHOLDER */
+  --ns-duration-slow: 400ms; /* PLACEHOLDER */
+
+  --ns-easing-default: cubic-bezier(0.4, 0, 0.2, 1); /* PLACEHOLDER */
+  --ns-easing-in: cubic-bezier(0.4, 0, 1, 1); /* PLACEHOLDER */
+  --ns-easing-out: cubic-bezier(0, 0, 0.2, 1); /* PLACEHOLDER */
+  --ns-easing-in-out: cubic-bezier(0.4, 0, 0.2, 1); /* PLACEHOLDER */
+}
+
+/* --------------------------------------------------------
+ * DARK MODE
+ *
+ * Activated by any of:
+ *   <html class="dark">
+ *   <html data-theme="dark">
+ *   OS-level prefers-color-scheme: dark
+ *
+ * Only colour tokens change — typography, spacing, radius,
+ * and motion are shared between modes.
+ * ------------------------------------------------------ */
+:root.dark,
+[data-theme='dark'],
+.q-dark {
+  /* — Brand colours (dark) — */
+  --ns-color-primary: #60a5fa; /* PLACEHOLDER */
+  --ns-color-primary-hover: #93c5fd; /* PLACEHOLDER */
+  --ns-color-secondary: #a78bfa; /* PLACEHOLDER */
+  --ns-color-secondary-hover: #c4b5fd; /* PLACEHOLDER */
+  --ns-color-accent: #fbbf24; /* PLACEHOLDER */
+  --ns-color-accent-hover: #fcd34d; /* PLACEHOLDER */
+
+  /* — Semantic colours (dark) — */
+  --ns-color-success: #4ade80; /* PLACEHOLDER */
+  --ns-color-warning: #fbbf24; /* PLACEHOLDER */
+  --ns-color-error: #f87171; /* PLACEHOLDER */
+  --ns-color-info: #60a5fa; /* PLACEHOLDER */
+
+  /* — Surface / background (dark) — */
+  --ns-color-background: #0f172a; /* PLACEHOLDER */
+  --ns-color-surface: #1e293b; /* PLACEHOLDER */
+  --ns-color-surface-variant: #334155; /* PLACEHOLDER */
+
+  /* — On-colours (dark) — */
+  --ns-color-on-primary: #0f172a; /* PLACEHOLDER */
+  --ns-color-on-secondary: #0f172a; /* PLACEHOLDER */
+  --ns-color-on-accent: #0f172a; /* PLACEHOLDER */
+  --ns-color-on-background: #f1f5f9; /* PLACEHOLDER */
+  --ns-color-on-surface: #f1f5f9; /* PLACEHOLDER */
+
+  /* — Neutral scale (dark — inverted) — */
+  --ns-color-neutral-50: #0f172a; /* PLACEHOLDER */
+  --ns-color-neutral-100: #1e293b; /* PLACEHOLDER */
+  --ns-color-neutral-200: #334155; /* PLACEHOLDER */
+  --ns-color-neutral-300: #475569; /* PLACEHOLDER */
+  --ns-color-neutral-400: #64748b; /* PLACEHOLDER */
+  --ns-color-neutral-500: #94a3b8; /* PLACEHOLDER */
+  --ns-color-neutral-600: #cbd5e1; /* PLACEHOLDER */
+  --ns-color-neutral-700: #e2e8f0; /* PLACEHOLDER */
+  --ns-color-neutral-800: #f1f5f9; /* PLACEHOLDER */
+  --ns-color-neutral-900: #f8fafc; /* PLACEHOLDER */
+
+  /* — Shadows (dark — lighter opacity looks better on dark bg) — */
+  --ns-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3); /* PLACEHOLDER */
+  --ns-shadow-md:
+    0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3); /* PLACEHOLDER */
+  --ns-shadow-lg:
+    0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3); /* PLACEHOLDER */
+  --ns-shadow-xl:
+    0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.3); /* PLACEHOLDER */
+}
+
+/* --------------------------------------------------------
+ * prefers-color-scheme fallback
+ *
+ * Applies dark tokens when the OS is in dark mode and
+ * no explicit class/attribute override is set.
+ * ------------------------------------------------------ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']):not(.light) {
+    /* — Brand colours (dark) — */
+    --ns-color-primary: #60a5fa;
+    --ns-color-primary-hover: #93c5fd;
+    --ns-color-secondary: #a78bfa;
+    --ns-color-secondary-hover: #c4b5fd;
+    --ns-color-accent: #fbbf24;
+    --ns-color-accent-hover: #fcd34d;
+
+    /* — Semantic colours (dark) — */
+    --ns-color-success: #4ade80;
+    --ns-color-warning: #fbbf24;
+    --ns-color-error: #f87171;
+    --ns-color-info: #60a5fa;
+
+    /* — Surface / background (dark) — */
+    --ns-color-background: #0f172a;
+    --ns-color-surface: #1e293b;
+    --ns-color-surface-variant: #334155;
+
+    /* — On-colours (dark) — */
+    --ns-color-on-primary: #0f172a;
+    --ns-color-on-secondary: #0f172a;
+    --ns-color-on-accent: #0f172a;
+    --ns-color-on-background: #f1f5f9;
+    --ns-color-on-surface: #f1f5f9;
+
+    /* — Neutral scale (dark — inverted) — */
+    --ns-color-neutral-50: #0f172a;
+    --ns-color-neutral-100: #1e293b;
+    --ns-color-neutral-200: #334155;
+    --ns-color-neutral-300: #475569;
+    --ns-color-neutral-400: #64748b;
+    --ns-color-neutral-500: #94a3b8;
+    --ns-color-neutral-600: #cbd5e1;
+    --ns-color-neutral-700: #e2e8f0;
+    --ns-color-neutral-800: #f1f5f9;
+    --ns-color-neutral-900: #f8fafc;
+
+    /* — Shadows (dark) — */
+    --ns-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --ns-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+    --ns-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+    --ns-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.3);
+  }
+}

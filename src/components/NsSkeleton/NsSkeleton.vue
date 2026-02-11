@@ -72,5 +72,5 @@ withDefaults(defineProps<NsSkeletonProps>(), {
 
 <style lang="sass" scoped>
 .ns-skeleton
-  border-radius: 8px
+  border-radius: var(--ns-radius-md)
 </style>

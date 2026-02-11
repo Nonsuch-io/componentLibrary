@@ -14,7 +14,7 @@
 
 /* Apply Fixel Text as the default body font */
 body {
-  font-family: 'Fixel Text', 'Roboto', sans-serif;
+  font-family: var(--ns-font-family-text, 'Fixel Text', 'Roboto', sans-serif);
 }
 
 /* Apply Fixel Display to headings */
@@ -30,5 +30,5 @@ h6,
 .text-h4,
 .text-h5,
 .text-h6 {
-  font-family: 'Fixel Display', 'Roboto', sans-serif;
+  font-family: var(--ns-font-family-display, 'Fixel Display', 'Roboto', sans-serif);
 }

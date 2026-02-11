@@ -9,6 +9,9 @@ import '@quasar/extras/material-icons/material-icons.css'
 // Nonsuch fonts (Fixel) — global applies Fixel to body + headings
 import '../fonts/global.css'
 
+// Nonsuch design tokens (CSS custom properties)
+import '../src/tokens/tokens.css'
+
 // Register Quasar plugin for all stories
 setup((app) => {
   app.use(Quasar, {

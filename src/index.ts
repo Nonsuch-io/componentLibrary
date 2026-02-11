@@ -18,3 +18,7 @@ export { nsLocaleFrCA } from './locale/fr-CA'
 // Composables
 export { provideNsLocale, useNsLocale, NsLocaleKey } from './composables/useNsLocale'
 export { useNsDefault } from './composables/useNsDefaults'
+
+// Tokens
+export type { NsToken } from './tokens'
+export { getToken } from './tokens'
