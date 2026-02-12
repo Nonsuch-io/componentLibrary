@@ -86,6 +86,77 @@ Or use Quasar components directly — they aren't re-exported through this libra
 import { QInput, QSelect } from 'quasar'
 ```
 
+### Translations (i18n)
+
+The library ships its own locale system — **no dependency on vue-i18n**. Components that render user-visible text accept optional string props with built-in defaults from the active locale.
+
+**Built-in locales:** `en-CA` (default) and `fr-CA`.
+
+**Option 1: Use the defaults** — components use English (Canada) strings out of the box with no setup:
+
+```vue
+<NsButton>Add to cart</NsButton>
+<!-- internal labels like loading text already default to English -->
+```
+
+**Option 2: Switch locale globally** — provide a locale pack at the app root:
+
+```ts
+import { createApp } from 'vue'
+import { provideNsLocale, nsLocaleFrCA } from '@nonsuch/component-library'
+
+const app = createApp(App)
+
+// Inside your root component's setup():
+provideNsLocale(nsLocaleFrCA)
+```
+
+**Option 3: Custom / partial locale** — supply your own translations by implementing the `NsLocaleMessages` interface:
+
+```ts
+import type { NsLocaleMessages } from '@nonsuch/component-library'
+import { nsLocaleEnCA, provideNsLocale } from '@nonsuch/component-library'
+
+const myLocale: NsLocaleMessages = {
+  ...nsLocaleEnCA,
+  product: {
+    ...nsLocaleEnCA.product,
+    addToCart: 'Add to bag', // override just what you need
+  },
+}
+
+provideNsLocale(myLocale)
+```
+
+**Option 4: Override per-component** — pass a string prop directly to bypass the locale:
+
+```vue
+<!-- This label is always "Ajouter" regardless of the active locale -->
+<NsButton label="Ajouter" />
+```
+
+The locale interface covers four sections: `common`, `product`, `media`, and `validation`. See the full type in `NsLocaleMessages`.
+
+### Design Tokens (Optional)
+
+Import CSS custom properties for colours, typography, spacing, border-radius, shadows, and motion:
+
+```ts
+import '@nonsuch/component-library/tokens.css'
+```
+
+All tokens use the `--ns-` prefix and support light/dark mode automatically. Current values are placeholders — token names are stable.
+
+```css
+.my-card {
+  border-radius: var(--ns-radius-md);
+  box-shadow: var(--ns-shadow-sm);
+  padding: var(--ns-space-4);
+}
+```
+
+Dark mode activates via `class="dark"`, `data-theme="dark"`, Quasar's `.q-dark`, or `prefers-color-scheme: dark`.
+
 ## Development
 
 ```bash
