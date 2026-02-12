@@ -44,3 +44,34 @@ bd sync               # Sync with git
 - NEVER stop before pushing - that leaves work stranded locally
 - NEVER say "ready to push when you are" - YOU must push
 - If push fails, resolve and retry until it succeeds
+
+## Auditing Closed Work
+
+**Before closing a beads issue**, verify the work actually landed. This prevents "closed but not done" drift.
+
+**Per-issue checklist:**
+
+1. **Code exists** — The files/exports/configs described in the issue are present in the repo
+2. **Tests cover it** — New functionality has corresponding test assertions that pass
+3. **No stale references** — grep for old names, removed files, or dead imports (this has bitten us before — e.g., renaming `en-US` to `en-CA` but missing `locale.test.ts`)
+4. **Exports are wired** — If the feature is consumer-facing, verify `src/index.ts` exports and `package.json` `exports` map include it
+5. **Docs updated** — CONTRIBUTING.md reflects the new patterns; Storybook stories exist if applicable
+6. **Quality gates pass** — `pnpm format:check && pnpm typecheck && pnpm lint && pnpm test && pnpm build` all green
+
+**Batch audit (end of session or milestone):**
+
+```bash
+# 1. List recently closed issues
+bd list -s closed --pretty
+
+# 2. Run full quality gates
+pnpm format:check && pnpm typecheck && pnpm lint && pnpm test && pnpm build
+
+# 3. Verify no orphan references to removed code
+grep -r 'TERM_THAT_SHOULD_NOT_EXIST' src/ --include='*.ts' --include='*.vue'
+
+# 4. Confirm everything is pushed
+git status  # "up to date with origin"
+```
+
+**If an issue fails audit:** reopen it with `bd reopen <id> --reason "..."`, fix the gap, then re-close.
