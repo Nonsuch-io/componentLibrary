@@ -35,8 +35,8 @@ import '@nonsuch/component-library/tokens.css'
 import 'quasar/src/css/index.sass'
 
 const app = createApp(App)
-app.use(Quasar, createQuasarConfig())  // Token-aligned Quasar brand colours
-app.use(createNonsuch())               // Locale + library setup
+app.use(Quasar, createQuasarConfig()) // Token-aligned Quasar brand colours
+app.use(createNonsuch()) // Locale + library setup
 app.mount('#app')
 ```
 
@@ -74,10 +74,13 @@ app.use(createNonsuch({ locale: nsLocaleFrCA }))
 ```ts
 import { createQuasarConfig } from '@nonsuch/component-library'
 
-app.use(Quasar, createQuasarConfig({
-  brand: { primary: '#1a73e8' },
-  plugins: { Notify: {} },
-}))
+app.use(
+  Quasar,
+  createQuasarConfig({
+    brand: { primary: '#1a73e8' },
+    plugins: { Notify: {} },
+  }),
+)
 ```
 
 ### Dark Mode
@@ -245,22 +248,22 @@ pnpm build:storybook
 
 ```markdown
 src/
-  index.ts             # Library entry — exports all public API
-  plugin.ts            # createNonsuch() Vue plugin
-  quasarConfig.ts      # createQuasarConfig() helper
-  components/
-    NsButton/          # Styled QBtn wrapper
-    NsCard/            # Card with title/subtitle/actions slots
-    NsInput/           # Styled QInput wrapper
-    NsSkeleton/        # Loading skeleton with animation
-    NsThemeProvider/   # Renderless locale provider
-  composables/
-    useNsLocale.ts     # Locale injection/provision
-    useNsDarkMode.ts   # Dark mode with persistence
-    useNsDefaults.ts   # Default value helper
-  locale/              # en-CA, fr-CA string packs
-  tokens/              # Design token CSS + TS helpers
-  fonts/               # Fixel font files + CSS
+index.ts # Library entry — exports all public API
+plugin.ts # createNonsuch() Vue plugin
+quasarConfig.ts # createQuasarConfig() helper
+components/
+NsButton/ # Styled QBtn wrapper
+NsCard/ # Card with title/subtitle/actions slots
+NsInput/ # Styled QInput wrapper
+NsSkeleton/ # Loading skeleton with animation
+NsThemeProvider/ # Renderless locale provider
+composables/
+useNsLocale.ts # Locale injection/provision
+useNsDarkMode.ts # Dark mode with persistence
+useNsDefaults.ts # Default value helper
+locale/ # en-CA, fr-CA string packs
+tokens/ # Design token CSS + TS helpers
+fonts/ # Fixel font files + CSS
 ```
 
 Each custom component lives in its own directory with co-located story and test files. The `Ns` prefix distinguishes library components from Quasar's `Q` prefix.
