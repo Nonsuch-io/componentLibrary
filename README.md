@@ -12,9 +12,9 @@ pnpm add @nonsuch/component-library
 pnpm add quasar @quasar/extras @quasar/vite-plugin
 ```
 
-### Vite Configuration
+### Quick Start (Recommended)
 
-In your `vite.config.ts`, register the Quasar Vite plugin as usual:
+#### Vite Configuration
 
 ```ts
 import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
@@ -25,24 +25,88 @@ export default defineConfig({
 })
 ```
 
-### App Entry
-
-Register Quasar in your Vue app:
+#### App Entry
 
 ```ts
 import { createApp } from 'vue'
 import { Quasar } from 'quasar'
+import { createNonsuch, createQuasarConfig } from '@nonsuch/component-library'
+import '@nonsuch/component-library/tokens.css'
 import 'quasar/src/css/index.sass'
 
 const app = createApp(App)
-app.use(Quasar, { plugins: {} })
+app.use(Quasar, createQuasarConfig())  // Token-aligned Quasar brand colours
+app.use(createNonsuch())               // Locale + library setup
+app.mount('#app')
 ```
 
-Then import custom components as needed:
+That's it — components, tokens, locale (defaults to `en-CA`), and Quasar brand colours are all wired up.
+
+#### Use Components
+
+```vue
+<script setup>
+import { NsButton, NsInput, NsCard } from '@nonsuch/component-library'
+</script>
+
+<template>
+  <NsCard title="Welcome">
+    <NsInput v-model="name" label="Your name" />
+    <template #actions>
+      <NsButton label="Submit" />
+    </template>
+  </NsCard>
+</template>
+```
+
+### Plugin Options
+
+`createNonsuch()` accepts options for locale:
 
 ```ts
-import { NsButton } from '@nonsuch/component-library'
+import { createNonsuch, nsLocaleFrCA } from '@nonsuch/component-library'
+
+app.use(createNonsuch({ locale: nsLocaleFrCA }))
 ```
+
+`createQuasarConfig()` accepts brand colour overrides and extra Quasar config:
+
+```ts
+import { createQuasarConfig } from '@nonsuch/component-library'
+
+app.use(Quasar, createQuasarConfig({
+  brand: { primary: '#1a73e8' },
+  plugins: { Notify: {} },
+}))
+```
+
+### Dark Mode
+
+```ts
+import { useNsDarkMode } from '@nonsuch/component-library'
+
+const { isDark, toggle, useSystem } = useNsDarkMode()
+```
+
+The composable persists the user's choice to `localStorage` and syncs with `prefers-color-scheme`. Design tokens switch automatically via the `dark` class on `<html>`.
+
+### NsThemeProvider
+
+For section-level locale overrides without a plugin:
+
+```vue
+<script setup>
+import { NsThemeProvider, nsLocaleFrCA } from '@nonsuch/component-library'
+</script>
+
+<template>
+  <NsThemeProvider :locale="nsLocaleFrCA">
+    <!-- All Ns components here use French strings -->
+  </NsThemeProvider>
+</template>
+```
+
+### Manual Setup (Advanced)
 
 ### Fonts (Optional)
 
@@ -181,13 +245,22 @@ pnpm build:storybook
 
 ```markdown
 src/
-index.ts # Library entry — exports all custom components
-components/
-NsButton/
-NsButton.vue # Component implementation
-NsButton.stories.ts # Storybook story
-NsButton.test.ts # Vitest unit test
-index.ts # Re-export
+  index.ts             # Library entry — exports all public API
+  plugin.ts            # createNonsuch() Vue plugin
+  quasarConfig.ts      # createQuasarConfig() helper
+  components/
+    NsButton/          # Styled QBtn wrapper
+    NsCard/            # Card with title/subtitle/actions slots
+    NsInput/           # Styled QInput wrapper
+    NsSkeleton/        # Loading skeleton with animation
+    NsThemeProvider/   # Renderless locale provider
+  composables/
+    useNsLocale.ts     # Locale injection/provision
+    useNsDarkMode.ts   # Dark mode with persistence
+    useNsDefaults.ts   # Default value helper
+  locale/              # en-CA, fr-CA string packs
+  tokens/              # Design token CSS + TS helpers
+  fonts/               # Fixel font files + CSS
 ```
 
 Each custom component lives in its own directory with co-located story and test files. The `Ns` prefix distinguishes library components from Quasar's `Q` prefix.
