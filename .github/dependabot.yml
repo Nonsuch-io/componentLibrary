@@ -1,0 +1,42 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    groups:
+      storybook:
+        patterns:
+          - '@storybook/*'
+          - storybook
+      testing:
+        patterns:
+          - vitest
+          - '@vue/test-utils'
+          - happy-dom
+      linting:
+        patterns:
+          - eslint
+          - eslint-*
+          - prettier
+          - typescript-eslint
+      build:
+        patterns:
+          - vite
+          - '@vitejs/*'
+          - vue-tsc
+          - typescript
+          - sass-embedded
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels:
+      - dependencies
+      - ci
