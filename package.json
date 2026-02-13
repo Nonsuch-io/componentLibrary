@@ -65,6 +65,7 @@
     "@quasar/vite-plugin": "^1.10.0",
     "@storybook/vue3-vite": "^10.2.7",
     "@vitejs/plugin-vue": "^6.0.4",
+    "@vitest/coverage-v8": "^4.0.18",
     "@vue/test-utils": "^2.4.6",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",

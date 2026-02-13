@@ -24,8 +24,22 @@ export default defineConfig({
     include: ['src/**/*.test.ts'],
     coverage: {
       provider: 'v8',
-      include: ['src/components/**/*.vue', 'src/components/**/*.ts'],
-      exclude: ['**/*.stories.ts', '**/*.test.ts'],
+      include: [
+        'src/components/**/*.vue',
+        'src/components/**/*.ts',
+        'src/composables/**/*.ts',
+        'src/locale/**/*.ts',
+        'src/tokens/**/*.ts',
+        'src/plugin.ts',
+        'src/quasarConfig.ts',
+      ],
+      exclude: ['**/*.stories.ts', '**/*.test.ts', '**/index.ts'],
+      thresholds: {
+        lines: 80,
+        functions: 80,
+        branches: 75,
+        statements: 80,
+      },
     },
   },
 })

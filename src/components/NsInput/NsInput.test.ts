@@ -35,4 +35,28 @@ describe('NsInput', () => {
     const input = wrapper.find('input')
     expect(input.attributes('placeholder')).toBe('Type here...')
   })
+
+  it('binds modelValue to q-input', () => {
+    const wrapper = mount(NsInput, {
+      props: { modelValue: 'hello' },
+    })
+    const input = wrapper.find('input')
+    expect(input.element.value).toBe('hello')
+  })
+
+  it('emits update:modelValue on input', async () => {
+    const wrapper = mount(NsInput, {
+      props: { modelValue: '' },
+    })
+    const input = wrapper.find('input')
+    await input.setValue('new value')
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+  })
+
+  it('forwards slots to q-input', () => {
+    const wrapper = mount(NsInput, {
+      slots: { prepend: '<span class="test-prepend">$</span>' },
+    })
+    expect(wrapper.find('.test-prepend').exists()).toBe(true)
+  })
 })
