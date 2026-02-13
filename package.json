@@ -85,6 +85,7 @@
     "vue": "^3.5.27",
     "vue-tsc": "^3.2.4"
   },
+  "packageManager": "pnpm@10.29.2",
   "lint-staged": {
     "*.{ts,vue}": "eslint --fix",
     "*.{ts,vue,json,md,css,scss,sass,html,yaml,yml}": "prettier --write"
