@@ -252,11 +252,21 @@ src/
   plugin.ts               # createNonsuch() Vue plugin
   quasarConfig.ts         # createQuasarConfig() helper
   components/
+    NsAvatar/             # Avatar with size presets
+    NsBanner/             # Info/success/warning/error banners
     NsButton/             # Styled QBtn wrapper
     NsCard/               # Card with title/subtitle/actions slots
+    NsCheckbox/           # Styled QCheckbox wrapper
+    NsChip/               # Tag/filter chip
+    NsDialog/             # Modal dialog with header/body/actions
+    NsForm/               # Form wrapper with validation
     NsInput/              # Styled QInput wrapper
+    NsList/               # List with separator defaults
+    NsSelect/             # Styled QSelect dropdown
     NsSkeleton/           # Loading skeleton with animation
     NsThemeProvider/      # Renderless locale provider
+    NsToggle/             # Styled QToggle switch
+    NsTooltip/            # Tooltip with consistent delays
   composables/
     useNsLocale.ts        # Locale injection/provision
     useNsDarkMode.ts      # Dark mode with persistence
