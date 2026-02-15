@@ -61,4 +61,17 @@ describe('NsCard', () => {
     })
     expect(wrapper.find('.custom-header').text()).toBe('Custom!')
   })
+
+  it('renders title, subtitle, and actions together', () => {
+    const wrapper = mount(NsCard, {
+      props: { title: 'Full Card', subtitle: 'With everything' },
+      slots: {
+        default: 'Full body',
+        actions: '<button>Action</button>',
+      },
+    })
+    expect(wrapper.text()).toContain('Full Card')
+    expect(wrapper.text()).toContain('With everything')
+    expect(wrapper.find('.q-card__actions').exists()).toBe(true)
+  })
 })

@@ -32,4 +32,18 @@ describe('NsForm', () => {
     await wrapper.find('form').trigger('submit')
     expect(wrapper.emitted('submit')).toBeTruthy()
   })
+
+  it('emits validationError when q-form fires validation-error', async () => {
+    const wrapper = mount(NsForm)
+    // Simulate QForm emitting the validation-error event
+    const qForm = wrapper.findComponent({ name: 'QForm' })
+    qForm.vm.$emit('validation-error', { field: 'email' })
+    expect(wrapper.emitted('validationError')).toBeTruthy()
+    expect(wrapper.emitted('validationError')![0]).toEqual([{ field: 'email' }])
+  })
+
+  it('accepts greedy prop', () => {
+    const wrapper = mount(NsForm, { props: { greedy: true } })
+    expect(wrapper.find('.ns-form').exists()).toBe(true)
+  })
 })

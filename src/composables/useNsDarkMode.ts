@@ -42,7 +42,8 @@ export function useNsDarkMode(): UseNsDarkModeReturn {
   const isDark = ref(false)
   const source = ref<DarkModeSource>('system')
   let mediaQuery: MediaQueryList | null = null
-  let mediaHandler: ((e: MediaQueryListEvent) => void) | null = null
+  // Initialise as no-op so cleanup never needs a null check
+  let mediaHandler: (e: MediaQueryListEvent) => void = () => {}
 
   function applyDark(dark: boolean) {
     isDark.value = dark
@@ -133,9 +134,7 @@ export function useNsDarkMode(): UseNsDarkModeReturn {
   onMounted(init)
 
   onUnmounted(() => {
-    if (mediaQuery && mediaHandler) {
-      mediaQuery.removeEventListener('change', mediaHandler)
-    }
+    mediaQuery?.removeEventListener('change', mediaHandler)
   })
 
   return {

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest'
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
 import { useNsDarkMode } from './useNsDarkMode'
@@ -18,12 +18,52 @@ function mountDarkMode() {
   return { result, wrapper }
 }
 
+/**
+ * Mount with a mocked matchMedia that captures the 'change' listener.
+ * Returns the result plus a `fireChange` helper to invoke the handler.
+ */
+function mountWithMediaSpy() {
+  let changeHandler: ((e: MediaQueryListEvent) => void) | undefined
+  const fakeMql = {
+    matches: false,
+    media: '(prefers-color-scheme: dark)',
+    addEventListener: (event: string, handler: (e: MediaQueryListEvent) => void) => {
+      if (event === 'change') changeHandler = handler
+    },
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+  } as unknown as MediaQueryList
+
+  const spy = vi.spyOn(window, 'matchMedia').mockReturnValue(fakeMql)
+
+  const { result, wrapper } = mountDarkMode()
+
+  function fireChange(matches: boolean) {
+    if (!changeHandler) throw new Error('No change handler registered')
+    changeHandler(
+      new MediaQueryListEvent('change', {
+        matches,
+        media: '(prefers-color-scheme: dark)',
+      }),
+    )
+  }
+
+  return { result, wrapper, fireChange, spy, fakeMql }
+}
+
 describe('useNsDarkMode', () => {
   beforeEach(() => {
     // Reset document state
     document.documentElement.classList.remove('dark')
     document.documentElement.removeAttribute('data-theme')
     localStorage.removeItem('ns-dark-mode')
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
   })
 
   it('defaults to light mode when no stored preference and system is light', () => {
@@ -120,41 +160,107 @@ describe('useNsDarkMode', () => {
   })
 
   it('follows system preference change when no stored preference', () => {
-    const { result } = mountDarkMode()
+    const { result, fireChange, spy } = mountWithMediaSpy()
 
-    // No stored preference — source should be system
     expect(result.source.value).toBe('system')
     expect(localStorage.getItem('ns-dark-mode')).toBeNull()
 
-    // Simulate OS dark mode change via matchMedia event
-    const mql = window.matchMedia('(prefers-color-scheme: dark)')
-    const event = new MediaQueryListEvent('change', {
-      matches: true,
-      media: '(prefers-color-scheme: dark)',
-    })
-    mql.dispatchEvent(event)
+    // Fire a system dark-mode change — should follow since no stored pref
+    fireChange(true)
 
-    // Should follow system since no stored preference
+    expect(result.isDark.value).toBe(true)
     expect(result.source.value).toBe('system')
+    spy.mockRestore()
   })
 
   it('ignores system preference change event when user has stored preference', () => {
-    const { result } = mountDarkMode()
+    const { result, fireChange, spy } = mountWithMediaSpy()
 
     // User explicitly sets preference
     result.enable()
     expect(localStorage.getItem('ns-dark-mode')).toBe('true')
 
-    // Simulate OS preference change
-    const mql = window.matchMedia('(prefers-color-scheme: dark)')
-    const event = new MediaQueryListEvent('change', {
-      matches: false,
-      media: '(prefers-color-scheme: dark)',
-    })
-    mql.dispatchEvent(event)
+    // System fires light-mode change — should be ignored
+    fireChange(false)
 
     // Should stay dark because user preference overrides system
     expect(result.isDark.value).toBe(true)
     expect(result.source.value).toBe('user')
+    spy.mockRestore()
+  })
+
+  it('removes media query listener on unmount', () => {
+    const { wrapper, fakeMql, spy } = mountWithMediaSpy()
+    wrapper.unmount()
+    expect(fakeMql.removeEventListener).toHaveBeenCalledWith('change', expect.any(Function))
+    spy.mockRestore()
+  })
+
+  describe('SSR safety guards', () => {
+    it('readStoredPreference returns null when localStorage is missing', () => {
+      const origStorage = globalThis.localStorage
+      // @ts-expect-error -- simulating SSR environment
+      delete globalThis.localStorage
+      try {
+        const { result } = mountDarkMode()
+        expect(result.isDark.value).toBe(false)
+        expect(result.source.value).toBe('system')
+      } finally {
+        globalThis.localStorage = origStorage
+      }
+    })
+
+    it('persist is a no-op when localStorage is missing', () => {
+      const origStorage = globalThis.localStorage
+      const { result } = mountDarkMode()
+      // @ts-expect-error -- simulating SSR environment
+      delete globalThis.localStorage
+      try {
+        // enable() calls persist() — should not throw without localStorage
+        result.enable()
+        expect(result.isDark.value).toBe(true)
+      } finally {
+        globalThis.localStorage = origStorage
+      }
+    })
+
+    it('clearStorage is a no-op when localStorage is missing', () => {
+      const origStorage = globalThis.localStorage
+      const { result } = mountDarkMode()
+      // @ts-expect-error -- simulating SSR environment
+      delete globalThis.localStorage
+      try {
+        // useSystem() calls clearStorage() — should not throw
+        result.useSystem()
+        expect(result.source.value).toBe('system')
+      } finally {
+        globalThis.localStorage = origStorage
+      }
+    })
+
+    it('applyDark skips DOM manipulation when document is unavailable', () => {
+      const { result } = mountDarkMode()
+      vi.stubGlobal('document', undefined)
+      try {
+        // enable() calls applyDark() which guards on typeof document
+        result.enable()
+        expect(result.isDark.value).toBe(true)
+      } finally {
+        vi.unstubAllGlobals()
+      }
+    })
+
+    it('readSystemPreference returns false when window is unavailable', () => {
+      const { result } = mountDarkMode()
+      vi.stubGlobal('window', undefined)
+      try {
+        // useSystem() calls readSystemPreference() which guards on typeof window
+        result.useSystem()
+        expect(result.isDark.value).toBe(false)
+        expect(result.source.value).toBe('system')
+      } finally {
+        vi.unstubAllGlobals()
+      }
+    })
   })
 })

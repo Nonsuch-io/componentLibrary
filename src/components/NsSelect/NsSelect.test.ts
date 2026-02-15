@@ -1,6 +1,21 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { defineComponent, h } from 'vue'
 import NsSelect from './NsSelect.vue'
+
+// Stub QSelect to render slots without dropdown portal
+const QSelectStub = defineComponent({
+  name: 'QSelect',
+  inheritAttrs: false,
+  setup(_, { slots }) {
+    return () =>
+      h('div', { class: 'q-select-stub ns-select q-field--outlined' }, [
+        slots.prepend?.(),
+        slots.append?.(),
+        slots.default?.(),
+      ])
+  },
+})
 
 describe('NsSelect', () => {
   it('renders with default props', () => {
@@ -35,10 +50,35 @@ describe('NsSelect', () => {
     expect(wrapper.find('.ns-select').exists()).toBe(true)
   })
 
-  it('forwards prepend slot to q-select', () => {
+  it('forwards slots through dynamic slot template', () => {
     const wrapper = mount(NsSelect, {
-      slots: { prepend: '<span class="test-prepend">Icon</span>' },
+      slots: {
+        prepend: '<span class="test-prepend">Icon</span>',
+      },
+      global: { stubs: { QSelect: QSelectStub } },
     })
-    expect(wrapper.find('.test-prepend').exists()).toBe(true)
+    expect(wrapper.find('.test-prepend').text()).toBe('Icon')
+  })
+
+  it('forwards multiple slots through dynamic slot template', () => {
+    const wrapper = mount(NsSelect, {
+      slots: {
+        prepend: '<span class="slot-pre">Pre</span>',
+        append: '<span class="slot-app">App</span>',
+      },
+      global: { stubs: { QSelect: QSelectStub } },
+    })
+    expect(wrapper.find('.slot-pre').exists()).toBe(true)
+    expect(wrapper.find('.slot-app').exists()).toBe(true)
+  })
+
+  it('emits update:modelValue when QSelect emits', () => {
+    const wrapper = mount(NsSelect, {
+      props: { options: ['A', 'B', 'C'] },
+    })
+    const qSelect = wrapper.findComponent({ name: 'QSelect' })
+    qSelect.vm.$emit('update:model-value', 'B')
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+    expect(wrapper.emitted('update:modelValue')![0]).toEqual(['B'])
   })
 })

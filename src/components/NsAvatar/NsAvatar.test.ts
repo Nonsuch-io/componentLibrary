@@ -35,4 +35,11 @@ describe('NsAvatar', () => {
     const style = wrapper.find('.q-avatar').attributes('style')
     expect(style).toContain('96px')
   })
+
+  it('passes through a custom size string when not a preset', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const wrapper = mount(NsAvatar, { props: { size: '128px' as any } })
+    const style = wrapper.find('.q-avatar').attributes('style')
+    expect(style).toContain('128px')
+  })
 })
