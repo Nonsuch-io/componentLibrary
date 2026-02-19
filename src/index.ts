@@ -3,25 +3,53 @@
 
 // Components
 export { default as NsButton } from './components/NsButton/NsButton.vue'
+export type { NsButtonProps } from './components/NsButton/NsButton.vue'
+
 export { default as NsSkeleton } from './components/NsSkeleton/NsSkeleton.vue'
 export type {
   NsSkeletonProps,
   NsSkeletonType,
   NsSkeletonAnimation,
 } from './components/NsSkeleton/NsSkeleton.vue'
+
 export { default as NsThemeProvider } from './components/NsThemeProvider/NsThemeProvider.vue'
+export type { NsThemeProviderProps } from './components/NsThemeProvider/NsThemeProvider.vue'
+
 export { default as NsInput } from './components/NsInput/NsInput.vue'
+export type { NsInputProps } from './components/NsInput/NsInput.vue'
+
 export { default as NsCard } from './components/NsCard/NsCard.vue'
+export type { NsCardProps } from './components/NsCard/NsCard.vue'
+
 export { default as NsSelect } from './components/NsSelect/NsSelect.vue'
+export type { NsSelectProps, NsSelectOption } from './components/NsSelect/NsSelect.vue'
+
 export { default as NsCheckbox } from './components/NsCheckbox/NsCheckbox.vue'
+export type { NsCheckboxProps } from './components/NsCheckbox/NsCheckbox.vue'
+
 export { default as NsToggle } from './components/NsToggle/NsToggle.vue'
+export type { NsToggleProps } from './components/NsToggle/NsToggle.vue'
+
 export { default as NsForm } from './components/NsForm/NsForm.vue'
+export type { NsFormProps } from './components/NsForm/NsForm.vue'
+
 export { default as NsDialog } from './components/NsDialog/NsDialog.vue'
+export type { NsDialogProps } from './components/NsDialog/NsDialog.vue'
+
 export { default as NsBanner } from './components/NsBanner/NsBanner.vue'
+export type { NsBannerProps, NsBannerType } from './components/NsBanner/NsBanner.vue'
+
 export { default as NsAvatar } from './components/NsAvatar/NsAvatar.vue'
+export type { NsAvatarProps, NsAvatarSize } from './components/NsAvatar/NsAvatar.vue'
+
 export { default as NsChip } from './components/NsChip/NsChip.vue'
+export type { NsChipProps } from './components/NsChip/NsChip.vue'
+
 export { default as NsList } from './components/NsList/NsList.vue'
+export type { NsListProps } from './components/NsList/NsList.vue'
+
 export { default as NsTooltip } from './components/NsTooltip/NsTooltip.vue'
+export type { NsTooltipProps, NsTooltipAnchor } from './components/NsTooltip/NsTooltip.vue'
 
 // Plugin
 export { createNonsuch } from './plugin'
