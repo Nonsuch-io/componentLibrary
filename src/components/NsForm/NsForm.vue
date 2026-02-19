@@ -3,6 +3,7 @@
     v-bind="$attrs"
     class="ns-form"
     :greedy="greedy"
+    :aria-label="ariaLabel"
     @submit="$emit('submit', $event)"
     @validation-error="$emit('validationError', $event)"
   >
@@ -21,14 +22,16 @@
 export interface NsFormProps {
   /** Validate all fields even after the first error */
   greedy?: boolean
+  /** Accessible label for the form */
+  ariaLabel?: string
 }
 
 withDefaults(defineProps<NsFormProps>(), {
   greedy: true,
+  ariaLabel: undefined,
 })
 
 defineEmits<{
-  /* eslint-disable-next-line no-undef */
   submit: [event: Event]
   validationError: [ref: unknown]
 }>()

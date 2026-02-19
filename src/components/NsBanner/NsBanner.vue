@@ -4,6 +4,8 @@
     :class="['ns-banner', `ns-banner--${type}`]"
     :dense="dense"
     :rounded="rounded"
+    :role="ariaRole"
+    :aria-live="ariaLive"
   >
     <template v-if="$slots.avatar" #avatar>
       <slot name="avatar" />
@@ -25,6 +27,8 @@
  * with token-based colours and layout.
  */
 
+import { computed } from 'vue'
+
 export type NsBannerType = 'info' | 'success' | 'warning' | 'error'
 
 export interface NsBannerProps {
@@ -36,11 +40,19 @@ export interface NsBannerProps {
   rounded?: boolean
 }
 
-withDefaults(defineProps<NsBannerProps>(), {
+const props = withDefaults(defineProps<NsBannerProps>(), {
   type: 'info',
   dense: false,
   rounded: true,
 })
+
+/** Error/warning banners are assertive alerts; info/success are polite status messages */
+const ariaRole = computed(() =>
+  props.type === 'error' || props.type === 'warning' ? 'alert' : 'status',
+)
+const ariaLive = computed(() =>
+  props.type === 'error' || props.type === 'warning' ? 'assertive' : 'polite',
+)
 </script>
 
 <style lang="sass" scoped>

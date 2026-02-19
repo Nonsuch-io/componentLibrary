@@ -4,6 +4,8 @@
     :bordered="bordered"
     :separator="separator"
     :dense="dense"
+    :aria-label="ariaLabel"
+    role="list"
     class="ns-list"
   >
     <slot />
@@ -25,12 +27,15 @@ export interface NsListProps {
   separator?: boolean
   /** Use dense (compact) spacing */
   dense?: boolean
+  /** Accessible label for the list */
+  ariaLabel?: string
 }
 
 withDefaults(defineProps<NsListProps>(), {
   bordered: false,
   separator: true,
   dense: false,
+  ariaLabel: undefined,
 })
 </script>
 

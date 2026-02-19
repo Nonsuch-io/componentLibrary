@@ -54,4 +54,12 @@ describe('NsSkeleton', () => {
     const wrapper = mountSkeleton()
     expect(wrapper.find('.ns-skeleton').exists()).toBe(true)
   })
+
+  describe('accessibility', () => {
+    it('is hidden from screen readers with aria-hidden', () => {
+      const wrapper = mountSkeleton()
+      const skeleton = wrapper.find('.q-skeleton')
+      expect(skeleton.attributes('aria-hidden')).toBe('true')
+    })
+  })
 })

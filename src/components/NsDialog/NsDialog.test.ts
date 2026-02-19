@@ -125,4 +125,58 @@ describe('NsDialog', () => {
     await nextTick()
     expect(document.querySelector('.ns-dialog__actions')).toBeNull()
   })
+
+  describe('accessibility', () => {
+    it('renders role="dialog" and aria-modal on the card', async () => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true, title: 'A11y' },
+        slots: { default: 'Content' },
+        attachTo: document.body,
+      })
+      await nextTick()
+      const card = document.querySelector('.ns-dialog__card')
+      expect(card?.getAttribute('role')).toBe('dialog')
+      expect(card?.getAttribute('aria-modal')).toBe('true')
+    })
+
+    it('links title via aria-labelledby', async () => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true, title: 'Confirm Delete' },
+        slots: { default: 'Are you sure?' },
+        attachTo: document.body,
+      })
+      await nextTick()
+      const header = document.querySelector('.ns-dialog__header')
+      const headerId = header?.getAttribute('id')
+      expect(headerId).toBeTruthy()
+      // q-dialog should have aria-labelledby matching the header id
+      const dialog = document.querySelector('.q-dialog')
+      expect(dialog?.getAttribute('aria-labelledby')).toBe(headerId)
+    })
+
+    it('links body via aria-describedby', async () => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true, title: 'Title' },
+        slots: { default: 'Description here' },
+        attachTo: document.body,
+      })
+      await nextTick()
+      const body = document.querySelector('.ns-dialog__body')
+      const bodyId = body?.getAttribute('id')
+      expect(bodyId).toBeTruthy()
+      const dialog = document.querySelector('.q-dialog')
+      expect(dialog?.getAttribute('aria-describedby')).toBe(bodyId)
+    })
+
+    it('omits aria-labelledby when no title or header slot', async () => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true },
+        slots: { default: 'Body only' },
+        attachTo: document.body,
+      })
+      await nextTick()
+      const dialog = document.querySelector('.q-dialog')
+      expect(dialog?.hasAttribute('aria-labelledby')).toBe(false)
+    })
+  })
 })

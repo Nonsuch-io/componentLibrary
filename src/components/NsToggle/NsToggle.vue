@@ -6,6 +6,8 @@
     :color="color"
     :dense="dense"
     :disable="disable"
+    role="switch"
+    :aria-checked="modelValue"
     class="ns-toggle"
     @update:model-value="$emit('update:modelValue', $event)"
   />

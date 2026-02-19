@@ -33,4 +33,24 @@ describe('NsToggle', () => {
     await wrapper.find('.q-toggle__inner').trigger('click')
     expect(wrapper.emitted('update:modelValue')).toBeTruthy()
   })
+
+  describe('accessibility', () => {
+    it('has role="switch"', () => {
+      const wrapper = mount(NsToggle)
+      const toggle = wrapper.find('.q-toggle')
+      expect(toggle.attributes('role')).toBe('switch')
+    })
+
+    it('reflects aria-checked when on', () => {
+      const wrapper = mount(NsToggle, { props: { modelValue: true } })
+      const toggle = wrapper.find('.q-toggle')
+      expect(toggle.attributes('aria-checked')).toBe('true')
+    })
+
+    it('reflects aria-checked when off', () => {
+      const wrapper = mount(NsToggle, { props: { modelValue: false } })
+      const toggle = wrapper.find('.q-toggle')
+      expect(toggle.attributes('aria-checked')).toBe('false')
+    })
+  })
 })

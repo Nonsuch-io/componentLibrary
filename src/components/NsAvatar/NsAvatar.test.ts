@@ -42,4 +42,24 @@ describe('NsAvatar', () => {
     const style = wrapper.find('.q-avatar').attributes('style')
     expect(style).toContain('128px')
   })
+
+  describe('accessibility', () => {
+    it('is hidden from screen readers when no ariaLabel', () => {
+      const wrapper = mount(NsAvatar, { slots: { default: 'JD' } })
+      const avatar = wrapper.find('.q-avatar')
+      expect(avatar.attributes('aria-hidden')).toBe('true')
+      expect(avatar.attributes('role')).toBeUndefined()
+    })
+
+    it('has role="img" and aria-label when ariaLabel is provided', () => {
+      const wrapper = mount(NsAvatar, {
+        props: { ariaLabel: 'Jane Doe' },
+        slots: { default: 'JD' },
+      })
+      const avatar = wrapper.find('.q-avatar')
+      expect(avatar.attributes('aria-label')).toBe('Jane Doe')
+      expect(avatar.attributes('role')).toBe('img')
+      expect(avatar.attributes('aria-hidden')).toBeUndefined()
+    })
+  })
 })

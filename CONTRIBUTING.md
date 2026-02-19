@@ -371,6 +371,37 @@ We use `postcss-rtlcss` to generate `[dir=rtl]` CSS variants in the build output
 - For directional icons, check `$q.lang.rtl` to flip them
 - Test your component in the **Utilities / RTL Support** Storybook page
 
+### Accessibility (a11y)
+
+Every component should be usable by everyone, including people who rely on screen readers, keyboard navigation, or other assistive technologies. We enforce this at three levels:
+
+**1. Lint-time** — `eslint-plugin-vuejs-accessibility` runs as part of `pnpm lint` and catches common issues (missing `alt` attributes, missing `label` associations, etc.).
+
+**2. Storybook** — The `@storybook/addon-a11y` panel (visible in the bottom panel when running Storybook) runs axe-core against every story automatically. Check it when building new stories.
+
+**3. Unit tests** — Each component has an `accessibility` describe block in its test file verifying the correct ARIA attributes are rendered.
+
+**When writing a new component, follow these patterns:**
+
+| Situation                     | What to add                                                                                                            |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Dialogs / modals**          | `role="dialog"`, `aria-modal="true"`, `aria-labelledby` pointing to the title, `aria-describedby` pointing to the body |
+| **Status banners**            | `role="status"` + `aria-live="polite"` for info/success; `role="alert"` + `aria-live="assertive"` for warning/error    |
+| **Loading states**            | `aria-busy="true"` on the element while loading                                                                        |
+| **Decorative elements**       | `aria-hidden="true"` (skeletons, decorative avatars/icons)                                                             |
+| **Meaningful images / icons** | `role="img"` + `aria-label="Description"`                                                                              |
+| **Named regions**             | `role="region"` + `aria-labelledby` pointing to the heading `id`                                                       |
+| **Lists**                     | `role="list"` and optionally `aria-label`                                                                              |
+| **Toggle switches**           | `role="switch"` + `aria-checked`                                                                                       |
+| **Forms**                     | Accept an `ariaLabel` prop that maps to `aria-label` on the `<form>`                                                   |
+
+**Tips:**
+
+- Use Vue's `useId()` to generate unique IDs for `aria-labelledby` / `aria-describedby` links
+- Expose an `ariaLabel` prop (not `aria-label`) — Vue converts camelCase props to kebab-case attributes automatically
+- When an element is purely decorative, hide it from screen readers with `aria-hidden="true"`
+- Test with the Storybook a11y panel; fix all "Violations" before merging
+
 ## Running Quality Checks
 
 Before opening a pull request, make sure everything passes:

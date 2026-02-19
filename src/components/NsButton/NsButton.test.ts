@@ -56,4 +56,18 @@ describe('NsButton', () => {
     const qBtn = wrapper.find('.q-btn')
     expect(qBtn.attributes('aria-disabled')).toBeUndefined()
   })
+
+  describe('accessibility', () => {
+    it('sets aria-busy="true" when loading', () => {
+      const wrapper = mountButton({ loading: true })
+      const qBtn = wrapper.find('.q-btn')
+      expect(qBtn.attributes('aria-busy')).toBe('true')
+    })
+
+    it('sets aria-busy="false" when not loading', () => {
+      const wrapper = mountButton({ loading: false })
+      const qBtn = wrapper.find('.q-btn')
+      expect(qBtn.attributes('aria-busy')).toBe('false')
+    })
+  })
 })

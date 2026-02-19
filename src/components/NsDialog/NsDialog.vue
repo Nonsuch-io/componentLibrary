@@ -4,17 +4,19 @@
     :model-value="modelValue"
     :persistent="persistent"
     :no-backdrop-dismiss="noBackdropDismiss"
+    :aria-labelledby="title || $slots.header ? titleId : undefined"
+    :aria-describedby="bodyId"
     class="ns-dialog"
     @update:model-value="$emit('update:modelValue', $event)"
   >
-    <q-card class="ns-dialog__card">
-      <q-card-section v-if="title || $slots.header" class="ns-dialog__header">
+    <q-card class="ns-dialog__card" role="dialog" :aria-modal="true">
+      <q-card-section v-if="title || $slots.header" :id="titleId" class="ns-dialog__header">
         <slot name="header">
           <div class="text-h6">{{ title }}</div>
         </slot>
       </q-card-section>
 
-      <q-card-section class="ns-dialog__body">
+      <q-card-section :id="bodyId" class="ns-dialog__body">
         <slot />
       </q-card-section>
 
@@ -26,6 +28,7 @@
 </template>
 
 <script setup lang="ts">
+import { useId } from 'vue'
 /**
  * NsDialog — A styled dialog wrapping Quasar's QDialog.
  *
@@ -54,6 +57,9 @@ withDefaults(defineProps<NsDialogProps>(), {
 defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
+
+const titleId = `ns-dialog-title-${useId()}`
+const bodyId = `ns-dialog-body-${useId()}`
 </script>
 
 <style lang="sass" scoped>

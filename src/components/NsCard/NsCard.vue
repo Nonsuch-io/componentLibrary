@@ -1,6 +1,12 @@
 <template>
-  <q-card v-bind="$attrs" class="ns-card" :class="{ 'ns-card--flat': flat }">
-    <q-card-section v-if="title || $slots.header" class="ns-card__header">
+  <q-card
+    v-bind="$attrs"
+    class="ns-card"
+    :class="{ 'ns-card--flat': flat }"
+    :role="title || $slots.header ? 'region' : undefined"
+    :aria-labelledby="title || $slots.header ? headerId : undefined"
+  >
+    <q-card-section v-if="title || $slots.header" :id="headerId" class="ns-card__header">
       <slot name="header">
         <div class="text-h6">{{ title }}</div>
         <div v-if="subtitle" class="text-subtitle2 text-grey">{{ subtitle }}</div>
@@ -18,6 +24,7 @@
 </template>
 
 <script setup lang="ts">
+import { useId } from 'vue'
 /**
  * NsCard — A styled card wrapping Quasar's QCard.
  *
@@ -39,6 +46,8 @@ withDefaults(defineProps<NsCardProps>(), {
   subtitle: undefined,
   flat: false,
 })
+
+const headerId = `ns-card-header-${useId()}`
 </script>
 
 <style lang="sass" scoped>

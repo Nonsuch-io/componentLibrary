@@ -46,4 +46,18 @@ describe('NsForm', () => {
     const wrapper = mount(NsForm, { props: { greedy: true } })
     expect(wrapper.find('.ns-form').exists()).toBe(true)
   })
+
+  describe('accessibility', () => {
+    it('passes aria-label to the form element', () => {
+      const wrapper = mount(NsForm, {
+        props: { ariaLabel: 'Sign up form' },
+      })
+      expect(wrapper.find('form').attributes('aria-label')).toBe('Sign up form')
+    })
+
+    it('omits aria-label when not provided', () => {
+      const wrapper = mount(NsForm)
+      expect(wrapper.find('form').attributes('aria-label')).toBeUndefined()
+    })
+  })
 })

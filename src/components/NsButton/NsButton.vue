@@ -7,6 +7,7 @@
     :no-caps="noCaps"
     :rounded="rounded"
     :loading="loading"
+    :aria-busy="loading"
     class="ns-button"
   >
     <slot />

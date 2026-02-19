@@ -139,4 +139,46 @@ describe('NsBanner', () => {
       expect(wrapper.find('.stub-act').exists()).toBe(true)
     })
   })
+
+  describe('accessibility', () => {
+    it('has role="status" and aria-live="polite" for info type', () => {
+      const wrapper = mount(NsBanner, {
+        props: { type: 'info' },
+        slots: { default: 'Info message' },
+      })
+      const banner = wrapper.find('.q-banner')
+      expect(banner.attributes('role')).toBe('status')
+      expect(banner.attributes('aria-live')).toBe('polite')
+    })
+
+    it('has role="status" and aria-live="polite" for success type', () => {
+      const wrapper = mount(NsBanner, {
+        props: { type: 'success' },
+        slots: { default: 'Saved!' },
+      })
+      const banner = wrapper.find('.q-banner')
+      expect(banner.attributes('role')).toBe('status')
+      expect(banner.attributes('aria-live')).toBe('polite')
+    })
+
+    it('has role="alert" and aria-live="assertive" for warning type', () => {
+      const wrapper = mount(NsBanner, {
+        props: { type: 'warning' },
+        slots: { default: 'Careful' },
+      })
+      const banner = wrapper.find('.q-banner')
+      expect(banner.attributes('role')).toBe('alert')
+      expect(banner.attributes('aria-live')).toBe('assertive')
+    })
+
+    it('has role="alert" and aria-live="assertive" for error type', () => {
+      const wrapper = mount(NsBanner, {
+        props: { type: 'error' },
+        slots: { default: 'Failed' },
+      })
+      const banner = wrapper.find('.q-banner')
+      expect(banner.attributes('role')).toBe('alert')
+      expect(banner.attributes('aria-live')).toBe('assertive')
+    })
+  })
 })

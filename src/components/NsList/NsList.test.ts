@@ -41,4 +41,23 @@ describe('NsList', () => {
     })
     expect(wrapper.find('.q-list').attributes('data-testid')).toBe('my-list')
   })
+
+  describe('accessibility', () => {
+    it('has role="list"', () => {
+      const wrapper = mount(NsList)
+      expect(wrapper.find('.q-list').attributes('role')).toBe('list')
+    })
+
+    it('passes aria-label when provided', () => {
+      const wrapper = mount(NsList, {
+        props: { ariaLabel: 'Navigation items' },
+      })
+      expect(wrapper.find('.q-list').attributes('aria-label')).toBe('Navigation items')
+    })
+
+    it('omits aria-label when not provided', () => {
+      const wrapper = mount(NsList)
+      expect(wrapper.find('.q-list').attributes('aria-label')).toBeUndefined()
+    })
+  })
 })

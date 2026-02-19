@@ -74,4 +74,27 @@ describe('NsCard', () => {
     expect(wrapper.text()).toContain('With everything')
     expect(wrapper.find('.q-card__actions').exists()).toBe(true)
   })
+
+  describe('accessibility', () => {
+    it('sets role="region" and aria-labelledby when title is provided', () => {
+      const wrapper = mount(NsCard, {
+        props: { title: 'Settings' },
+        slots: { default: 'Body' },
+      })
+      const card = wrapper.find('.q-card')
+      expect(card.attributes('role')).toBe('region')
+      const headerId = wrapper.find('.ns-card__header').attributes('id')
+      expect(headerId).toBeTruthy()
+      expect(card.attributes('aria-labelledby')).toBe(headerId)
+    })
+
+    it('omits role and aria-labelledby when no title', () => {
+      const wrapper = mount(NsCard, {
+        slots: { default: 'Body only' },
+      })
+      const card = wrapper.find('.q-card')
+      expect(card.attributes('role')).toBeUndefined()
+      expect(card.attributes('aria-labelledby')).toBeUndefined()
+    })
+  })
 })

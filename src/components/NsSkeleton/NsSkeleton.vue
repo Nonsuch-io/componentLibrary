@@ -7,6 +7,7 @@
     :bordered="bordered"
     :width="width"
     :height="height"
+    aria-hidden="true"
     class="ns-skeleton"
   />
 </template>

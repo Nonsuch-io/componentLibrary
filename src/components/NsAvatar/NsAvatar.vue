@@ -6,6 +6,9 @@
     :text-color="textColor"
     :rounded="rounded"
     :square="square"
+    :aria-label="ariaLabel"
+    :aria-hidden="ariaLabel ? undefined : 'true'"
+    :role="ariaLabel ? 'img' : undefined"
     class="ns-avatar"
   >
     <slot />
@@ -41,6 +44,8 @@ export interface NsAvatarProps {
   rounded?: boolean
   /** Apply square shape */
   square?: boolean
+  /** Accessible label — omit for decorative avatars (hides from screen readers) */
+  ariaLabel?: string
 }
 
 const props = withDefaults(defineProps<NsAvatarProps>(), {
@@ -49,6 +54,7 @@ const props = withDefaults(defineProps<NsAvatarProps>(), {
   textColor: 'white',
   rounded: false,
   square: false,
+  ariaLabel: undefined,
 })
 
 const size = computed(() => sizeMap[props.size] ?? props.size)
