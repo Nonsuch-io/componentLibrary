@@ -37,6 +37,10 @@ export default ts.config(
         parser: ts.parser,
       },
     },
+    rules: {
+      // no-useless-assignment doesn't see Vue template usage of <script> variables
+      'no-useless-assignment': 'off',
+    },
   },
 
   // Project-specific rule overrides
