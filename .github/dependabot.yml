@@ -5,6 +5,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
+    versioning-strategy: increase-if-necessary
     open-pull-requests-limit: 10
     labels:
       - dependencies
@@ -16,12 +17,14 @@ updates:
       testing:
         patterns:
           - vitest
+          - '@vitest/*'
           - '@vue/test-utils'
           - happy-dom
       linting:
         patterns:
           - eslint
           - eslint-*
+          - '@eslint/*'
           - prettier
           - typescript-eslint
       build:
@@ -31,6 +34,11 @@ updates:
           - vue-tsc
           - typescript
           - sass-embedded
+      vue:
+        patterns:
+          - vue
+          - quasar
+          - '@quasar/*'
 
   - package-ecosystem: github-actions
     directory: /
