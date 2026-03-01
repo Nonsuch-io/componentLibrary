@@ -249,23 +249,58 @@ pnpm build:storybook
 ```text
 src/
   index.ts                # Library entry — exports all public API
+  manifest.ts             # Quasar → Ns component mapping for sync enforcement
   plugin.ts               # createNonsuch() Vue plugin
   quasarConfig.ts         # createQuasarConfig() helper
   components/
     NsAvatar/             # Avatar with size presets
+    NsBadge/              # Styled QBadge wrapper
     NsBanner/             # Info/success/warning/error banners
+    NsBreadcrumbs/        # Breadcrumb navigation
+    NsBreadcrumbElement/  # Individual breadcrumb item
     NsButton/             # Styled QBtn wrapper
+    NsButtonToggle/       # Toggle between button options
     NsCard/               # Card with title/subtitle/actions slots
+    NsCardActions/        # Card action bar
+    NsCardSection/        # Card content section
     NsCheckbox/           # Styled QCheckbox wrapper
     NsChip/               # Tag/filter chip
     NsDialog/             # Modal dialog with header/body/actions
+    NsFooter/             # App footer (within NsLayout)
     NsForm/               # Form wrapper with validation
+    NsHeader/             # App header (within NsLayout)
+    NsIcon/               # Styled QIcon wrapper
+    NsImage/              # Styled QImg wrapper
+    NsInnerLoading/       # Overlay loading indicator
     NsInput/              # Styled QInput wrapper
+    NsItem/               # List item
+    NsItemLabel/          # List item label
+    NsItemSection/        # List item section
+    NsLayout/             # App layout container
+    NsLinearProgress/     # Linear progress bar
     NsList/               # List with separator defaults
+    NsMenu/               # Dropdown/context menu
+    NsPage/               # Page content area
+    NsPageContainer/      # Page container (within NsLayout)
+    NsPagination/         # Page navigation controls
     NsSelect/             # Styled QSelect dropdown
+    NsSeparator/          # Horizontal/vertical separator
     NsSkeleton/           # Loading skeleton with animation
+    NsSpace/              # Flex spacer
+    NsSpinner/            # Circular spinner
+    NsSpinnerDots/        # Dot-style spinner
+    NsTab/                # Tab item (within NsTabs)
+    NsTabPanel/           # Tab panel content
+    NsTabPanels/          # Tab panels container
+    NsTable/              # Data table
+    NsTableCell/          # Table cell
+    NsTabs/               # Tab navigation bar
     NsThemeProvider/      # Renderless locale provider
+    NsTimeline/           # Timeline container
+    NsTimelineEntry/      # Timeline entry item
     NsToggle/             # Styled QToggle switch
+    NsToolbar/            # Toolbar container
+    NsToolbarTitle/       # Toolbar title
     NsTooltip/            # Tooltip with consistent delays
   composables/
     useNsLocale.ts        # Locale injection/provision
