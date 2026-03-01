@@ -41,4 +41,11 @@ describe('NsButtonToggle', () => {
       expect(wrapper.find('.q-btn-toggle').attributes('aria-label')).toBe('Test label')
     })
   })
+
+  it('emits update:modelValue when toggled', async () => {
+    const wrapper = mount(NsButtonToggle, { props: defaultProps })
+    const buttons = wrapper.findAll('.q-btn')
+    await buttons[1].trigger('click')
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+  })
 })

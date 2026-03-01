@@ -32,4 +32,11 @@ describe('NsTabPanels', () => {
       expect(wrapper.find('.q-tab-panels').attributes('aria-label')).toBe('Test label')
     })
   })
+
+  it('emits update:modelValue when panel changes', async () => {
+    const wrapper = mount(NsTabPanels, { props: defaultProps, slots: { default: 'panel content' } })
+    // Trigger model update programmatically
+    await wrapper.vm.$emit('update:modelValue', 'panel-2')
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+  })
 })

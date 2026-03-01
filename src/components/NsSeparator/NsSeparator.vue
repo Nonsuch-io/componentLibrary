@@ -1,7 +1,5 @@
 <template>
-  <q-separator v-bind="$attrs" class="ns-separator">
-    <slot />
-  </q-separator>
+  <q-separator v-bind="$attrs" class="ns-separator" />
 </template>
 
 <script setup lang="ts">

@@ -1,22 +1,31 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import NsPageContainer from './NsPageContainer.vue'
+import { QLayout } from 'quasar'
 
 describe('NsPageContainer', () => {
-  it('mounts without errors', () => {
-    const wrapper = mount(NsPageContainer, { slots: { default: 'Test content' } })
-    expect(wrapper.exists()).toBe(true)
+  const mountPageContainer = (attrs = {}) =>
+    mount({
+      components: { QLayout, NsPageContainer },
+      template:
+        '<q-layout><NsPageContainer v-bind="extraAttrs">Container content</NsPageContainer></q-layout>',
+      setup: () => ({ extraAttrs: attrs }),
+    })
+
+  it('renders within a QLayout parent', () => {
+    const wrapper = mountPageContainer()
+    expect(wrapper.find('.ns-page-container').exists()).toBe(true)
   })
 
-  it('renders the component', () => {
-    const wrapper = mount(NsPageContainer)
-    expect(wrapper.vm).toBeTruthy()
+  it('renders slot content', () => {
+    const wrapper = mountPageContainer()
+    expect(wrapper.text()).toContain('Container content')
   })
 
   describe('accessibility', () => {
-    it('component instance is accessible', () => {
-      const wrapper = mount(NsPageContainer)
-      expect(wrapper.vm.$el).toBeTruthy()
+    it('renders as a page container', () => {
+      const wrapper = mountPageContainer()
+      expect(wrapper.find('.q-page-container').exists()).toBe(true)
     })
   })
 })

@@ -1,7 +1,5 @@
 <template>
-  <q-spinner v-bind="$attrs" class="ns-spinner">
-    <slot />
-  </q-spinner>
+  <q-spinner v-bind="$attrs" class="ns-spinner" />
 </template>
 
 <script setup lang="ts">

@@ -1,22 +1,30 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import NsFooter from './NsFooter.vue'
+import { QLayout } from 'quasar'
 
 describe('NsFooter', () => {
-  it('mounts without errors', () => {
-    const wrapper = mount(NsFooter, { slots: { default: 'Test content' } })
-    expect(wrapper.exists()).toBe(true)
+  const mountFooter = (attrs = {}) =>
+    mount({
+      components: { QLayout, NsFooter },
+      template: '<q-layout><NsFooter v-bind="extraAttrs">Footer content</NsFooter></q-layout>',
+      setup: () => ({ extraAttrs: attrs }),
+    })
+
+  it('renders within a QLayout parent', () => {
+    const wrapper = mountFooter()
+    expect(wrapper.find('.ns-footer').exists()).toBe(true)
   })
 
-  it('renders the component', () => {
-    const wrapper = mount(NsFooter)
-    expect(wrapper.vm).toBeTruthy()
+  it('renders slot content', () => {
+    const wrapper = mountFooter()
+    expect(wrapper.text()).toContain('Footer content')
   })
 
   describe('accessibility', () => {
-    it('component instance is accessible', () => {
-      const wrapper = mount(NsFooter)
-      expect(wrapper.vm.$el).toBeTruthy()
+    it('renders as a footer element', () => {
+      const wrapper = mountFooter()
+      expect(wrapper.find('footer').exists()).toBe(true)
     })
   })
 })

@@ -1,22 +1,30 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import NsHeader from './NsHeader.vue'
+import { QLayout } from 'quasar'
 
 describe('NsHeader', () => {
-  it('mounts without errors', () => {
-    const wrapper = mount(NsHeader, { slots: { default: 'Test content' } })
-    expect(wrapper.exists()).toBe(true)
+  const mountHeader = (attrs = {}) =>
+    mount({
+      components: { QLayout, NsHeader },
+      template: '<q-layout><NsHeader v-bind="extraAttrs">Header content</NsHeader></q-layout>',
+      setup: () => ({ extraAttrs: attrs }),
+    })
+
+  it('renders within a QLayout parent', () => {
+    const wrapper = mountHeader()
+    expect(wrapper.find('.ns-header').exists()).toBe(true)
   })
 
-  it('renders the component', () => {
-    const wrapper = mount(NsHeader)
-    expect(wrapper.vm).toBeTruthy()
+  it('renders slot content', () => {
+    const wrapper = mountHeader()
+    expect(wrapper.text()).toContain('Header content')
   })
 
   describe('accessibility', () => {
-    it('component instance is accessible', () => {
-      const wrapper = mount(NsHeader)
-      expect(wrapper.vm.$el).toBeTruthy()
+    it('renders as a header element', () => {
+      const wrapper = mountHeader()
+      expect(wrapper.find('header').exists()).toBe(true)
     })
   })
 })

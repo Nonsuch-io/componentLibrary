@@ -32,4 +32,14 @@ describe('NsPagination', () => {
       expect(wrapper.find('.q-pagination').attributes('aria-label')).toBe('Test label')
     })
   })
+
+  it('emits update:modelValue when page changes', async () => {
+    const wrapper = mount(NsPagination, { props: defaultProps })
+    const buttons = wrapper.findAll('.q-btn')
+    // Click the next/last page button
+    if (buttons.length > 1) {
+      await buttons[buttons.length - 1].trigger('click')
+    }
+    expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+  })
 })
