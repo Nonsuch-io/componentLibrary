@@ -490,3 +490,75 @@ test/
 ## Questions?
 
 If something in this guide is unclear, open an issue! We'd rather improve the docs than have someone stuck.
+
+---
+
+## Keeping Consuming Apps in Sync
+
+The library ships a **component manifest** (`src/manifest.ts`) that maps every Quasar component name to its Nonsuch wrapper. This enables automated enforcement in consuming apps so raw Quasar usage doesn't creep back in once an Ns equivalent exists.
+
+### What the manifest provides
+
+| Export                     | Purpose                                                                                |
+| -------------------------- | -------------------------------------------------------------------------------------- |
+| `nsComponentManifest`      | `Record<string, string>` — PascalCase Quasar name → Ns name (e.g. `QBtn` → `NsButton`) |
+| `nsTemplateTagManifest`    | Same mapping as kebab-case tags (e.g. `q-btn` → `ns-button`)                           |
+| `generateQuasarBanRules()` | Returns an array ready to plug into `vue/no-restricted-html-elements`                  |
+
+### Template-level enforcement (recommended)
+
+In the consuming app's `eslint.config.js`:
+
+```js
+import { generateQuasarBanRules } from '@nonsuch/components'
+
+export default [
+  // ...your other configs
+  {
+    rules: {
+      'vue/no-restricted-html-elements': ['error', ...generateQuasarBanRules()],
+    },
+  },
+]
+```
+
+This will flag any `<q-btn>`, `<q-card>`, etc. in templates when an `<ns-button>`, `<ns-card>` equivalent is available, with a message pointing to the correct Ns component.
+
+### Import-level enforcement
+
+Ban direct Quasar component imports for wrapped components:
+
+```js
+{
+  rules: {
+    'no-restricted-imports': ['error', {
+      paths: [{
+        name: 'quasar',
+        importNames: Object.keys(nsComponentManifest),
+        message: 'Import the Ns wrapper from @nonsuch/components instead.',
+      }],
+    }],
+  },
+}
+```
+
+### CI grep check (lightweight alternative)
+
+For teams that want a quick check without ESLint changes:
+
+```bash
+# Fail CI if any raw Quasar tags are used when Ns equivalents exist
+node -e "
+  const { nsTemplateTagManifest } = require('@nonsuch/components');
+  const tags = Object.keys(nsTemplateTagManifest).join('|');
+  console.log(tags);
+" | xargs -I{} grep -rn --include='*.vue' -E '<({})[\\s>/]' src/
+```
+
+### Keeping the manifest up to date
+
+When you add a new component wrapper to this library:
+
+1. Add the `QXxx: 'NsXxx'` entry to `nsComponentManifest` in `src/manifest.ts`
+2. The kebab-case mapping and ESLint rule generator update automatically
+3. Consuming apps pick up the new rule on their next library version bump

@@ -51,6 +51,108 @@ export type { NsListProps } from './components/NsList/NsList.vue'
 export { default as NsTooltip } from './components/NsTooltip/NsTooltip.vue'
 export type { NsTooltipProps, NsTooltipAnchor } from './components/NsTooltip/NsTooltip.vue'
 
+export { default as NsBadge } from './components/NsBadge/NsBadge.vue'
+export type { NsBadgeProps } from './components/NsBadge/NsBadge.vue'
+
+export { default as NsBreadcrumbs } from './components/NsBreadcrumbs/NsBreadcrumbs.vue'
+export type { NsBreadcrumbsProps } from './components/NsBreadcrumbs/NsBreadcrumbs.vue'
+
+export { default as NsBreadcrumbElement } from './components/NsBreadcrumbElement/NsBreadcrumbElement.vue'
+export type { NsBreadcrumbElementProps } from './components/NsBreadcrumbElement/NsBreadcrumbElement.vue'
+
+export { default as NsButtonToggle } from './components/NsButtonToggle/NsButtonToggle.vue'
+export type { NsButtonToggleProps } from './components/NsButtonToggle/NsButtonToggle.vue'
+
+export { default as NsCardActions } from './components/NsCardActions/NsCardActions.vue'
+export type { NsCardActionsProps } from './components/NsCardActions/NsCardActions.vue'
+
+export { default as NsCardSection } from './components/NsCardSection/NsCardSection.vue'
+export type { NsCardSectionProps } from './components/NsCardSection/NsCardSection.vue'
+
+export { default as NsFooter } from './components/NsFooter/NsFooter.vue'
+export type { NsFooterProps } from './components/NsFooter/NsFooter.vue'
+
+export { default as NsHeader } from './components/NsHeader/NsHeader.vue'
+export type { NsHeaderProps } from './components/NsHeader/NsHeader.vue'
+
+export { default as NsIcon } from './components/NsIcon/NsIcon.vue'
+export type { NsIconProps } from './components/NsIcon/NsIcon.vue'
+
+export { default as NsImage } from './components/NsImage/NsImage.vue'
+export type { NsImageProps } from './components/NsImage/NsImage.vue'
+
+export { default as NsInnerLoading } from './components/NsInnerLoading/NsInnerLoading.vue'
+export type { NsInnerLoadingProps } from './components/NsInnerLoading/NsInnerLoading.vue'
+
+export { default as NsItem } from './components/NsItem/NsItem.vue'
+export type { NsItemProps } from './components/NsItem/NsItem.vue'
+
+export { default as NsItemLabel } from './components/NsItemLabel/NsItemLabel.vue'
+export type { NsItemLabelProps } from './components/NsItemLabel/NsItemLabel.vue'
+
+export { default as NsItemSection } from './components/NsItemSection/NsItemSection.vue'
+export type { NsItemSectionProps } from './components/NsItemSection/NsItemSection.vue'
+
+export { default as NsLayout } from './components/NsLayout/NsLayout.vue'
+export type { NsLayoutProps } from './components/NsLayout/NsLayout.vue'
+
+export { default as NsLinearProgress } from './components/NsLinearProgress/NsLinearProgress.vue'
+export type { NsLinearProgressProps } from './components/NsLinearProgress/NsLinearProgress.vue'
+
+export { default as NsMenu } from './components/NsMenu/NsMenu.vue'
+export type { NsMenuProps } from './components/NsMenu/NsMenu.vue'
+
+export { default as NsPage } from './components/NsPage/NsPage.vue'
+export type { NsPageProps } from './components/NsPage/NsPage.vue'
+
+export { default as NsPageContainer } from './components/NsPageContainer/NsPageContainer.vue'
+export type { NsPageContainerProps } from './components/NsPageContainer/NsPageContainer.vue'
+
+export { default as NsPagination } from './components/NsPagination/NsPagination.vue'
+export type { NsPaginationProps } from './components/NsPagination/NsPagination.vue'
+
+export { default as NsSeparator } from './components/NsSeparator/NsSeparator.vue'
+export type { NsSeparatorProps } from './components/NsSeparator/NsSeparator.vue'
+
+export { default as NsSpace } from './components/NsSpace/NsSpace.vue'
+export type { NsSpaceProps } from './components/NsSpace/NsSpace.vue'
+
+export { default as NsSpinner } from './components/NsSpinner/NsSpinner.vue'
+export type { NsSpinnerProps } from './components/NsSpinner/NsSpinner.vue'
+
+export { default as NsSpinnerDots } from './components/NsSpinnerDots/NsSpinnerDots.vue'
+export type { NsSpinnerDotsProps } from './components/NsSpinnerDots/NsSpinnerDots.vue'
+
+export { default as NsTab } from './components/NsTab/NsTab.vue'
+export type { NsTabProps } from './components/NsTab/NsTab.vue'
+
+export { default as NsTable } from './components/NsTable/NsTable.vue'
+export type { NsTableProps } from './components/NsTable/NsTable.vue'
+
+export { default as NsTableCell } from './components/NsTableCell/NsTableCell.vue'
+export type { NsTableCellProps } from './components/NsTableCell/NsTableCell.vue'
+
+export { default as NsTabPanel } from './components/NsTabPanel/NsTabPanel.vue'
+export type { NsTabPanelProps } from './components/NsTabPanel/NsTabPanel.vue'
+
+export { default as NsTabPanels } from './components/NsTabPanels/NsTabPanels.vue'
+export type { NsTabPanelsProps } from './components/NsTabPanels/NsTabPanels.vue'
+
+export { default as NsTabs } from './components/NsTabs/NsTabs.vue'
+export type { NsTabsProps } from './components/NsTabs/NsTabs.vue'
+
+export { default as NsTimeline } from './components/NsTimeline/NsTimeline.vue'
+export type { NsTimelineProps } from './components/NsTimeline/NsTimeline.vue'
+
+export { default as NsTimelineEntry } from './components/NsTimelineEntry/NsTimelineEntry.vue'
+export type { NsTimelineEntryProps } from './components/NsTimelineEntry/NsTimelineEntry.vue'
+
+export { default as NsToolbar } from './components/NsToolbar/NsToolbar.vue'
+export type { NsToolbarProps } from './components/NsToolbar/NsToolbar.vue'
+
+export { default as NsToolbarTitle } from './components/NsToolbarTitle/NsToolbarTitle.vue'
+export type { NsToolbarTitleProps } from './components/NsToolbarTitle/NsToolbarTitle.vue'
+
 // Plugin
 export { createNonsuch } from './plugin'
 export type { NsPluginOptions } from './plugin'
@@ -73,3 +175,6 @@ export type { UseNsDarkModeReturn } from './composables/useNsDarkMode'
 // Tokens
 export type { NsToken } from './tokens'
 export { getToken } from './tokens'
+
+// Component manifest (Quasar → Ns mapping for sync enforcement)
+export { nsComponentManifest, nsTemplateTagManifest, generateQuasarBanRules } from './manifest'
