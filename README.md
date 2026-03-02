@@ -224,6 +224,45 @@ All tokens use the `--ns-` prefix and support light/dark mode automatically. Cur
 
 Dark mode activates via `class="dark"`, `data-theme="dark"`, Quasar's `.q-dark`, or `prefers-color-scheme: dark`.
 
+### Breakpoints
+
+The library ships Quasar-aligned breakpoint values and media-query helpers:
+
+```ts
+import {
+  nsBreakpoints,
+  nsMediaUp,
+  nsMediaDown,
+  nsMediaOnly,
+  nsMediaBetween,
+} from '@nonsuch/component-library'
+```
+
+| Name | Min-width | Range          | Note  |
+| ---- | --------- | -------------- | ----- |
+| xs   | 0         | 0 – 599 px     |       |
+| sm   | 600       | 600 – 1023 px  |       |
+| md   | 1024      | 1024 – 1439 px |       |
+| lg   | 1440      | 1440 – 1919 px |       |
+| xl   | 1920      | 1920 – 2559 px |       |
+| xxl  | 2560      | 2560 – 3839 px | 1440p |
+| xxxl | 3840      | 3840 px +      | 4K    |
+
+Media-query helpers return `matchMedia()`-ready strings:
+
+```ts
+nsMediaUp('md') // '(min-width: 1024px)'
+nsMediaDown('md') // '(max-width: 1023px)'
+nsMediaOnly('md') // '(min-width: 1024px) and (max-width: 1439px)'
+nsMediaBetween('sm', 'lg') // '(min-width: 600px) and (max-width: 1919px)'
+```
+
+To customize in the future, spread and override:
+
+```ts
+const custom = { ...nsBreakpoints, lg: 1280 }
+```
+
 ## Development
 
 ```bash
@@ -307,6 +346,7 @@ src/
     useNsDarkMode.ts      # Dark mode with persistence
     useNsDefaults.ts      # Default value helper
   locale/                 # en-CA, fr-CA string packs
+  breakpoints/            # Breakpoint values + media query helpers
   tokens/                 # Design token CSS + TS helpers
   fonts/                  # Fixel font files + CSS
 ```

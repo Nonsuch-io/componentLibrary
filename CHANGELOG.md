@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/) and this 
 
 ## [Unreleased]
 
+## [0.7.1] — 2026-03-01
+
+### Added
+
+- **Breakpoints module** (`breakpoints/`) — Quasar-aligned breakpoint values and media-query helpers
+  - `NsBreakpointName` type (`xs` | `sm` | `md` | `lg` | `xl` | `xxl` | `xxxl`)
+  - `nsBreakpoints` object with pixel values for each breakpoint
+  - `nsBreakpointNames` ordered array
+  - `nsMediaUp()`, `nsMediaDown()`, `nsMediaOnly()`, `nsMediaBetween()` helpers returning `matchMedia()`-ready strings
+  - Two custom breakpoints beyond Quasar defaults: `xxl` (2560 px / 1440p) and `xxxl` (3840 px / 4K)
+
 ## [0.7.0] — 2026-02-28
 
 ### Added
@@ -43,7 +54,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/) and this 
 - Light and dark mode token sets (`:root.dark`, `[data-theme="dark"]`, `.q-dark`, `prefers-color-scheme`)
 - `NsToken` type union and `getToken()` runtime helper
 - `./tokens.css` package export for consumer apps
-- Storybook Design Tokens page with colour swatches, typography scale, spacing visualisation, and dark mode toggle
+- Storybook Design Tokens page with colour swatches, typography scale, spacing visualization, and dark mode toggle
 - Audit process documented in `AGENTS.md`
 
 ### Changed

@@ -176,5 +176,16 @@ export type { UseNsDarkModeReturn } from './composables/useNsDarkMode'
 export type { NsToken } from './tokens'
 export { getToken } from './tokens'
 
+// Breakpoints
+export type { NsBreakpointName } from './breakpoints'
+export {
+  nsBreakpoints,
+  nsBreakpointNames,
+  nsMediaUp,
+  nsMediaDown,
+  nsMediaOnly,
+  nsMediaBetween,
+} from './breakpoints'
+
 // Component manifest (Quasar → Ns mapping for sync enforcement)
 export { nsComponentManifest, nsTemplateTagManifest, generateQuasarBanRules } from './manifest'

@@ -30,6 +30,7 @@ export default defineConfig({
         'src/composables/**/*.ts',
         'src/locale/**/*.ts',
         'src/tokens/**/*.ts',
+        'src/breakpoints/**/*.ts',
         'src/plugin.ts',
         'src/quasarConfig.ts',
       ],
