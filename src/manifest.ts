@@ -25,6 +25,8 @@ export const nsComponentManifest: Record<string, string> = {
 
   // Placeholder wrapper components
   QBadge: 'NsBadge',
+  QDrawer: 'NsDrawer',
+  QExpansionItem: 'NsExpansionItem',
   QBreadcrumbs: 'NsBreadcrumbs',
   QBreadcrumbsEl: 'NsBreadcrumbElement',
   QBtnToggle: 'NsButtonToggle',

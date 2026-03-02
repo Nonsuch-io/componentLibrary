@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/) and this 
 
 ## [Unreleased]
 
+## [0.7.2] — 2026-03-01
+
+### Added
+
+- **NsDrawer** — placeholder wrapper for `QDrawer` (side drawer within `NsLayout`)
+- **NsExpansionItem** — placeholder wrapper for `QExpansionItem` (collapsible list item)
+- Both components added to the component manifest for sync enforcement
+
 ## [0.7.1] — 2026-03-01
 
 ### Added

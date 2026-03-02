@@ -36,6 +36,12 @@ export type { NsFormProps } from './components/NsForm/NsForm.vue'
 export { default as NsDialog } from './components/NsDialog/NsDialog.vue'
 export type { NsDialogProps } from './components/NsDialog/NsDialog.vue'
 
+export { default as NsDrawer } from './components/NsDrawer/NsDrawer.vue'
+export type { NsDrawerProps } from './components/NsDrawer/NsDrawer.vue'
+
+export { default as NsExpansionItem } from './components/NsExpansionItem/NsExpansionItem.vue'
+export type { NsExpansionItemProps } from './components/NsExpansionItem/NsExpansionItem.vue'
+
 export { default as NsBanner } from './components/NsBanner/NsBanner.vue'
 export type { NsBannerProps, NsBannerType } from './components/NsBanner/NsBanner.vue'
 

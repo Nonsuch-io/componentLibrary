@@ -305,6 +305,8 @@ src/
     NsCheckbox/           # Styled QCheckbox wrapper
     NsChip/               # Tag/filter chip
     NsDialog/             # Modal dialog with header/body/actions
+    NsDrawer/             # Side drawer (within NsLayout)
+    NsExpansionItem/      # Collapsible list item
     NsFooter/             # App footer (within NsLayout)
     NsForm/               # Form wrapper with validation
     NsHeader/             # App header (within NsLayout)
