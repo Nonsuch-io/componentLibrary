@@ -26,3 +26,6 @@ Thumbs.db
 # Environment
 .env
 .env.local
+
+# Local-only agent references (design links, credentials)
+AGENTS.local.md

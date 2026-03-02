@@ -159,6 +159,20 @@ export type { NsToolbarProps } from './components/NsToolbar/NsToolbar.vue'
 export { default as NsToolbarTitle } from './components/NsToolbarTitle/NsToolbarTitle.vue'
 export type { NsToolbarTitleProps } from './components/NsToolbarTitle/NsToolbarTitle.vue'
 
+// Templates
+export { default as NsAppShell } from './components/NsAppShell/NsAppShell.vue'
+export type { NsAppShellProps } from './components/NsAppShell/NsAppShell.vue'
+export type { NsAppShellTab, NsAppShellNavItem } from './components/NsAppShell/types'
+
+export { default as NsAuthLayout } from './components/NsAuthLayout/NsAuthLayout.vue'
+export type { NsAuthLayoutProps } from './components/NsAuthLayout/NsAuthLayout.vue'
+
+export { default as NsDashboardGrid } from './components/NsDashboardGrid/NsDashboardGrid.vue'
+export type {
+  NsDashboardGridProps,
+  NsDashboardGridColumns,
+} from './components/NsDashboardGrid/NsDashboardGrid.vue'
+
 // Plugin
 export { createNonsuch } from './plugin'
 export type { NsPluginOptions } from './plugin'

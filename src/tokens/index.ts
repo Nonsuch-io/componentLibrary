@@ -71,6 +71,8 @@ export type NsToken =
   | '--ns-space-10'
   | '--ns-space-12'
   | '--ns-space-16'
+  // Interaction
+  | '--ns-touch-target'
   // Border radius
   | '--ns-radius-none'
   | '--ns-radius-sm'

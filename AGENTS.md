@@ -12,6 +12,21 @@ bd close <id>         # Complete work
 bd sync               # Sync with git
 ```
 
+## Mobile-First Design
+
+> **Wireframes:** Figma. All page layouts and component sizing must match the wireframes. When wireframes and code diverge, the wireframe wins.
+> See [`AGENTS.local.md`](AGENTS.local.md) for design links.
+
+### MUST follow
+
+1. **Mobile-first always.** All layout CSS starts at the smallest viewport and scales up. Use Quasar's ascending column classes (`col-12` → `col-sm-*` → `col-md-*` → `col-lg-*`), never desktop-down. This applies equally to admin, portal, and storefront.
+2. **Breakpoints come from this component library.** `@nonsuch/component-library` is the design authority for breakpoint values. Initially these match Quasar's defaults (xs: 0, sm: 600, md: 1024, lg: 1440, xl: 1920) but may diverge — applications utilizing this library should always reference the library, not hardcoded values.
+3. **No desktop-first overrides.** Do not use `lt-*` (less-than) visibility/sizing classes or `max-width` media queries. Responsive logic flows upward from mobile.
+4. **Scoped CSS for exceptions only.** Quasar utility classes remain the primary styling mechanism. Scoped `<style>` blocks are allowed only for layout edge cases that cannot be expressed with utility classes (sticky positioning, custom hover states, etc.).
+5. **Touch-friendly targets.** Interactive elements must meet minimum 44×44px touch targets on mobile viewports.
+
+---
+
 ## Landing the Plane (Session Completion)
 
 **When ending a work session**, you MUST complete ALL steps below. Work is NOT complete until `git push` succeeds.

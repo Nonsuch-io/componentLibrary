@@ -100,6 +100,12 @@ describe('tokens.css', () => {
     }
   })
 
+  /* -- Interaction tokens -- */
+
+  it('defines touch target token', () => {
+    expect(allTokens).toContain('--ns-touch-target')
+  })
+
   /* -- Border radius tokens -- */
 
   it('defines border radius tokens', () => {
