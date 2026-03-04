@@ -60,6 +60,8 @@
     ]
   },
   "devDependencies": {
+    "@commitlint/cli": "^20.4.3",
+    "@commitlint/config-conventional": "^20.4.3",
     "@eslint/js": "^10.0.1",
     "@quasar/extras": "^1.17.0",
     "@quasar/vite-plugin": "^1.10.0",
