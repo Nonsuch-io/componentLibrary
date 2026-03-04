@@ -34,7 +34,13 @@ export default defineConfig({
         'src/plugin.ts',
         'src/quasarConfig.ts',
       ],
-      exclude: ['**/*.stories.ts', '**/*.test.ts', '**/index.ts'],
+      exclude: [
+        '**/*.stories.ts',
+        '**/*.test.ts',
+        '**/index.ts',
+        '**/types.ts',
+        '**/NsLocaleMessages.ts',
+      ],
       thresholds: {
         lines: 90,
         functions: 90,
