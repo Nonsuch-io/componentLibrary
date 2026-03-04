@@ -78,13 +78,28 @@
     <NsDrawer
       v-model="drawerOpen"
       :breakpoint="drawerBreakpoint"
-      :mini="isDesktop && miniDrawer"
+      :mini="shouldUseMini"
       bordered
       class="ns-app-shell__drawer"
       :behavior="isDesktop ? 'desktop' : 'mobile'"
       side="left"
       @update:model-value="onDrawerToggle"
     >
+      <!-- Collapsible toggle at top of drawer -->
+      <NsItem
+        v-if="collapsible && isDesktop"
+        clickable
+        class="ns-app-shell__collapse-toggle"
+        @click="toggleCollapse"
+      >
+        <NsItemSection avatar>
+          <NsIcon :name="shouldUseMini ? 'menu' : 'chevron_left'" />
+        </NsItemSection>
+        <NsItemSection>
+          <NsItemLabel>Hide Menu</NsItemLabel>
+        </NsItemSection>
+      </NsItem>
+
       <slot name="drawer-header" />
 
       <NsList v-if="drawerItems.length > 0">
@@ -96,6 +111,9 @@
             </NsItemSection>
             <NsItemSection>
               <NsItemLabel>{{ item.label }}</NsItemLabel>
+            </NsItemSection>
+            <NsItemSection v-if="item.children && item.children.length > 0" side>
+              <NsIcon name="chevron_right" size="sm" />
             </NsItemSection>
           </NsItem>
         </template>
@@ -163,7 +181,8 @@ import { nsBreakpoints } from '../../breakpoints'
  *
  * Handles the mobile → tablet → desktop layout transition:
  * - Mobile (xs/sm): Bottom tab bar for primary nav, hamburger opens drawer
- * - Tablet+ (md+): Persistent or mini side drawer, no bottom tab bar
+ * - Tablet (md): Persistent mini/rail drawer (icons only), no bottom tab bar
+ * - Desktop (lg+): Full persistent drawer with labels, no bottom tab bar
  *
  * Composes NsLayout, NsHeader, NsToolbar, NsDrawer, NsPageContainer,
  * NsTabs, NsTab, NsIcon, NsButton, NsFooter, and more.
@@ -175,10 +194,14 @@ export interface NsAppShellProps {
   drawerItems?: NsAppShellNavItem[]
   /** Whether to show the search action */
   showSearch?: boolean
-  /** Use mini (rail) mode for the side drawer on desktop */
+  /** Use mini (rail) mode for the side drawer on desktop (lg+). At tablet (md–lg) mini mode is automatic. */
   miniDrawer?: boolean
   /** Pixel breakpoint for persistent drawer (default: md = 1024) */
   drawerBreakpoint?: number
+  /** Pixel breakpoint for full (non-mini) drawer (default: lg = 1440) */
+  fullDrawerBreakpoint?: number
+  /** Show a collapse/expand toggle at the top of the drawer */
+  collapsible?: boolean
   /** Currently active tab name */
   modelValue?: string
 }
@@ -189,6 +212,8 @@ const props = withDefaults(defineProps<NsAppShellProps>(), {
   showSearch: false,
   miniDrawer: false,
   drawerBreakpoint: () => nsBreakpoints.md,
+  fullDrawerBreakpoint: () => nsBreakpoints.lg,
+  collapsible: true,
   modelValue: undefined,
 })
 
@@ -196,6 +221,7 @@ const emit = defineEmits<{
   search: [query: string]
   'tab-change': [name: string | number]
   'drawer-toggle': [open: boolean]
+  'drawer-collapse': [collapsed: boolean]
   'update:modelValue': [name: string]
 }>()
 
@@ -203,6 +229,19 @@ const $q = useQuasar()
 
 /** True when viewport is at/above the drawer breakpoint */
 const isDesktop = computed(() => $q.screen.width >= props.drawerBreakpoint)
+
+/** True when viewport is in the tablet range (md–lg) — mini drawer auto-enabled */
+const isTablet = computed(
+  () => $q.screen.width >= props.drawerBreakpoint && $q.screen.width < props.fullDrawerBreakpoint,
+)
+
+/** User-toggled collapse state */
+const isCollapsed = ref(false)
+
+/** Mini mode: auto-enabled at tablet range, when collapsed, or when explicitly set via miniDrawer prop */
+const shouldUseMini = computed(
+  () => isDesktop.value && (isTablet.value || props.miniDrawer || isCollapsed.value),
+)
 
 const drawerOpen = ref(false)
 const searchExpanded = ref(false)
@@ -223,6 +262,11 @@ function onTabChange(val: string | number) {
   emit('update:modelValue', String(val))
 }
 
+function toggleCollapse() {
+  isCollapsed.value = !isCollapsed.value
+  emit('drawer-collapse', isCollapsed.value)
+}
+
 function emitSearch() {
   emit('search', searchQuery.value)
 }
@@ -240,6 +284,9 @@ function emitSearch() {
 
 .ns-app-shell__search-input
   width: 100%
+
+.ns-app-shell__collapse-toggle
+  min-height: var(--ns-touch-target)
 
 .ns-app-shell__nav-item
   min-height: var(--ns-touch-target)

@@ -5,7 +5,7 @@ import { computed, useSlots, h, type VNode, Fragment } from 'vue'
  * NsDashboardGrid — A responsive grid layout for dashboard widgets.
  *
  * Mobile-first responsive columns using Quasar's ascending breakpoint system.
- * Default: 1 column (xs) → 2 columns (sm) → 3 columns (md) → 4 columns (lg).
+ * Default: 1 column (xs) → 2 columns (sm) → 4 columns (md) → 4 columns (lg).
  *
  * Each direct child in the default slot is automatically wrapped in a
  * responsive column div. Works with any content but optimized for
@@ -27,7 +27,7 @@ export interface NsDashboardGridProps {
 }
 
 const props = withDefaults(defineProps<NsDashboardGridProps>(), {
-  columns: () => ({ xs: 1, sm: 2, md: 3, lg: 4 }),
+  columns: () => ({ xs: 1, sm: 2, md: 4, lg: 4 }),
   gap: 'md',
 })
 

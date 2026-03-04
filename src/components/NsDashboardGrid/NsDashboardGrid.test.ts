@@ -33,12 +33,12 @@ describe('NsDashboardGrid', () => {
     expect(columns).toHaveLength(4)
   })
 
-  it('applies default column classes (xs:1, sm:2, md:3, lg:4)', () => {
+  it('applies default column classes (xs:1, sm:2, md:4, lg:4)', () => {
     const wrapper = mountGrid(2)
     const col = wrapper.find('.ns-dashboard-grid > div')
     expect(col.classes()).toContain('col-12')
     expect(col.classes()).toContain('col-sm-6')
-    expect(col.classes()).toContain('col-md-4')
+    expect(col.classes()).toContain('col-md-3')
     expect(col.classes()).toContain('col-lg-3')
   })
 

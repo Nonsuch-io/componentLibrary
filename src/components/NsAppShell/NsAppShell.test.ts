@@ -47,6 +47,55 @@ describe('NsAppShell', () => {
     expect(wrapper.text()).toContain('Main content')
   })
 
+  describe('tablet viewport', () => {
+    beforeEach(() => {
+      mockScreenWidth.value = 1100 // md range (1024–1439)
+    })
+
+    it('hides the hamburger menu button', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { tabs: sampleTabs },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.find('.ns-app-shell__menu-btn').exists()).toBe(false)
+    })
+
+    it('hides the bottom tab bar', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { tabs: sampleTabs },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.find('.ns-app-shell__bottom-bar').exists()).toBe(false)
+    })
+
+    it('auto-enables mini drawer at tablet range', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      const drawer = wrapper.findComponent({ name: 'QDrawer' })
+      expect(drawer.props('mini')).toBe(true)
+    })
+
+    it('uses desktop behavior for drawer', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      const drawer = wrapper.findComponent({ name: 'QDrawer' })
+      expect(drawer.props('behavior')).toBe('desktop')
+    })
+
+    it('shows inline search like desktop', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { showSearch: true },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.find('.ns-app-shell__search-inline').exists()).toBe(true)
+      expect(wrapper.find('.ns-app-shell__search-btn').exists()).toBe(false)
+    })
+  })
+
   describe('desktop viewport', () => {
     beforeEach(() => {
       mockScreenWidth.value = 1440
@@ -66,6 +115,24 @@ describe('NsAppShell', () => {
         slots: { default: 'Content' },
       })
       expect(wrapper.find('.ns-app-shell__bottom-bar').exists()).toBe(false)
+    })
+
+    it('disables mini drawer at lg+ by default', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      const drawer = wrapper.findComponent({ name: 'QDrawer' })
+      expect(drawer.props('mini')).toBe(false)
+    })
+
+    it('enables mini drawer at lg+ when miniDrawer prop is true', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems, miniDrawer: true },
+        slots: { default: 'Content' },
+      })
+      const drawer = wrapper.findComponent({ name: 'QDrawer' })
+      expect(drawer.props('mini')).toBe(true)
     })
 
     it('shows inline search when showSearch is true', () => {
@@ -305,6 +372,17 @@ describe('NsAppShell', () => {
       // At 1200px with breakpoint 1440, should be "mobile" mode
       expect(wrapper.find('.ns-app-shell__menu-btn').exists()).toBe(true)
       expect(wrapper.find('.ns-app-shell__bottom-bar').exists()).toBe(true)
+    })
+
+    it('uses custom fullDrawerBreakpoint to control mini→full transition', () => {
+      mockScreenWidth.value = 1440
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems, fullDrawerBreakpoint: 1920 },
+        slots: { default: 'Content' },
+      })
+      // At 1440px with fullDrawerBreakpoint 1920, should still be in mini mode
+      const drawer = wrapper.findComponent({ name: 'QDrawer' })
+      expect(drawer.props('mini')).toBe(true)
     })
 
     it('hides search entirely when showSearch is false', () => {
