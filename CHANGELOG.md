@@ -4,6 +4,54 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.9.0](https://github.com/Nonsuch-io/componentLibrary/compare/component-library-v0.8.0...component-library-v0.9.0) (2026-03-04)
+
+
+### ⚠ BREAKING CHANGES
+
+* bumps version to 0.8.0
+
+### Features
+
+* **a11y:** add ARIA attributes and accessibility tests across all components ([4e033a8](https://github.com/Nonsuch-io/componentLibrary/commit/4e033a862fac14eca06b0ab4f192d8e5765caf07))
+* add 10 placeholder component wrappers ([9be7ee2](https://github.com/Nonsuch-io/componentLibrary/commit/9be7ee26f1a8569a17f70590e7f97d1dddcbfe32))
+* add 34 placeholder components, manifest, and sync tooling ([0bdf836](https://github.com/Nonsuch-io/componentLibrary/commit/0bdf8368ba50cb144a4054abb1329ed5db6b8d03))
+* add all Fixel weights + global.css and Quasar sass overrides ([4e70c3d](https://github.com/Nonsuch-io/componentLibrary/commit/4e70c3d49d6f562df1b7107f02b3b0b6c6317066))
+* add App Shell Template system (NsAppShell, NsAuthLayout, NsDashboardGrid) ([814027d](https://github.com/Nonsuch-io/componentLibrary/commit/814027da58452afe3e2144a29c4baed5a3273f04))
+* add breakpoints module with Quasar defaults and media query helpers ([a573245](https://github.com/Nonsuch-io/componentLibrary/commit/a5732459d39b2459fe5218959db894801a64a47e))
+* add CSS custom property design token system ([cfccefe](https://github.com/Nonsuch-io/componentLibrary/commit/cfccefe277715f6919718bd9781e3d05310206c8))
+* add ESLint + Prettier for code quality (componentLibrary-91i) ([1aafa4e](https://github.com/Nonsuch-io/componentLibrary/commit/1aafa4e1f6583b0264df32ff6424b3b352290cc6))
+* add Fixel font structure with [@font-face](https://github.com/font-face) CSS and Roboto fallback ([799bd9f](https://github.com/Nonsuch-io/componentLibrary/commit/799bd9fc4fd727296fb2fc69630688b7e23f9213))
+* add i18n locale system, string-prop composables, and RTL support ([402cbd1](https://github.com/Nonsuch-io/componentLibrary/commit/402cbd1fcec05a34c0d6c03eebfd76bab4dc80b4))
+* add loading states and NsSkeleton component ([f4eb643](https://github.com/Nonsuch-io/componentLibrary/commit/f4eb6434022d9febfdff2574041f8225126e1a77))
+* add NsDrawer and NsExpansionItem placeholder components ([6e4d241](https://github.com/Nonsuch-io/componentLibrary/commit/6e4d241aa187cbc722ac8ba8d3e631df96e35c5a))
+* add test coverage thresholds with @vitest/coverage-v8 ([36c3031](https://github.com/Nonsuch-io/componentLibrary/commit/36c3031c26939977c6f936bb32baf498d53732d4))
+* configure npm publishing + CI/CD (componentLibrary-a9h) ([702b657](https://github.com/Nonsuch-io/componentLibrary/commit/702b6575a7900f4bf2dafd226e21fcec8bf51081))
+* MLP features — plugin, dark mode, theme provider, quasar config, NsInput, NsCard ([c963d04](https://github.com/Nonsuch-io/componentLibrary/commit/c963d048e7f0f339327d38fdcd447882b824b214))
+* scaffold component library ([995a57e](https://github.com/Nonsuch-io/componentLibrary/commit/995a57e3939d249079695c6c8a136322846197e0))
+
+
+### Bug Fixes
+
+* add --provenance flag for npm Trusted Publishing ([856620d](https://github.com/Nonsuch-io/componentLibrary/commit/856620d2fa1720def80ad52007406578e0371e22))
+* **ci:** remove packageManager field conflicting with pnpm/action-setup@v4 ([8dafa0d](https://github.com/Nonsuch-io/componentLibrary/commit/8dafa0d5aa0ba640ec4a8d3aa3d5d7eabe6515a7))
+* **ci:** replace pnpm/action-setup with corepack enable ([f97d2cc](https://github.com/Nonsuch-io/componentLibrary/commit/f97d2ccca687af054e246ad52c5b9ce79aa33759))
+* clear setup-node auth token for Trusted Publishing OIDC ([289e42b](https://github.com/Nonsuch-io/componentLibrary/commit/289e42bb2881e279e4ec29ff9d1dad62bf96b8c4))
+* correct repository URL to Nonsuch-io org ([98434a1](https://github.com/Nonsuch-io/componentLibrary/commit/98434a1ad9d39cb263fbdaebcd2fa68314f37932))
+* explicit OIDC token exchange for npm Trusted Publishing ([72e19d9](https://github.com/Nonsuch-io/componentLibrary/commit/72e19d9eb88791c030db39d8ee86d4a71a1c39eb))
+* export all component Props interfaces and helper types ([aabc3c9](https://github.com/Nonsuch-io/componentLibrary/commit/aabc3c985e467d3bfd723a52666d2c5153c63fd0))
+* load Material Icons in Storybook, add typecheck script ([cad4e07](https://github.com/Nonsuch-io/componentLibrary/commit/cad4e07e6f422ce4085dc3251e637561776cd48f))
+* lower branch coverage threshold to 70% ([7b73400](https://github.com/Nonsuch-io/componentLibrary/commit/7b734009e9c5b23d602a2c7e7056c7f2aa57c652))
+* **publish:** use npm CLI built-in Trusted Publishing OIDC ([f6f7d74](https://github.com/Nonsuch-io/componentLibrary/commit/f6f7d74f16b4687491b55a53d8147b1e45ab479c))
+* raise function coverage to 92% to meet CI threshold ([6c330a2](https://github.com/Nonsuch-io/componentLibrary/commit/6c330a2e9b9cca08c6ad96050852788b9c5759ed))
+* remove registry-url to let Trusted Publishing handle auth via OIDC ([40b09a6](https://github.com/Nonsuch-io/componentLibrary/commit/40b09a656e1e0ca3e162fd378e8a79aa6b43b12b))
+* resolve type errors and add type-check to quality gates ([1cfb2e6](https://github.com/Nonsuch-io/componentLibrary/commit/1cfb2e6070e545d80c2e004267bfe5cfa6ee2104))
+* restore registry-url for npm OIDC auth ([e0f0a0b](https://github.com/Nonsuch-io/componentLibrary/commit/e0f0a0b556f3f1794eb60821465a4b6d1da20ae8))
+* restore Trusted Publishing workflow with OIDC ([dcc2872](https://github.com/Nonsuch-io/componentLibrary/commit/dcc28728a3288bc958ee9f12cf9dc76d0e2d9a5a))
+* simplify publish workflow for Trusted Publishing ([f50127f](https://github.com/Nonsuch-io/componentLibrary/commit/f50127f699c3150aea31e30425eab44623d99e2b))
+* use npm publish for Trusted Publishing OIDC support ([d51bca2](https://github.com/Nonsuch-io/componentLibrary/commit/d51bca2ce16e20ec47b5dd6ffc5125728648946a))
+* use npm Trusted Publishing (OIDC) instead of token ([49c8da9](https://github.com/Nonsuch-io/componentLibrary/commit/49c8da9dc644fbb1fe0e85f5acfcf5828c5204f7))
+
 ## [Unreleased]
 
 ## [0.8.0] — 2026-03-03
