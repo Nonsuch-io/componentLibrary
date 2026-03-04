@@ -295,9 +295,23 @@ function emitSearch() {
   // Handle iOS safe area
   padding-bottom: env(safe-area-inset-bottom, 0px)
 
+.ns-app-shell__bottom-tabs
+  // Even flex distribution — all tabs share width equally
+  :deep(.q-tabs__content)
+    justify-content: space-around
+
 .ns-app-shell__bottom-tab
   min-height: 56px
   min-width: var(--ns-touch-target)
+  // Distribute tabs evenly across viewport width
+  flex: 1 1 0
+  max-width: 20%
+  // Truncate long labels with ellipsis
+  :deep(.q-tab__label)
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap
+    max-width: 100%
 
 .ns-app-shell__page--has-bottom-bar
   // Extra padding at the bottom so content isn't hidden behind the tab bar

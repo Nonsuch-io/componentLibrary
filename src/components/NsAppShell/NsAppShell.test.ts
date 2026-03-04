@@ -30,6 +30,15 @@ const sampleTabs: NsAppShellTab[] = [
 const sampleNavItems: NsAppShellNavItem[] = [
   { name: 'dashboard', label: 'Dashboard', icon: 'dashboard', to: '/dashboard' },
   { name: 'orders', label: 'Orders', icon: 'receipt', to: '/orders' },
+  {
+    name: 'products',
+    label: 'Products',
+    icon: 'inventory_2',
+    children: [
+      { name: 'all', label: 'All Products', to: '/products' },
+      { name: 'categories', label: 'Categories', to: '/products/categories' },
+    ],
+  },
   { name: 'settings', label: 'Settings', icon: 'settings', to: '/settings', separator: true },
 ]
 
@@ -182,6 +191,39 @@ describe('NsAppShell', () => {
         slots: { default: 'Content' },
       })
       expect(wrapper.find('.ns-app-shell__bottom-bar').exists()).toBe(false)
+    })
+
+    it('applies bottom-tabs class for even flex distribution', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { tabs: sampleTabs },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.find('.ns-app-shell__bottom-tabs').exists()).toBe(true)
+    })
+
+    it('applies bottom-tab class to each tab for truncation styling', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { tabs: sampleTabs },
+        slots: { default: 'Content' },
+      })
+      const tabs = wrapper.findAll('.ns-app-shell__bottom-tab')
+      expect(tabs).toHaveLength(4)
+      tabs.forEach((tab) => {
+        expect(tab.classes()).toContain('ns-app-shell__bottom-tab')
+      })
+    })
+
+    it('renders 5 bottom tabs when 5 tabs are provided', () => {
+      const fiveTabs: NsAppShellTab[] = [
+        ...sampleTabs,
+        { name: 'notifications', label: 'Notifications', icon: 'notifications' },
+      ]
+      const wrapper = mount(NsAppShell, {
+        props: { tabs: fiveTabs },
+        slots: { default: 'Content' },
+      })
+      const tabs = wrapper.findAll('.ns-app-shell__bottom-tab')
+      expect(tabs).toHaveLength(5)
     })
   })
 
@@ -415,6 +457,122 @@ describe('NsAppShell', () => {
       const navItems = wrapper.findAll('.ns-app-shell__nav-item')
       expect(navItems.length).toBeGreaterThan(0)
       // CSS enforces min-height of 44px
+    })
+  })
+
+  describe('collapsible drawer', () => {
+    beforeEach(() => {
+      mockScreenWidth.value = 1440 // desktop (lg+)
+    })
+
+    it('shows collapse toggle at desktop when collapsible is true (default)', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.find('.ns-app-shell__collapse-toggle').exists()).toBe(true)
+    })
+
+    it('hides collapse toggle when collapsible is false', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems, collapsible: false },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.find('.ns-app-shell__collapse-toggle').exists()).toBe(false)
+    })
+
+    it('hides collapse toggle on mobile', () => {
+      mockScreenWidth.value = 375
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.find('.ns-app-shell__collapse-toggle').exists()).toBe(false)
+    })
+
+    it('toggles mini mode when collapse button is clicked', async () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      const drawer = wrapper.findComponent({ name: 'QDrawer' })
+      // Initially not mini at lg+ (not tablet, not collapsed)
+      expect(drawer.props('mini')).toBe(false)
+
+      // Click the collapse toggle
+      await wrapper.find('.ns-app-shell__collapse-toggle').trigger('click')
+
+      // Now should be in mini mode
+      expect(drawer.props('mini')).toBe(true)
+    })
+
+    it('emits drawer-collapse event when toggled', async () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      await wrapper.find('.ns-app-shell__collapse-toggle').trigger('click')
+      expect(wrapper.emitted('drawer-collapse')?.[0]).toEqual([true])
+
+      // Toggle back
+      await wrapper.find('.ns-app-shell__collapse-toggle').trigger('click')
+      expect(wrapper.emitted('drawer-collapse')?.[1]).toEqual([false])
+    })
+
+    it('shows chevron_left icon when drawer is expanded', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      const toggleIcon = wrapper.find('.ns-app-shell__collapse-toggle .ns-icon')
+      expect(toggleIcon.text()).toContain('chevron_left')
+    })
+
+    it('shows menu icon when drawer is collapsed to mini', async () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      await wrapper.find('.ns-app-shell__collapse-toggle').trigger('click')
+      const toggleIcon = wrapper.find('.ns-app-shell__collapse-toggle .ns-icon')
+      expect(toggleIcon.text()).toContain('menu')
+    })
+  })
+
+  describe('nav item chevrons', () => {
+    it('shows chevron on nav items with children', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      // Products has children, should show chevron_right
+      const navItems = wrapper.findAll('.ns-app-shell__nav-item')
+      const productsItem = navItems.find((item) => item.text().includes('Products'))
+      expect(productsItem).toBeTruthy()
+      expect(productsItem!.text()).toContain('chevron_right')
+    })
+
+    it('does not show chevron on nav items without children', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      const navItems = wrapper.findAll('.ns-app-shell__nav-item')
+      const dashboardItem = navItems.find((item) => item.text().includes('Dashboard'))
+      expect(dashboardItem).toBeTruthy()
+      expect(dashboardItem!.text()).not.toContain('chevron_right')
+    })
+
+    it('does not show chevron when children array is empty', () => {
+      const itemsWithEmptyChildren: NsAppShellNavItem[] = [
+        { name: 'test', label: 'Test', icon: 'home', children: [] },
+      ]
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: itemsWithEmptyChildren },
+        slots: { default: 'Content' },
+      })
+      const navItem = wrapper.find('.ns-app-shell__nav-item')
+      expect(navItem.text()).not.toContain('chevron_right')
     })
   })
 })
