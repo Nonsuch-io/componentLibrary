@@ -1,7 +1,42 @@
 import { describe, it, expect, afterEach } from 'vitest'
 import { mount, VueWrapper } from '@vue/test-utils'
-import { nextTick } from 'vue'
+import { nextTick, defineComponent, h } from 'vue'
 import NsDialog from './NsDialog.vue'
+
+// Stubs for template branch coverage
+const QDialogStub = defineComponent({
+  name: 'QDialog',
+  inheritAttrs: true,
+  props: { modelValue: Boolean },
+  emits: ['update:model-value'],
+  setup(props, { slots, attrs }) {
+    return () =>
+      props.modelValue
+        ? h('div', { class: 'q-dialog', ...attrs }, slots.default?.())
+        : h('div', { class: 'q-dialog q-dialog--hidden', ...attrs })
+  },
+})
+const QCardStub = defineComponent({
+  name: 'QCard',
+  inheritAttrs: true,
+  setup(_, { slots, attrs }) {
+    return () => h('div', { class: 'ns-dialog__card', ...attrs }, slots.default?.())
+  },
+})
+const QCardSectionStub = defineComponent({
+  name: 'QCardSection',
+  inheritAttrs: true,
+  setup(_, { slots, attrs }) {
+    return () => h('div', { ...attrs }, slots.default?.())
+  },
+})
+const QCardActionsStub = defineComponent({
+  name: 'QCardActions',
+  inheritAttrs: true,
+  setup(_, { slots, attrs }) {
+    return () => h('div', { class: 'ns-dialog__actions', ...attrs }, slots.default?.())
+  },
+})
 
 describe('NsDialog', () => {
   let wrapper: VueWrapper
@@ -177,6 +212,61 @@ describe('NsDialog', () => {
       await nextTick()
       const dialog = document.querySelector('.q-dialog')
       expect(dialog?.hasAttribute('aria-labelledby')).toBe(false)
+    })
+  })
+
+  describe('with stubs (template branch coverage)', () => {
+    const stubs = {
+      QDialog: QDialogStub,
+      QCard: QCardStub,
+      QCardSection: QCardSectionStub,
+      QCardActions: QCardActionsStub,
+    }
+
+    it('renders header with title through template', () => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true, title: 'Stub Title' },
+        slots: { default: 'Body' },
+        global: { stubs },
+      })
+      expect(wrapper.find('.ns-dialog__header').exists()).toBe(true)
+      expect(wrapper.text()).toContain('Stub Title')
+    })
+
+    it('renders without header when no title or header slot', () => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true },
+        slots: { default: 'Body only' },
+        global: { stubs },
+      })
+      expect(wrapper.find('.ns-dialog__header').exists()).toBe(false)
+    })
+
+    it('renders actions slot through template', () => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true },
+        slots: { default: 'Body', actions: '<button class="stub-action">OK</button>' },
+        global: { stubs },
+      })
+      expect(wrapper.find('.stub-action').exists()).toBe(true)
+    })
+
+    it('omits actions when no actions slot', () => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true },
+        slots: { default: 'Body' },
+        global: { stubs },
+      })
+      expect(wrapper.find('.ns-dialog__actions').exists()).toBe(false)
+    })
+
+    it('renders custom header slot through template', () => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true },
+        slots: { default: 'Body', header: '<h3 class="stub-hdr">Custom</h3>' },
+        global: { stubs },
+      })
+      expect(wrapper.find('.stub-hdr').exists()).toBe(true)
     })
   })
 })

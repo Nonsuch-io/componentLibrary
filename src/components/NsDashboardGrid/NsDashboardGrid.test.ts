@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, createCommentVNode, createTextVNode } from 'vue'
 import NsDashboardGrid from './NsDashboardGrid.vue'
 
 // Helper to create a grid with N widget children
@@ -86,5 +86,38 @@ describe('NsDashboardGrid', () => {
   it('applies items-stretch for equal-height cards', () => {
     const wrapper = mountGrid(2)
     expect(wrapper.find('.ns-dashboard-grid').classes()).toContain('items-stretch')
+  })
+
+  it('filters out text and comment nodes from slot children', () => {
+    const Wrapper = defineComponent({
+      setup() {
+        return () =>
+          h(NsDashboardGrid, null, {
+            default: () => [
+              h('div', { class: 'real-widget' }, 'Widget'),
+              createTextVNode('stray text'),
+              createCommentVNode('a comment'),
+              h('div', { class: 'real-widget' }, 'Widget 2'),
+            ],
+          })
+      },
+    })
+    const wrapper = mount(Wrapper)
+    // Only real element vnodes should be wrapped in columns
+    const columns = wrapper.findAll('.ns-dashboard-grid > div')
+    expect(columns).toHaveLength(2)
+    expect(wrapper.findAll('.real-widget')).toHaveLength(2)
+  })
+
+  it('handles empty column configuration (all breakpoints omitted)', () => {
+    const wrapper = mountGrid(2, {
+      columns: {},
+    })
+    const col = wrapper.find('.ns-dashboard-grid > div')
+    // With no breakpoints specified, no col-* classes should be applied
+    expect(col.classes()).not.toContain('col-12')
+    expect(col.classes()).not.toContain('col-sm-6')
+    expect(col.classes()).not.toContain('col-md-4')
+    expect(col.classes()).not.toContain('col-lg-3')
   })
 })

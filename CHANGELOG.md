@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/) and this 
 
 ## [Unreleased]
 
+## [0.8.0] — 2026-03-03
+
+### Added
+
+- **NsAppShell** — primary responsive app layout template
+  - Mobile (xs/sm): bottom tab bar for primary nav, hamburger opens off-canvas drawer
+  - Tablet+ (md+): persistent or mini (rail) side drawer, no bottom tab bar
+  - Collapsible mobile search bar with inline desktop variant
+  - Configurable `drawerBreakpoint`, `miniDrawer`, `showSearch`, `tabs`, `drawerItems` props
+  - Named slots: `header-left`, `header-actions`, `drawer-header`, `drawer-footer`, `bottom-bar-above`
+- **NsAuthLayout** — centered card layout for login, register, 2FA, and password-reset flows
+  - Logo slot, default content slot, and footer slot
+  - Responsive card sizing with token-based spacing
+- **NsDashboardGrid** — responsive widget grid using Quasar's ascending breakpoint classes
+  - Render-function component that wraps each slot child in responsive column divs
+  - Configurable `columns` (per-breakpoint) and `gap` props
+  - Automatic Fragment flattening and text/comment node filtering
+- **`--ns-touch-target` design token** (44 px) — minimum interactive element size for mobile accessibility
+
+### Fixed
+
+- NsAuthLayout: replaced non-existent `--ns-spacing-md`/`--ns-spacing-lg` token references with correct `--ns-space-4`/`--ns-space-6`
+
 ## [0.7.2] — 2026-03-01
 
 ### Added
