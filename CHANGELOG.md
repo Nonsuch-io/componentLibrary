@@ -4,6 +4,19 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.10.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.9.0...v0.10.0) (2026-03-05)
+
+
+### Features
+
+* tablet landscape UI — auto mini drawer at md, 4-col grid ([6cf36ee](https://github.com/Nonsuch-io/componentLibrary/commit/6cf36ee6a8baa3281c30a7af54ae50d5177c22a5))
+
+
+### Bug Fixes
+
+* mobile bottom nav overflow — even flex tabs with ellipsis truncation ([55247d7](https://github.com/Nonsuch-io/componentLibrary/commit/55247d74c24031ee0f3a1f15a0242a5325a8470f))
+* use plain v* tags in release-please config ([9095ba4](https://github.com/Nonsuch-io/componentLibrary/commit/9095ba43d8a13a146637c841fc0ef77a028cd959))
+
 ## [0.9.0](https://github.com/Nonsuch-io/componentLibrary/compare/component-library-v0.8.0...component-library-v0.9.0) (2026-03-04)
 
 
