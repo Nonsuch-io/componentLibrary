@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.10.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.10.0...v0.10.1) (2026-03-05)
+
+
+### Bug Fixes
+
+* drawer auto-open, icon font, gutter classes, mini avatar overlap ([ea0373d](https://github.com/Nonsuch-io/componentLibrary/commit/ea0373de2b619470ef481151f335190790a7109d))
+
 ## [0.10.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.9.0...v0.10.0) (2026-03-05)
 
 
