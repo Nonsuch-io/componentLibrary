@@ -18,6 +18,5 @@ defineProps<NsIconProps>()
 </script>
 
 <style lang="sass" scoped>
-.ns-icon
-  font-family: var(--ns-font-family-text)
+// No font-family override — icons must use their icon font (e.g. Material Icons)
 </style>

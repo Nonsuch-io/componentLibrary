@@ -71,11 +71,13 @@ export const Default: Story = {
           </NsButton>
           <NsAvatar size="32px" color="primary" text-color="white">JD</NsAvatar>
         </template>
-        <template #drawer-header>
-          <div class="q-pa-md">
+        <template #drawer-header="{ mini }">
+          <div class="q-pa-md" :class="{ 'text-center': mini }">
             <NsAvatar size="48px" color="primary" text-color="white">JD</NsAvatar>
-            <div class="q-mt-sm text-subtitle1">Jane Doe</div>
-            <div class="text-caption text-grey">jane@butiq.com</div>
+            <template v-if="!mini">
+              <div class="q-mt-sm text-subtitle1">Jane Doe</div>
+              <div class="text-caption text-grey">jane@butiq.com</div>
+            </template>
           </div>
         </template>
         ${pageContent}

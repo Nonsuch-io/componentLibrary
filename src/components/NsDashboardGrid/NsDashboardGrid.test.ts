@@ -54,14 +54,14 @@ describe('NsDashboardGrid', () => {
     expect(col.classes()).toContain('col-xl-3')
   })
 
-  it('applies default gap class (q-gutter-md)', () => {
+  it('applies default gap class (q-col-gutter-md)', () => {
     const wrapper = mountGrid(2)
-    expect(wrapper.find('.ns-dashboard-grid').classes()).toContain('q-gutter-md')
+    expect(wrapper.find('.ns-dashboard-grid').classes()).toContain('q-col-gutter-md')
   })
 
   it('applies custom gap class', () => {
     const wrapper = mountGrid(2, { gap: 'lg' })
-    expect(wrapper.find('.ns-dashboard-grid').classes()).toContain('q-gutter-lg')
+    expect(wrapper.find('.ns-dashboard-grid').classes()).toContain('q-col-gutter-lg')
   })
 
   it('renders slot content inside column wrappers', () => {

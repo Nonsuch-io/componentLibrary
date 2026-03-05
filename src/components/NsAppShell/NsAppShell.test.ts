@@ -152,6 +152,15 @@ describe('NsAppShell', () => {
       expect(wrapper.find('.ns-app-shell__search-inline').exists()).toBe(true)
       expect(wrapper.find('.ns-app-shell__search-btn').exists()).toBe(false)
     })
+
+    it('auto-opens drawer on desktop', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      const drawer = wrapper.findComponent({ name: 'QDrawer' })
+      expect(drawer.props('modelValue')).toBe(true)
+    })
   })
 
   describe('mobile viewport', () => {
@@ -165,6 +174,15 @@ describe('NsAppShell', () => {
         slots: { default: 'Content' },
       })
       expect(wrapper.find('.ns-app-shell__menu-btn').exists()).toBe(true)
+    })
+
+    it('starts with drawer closed on mobile', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      const drawer = wrapper.findComponent({ name: 'QDrawer' })
+      expect(drawer.props('modelValue')).toBe(false)
     })
 
     it('shows the bottom tab bar with tabs', () => {

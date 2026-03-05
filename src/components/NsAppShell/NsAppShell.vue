@@ -100,7 +100,7 @@
         </NsItemSection>
       </NsItem>
 
-      <slot name="drawer-header" />
+      <slot name="drawer-header" :mini="shouldUseMini" />
 
       <NsList v-if="drawerItems.length > 0">
         <template v-for="item in drawerItems" :key="item.name">
@@ -153,7 +153,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import type { NsAppShellTab, NsAppShellNavItem } from './types'
 import NsLayout from '../NsLayout/NsLayout.vue'
@@ -243,10 +243,15 @@ const shouldUseMini = computed(
   () => isDesktop.value && (isTablet.value || props.miniDrawer || isCollapsed.value),
 )
 
-const drawerOpen = ref(false)
+const drawerOpen = ref(isDesktop.value)
 const searchExpanded = ref(false)
 const searchQuery = ref('')
 const activeTab = ref(props.modelValue ?? (props.tabs[0]?.name || ''))
+
+// Auto-open drawer when entering desktop, close when leaving
+watch(isDesktop, (desktop) => {
+  drawerOpen.value = desktop
+})
 
 function toggleDrawer() {
   drawerOpen.value = !drawerOpen.value
@@ -284,6 +289,10 @@ function emitSearch() {
 
 .ns-app-shell__search-input
   width: 100%
+
+.ns-app-shell__drawer
+  // Prevent content overflow when drawer is in mini/rail mode
+  overflow: hidden
 
 .ns-app-shell__collapse-toggle
   min-height: var(--ns-touch-target)

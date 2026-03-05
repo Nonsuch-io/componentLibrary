@@ -30,7 +30,7 @@ export const Default: Story = {
           <h4 class="text-h4 text-weight-bold">butiq</h4>
           <p class="text-subtitle2 text-grey">Sign in to your account</p>
         </template>
-        <div class="column q-gutter-md">
+        <div class="column q-gutter-y-md">
           <NsInput label="Email" type="email" />
           <NsInput label="Password" type="password" />
           <NsButton color="primary" class="full-width">Sign In</NsButton>
@@ -46,7 +46,7 @@ export const NoBranding: Story = {
     setup: () => ({ args }),
     template: `
       <NsAuthLayout v-bind="args">
-        <div class="column q-gutter-md">
+        <div class="column q-gutter-y-md">
           <div class="text-h5 text-center">Create Account</div>
           <NsInput label="Full Name" />
           <NsInput label="Email" type="email" />
@@ -72,7 +72,7 @@ export const CustomWidth: Story = {
           <h4 class="text-h4 text-weight-bold">butiq</h4>
           <p class="text-subtitle2 text-grey">Two-factor authentication</p>
         </template>
-        <div class="column q-gutter-md">
+        <div class="column q-gutter-y-md">
           <p>Enter the 6-digit code from your authenticator app.</p>
           <NsInput label="Verification Code" mask="### ###" />
           <NsButton color="primary" class="full-width">Verify</NsButton>
@@ -94,7 +94,7 @@ export const Mobile: Story = {
         <template #branding>
           <h4 class="text-h4 text-weight-bold">butiq</h4>
         </template>
-        <div class="column q-gutter-md">
+        <div class="column q-gutter-y-md">
           <NsInput label="Email" type="email" />
           <NsInput label="Password" type="password" />
           <NsButton color="primary" class="full-width">Sign In</NsButton>

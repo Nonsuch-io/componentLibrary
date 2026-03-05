@@ -33,7 +33,7 @@ const props = withDefaults(defineProps<NsDashboardGridProps>(), {
 
 const slots = useSlots()
 
-const gutterClass = computed(() => `q-gutter-${props.gap}`)
+const gutterClass = computed(() => `q-col-gutter-${props.gap}`)
 
 function colClass(breakpoint: string, cols: number): string {
   const span = Math.floor(12 / cols)
