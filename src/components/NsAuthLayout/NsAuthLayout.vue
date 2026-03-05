@@ -54,6 +54,7 @@ const containerStyle = computed(() => ({
 
 .ns-auth-layout__container
   width: 100%
+  margin: 0 auto
 
 .ns-auth-layout__branding
   text-align: center
