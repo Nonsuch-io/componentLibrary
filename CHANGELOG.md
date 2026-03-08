@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.11.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.10.1...v0.11.0) (2026-03-08)
+
+
+### Features
+
+* add bundle size tracking with size-limit ([bbd1f4b](https://github.com/Nonsuch-io/componentLibrary/commit/bbd1f4b3a267a3c28a19b2bbe8b6d1d6f0bdebf8))
+
 ## [0.10.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.10.0...v0.10.1) (2026-03-05)
 
 
