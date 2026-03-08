@@ -1,6 +1,6 @@
 {
   "name": "@nonsuch/component-library",
-  "version": "0.10.1",
+  "version": "0.11.0",
   "description": "A Vue 3 component library built on Quasar with opinionated defaults and custom components.",
   "type": "module",
   "sideEffects": false,
