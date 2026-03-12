@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import NsAppShell from './NsAppShell.vue'
-import NsAvatar from '../NsAvatar/NsAvatar.vue'
 import NsButton from '../NsButton/NsButton.vue'
 import NsCard from '../NsCard/NsCard.vue'
-import type { NsAppShellTab, NsAppShellNavItem } from './types'
+import type { NsAppShellTab, NsAppShellNavItem, NsAppShellUserMenuItem } from './types'
 
 const sampleTabs: NsAppShellTab[] = [
   { name: 'home', label: 'Home', icon: 'home' },
@@ -21,6 +20,12 @@ const sampleNavItems: NsAppShellNavItem[] = [
   { name: 'settings', label: 'Settings', icon: 'settings', to: '/settings', separator: true },
 ]
 
+const sampleUserMenuItems: NsAppShellUserMenuItem[] = [
+  { name: 'profile', label: 'Profile', icon: 'person' },
+  { name: 'account', label: 'Account Settings', icon: 'settings' },
+  { name: 'logout', label: 'Log out', icon: 'logout', separator: true },
+]
+
 const meta: Meta<typeof NsAppShell> = {
   title: 'Templates/NsAppShell',
   component: NsAppShell,
@@ -29,6 +34,9 @@ const meta: Meta<typeof NsAppShell> = {
     drawerItems: sampleNavItems,
     showSearch: true,
     miniDrawer: false,
+    userName: 'Jane Doe',
+    userInitials: 'JD',
+    userMenuItems: sampleUserMenuItems,
   },
   argTypes: {
     showSearch: { control: 'boolean' },
@@ -58,7 +66,7 @@ const pageContent = `
 
 export const Default: Story = {
   render: (args) => ({
-    components: { NsAppShell, NsAvatar, NsButton, NsCard },
+    components: { NsAppShell, NsButton, NsCard },
     setup: () => ({ args }),
     template: `
       <NsAppShell v-bind="args">
@@ -69,16 +77,6 @@ export const Default: Story = {
           <NsButton flat round dense aria-label="Notifications">
             <q-icon name="notifications" />
           </NsButton>
-          <NsAvatar size="32px" color="primary" text-color="white">JD</NsAvatar>
-        </template>
-        <template #drawer-header="{ mini }">
-          <div class="q-pa-md" :class="{ 'text-center': mini }">
-            <NsAvatar size="48px" color="primary" text-color="white">JD</NsAvatar>
-            <template v-if="!mini">
-              <div class="q-mt-sm text-subtitle1">Jane Doe</div>
-              <div class="text-caption text-grey">jane@butiq.com</div>
-            </template>
-          </div>
         </template>
         ${pageContent}
       </NsAppShell>

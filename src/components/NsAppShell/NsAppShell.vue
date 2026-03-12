@@ -50,6 +50,45 @@
         </template>
 
         <slot name="header-actions" />
+
+        <!-- User avatar with dropdown menu -->
+        <NsButton
+          v-if="userInitials"
+          flat
+          round
+          dense
+          aria-label="User menu"
+          class="ns-app-shell__user-btn"
+        >
+          <NsAvatar size="sm" color="primary" text-color="white" :aria-label="userName">
+            {{ userInitials }}
+          </NsAvatar>
+          <NsMenu>
+            <NsList>
+              <NsItem v-if="userName" class="ns-app-shell__user-info">
+                <NsItemSection>
+                  <NsItemLabel>{{ userName }}</NsItemLabel>
+                </NsItemSection>
+              </NsItem>
+              <NsSeparator v-if="userName && userMenuItems.length > 0" />
+              <template v-for="item in userMenuItems" :key="item.name">
+                <NsSeparator v-if="item.separator" />
+                <NsItem
+                  clickable
+                  class="ns-app-shell__user-menu-item"
+                  @click="onUserMenuAction(item.name)"
+                >
+                  <NsItemSection v-if="item.icon" avatar>
+                    <NsIcon :name="item.icon" />
+                  </NsItemSection>
+                  <NsItemSection>
+                    <NsItemLabel>{{ item.label }}</NsItemLabel>
+                  </NsItemSection>
+                </NsItem>
+              </template>
+            </NsList>
+          </NsMenu>
+        </NsButton>
       </NsToolbar>
 
       <!-- Expanded mobile search bar -->
@@ -155,7 +194,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useQuasar } from 'quasar'
-import type { NsAppShellTab, NsAppShellNavItem } from './types'
+import type { NsAppShellTab, NsAppShellNavItem, NsAppShellUserMenuItem } from './types'
 import NsLayout from '../NsLayout/NsLayout.vue'
 import NsHeader from '../NsHeader/NsHeader.vue'
 import NsToolbar from '../NsToolbar/NsToolbar.vue'
@@ -174,6 +213,8 @@ import NsItem from '../NsItem/NsItem.vue'
 import NsItemSection from '../NsItemSection/NsItemSection.vue'
 import NsItemLabel from '../NsItemLabel/NsItemLabel.vue'
 import NsSeparator from '../NsSeparator/NsSeparator.vue'
+import NsAvatar from '../NsAvatar/NsAvatar.vue'
+import NsMenu from '../NsMenu/NsMenu.vue'
 import { nsBreakpoints } from '../../breakpoints'
 
 /**
@@ -204,6 +245,12 @@ export interface NsAppShellProps {
   collapsible?: boolean
   /** Currently active tab name */
   modelValue?: string
+  /** User display name shown in the avatar dropdown */
+  userName?: string
+  /** User initials rendered inside the avatar (e.g. "JD") */
+  userInitials?: string
+  /** Menu items for the user avatar dropdown */
+  userMenuItems?: NsAppShellUserMenuItem[]
 }
 
 const props = withDefaults(defineProps<NsAppShellProps>(), {
@@ -215,6 +262,9 @@ const props = withDefaults(defineProps<NsAppShellProps>(), {
   fullDrawerBreakpoint: () => nsBreakpoints.lg,
   collapsible: true,
   modelValue: undefined,
+  userName: undefined,
+  userInitials: undefined,
+  userMenuItems: () => [],
 })
 
 const emit = defineEmits<{
@@ -223,6 +273,7 @@ const emit = defineEmits<{
   'drawer-toggle': [open: boolean]
   'drawer-collapse': [collapsed: boolean]
   'update:modelValue': [name: string]
+  'user-menu-action': [name: string]
 }>()
 
 const $q = useQuasar()
@@ -275,11 +326,16 @@ function toggleCollapse() {
 function emitSearch() {
   emit('search', searchQuery.value)
 }
+
+function onUserMenuAction(name: string) {
+  emit('user-menu-action', name)
+}
 </script>
 
 <style lang="sass" scoped>
 .ns-app-shell__menu-btn,
-.ns-app-shell__search-btn
+.ns-app-shell__search-btn,
+.ns-app-shell__user-btn
   min-width: var(--ns-touch-target)
   min-height: var(--ns-touch-target)
 
@@ -298,6 +354,9 @@ function emitSearch() {
   min-height: var(--ns-touch-target)
 
 .ns-app-shell__nav-item
+  min-height: var(--ns-touch-target)
+
+.ns-app-shell__user-menu-item
   min-height: var(--ns-touch-target)
 
 .ns-app-shell__bottom-bar
