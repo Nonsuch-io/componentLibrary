@@ -27,39 +27,45 @@ export default defineConfig({
     },
   },
   test: {
-    globals: true,
-    environment: 'happy-dom',
-    setupFiles: ['./test/setup.ts'],
-    include: ['src/**/*.test.ts'],
-    coverage: {
-      provider: 'v8',
-      include: [
-        'src/components/**/*.vue',
-        'src/components/**/*.ts',
-        'src/composables/**/*.ts',
-        'src/locale/**/*.ts',
-        'src/tokens/**/*.ts',
-        'src/breakpoints/**/*.ts',
-        'src/plugin.ts',
-        'src/quasarConfig.ts',
-      ],
-      exclude: [
-        '**/*.stories.ts',
-        '**/*.test.ts',
-        '**/index.ts',
-        '**/types.ts',
-        '**/NsLocaleMessages.ts',
-      ],
-      thresholds: {
-        lines: 90,
-        functions: 90,
-        statements: 90,
-        // v8 can't fully trace Vue template v-if branches through source maps.
-        // Actual branch coverage is higher — verified at 97%+ with Istanbul.
-        branches: 90,
-      },
-    },
     projects: [
+      {
+        extends: true,
+        test: {
+          name: 'unit',
+          globals: true,
+          environment: 'happy-dom',
+          setupFiles: ['./test/setup.ts'],
+          include: ['src/**/*.test.ts'],
+          coverage: {
+            provider: 'v8',
+            include: [
+              'src/components/**/*.vue',
+              'src/components/**/*.ts',
+              'src/composables/**/*.ts',
+              'src/locale/**/*.ts',
+              'src/tokens/**/*.ts',
+              'src/breakpoints/**/*.ts',
+              'src/plugin.ts',
+              'src/quasarConfig.ts',
+            ],
+            exclude: [
+              '**/*.stories.ts',
+              '**/*.test.ts',
+              '**/index.ts',
+              '**/types.ts',
+              '**/NsLocaleMessages.ts',
+            ],
+            thresholds: {
+              lines: 90,
+              functions: 90,
+              statements: 90,
+              // v8 can't fully trace Vue template v-if branches through source maps.
+              // Actual branch coverage is higher — verified at 97%+ with Istanbul.
+              branches: 90,
+            },
+          },
+        },
+      },
       {
         extends: true,
         plugins: [
