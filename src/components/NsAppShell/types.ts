@@ -8,6 +8,18 @@ export interface NsAppShellTab {
   icon: string
 }
 
+/** Represents an item in the user avatar dropdown menu. */
+export interface NsAppShellUserMenuItem {
+  /** Unique identifier for the menu item (emitted with user-menu-action) */
+  name: string
+  /** Display label */
+  label: string
+  /** Material icon name */
+  icon?: string
+  /** Separator before this item */
+  separator?: boolean
+}
+
 /** Represents a navigation item in the side drawer. */
 export interface NsAppShellNavItem {
   /** Unique identifier for the nav item */

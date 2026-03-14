@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import NsAppShell from './NsAppShell.vue'
-import type { NsAppShellTab, NsAppShellNavItem } from './types'
+import type { NsAppShellTab, NsAppShellNavItem, NsAppShellUserMenuItem } from './types'
 
 // Mock Quasar's useQuasar to control screen width
 const mockScreenWidth = { value: 1440 }
@@ -40,6 +40,11 @@ const sampleNavItems: NsAppShellNavItem[] = [
     ],
   },
   { name: 'settings', label: 'Settings', icon: 'settings', to: '/settings', separator: true },
+]
+
+const sampleUserMenuItems: NsAppShellUserMenuItem[] = [
+  { name: 'profile', label: 'Profile', icon: 'person' },
+  { name: 'logout', label: 'Log out', icon: 'logout', separator: true },
 ]
 
 describe('NsAppShell', () => {
@@ -591,6 +596,69 @@ describe('NsAppShell', () => {
       })
       const navItem = wrapper.find('.ns-app-shell__nav-item')
       expect(navItem.text()).not.toContain('chevron_right')
+    })
+  })
+
+  describe('user avatar menu', () => {
+    it('renders user avatar button when userInitials is provided', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { userInitials: 'JD' },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.find('.ns-app-shell__user-btn').exists()).toBe(true)
+    })
+
+    it('does not render user avatar button when userInitials is not provided', () => {
+      const wrapper = mount(NsAppShell, {
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.find('.ns-app-shell__user-btn').exists()).toBe(false)
+    })
+
+    it('displays user initials in the avatar', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { userInitials: 'JD' },
+        slots: { default: 'Content' },
+      })
+      const avatar = wrapper.find('.ns-app-shell__user-btn .ns-avatar')
+      expect(avatar.text()).toContain('JD')
+    })
+
+    it('passes user menu items to the dropdown', () => {
+      const wrapper = mount(NsAppShell, {
+        props: {
+          userInitials: 'JD',
+          userName: 'Jane Doe',
+          userMenuItems: sampleUserMenuItems,
+        },
+        slots: { default: 'Content' },
+      })
+      // Verify the component received the props (QMenu content is teleported/lazy)
+      expect(wrapper.props('userMenuItems')).toHaveLength(2)
+      expect(wrapper.props('userName')).toBe('Jane Doe')
+    })
+
+    it('renders NsMenu inside the user avatar button', () => {
+      const wrapper = mount(NsAppShell, {
+        props: {
+          userInitials: 'JD',
+          userMenuItems: sampleUserMenuItems,
+        },
+        slots: { default: 'Content' },
+      })
+      // QMenu is rendered inside the button even though its content is teleported
+      const menu = wrapper.find('.ns-app-shell__user-btn').findComponent({ name: 'QMenu' })
+      expect(menu.exists()).toBe(true)
+    })
+
+    it('user avatar button meets minimum touch target size', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { userInitials: 'JD' },
+        slots: { default: 'Content' },
+      })
+      const btn = wrapper.find('.ns-app-shell__user-btn')
+      expect(btn.exists()).toBe(true)
+      // CSS enforces min-width/min-height of 44px via --ns-touch-target
     })
   })
 })

@@ -162,7 +162,11 @@ export type { NsToolbarTitleProps } from './components/NsToolbarTitle/NsToolbarT
 // Templates
 export { default as NsAppShell } from './components/NsAppShell/NsAppShell.vue'
 export type { NsAppShellProps } from './components/NsAppShell/NsAppShell.vue'
-export type { NsAppShellTab, NsAppShellNavItem } from './components/NsAppShell/types'
+export type {
+  NsAppShellTab,
+  NsAppShellNavItem,
+  NsAppShellUserMenuItem,
+} from './components/NsAppShell/types'
 
 export { default as NsAuthLayout } from './components/NsAuthLayout/NsAuthLayout.vue'
 export type { NsAuthLayoutProps } from './components/NsAuthLayout/NsAuthLayout.vue'
