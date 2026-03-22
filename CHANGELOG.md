@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.12.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.11.0...v0.12.0) (2026-03-14)
+
+
+### Features
+
+* **NsAppShell:** add user avatar dropdown menu & complete Storybook setup ([#36](https://github.com/Nonsuch-io/componentLibrary/issues/36)) ([3c072a8](https://github.com/Nonsuch-io/componentLibrary/commit/3c072a8a6d4548fb39b3de3acd3967b8aec7ea53))
+
 ## [0.11.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.10.1...v0.11.0) (2026-03-08)
 
 
