@@ -301,7 +301,7 @@ Collect all findings from Steps 1–5 into this table:
 
 - Fix all **HIGH** and **MEDIUM** findings. Re-run the affected steps to confirm resolution.
 - File separate beads for **LOW** findings: `bd create "<title>" --description="<details>" -p 3 --deps discovered-from:<current-bead-id>`
-- After all fixes, print the findings table again with updated results. Every row must show PASS or be filed as a follow-up bead.
+- After all fixes, ensure every finding in the table is either resolved according to its **Action** or tracked as a follow-up bead.
 
 ---
 
@@ -396,6 +396,6 @@ bd automatically syncs with git:
 - ❌ Do NOT use external issue trackers
 - ❌ Do NOT duplicate tracking systems
 
-For more details, see README.md and docs/QUICKSTART.md.
+For more details, see README.md.
 
 <!-- END BEADS INTEGRATION -->

@@ -26,7 +26,7 @@ Your task prompt will include:
 4. **Refactor** — Clean up with confidence that the suite catches regressions. Re-run tests.
 5. **Repeat** — Continue the RED-GREEN cycle for each piece of the task.
 6. **Validate** — Run the full quality gate:
-   - `pnpm test -- --run`
+   - `pnpm test`
    - `pnpm typecheck`
    - `pnpm lint`
 
