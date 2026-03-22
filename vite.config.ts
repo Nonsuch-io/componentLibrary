@@ -26,12 +26,6 @@ export default defineConfig({
     },
     rollupOptions: {
       external: ['vue', 'quasar', /^quasar\//, /^@quasar\//],
-      output: {
-        globals: {
-          vue: 'Vue',
-          quasar: 'Quasar',
-        },
-      },
     },
   },
 })

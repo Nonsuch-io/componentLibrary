@@ -29,3 +29,7 @@ Thumbs.db
 
 # Local-only agent references (design links, credentials)
 AGENTS.local.md
+
+# Dolt database files (added by bd init)
+.dolt/
+*.db
