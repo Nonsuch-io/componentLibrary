@@ -40,6 +40,9 @@ jobs:
       - name: Test
         run: pnpm test
 
+      - name: Storybook tests
+        run: pnpm test:storybook
+
       - name: Coverage
         run: pnpm test:coverage
 
