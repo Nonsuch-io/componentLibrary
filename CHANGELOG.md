@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.12.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.12.0...v0.12.1) (2026-03-24)
+
+
+### Bug Fixes
+
+* scope test scripts to unit project so Playwright is not required locally (componentLibrary-9ky) ([#50](https://github.com/Nonsuch-io/componentLibrary/issues/50)) ([d92aead](https://github.com/Nonsuch-io/componentLibrary/commit/d92aeadef40957913e050b5019733e7a2169e691))
+
 ## [0.12.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.11.0...v0.12.0) (2026-03-14)
 
 
