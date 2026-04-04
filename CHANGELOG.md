@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.12.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.12.1...v0.12.2) (2026-04-04)
+
+
+### Bug Fixes
+
+* remove deprecated baseUrl from tsconfig files for TS7 compat ([a56a90a](https://github.com/Nonsuch-io/componentLibrary/commit/a56a90aed78bde010f8e2698727764dd29e9d23d))
+
 ## [0.12.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.12.0...v0.12.1) (2026-03-24)
 
 
