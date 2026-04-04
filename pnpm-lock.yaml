@@ -75,8 +75,8 @@ importers:
         specifier: ^1.58.2
         version: 1.58.2
       postcss-rtlcss:
-        specifier: ^5.7.1
-        version: 5.7.1(postcss@8.5.8)
+        specifier: ^6.0.0
+        version: 6.0.0(postcss@8.5.8)
       prettier:
         specifier: ^3.8.1
         version: 3.8.1
@@ -2216,8 +2216,8 @@ packages:
     resolution: {integrity: sha512-LKWqWJRhstyYo9pGvgor/ivk2w94eSjE3RGVuzLGlr3NmD8bf7RcYGze1mNdEHRP6TRP6rMuDHk5t44hnTRyow==}
     engines: {node: '>=14.19.0'}
 
-  postcss-rtlcss@5.7.1:
-    resolution: {integrity: sha512-zE68CuARv5StOG/UQLa0W1Y/raUTzgJlfjtas43yh3/G1BFmoPEaHxPRHgeowXRFFhW33FehrNgsljxRLmPVWw==}
+  postcss-rtlcss@6.0.0:
+    resolution: {integrity: sha512-iJMOT4vM6EOnvNUm+uZycpqqTeHCTMGPsyxIHloVUioECgKIrvtWtPIczc5NMc14x5ZJGadwUs0L1o6iZDCldg==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       postcss: ^8.4.21
@@ -4887,7 +4887,7 @@ snapshots:
 
   pngjs@7.0.0: {}
 
-  postcss-rtlcss@5.7.1(postcss@8.5.8):
+  postcss-rtlcss@6.0.0(postcss@8.5.8):
     dependencies:
       postcss: 8.5.8
       rtlcss: 4.3.0
