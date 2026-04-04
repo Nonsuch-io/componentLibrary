@@ -71,7 +71,7 @@ export const Default: Story = {
     template: `
       <NsAppShell v-bind="args">
         <template #header-left>
-          <span class="text-weight-bold text-subtitle1 q-ml-sm">butiq</span>
+          <span class="text-weight-bold text-subtitle1 q-ml-sm">Acme</span>
         </template>
         <template #header-actions>
           <NsButton flat round dense aria-label="Notifications">
@@ -94,7 +94,7 @@ export const MiniDrawer: Story = {
     template: `
       <NsAppShell v-bind="args">
         <template #header-left>
-          <span class="text-weight-bold text-subtitle1 q-ml-sm">butiq</span>
+          <span class="text-weight-bold text-subtitle1 q-ml-sm">Acme</span>
         </template>
         ${pageContent}
       </NsAppShell>
@@ -112,7 +112,7 @@ export const NoSearch: Story = {
     template: `
       <NsAppShell v-bind="args">
         <template #header-left>
-          <span class="text-weight-bold text-subtitle1 q-ml-sm">butiq</span>
+          <span class="text-weight-bold text-subtitle1 q-ml-sm">Acme</span>
         </template>
         ${pageContent}
       </NsAppShell>
@@ -130,7 +130,7 @@ export const WithBottomBarAbove: Story = {
     template: `
       <NsAppShell v-bind="args">
         <template #header-left>
-          <span class="text-weight-bold text-subtitle1 q-ml-sm">butiq</span>
+          <span class="text-weight-bold text-subtitle1 q-ml-sm">Acme</span>
         </template>
         <template #bottom-bar-above>
           <div class="bg-dark text-white q-pa-sm row items-center justify-between">
@@ -154,7 +154,7 @@ export const Mobile: Story = {
     template: `
       <NsAppShell v-bind="args">
         <template #header-left>
-          <span class="text-weight-bold text-subtitle1 q-ml-sm">butiq</span>
+          <span class="text-weight-bold text-subtitle1 q-ml-sm">Acme</span>
         </template>
         ${pageContent}
       </NsAppShell>
@@ -172,7 +172,7 @@ export const Tablet: Story = {
     template: `
       <NsAppShell v-bind="args">
         <template #header-left>
-          <span class="text-weight-bold text-subtitle1 q-ml-sm">butiq</span>
+          <span class="text-weight-bold text-subtitle1 q-ml-sm">Acme</span>
         </template>
         ${pageContent}
       </NsAppShell>

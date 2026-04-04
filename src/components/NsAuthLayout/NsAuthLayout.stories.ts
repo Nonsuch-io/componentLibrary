@@ -27,7 +27,7 @@ export const Default: Story = {
     template: `
       <NsAuthLayout v-bind="args">
         <template #branding>
-          <h4 class="text-h4 text-weight-bold">butiq</h4>
+          <h4 class="text-h4 text-weight-bold">Acme</h4>
           <p class="text-subtitle2 text-grey">Sign in to your account</p>
         </template>
         <div class="column q-gutter-y-md">
@@ -69,7 +69,7 @@ export const CustomWidth: Story = {
     template: `
       <NsAuthLayout v-bind="args">
         <template #branding>
-          <h4 class="text-h4 text-weight-bold">butiq</h4>
+          <h4 class="text-h4 text-weight-bold">Acme</h4>
           <p class="text-subtitle2 text-grey">Two-factor authentication</p>
         </template>
         <div class="column q-gutter-y-md">
@@ -92,7 +92,7 @@ export const Mobile: Story = {
     template: `
       <NsAuthLayout v-bind="args">
         <template #branding>
-          <h4 class="text-h4 text-weight-bold">butiq</h4>
+          <h4 class="text-h4 text-weight-bold">Acme</h4>
         </template>
         <div class="column q-gutter-y-md">
           <NsInput label="Email" type="email" />
