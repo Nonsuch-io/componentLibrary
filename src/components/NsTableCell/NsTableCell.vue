@@ -8,11 +8,10 @@
 /**
  * NsTableCell — A styled wrapper around Quasar's QTd.
  *
- * Provides Nonsuch design-token integration and a consistent API surface.
- * All QTd props and events are forwarded via $attrs.
+ * Drop-in compatible with QTd's API — pass the body-cell slot scope via
+ * `:props="cellProps"` the same way you would with `<q-td>`.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface NsTableCellProps {}
+import type { NsTableCellProps } from '../NsTable/types'
 
 defineProps<NsTableCellProps>()
 </script>
