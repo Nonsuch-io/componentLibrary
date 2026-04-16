@@ -1,6 +1,8 @@
 <template>
-  <q-table v-bind="$attrs" :rows="rows" class="ns-table">
-    <slot />
+  <q-table v-bind="props" class="ns-table">
+    <template v-for="(_, name) in $slots" #[name]="slotData">
+      <slot :name="name" v-bind="slotData ?? {}" />
+    </template>
   </q-table>
 </template>
 
@@ -8,15 +10,17 @@
 /**
  * NsTable — A styled wrapper around Quasar's QTable.
  *
- * Provides Nonsuch design-token integration and a consistent API surface.
- * All QTable props and events are forwarded via $attrs.
+ * Drop-in compatible with the full QTable API: columns, pagination, rowKey,
+ * loading, flat, bordered, hide-pagination, selection, and every scoped slot
+ * (body-cell-<name>, header-cell, top, no-data, …) pass through unchanged.
+ *
+ * Consumers should import `NsTableColumn`, `NsTableProps`,
+ * `NsTableBodyCellSlotProps`, and `NsTableCellProps` from this library rather
+ * than reaching into the `quasar` package for type definitions.
  */
-export interface NsTableProps {
-  /** Row data for the table */
-  rows?: Record<string, unknown>[]
-}
+import type { NsTableProps } from './types'
 
-withDefaults(defineProps<NsTableProps>(), {
+const props = withDefaults(defineProps<NsTableProps>(), {
   rows: () => [],
 })
 </script>

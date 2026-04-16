@@ -133,10 +133,14 @@ export { default as NsTab } from './components/NsTab/NsTab.vue'
 export type { NsTabProps } from './components/NsTab/NsTab.vue'
 
 export { default as NsTable } from './components/NsTable/NsTable.vue'
-export type { NsTableProps } from './components/NsTable/NsTable.vue'
+export type {
+  NsTableProps,
+  NsTableColumn,
+  NsTableBodyCellSlotProps,
+  NsTableCellProps,
+} from './components/NsTable/types'
 
 export { default as NsTableCell } from './components/NsTableCell/NsTableCell.vue'
-export type { NsTableCellProps } from './components/NsTableCell/NsTableCell.vue'
 
 export { default as NsTabPanel } from './components/NsTabPanel/NsTabPanel.vue'
 export type { NsTabPanelProps } from './components/NsTabPanel/NsTabPanel.vue'
