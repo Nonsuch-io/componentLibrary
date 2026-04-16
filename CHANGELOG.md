@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.13.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.12.2...v0.13.0) (2026-04-16)
+
+
+### Features
+
+* surface NsTable types (NsTableColumn, NsTableProps, slot scope) ([4f67821](https://github.com/Nonsuch-io/componentLibrary/commit/4f6782197b02df3189f9b8c106c8292c33a73c2a))
+* surface NsTable types so consumers drop raw Quasar imports ([d6baca6](https://github.com/Nonsuch-io/componentLibrary/commit/d6baca643a3e43fe8a6f48c8b0232e0239a23f94))
+
 ## [0.12.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.12.1...v0.12.2) (2026-04-04)
 
 
