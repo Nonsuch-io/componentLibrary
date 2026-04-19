@@ -16,43 +16,53 @@
  * LIGHT MODE (default)
  * ------------------------------------------------------ */
 :root {
-  /* — Brand colours — */
-  --ns-color-primary: #3b82f6; /* PLACEHOLDER */
-  --ns-color-primary-hover: #2563eb; /* PLACEHOLDER */
-  --ns-color-secondary: #8b5cf6; /* PLACEHOLDER */
-  --ns-color-secondary-hover: #7c3aed; /* PLACEHOLDER */
-  --ns-color-accent: #f59e0b; /* PLACEHOLDER */
-  --ns-color-accent-hover: #d97706; /* PLACEHOLDER */
+  /* — Brand colours —
+   * Sourced from butiq Design System (Figma). Primary = orange ramp,
+   * secondary = blue ramp, accent = light-blue highlight (butiq color-accent).
+   */
+  --ns-color-primary: #cc3c00; /* butiq primary-500 */
+  --ns-color-primary-hover: #d56307; /* butiq primary-400 */
+  --ns-color-secondary: #15acf8; /* butiq secondary-700 */
+  --ns-color-secondary-hover: #0069b4; /* butiq secondary-800 */
+  --ns-color-accent: #93dbff; /* butiq secondary-500 (color-accent) */
+  --ns-color-accent-hover: #a8d8f0; /* butiq secondary-400 */
 
   /* — Semantic colours — */
-  --ns-color-success: #22c55e; /* PLACEHOLDER */
-  --ns-color-warning: #f59e0b; /* PLACEHOLDER */
-  --ns-color-error: #ef4444; /* PLACEHOLDER */
-  --ns-color-info: #3b82f6; /* PLACEHOLDER */
+  --ns-color-success: #c4c81d; /* butiq positive-500 */
+  --ns-color-warning: #f1b931; /* butiq warning-500 */
+  --ns-color-error: #a5282d; /* butiq negative-700 (color-status-negative) */
+  --ns-color-info: #0069b4; /* butiq secondary-800 (color-status-info) */
 
   /* — Surface / background — */
-  --ns-color-background: #ffffff; /* PLACEHOLDER */
-  --ns-color-surface: #ffffff; /* PLACEHOLDER */
-  --ns-color-surface-variant: #f8fafc; /* PLACEHOLDER */
+  --ns-color-background: #fefbf5; /* butiq neutrals-300 (color-bg-canvas) */
+  --ns-color-surface: #ffffff; /* butiq color-bg-surface */
+  --ns-color-surface-variant: #fef7ee; /* butiq neutrals-400 (color-bg-subtle) */
 
-  /* — On-colours (text/icons on top of the corresponding colour) — */
-  --ns-color-on-primary: #ffffff; /* PLACEHOLDER */
-  --ns-color-on-secondary: #ffffff; /* PLACEHOLDER */
-  --ns-color-on-accent: #000000; /* PLACEHOLDER */
-  --ns-color-on-background: #0f172a; /* PLACEHOLDER */
-  --ns-color-on-surface: #0f172a; /* PLACEHOLDER */
+  /* — On-colours (text/icons on top of the corresponding colour) —
+   * butiq does not define explicit on-* variables; these values are chosen
+   * for WCAG AA contrast against the paired brand/surface tokens above.
+   */
+  --ns-color-on-primary: #ffffff;
+  --ns-color-on-secondary: #ffffff;
+  --ns-color-on-accent: #2d0b00; /* butiq greys/black — dark text on light accent */
+  --ns-color-on-background: #2d0b00; /* butiq color-text-primary */
+  --ns-color-on-surface: #2d0b00; /* butiq color-text-primary */
 
-  /* — Neutral scale — */
-  --ns-color-neutral-50: #f8fafc; /* PLACEHOLDER */
-  --ns-color-neutral-100: #f1f5f9; /* PLACEHOLDER */
-  --ns-color-neutral-200: #e2e8f0; /* PLACEHOLDER */
-  --ns-color-neutral-300: #cbd5e1; /* PLACEHOLDER */
-  --ns-color-neutral-400: #94a3b8; /* PLACEHOLDER */
-  --ns-color-neutral-500: #64748b; /* PLACEHOLDER */
-  --ns-color-neutral-600: #475569; /* PLACEHOLDER */
-  --ns-color-neutral-700: #334155; /* PLACEHOLDER */
-  --ns-color-neutral-800: #1e293b; /* PLACEHOLDER */
-  --ns-color-neutral-900: #0f172a; /* PLACEHOLDER */
+  /* — Neutral scale —
+   * Maps 1:1 to butiq greys/grey-50..900. Note: butiq's grey scale is not
+   * strictly monotonic (grey-50 is mid-tone, grey-100 is lighter). Values
+   * reflect the design system's source of truth.
+   */
+  --ns-color-neutral-50: #c5c5c5;
+  --ns-color-neutral-100: #e5e7eb;
+  --ns-color-neutral-200: #e0e0e0;
+  --ns-color-neutral-300: #d1d5db;
+  --ns-color-neutral-400: #9ca3af;
+  --ns-color-neutral-500: #909090;
+  --ns-color-neutral-600: #757575;
+  --ns-color-neutral-700: #535353;
+  --ns-color-neutral-800: #3c3c3c;
+  --ns-color-neutral-900: #212121;
 
   /* — Typography — */
   --ns-font-family-text: 'Fixel Text', 'Roboto', sans-serif; /* PLACEHOLDER */

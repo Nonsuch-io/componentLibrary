@@ -41,17 +41,19 @@ export interface QuasarConfigOverrides {
   [key: string]: unknown
 }
 
-/** Nonsuch placeholder brand colours — values match tokens.css (light mode) */
+/** Nonsuch brand colours — sourced from butiq Design System (Figma).
+ *  Values mirror the light-mode tokens in `tokens.css`. Keep in sync.
+ */
 const NS_BRAND: Required<QuasarBrandColors> = {
-  primary: '#3b82f6', // PLACEHOLDER — matches --ns-color-primary
-  secondary: '#8b5cf6', // PLACEHOLDER — matches --ns-color-secondary
-  accent: '#f59e0b', // PLACEHOLDER — matches --ns-color-accent
-  dark: '#1e293b', // PLACEHOLDER — matches --ns-color-neutral-800
-  'dark-page': '#0f172a', // PLACEHOLDER — matches --ns-color-neutral-900
-  positive: '#22c55e', // PLACEHOLDER — matches --ns-color-success
-  negative: '#ef4444', // PLACEHOLDER — matches --ns-color-error
-  info: '#3b82f6', // PLACEHOLDER — matches --ns-color-info
-  warning: '#f59e0b', // PLACEHOLDER — matches --ns-color-warning
+  primary: '#cc3c00', // butiq primary-500
+  secondary: '#15acf8', // butiq secondary-700
+  accent: '#93dbff', // butiq secondary-500 (color-accent)
+  dark: '#3c3c3c', // butiq greys/grey-800
+  'dark-page': '#212121', // butiq greys/grey-900
+  positive: '#c4c81d', // butiq positive-500
+  negative: '#a5282d', // butiq negative-700 (color-status-negative)
+  info: '#0069b4', // butiq secondary-800 (color-status-info)
+  warning: '#f1b931', // butiq warning-500
 }
 
 export function createQuasarConfig(overrides: QuasarConfigOverrides = {}): Record<string, unknown> {
