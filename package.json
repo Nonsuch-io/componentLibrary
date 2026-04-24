@@ -12,7 +12,8 @@
   "files": [
     "dist",
     "fonts",
-    "src/tokens/tokens.css"
+    "src/tokens/tokens.css",
+    "src/tokens/typography.css"
   ],
   "main": "./dist/nonsuch-components.js",
   "module": "./dist/nonsuch-components.js",
@@ -26,7 +27,8 @@
     "./fonts.css": "./fonts/fonts.css",
     "./fonts/global.css": "./fonts/global.css",
     "./fonts/quasar-overrides": "./fonts/_quasar-overrides.sass",
-    "./tokens.css": "./src/tokens/tokens.css"
+    "./tokens.css": "./src/tokens/tokens.css",
+    "./typography.css": "./src/tokens/typography.css"
   },
   "scripts": {
     "dev": "storybook dev -p 6006",

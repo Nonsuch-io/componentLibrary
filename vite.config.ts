@@ -4,6 +4,13 @@ import { resolve } from 'path'
 import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
 
 export default defineConfig({
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@use '${resolve(__dirname, 'src/tokens/tokens-primitive')}' as *;`,
+      },
+    },
+  },
   plugins: [
     vue({
       template: { transformAssetUrls },
