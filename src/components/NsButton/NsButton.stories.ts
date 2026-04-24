@@ -1,38 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import NsButton from './NsButton.vue'
-import { NsSkeleton } from '../NsSkeleton'
 
 const meta = {
   title: 'Components/NsButton',
   component: NsButton,
   tags: ['autodocs'],
   argTypes: {
-    color: {
+    variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'accent', 'positive', 'negative', 'info', 'warning'],
-      description: 'Quasar color palette name',
+      options: ['primary', 'secondary', 'tertiary', 'accent', 'positive', 'negative', 'warning'],
     },
     size: {
       control: 'select',
       options: ['xs', 'sm', 'md', 'lg', 'xl'],
-      description: 'Button size',
     },
-    unelevated: {
-      control: 'boolean',
-      description: 'Remove elevation (box-shadow)',
-    },
-    noCaps: {
-      control: 'boolean',
-      description: 'Disable uppercase text',
-    },
-    rounded: {
-      control: 'boolean',
-      description: 'Apply rounded border-radius',
-    },
-    loading: {
-      control: 'boolean',
-      description: 'Show loading spinner overlay',
-    },
+    iconOnly: { control: 'boolean' },
+    loading: { control: 'boolean' },
   },
 } satisfies Meta<typeof NsButton>
 
@@ -40,28 +23,26 @@ export default meta
 type Story = StoryObj<typeof meta>
 
 export const Default: Story = {
-  args: {},
+  args: { variant: 'primary', size: 'md' },
   render: (args) => ({
     components: { NsButton },
-    setup() {
-      return { args }
-    },
+    setup: () => ({ args }),
     template: '<NsButton v-bind="args">Click Me</NsButton>',
   }),
 }
 
-export const Colors: Story = {
+export const Variants: Story = {
   render: () => ({
     components: { NsButton },
     template: `
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <NsButton color="primary">Primary</NsButton>
-        <NsButton color="secondary">Secondary</NsButton>
-        <NsButton color="accent">Accent</NsButton>
-        <NsButton color="positive">Positive</NsButton>
-        <NsButton color="negative">Negative</NsButton>
-        <NsButton color="info">Info</NsButton>
-        <NsButton color="warning">Warning</NsButton>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <NsButton variant="primary">Primary</NsButton>
+        <NsButton variant="secondary">Secondary</NsButton>
+        <NsButton variant="tertiary">Tertiary</NsButton>
+        <NsButton variant="accent">Accent</NsButton>
+        <NsButton variant="positive">Positive</NsButton>
+        <NsButton variant="negative">Negative</NsButton>
+        <NsButton variant="warning">Warning</NsButton>
       </div>
     `,
   }),
@@ -71,7 +52,7 @@ export const Sizes: Story = {
   render: () => ({
     components: { NsButton },
     template: `
-      <div style="display: flex; gap: 8px; align-items: center;">
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
         <NsButton size="xs">Extra Small</NsButton>
         <NsButton size="sm">Small</NsButton>
         <NsButton size="md">Medium</NsButton>
@@ -85,46 +66,60 @@ export const Sizes: Story = {
 export const WithIcon: Story = {
   render: () => ({
     components: { NsButton },
-    template: '<NsButton icon="send">Send</NsButton>',
-  }),
-}
-
-export const Loading: Story = {
-  args: {
-    loading: true,
-  },
-  render: (args) => ({
-    components: { NsButton },
-    setup() {
-      return { args }
-    },
-    template: '<NsButton v-bind="args">Submit</NsButton>',
-  }),
-}
-
-export const LoadingSizes: Story = {
-  render: () => ({
-    components: { NsButton },
     template: `
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <NsButton size="xs" loading>Extra Small</NsButton>
-        <NsButton size="sm" loading>Small</NsButton>
-        <NsButton size="md" loading>Medium</NsButton>
-        <NsButton size="lg" loading>Large</NsButton>
-        <NsButton size="xl" loading>Extra Large</NsButton>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <NsButton size="xs" icon="send">Send</NsButton>
+        <NsButton size="sm" icon="send">Send</NsButton>
+        <NsButton size="md" icon="send">Send</NsButton>
+        <NsButton size="lg" icon="send">Send</NsButton>
+        <NsButton size="xl" icon="send">Send</NsButton>
       </div>
     `,
   }),
 }
 
-export const SkeletonPlaceholder: Story = {
+export const IconOnly: Story = {
   render: () => ({
-    components: { NsSkeleton },
+    components: { NsButton },
     template: `
-      <div style="display: flex; gap: 8px; align-items: center;">
-        <NsSkeleton type="QBtn" />
-        <NsSkeleton type="QBtn" width="120px" />
-        <NsSkeleton type="QBtn" width="160px" />
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <NsButton size="xs" icon="send" icon-only />
+        <NsButton size="sm" icon="send" icon-only />
+        <NsButton size="md" icon="send" icon-only />
+        <NsButton size="lg" icon="send" icon-only />
+        <NsButton size="xl" icon="send" icon-only />
+      </div>
+    `,
+  }),
+}
+
+export const Disabled: Story = {
+  render: () => ({
+    components: { NsButton },
+    template: `
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+        <NsButton variant="primary" disable>Primary</NsButton>
+        <NsButton variant="secondary" disable>Secondary</NsButton>
+        <NsButton variant="tertiary" disable>Tertiary</NsButton>
+        <NsButton variant="accent" disable>Accent</NsButton>
+        <NsButton variant="positive" disable>Positive</NsButton>
+        <NsButton variant="negative" disable>Negative</NsButton>
+        <NsButton variant="warning" disable>Warning</NsButton>
+      </div>
+    `,
+  }),
+}
+
+export const Loading: Story = {
+  render: () => ({
+    components: { NsButton },
+    template: `
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <NsButton size="xs" loading>Extra Small</NsButton>
+        <NsButton size="sm" loading>Small</NsButton>
+        <NsButton size="md" loading>Medium</NsButton>
+        <NsButton size="lg" loading>Large</NsButton>
+        <NsButton size="xl" loading>Extra Large</NsButton>
       </div>
     `,
   }),
