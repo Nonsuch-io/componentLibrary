@@ -1,6 +1,7 @@
 ---
 name: worker
 description: Worker subagent for independent implementation tasks. Use when dispatching TDD implementation work — either a full bead or an isolated subtask. Worker implements code and runs tests but does NOT commit, push, or manage beads. Parent agent reviews results before committing.
+model: sonnet
 tools: Read, Write, Edit, Grep, Glob, Bash, WebFetch, TodoWrite
 ---
 

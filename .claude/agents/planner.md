@@ -1,6 +1,7 @@
 ---
 name: planner
 description: Planner agent for epic scoping, architecture decisions, and codebase analysis. Use when designing components, breaking down epics into beads, evaluating trade-offs, or exploring how the library works before writing code.
+model: opus
 tools: Read, Grep, Glob, Bash, WebFetch, WebSearch, TodoWrite, Task
 ---
 
