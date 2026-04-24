@@ -22,8 +22,8 @@
    */
   --ns-color-primary: #cc3c00; /* butiq primary-500 */
   --ns-color-primary-hover: #d56307; /* butiq primary-400 */
-  --ns-color-secondary: #15acf8; /* butiq secondary-700 */
-  --ns-color-secondary-hover: #0069b4; /* butiq secondary-800 */
+  --ns-color-secondary: #93dbff; /* matches accent */
+  --ns-color-secondary-hover: #a8d8f0; /* matches accent-hover */
   --ns-color-accent: #93dbff; /* butiq secondary-500 (color-accent) */
   --ns-color-accent-hover: #a8d8f0; /* butiq secondary-400 */
 
@@ -63,6 +63,65 @@
   --ns-color-neutral-700: #535353;
   --ns-color-neutral-800: #3c3c3c;
   --ns-color-neutral-900: #212121;
+
+  /* — Text colours — */
+  --ns-color-text-secondary: #757575;
+  --ns-color-text-tertiary: #9ca3af;
+  --ns-color-text-brand: #d56307;
+  --ns-color-text-brand-hover: #ef7c20;
+  --ns-color-text-disabled: #909090;
+  --ns-color-text-link: #64cbff;
+  --ns-color-text-link-hover: #a8d8f0;
+
+  /* — Extended background colours — */
+  --ns-color-bg-brand-subtle: #fce5d2;
+  --ns-color-bg-brand-hover: #ef7c20;
+  --ns-color-bg-header: #fdf4e7;
+  --ns-color-bg-disabled: #e0e0e0;
+  --ns-color-bg-menu-hover: #f9cba6;
+  --ns-color-bg-menu-selected: #d56307;
+
+  /* — Border colours — */
+  --ns-color-border: #e5e7eb;
+  --ns-color-border-subtle: #ffffff;
+  --ns-color-border-focus: #93dbff;
+  --ns-color-border-strong: #93dbff;
+  --ns-color-border-disabled: #d1d5db;
+  --ns-color-border-brand: #d56307;
+  --ns-color-border-brand-subtle: #fce5d2;
+  --ns-color-border-positive: #aaae04;
+  --ns-color-border-warning: #f1b931;
+  --ns-color-border-negative: #cc363c;
+  --ns-color-border-info: #0069b4;
+  --ns-color-border-accent: #15acf8;
+
+  /* — Extended status colours — */
+  --ns-color-success-light: #e7e9a5;
+  --ns-color-success-hover: #e2e653;
+  --ns-color-success-active: #919500;
+  --ns-color-warning-light: #fcf1d6;
+  --ns-color-warning-hover: #f8dc98;
+  --ns-color-warning-active: #f1b931;
+  --ns-color-error-light: #fce4e5;
+  --ns-color-error-hover: #e05359;
+  --ns-color-error-active: #8e262a;
+  --ns-color-info-light: #dceef7;
+  --ns-color-info-hover: #15acf8;
+  --ns-color-info-active: #004a7f;
+  --ns-color-accent-light: #edf6fb;
+  --ns-color-accent-active: #15acf8;
+  --ns-color-status-neutral: #e5e7eb;
+
+  /* — Data visualisation colours — */
+  --ns-color-data-1: #f4adb0;
+  --ns-color-data-2: #dcde77;
+  --ns-color-data-3: #f9cba6;
+  --ns-color-data-4: #a8d8f0;
+  --ns-color-data-5: #e8a9ff;
+  --ns-color-data-6: #cf68f4;
+  --ns-color-data-7: #e05359;
+  --ns-color-data-8: #ef7c20;
+  --ns-color-data-9: #8e23b3;
 
   /* — Typography — */
   --ns-font-family-text: 'Fixel Text', 'Roboto', sans-serif; /* PLACEHOLDER */
