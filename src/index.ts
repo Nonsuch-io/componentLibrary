@@ -5,6 +5,12 @@
 export { default as NsButton } from './components/NsButton/NsButton.vue'
 export type { NsButtonProps } from './components/NsButton/NsButton.vue'
 
+export { default as NsNavSidebar } from './components/NsNavSidebar/NsNavSidebar.vue'
+export type { NsNavSidebarProps, NsNavItem } from './components/NsNavSidebar/NsNavSidebar.vue'
+
+export { default as NsBottomNav } from './components/NsBottomNav/NsBottomNav.vue'
+export type { NsBottomNavProps } from './components/NsBottomNav/NsBottomNav.vue'
+
 export { default as NsSkeleton } from './components/NsSkeleton/NsSkeleton.vue'
 export type {
   NsSkeletonProps,

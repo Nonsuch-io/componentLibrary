@@ -149,6 +149,7 @@
   --ns-letter-spacing-wide: 0.02em; /* PLACEHOLDER */
 
   /* — Spacing (4px grid) — */
+  --ns-space-0: 0.125rem; /* 2px */
   --ns-space-1: 0.25rem; /* 4px */
   --ns-space-2: 0.5rem; /* 8px */
   --ns-space-3: 0.75rem; /* 12px */
