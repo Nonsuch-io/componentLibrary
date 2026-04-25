@@ -176,7 +176,7 @@ function onSubClick(parentId: string, subLabel: string) {
 $pill-h: 44px;
 $pill-radius: 999px;
 $icon-size: 60px;
-$active-bg: #d56307;
+$active-bg: var(--ns-color-bg-brand);
 
 @mixin gradient-border {
   border: 1.5px solid transparent;
@@ -289,7 +289,7 @@ $active-bg: #d56307;
   &--active {
     background: $active-bg;
     border-color: transparent;
-    color: #ffffff;
+    color: var(--ns-color-on-primary);
   }
 }
 
@@ -353,7 +353,7 @@ $active-bg: #d56307;
   &--active {
     background: $active-bg;
     border-color: transparent;
-    color: #ffffff;
+    color: var(--ns-color-on-primary);
   }
 }
 

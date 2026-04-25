@@ -50,7 +50,9 @@ export type NsToken =
   | '--ns-color-text-link-hover'
   // Extended background colours
   | '--ns-color-bg-brand-subtle'
+  | '--ns-color-bg-brand'
   | '--ns-color-bg-brand-hover'
+  | '--ns-color-bg-brand-active'
   | '--ns-color-bg-header'
   | '--ns-color-bg-disabled'
   | '--ns-color-bg-menu-hover'

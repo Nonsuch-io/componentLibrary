@@ -75,7 +75,9 @@
 
   /* — Extended background colours — */
   --ns-color-bg-brand-subtle: #fce5d2;
+  --ns-color-bg-brand: #d56307;
   --ns-color-bg-brand-hover: #ef7c20;
+  --ns-color-bg-brand-active: #cc3c00;
   --ns-color-bg-header: #fdf4e7;
   --ns-color-bg-disabled: #e0e0e0;
   --ns-color-bg-menu-hover: #f9cba6;
@@ -193,7 +195,10 @@
 }
 
 /* --------------------------------------------------------
- * DARK MODE
+ * DARK MODE — PLACEHOLDER VALUES
+ *
+ * Awaiting dark-mode design in Figma. All values below are
+ * temporary placeholders and must not be shipped to production.
  *
  * Activated by any of:
  *   <html class="dark">
@@ -209,6 +214,8 @@
   /* — Brand colours (dark) — */
   --ns-color-primary: #60a5fa; /* PLACEHOLDER */
   --ns-color-primary-hover: #93c5fd; /* PLACEHOLDER */
+  --ns-color-bg-brand: #d56307; /* PLACEHOLDER — awaiting dark Figma values */
+  --ns-color-bg-brand-active: #cc3c00; /* PLACEHOLDER — awaiting dark Figma values */
   --ns-color-secondary: #a78bfa; /* PLACEHOLDER */
   --ns-color-secondary-hover: #c4b5fd; /* PLACEHOLDER */
   --ns-color-accent: #fbbf24; /* PLACEHOLDER */

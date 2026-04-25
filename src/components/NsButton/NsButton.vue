@@ -5,6 +5,7 @@
     no-caps
     :ripple="false"
     :loading="loading"
+    :padding="buttonPadding"
     :aria-busy="loading"
     :class="['ns-btn', `ns-btn--${variant}`, `ns-btn--${size}`, { 'ns-btn--icon-only': iconOnly }]"
   >
@@ -18,6 +19,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { QSpinnerDots } from 'quasar'
 
 export type NsButtonVariant =
@@ -39,12 +41,24 @@ export interface NsButtonProps {
   loading?: boolean
 }
 
-withDefaults(defineProps<NsButtonProps>(), {
+const props = withDefaults(defineProps<NsButtonProps>(), {
   variant: 'primary',
   size: 'md',
   iconOnly: false,
   loading: false,
 })
+
+const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = {
+  xs: { default: '4px 8px', iconOnly: '8px' },
+  sm: { default: '8px 12px', iconOnly: '8px' },
+  md: { default: '8px 16px', iconOnly: '8px' },
+  lg: { default: '12px 16px', iconOnly: '12px' },
+  xl: { default: '20px', iconOnly: '12px' },
+}
+
+const buttonPadding = computed(
+  () => paddingMap[props.size][props.iconOnly ? 'iconOnly' : 'default'],
+)
 </script>
 
 <style lang="scss" scoped>
@@ -59,99 +73,58 @@ withDefaults(defineProps<NsButtonProps>(), {
     box-shadow 150ms ease;
 
   :deep(.q-btn__wrapper) {
-    min-height: unset;
-    padding: 0;
+    min-height: unset; /* Quasar 2.x internal — revisit on major Quasar bump */
   }
 
   :deep(.q-btn__content) {
-    gap: 4px;
+    gap: 4px; /* Quasar 2.x internal — revisit on major Quasar bump */
   }
 }
 
 // ---- Sizes ----
 .ns-btn--xs {
   font-size: 12px;
-
-  :deep(.q-btn__wrapper) {
-    padding: 4px 8px;
-  }
-
-  &.ns-btn--icon-only :deep(.q-btn__wrapper) {
-    padding: 8px;
-  }
 }
 
 .ns-btn--sm {
   font-size: 12px;
-
-  :deep(.q-btn__wrapper) {
-    padding: 8px 12px;
-  }
-
-  &.ns-btn--icon-only :deep(.q-btn__wrapper) {
-    padding: 8px;
-  }
 }
 
 .ns-btn--md {
   font-size: 14px;
-
-  :deep(.q-btn__wrapper) {
-    padding: 8px 16px;
-  }
-
-  &.ns-btn--icon-only :deep(.q-btn__wrapper) {
-    padding: 8px;
-  }
 }
 
 .ns-btn--lg {
   font-size: 16px;
 
-  :deep(.q-btn__wrapper) {
-    padding: 12px 16px;
-  }
-
   :deep(.q-btn__content) {
-    gap: 8px;
-  }
-
-  &.ns-btn--icon-only :deep(.q-btn__wrapper) {
-    padding: 12px;
+    gap: 8px; /* Quasar 2.x internal — revisit on major Quasar bump */
   }
 }
 
 .ns-btn--xl {
   font-size: 20px;
 
-  :deep(.q-btn__wrapper) {
-    padding: 20px;
-  }
-
   :deep(.q-btn__content) {
-    gap: 12px;
+    gap: 12px; /* Quasar 2.x internal — revisit on major Quasar bump */
   }
 
   &.ns-btn--icon-only {
     border-radius: 12px;
-
-    :deep(.q-btn__wrapper) {
-      padding: 12px;
-    }
   }
 }
 
 // ---- Primary ----
 .ns-btn--primary {
-  background: #d56307; // color-bg-brand (primary-400)
-  color: #ffffff;
+  background: var(--ns-color-bg-brand);
+  color: var(--ns-color-on-primary);
 
   &:hover:not(.disabled) {
-    background: #ef7c20; // color-bg-brand-hover
+    background: var(--ns-color-bg-brand-hover);
   }
 
   &:active:not(.disabled) {
-    background: #cc3c00; // color-bg-brand-active
+    background: var(--ns-color-bg-brand-active);
   }
 
   &.disabled {
@@ -263,7 +236,7 @@ withDefaults(defineProps<NsButtonProps>(), {
 
 // ---- Warning ----
 .ns-btn--warning {
-  background: #f4c75a; // color-status-warning (warning-400) — between --ns-color-warning tokens
+  background: var(--ns-color-warning);
   color: var(--ns-color-on-accent);
 
   &:hover:not(.disabled) {

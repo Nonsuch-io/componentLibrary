@@ -222,7 +222,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
-$active-bg: #d56307;
+$active-bg: var(--ns-color-bg-brand);
 $pill-radius: 999px;
 $pill-h: 56px;
 
@@ -274,7 +274,7 @@ $pill-h: 56px;
   &--active {
     background: $active-bg;
     border-color: transparent;
-    color: #ffffff;
+    color: var(--ns-color-on-primary);
     font-weight: 700;
   }
 
@@ -335,7 +335,7 @@ $pill-h: 56px;
   &--active {
     background: $active-bg;
     border-color: transparent;
-    color: #ffffff;
+    color: var(--ns-color-on-primary);
   }
 }
 
