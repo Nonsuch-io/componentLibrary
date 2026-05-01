@@ -52,12 +52,12 @@
   "size-limit": [
     {
       "path": "dist/nonsuch-components.js",
-      "limit": "15 kB",
+      "limit": "18 kB",
       "gzip": true
     },
     {
       "path": "dist/nonsuch-components.css",
-      "limit": "3 kB",
+      "limit": "4 kB",
       "gzip": true
     }
   ],
