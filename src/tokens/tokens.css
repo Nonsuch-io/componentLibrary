@@ -16,43 +16,114 @@
  * LIGHT MODE (default)
  * ------------------------------------------------------ */
 :root {
-  /* — Brand colours — */
-  --ns-color-primary: #3b82f6; /* PLACEHOLDER */
-  --ns-color-primary-hover: #2563eb; /* PLACEHOLDER */
-  --ns-color-secondary: #8b5cf6; /* PLACEHOLDER */
-  --ns-color-secondary-hover: #7c3aed; /* PLACEHOLDER */
-  --ns-color-accent: #f59e0b; /* PLACEHOLDER */
-  --ns-color-accent-hover: #d97706; /* PLACEHOLDER */
+  /* — Brand colours —
+   * Sourced from butiq Design System (Figma). Primary = orange ramp,
+   * secondary = blue ramp, accent = light-blue highlight (butiq color-accent).
+   */
+  --ns-color-primary: #cc3c00; /* butiq primary-500 */
+  --ns-color-primary-hover: #d56307; /* butiq primary-400 */
+  --ns-color-secondary: #93dbff; /* matches accent */
+  --ns-color-secondary-hover: #a8d8f0; /* matches accent-hover */
+  --ns-color-accent: #93dbff; /* butiq secondary-500 (color-accent) */
+  --ns-color-accent-hover: #a8d8f0; /* butiq secondary-400 */
 
   /* — Semantic colours — */
-  --ns-color-success: #22c55e; /* PLACEHOLDER */
-  --ns-color-warning: #f59e0b; /* PLACEHOLDER */
-  --ns-color-error: #ef4444; /* PLACEHOLDER */
-  --ns-color-info: #3b82f6; /* PLACEHOLDER */
+  --ns-color-success: #c4c81d; /* butiq positive-500 */
+  --ns-color-warning: #f1b931; /* butiq warning-500 */
+  --ns-color-error: #a5282d; /* butiq negative-700 (color-status-negative) */
+  --ns-color-info: #0069b4; /* butiq secondary-800 (color-status-info) */
 
   /* — Surface / background — */
-  --ns-color-background: #ffffff; /* PLACEHOLDER */
-  --ns-color-surface: #ffffff; /* PLACEHOLDER */
-  --ns-color-surface-variant: #f8fafc; /* PLACEHOLDER */
+  --ns-color-background: #fefbf5; /* butiq neutrals-300 (color-bg-canvas) */
+  --ns-color-surface: #ffffff; /* butiq color-bg-surface */
+  --ns-color-surface-variant: #fef7ee; /* butiq neutrals-400 (color-bg-subtle) */
 
-  /* — On-colours (text/icons on top of the corresponding colour) — */
-  --ns-color-on-primary: #ffffff; /* PLACEHOLDER */
-  --ns-color-on-secondary: #ffffff; /* PLACEHOLDER */
-  --ns-color-on-accent: #000000; /* PLACEHOLDER */
-  --ns-color-on-background: #0f172a; /* PLACEHOLDER */
-  --ns-color-on-surface: #0f172a; /* PLACEHOLDER */
+  /* — On-colours (text/icons on top of the corresponding colour) —
+   * butiq does not define explicit on-* variables; these values are chosen
+   * for WCAG AA contrast against the paired brand/surface tokens above.
+   */
+  --ns-color-on-primary: #ffffff;
+  --ns-color-on-secondary: #ffffff;
+  --ns-color-on-accent: #2d0b00; /* butiq greys/black — dark text on light accent */
+  --ns-color-on-background: #2d0b00; /* butiq color-text-primary */
+  --ns-color-on-surface: #2d0b00; /* butiq color-text-primary */
 
-  /* — Neutral scale — */
-  --ns-color-neutral-50: #f8fafc; /* PLACEHOLDER */
-  --ns-color-neutral-100: #f1f5f9; /* PLACEHOLDER */
-  --ns-color-neutral-200: #e2e8f0; /* PLACEHOLDER */
-  --ns-color-neutral-300: #cbd5e1; /* PLACEHOLDER */
-  --ns-color-neutral-400: #94a3b8; /* PLACEHOLDER */
-  --ns-color-neutral-500: #64748b; /* PLACEHOLDER */
-  --ns-color-neutral-600: #475569; /* PLACEHOLDER */
-  --ns-color-neutral-700: #334155; /* PLACEHOLDER */
-  --ns-color-neutral-800: #1e293b; /* PLACEHOLDER */
-  --ns-color-neutral-900: #0f172a; /* PLACEHOLDER */
+  /* — Neutral scale —
+   * Maps 1:1 to butiq greys/grey-50..900. Note: butiq's grey scale is not
+   * strictly monotonic (grey-50 is mid-tone, grey-100 is lighter). Values
+   * reflect the design system's source of truth.
+   */
+  --ns-color-neutral-50: #c5c5c5;
+  --ns-color-neutral-100: #e5e7eb;
+  --ns-color-neutral-200: #e0e0e0;
+  --ns-color-neutral-300: #d1d5db;
+  --ns-color-neutral-400: #9ca3af;
+  --ns-color-neutral-500: #909090;
+  --ns-color-neutral-600: #757575;
+  --ns-color-neutral-700: #535353;
+  --ns-color-neutral-800: #3c3c3c;
+  --ns-color-neutral-900: #212121;
+
+  /* — Text colours — */
+  --ns-color-text-secondary: #757575;
+  --ns-color-text-tertiary: #9ca3af;
+  --ns-color-text-brand: #d56307;
+  --ns-color-text-brand-hover: #ef7c20;
+  --ns-color-text-disabled: #909090;
+  --ns-color-text-link: #64cbff;
+  --ns-color-text-link-hover: #a8d8f0;
+
+  /* — Extended background colours — */
+  --ns-color-bg-brand-subtle: #fce5d2;
+  --ns-color-bg-brand: #d56307;
+  --ns-color-bg-brand-hover: #ef7c20;
+  --ns-color-bg-brand-active: #cc3c00;
+  --ns-color-bg-header: #fdf4e7;
+  --ns-color-bg-disabled: #e0e0e0;
+  --ns-color-bg-menu-hover: #f9cba6;
+  --ns-color-bg-menu-selected: #d56307;
+
+  /* — Border colours — */
+  --ns-color-border: #e5e7eb;
+  --ns-color-border-subtle: #ffffff;
+  --ns-color-border-focus: #93dbff;
+  --ns-color-border-strong: #93dbff;
+  --ns-color-border-disabled: #d1d5db;
+  --ns-color-border-brand: #d56307;
+  --ns-color-border-brand-subtle: #fce5d2;
+  --ns-color-border-positive: #aaae04;
+  --ns-color-border-warning: #f1b931;
+  --ns-color-border-negative: #cc363c;
+  --ns-color-border-info: #0069b4;
+  --ns-color-border-accent: #15acf8;
+
+  /* — Extended status colours — */
+  --ns-color-success-light: #e7e9a5;
+  --ns-color-success-hover: #e2e653;
+  --ns-color-success-active: #919500;
+  --ns-color-warning-light: #fcf1d6;
+  --ns-color-warning-hover: #f8dc98;
+  --ns-color-warning-active: #f1b931;
+  --ns-color-error-light: #fce4e5;
+  --ns-color-error-hover: #e05359;
+  --ns-color-error-active: #8e262a;
+  --ns-color-info-light: #dceef7;
+  --ns-color-info-hover: #15acf8;
+  --ns-color-info-active: #004a7f;
+  --ns-color-accent-light: #edf6fb;
+  --ns-color-accent-active: #15acf8;
+  --ns-color-status-neutral: #e5e7eb;
+
+  /* — Data visualisation colours — */
+  --ns-color-data-1: #f4adb0;
+  --ns-color-data-2: #dcde77;
+  --ns-color-data-3: #f9cba6;
+  --ns-color-data-4: #a8d8f0;
+  --ns-color-data-5: #e8a9ff;
+  --ns-color-data-6: #cf68f4;
+  --ns-color-data-7: #e05359;
+  --ns-color-data-8: #ef7c20;
+  --ns-color-data-9: #8e23b3;
 
   /* — Typography — */
   --ns-font-family-text: 'Fixel Text', 'Roboto', sans-serif; /* PLACEHOLDER */
@@ -80,6 +151,7 @@
   --ns-letter-spacing-wide: 0.02em; /* PLACEHOLDER */
 
   /* — Spacing (4px grid) — */
+  --ns-space-0: 0.125rem; /* 2px */
   --ns-space-1: 0.25rem; /* 4px */
   --ns-space-2: 0.5rem; /* 8px */
   --ns-space-3: 0.75rem; /* 12px */
@@ -123,7 +195,10 @@
 }
 
 /* --------------------------------------------------------
- * DARK MODE
+ * DARK MODE — PLACEHOLDER VALUES
+ *
+ * Awaiting dark-mode design in Figma. All values below are
+ * temporary placeholders and must not be shipped to production.
  *
  * Activated by any of:
  *   <html class="dark">
@@ -139,6 +214,8 @@
   /* — Brand colours (dark) — */
   --ns-color-primary: #60a5fa; /* PLACEHOLDER */
   --ns-color-primary-hover: #93c5fd; /* PLACEHOLDER */
+  --ns-color-bg-brand: #d56307; /* PLACEHOLDER — awaiting dark Figma values */
+  --ns-color-bg-brand-active: #cc3c00; /* PLACEHOLDER — awaiting dark Figma values */
   --ns-color-secondary: #a78bfa; /* PLACEHOLDER */
   --ns-color-secondary-hover: #c4b5fd; /* PLACEHOLDER */
   --ns-color-accent: #fbbf24; /* PLACEHOLDER */

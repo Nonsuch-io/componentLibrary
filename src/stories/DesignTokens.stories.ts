@@ -20,40 +20,104 @@ interface Token {
 }
 
 const colours: Token[] = [
-  { name: '--ns-color-primary', fallback: '#3b82f6' },
-  { name: '--ns-color-primary-hover', fallback: '#2563eb' },
-  { name: '--ns-color-secondary', fallback: '#8b5cf6' },
-  { name: '--ns-color-secondary-hover', fallback: '#7c3aed' },
-  { name: '--ns-color-accent', fallback: '#f59e0b' },
-  { name: '--ns-color-accent-hover', fallback: '#d97706' },
-  { name: '--ns-color-success', fallback: '#22c55e' },
-  { name: '--ns-color-warning', fallback: '#f59e0b' },
-  { name: '--ns-color-error', fallback: '#ef4444' },
-  { name: '--ns-color-info', fallback: '#3b82f6' },
+  { name: '--ns-color-primary', fallback: '#cc3c00' },
+  { name: '--ns-color-primary-hover', fallback: '#d56307' },
+  { name: '--ns-color-secondary', fallback: '#93dbff' },
+  { name: '--ns-color-secondary-hover', fallback: '#a8d8f0' },
+  { name: '--ns-color-accent', fallback: '#93dbff' },
+  { name: '--ns-color-accent-hover', fallback: '#a8d8f0' },
 ]
 
 const neutrals: Token[] = [
-  { name: '--ns-color-neutral-50', fallback: '#f8fafc' },
-  { name: '--ns-color-neutral-100', fallback: '#f1f5f9' },
-  { name: '--ns-color-neutral-200', fallback: '#e2e8f0' },
-  { name: '--ns-color-neutral-300', fallback: '#cbd5e1' },
-  { name: '--ns-color-neutral-400', fallback: '#94a3b8' },
-  { name: '--ns-color-neutral-500', fallback: '#64748b' },
-  { name: '--ns-color-neutral-600', fallback: '#475569' },
-  { name: '--ns-color-neutral-700', fallback: '#334155' },
-  { name: '--ns-color-neutral-800', fallback: '#1e293b' },
-  { name: '--ns-color-neutral-900', fallback: '#0f172a' },
+  { name: '--ns-color-neutral-50', fallback: '#c5c5c5' },
+  { name: '--ns-color-neutral-100', fallback: '#e5e7eb' },
+  { name: '--ns-color-neutral-200', fallback: '#e0e0e0' },
+  { name: '--ns-color-neutral-300', fallback: '#d1d5db' },
+  { name: '--ns-color-neutral-400', fallback: '#9ca3af' },
+  { name: '--ns-color-neutral-500', fallback: '#909090' },
+  { name: '--ns-color-neutral-600', fallback: '#757575' },
+  { name: '--ns-color-neutral-700', fallback: '#535353' },
+  { name: '--ns-color-neutral-800', fallback: '#3c3c3c' },
+  { name: '--ns-color-neutral-900', fallback: '#212121' },
 ]
 
 const surfaces: Token[] = [
-  { name: '--ns-color-background', fallback: '#ffffff' },
+  { name: '--ns-color-background', fallback: '#fefbf5' },
   { name: '--ns-color-surface', fallback: '#ffffff' },
-  { name: '--ns-color-surface-variant', fallback: '#f8fafc' },
+  { name: '--ns-color-surface-variant', fallback: '#fef7ee' },
   { name: '--ns-color-on-primary', fallback: '#ffffff' },
   { name: '--ns-color-on-secondary', fallback: '#ffffff' },
-  { name: '--ns-color-on-accent', fallback: '#000000' },
-  { name: '--ns-color-on-background', fallback: '#0f172a' },
-  { name: '--ns-color-on-surface', fallback: '#0f172a' },
+  { name: '--ns-color-on-accent', fallback: '#2d0b00' },
+  { name: '--ns-color-on-background', fallback: '#2d0b00' },
+  { name: '--ns-color-on-surface', fallback: '#2d0b00' },
+]
+
+const textColours: Token[] = [
+  { name: '--ns-color-text-secondary', fallback: '#757575' },
+  { name: '--ns-color-text-tertiary', fallback: '#9ca3af' },
+  { name: '--ns-color-text-brand', fallback: '#d56307' },
+  { name: '--ns-color-text-brand-hover', fallback: '#ef7c20' },
+  { name: '--ns-color-text-disabled', fallback: '#909090' },
+  { name: '--ns-color-text-link', fallback: '#64cbff' },
+  { name: '--ns-color-text-link-hover', fallback: '#a8d8f0' },
+]
+
+const backgroundColours: Token[] = [
+  { name: '--ns-color-bg-brand-subtle', fallback: '#fce5d2' },
+  { name: '--ns-color-bg-brand-hover', fallback: '#ef7c20' },
+  { name: '--ns-color-bg-header', fallback: '#fdf4e7' },
+  { name: '--ns-color-bg-disabled', fallback: '#e0e0e0' },
+  { name: '--ns-color-bg-menu-hover', fallback: '#f9cba6' },
+  { name: '--ns-color-bg-menu-selected', fallback: '#d56307' },
+]
+
+const borderColours: Token[] = [
+  { name: '--ns-color-border', fallback: '#e5e7eb' },
+  { name: '--ns-color-border-subtle', fallback: '#ffffff' },
+  { name: '--ns-color-border-focus', fallback: '#93dbff' },
+  { name: '--ns-color-border-strong', fallback: '#93dbff' },
+  { name: '--ns-color-border-disabled', fallback: '#d1d5db' },
+  { name: '--ns-color-border-brand', fallback: '#d56307' },
+  { name: '--ns-color-border-brand-subtle', fallback: '#fce5d2' },
+  { name: '--ns-color-border-positive', fallback: '#aaae04' },
+  { name: '--ns-color-border-warning', fallback: '#f1b931' },
+  { name: '--ns-color-border-negative', fallback: '#cc363c' },
+  { name: '--ns-color-border-info', fallback: '#0069b4' },
+  { name: '--ns-color-border-accent', fallback: '#15acf8' },
+]
+
+const statusColours: Token[] = [
+  { name: '--ns-color-success', fallback: '#c4c81d' },
+  { name: '--ns-color-success-light', fallback: '#e7e9a5' },
+  { name: '--ns-color-success-hover', fallback: '#e2e653' },
+  { name: '--ns-color-success-active', fallback: '#919500' },
+  { name: '--ns-color-warning', fallback: '#f1b931' },
+  { name: '--ns-color-warning-light', fallback: '#fcf1d6' },
+  { name: '--ns-color-warning-hover', fallback: '#f8dc98' },
+  { name: '--ns-color-warning-active', fallback: '#f1b931' },
+  { name: '--ns-color-error', fallback: '#a5282d' },
+  { name: '--ns-color-error-light', fallback: '#fce4e5' },
+  { name: '--ns-color-error-hover', fallback: '#e05359' },
+  { name: '--ns-color-error-active', fallback: '#8e262a' },
+  { name: '--ns-color-info', fallback: '#0069b4' },
+  { name: '--ns-color-info-light', fallback: '#dceef7' },
+  { name: '--ns-color-info-hover', fallback: '#15acf8' },
+  { name: '--ns-color-info-active', fallback: '#004a7f' },
+  { name: '--ns-color-accent-light', fallback: '#edf6fb' },
+  { name: '--ns-color-accent-active', fallback: '#15acf8' },
+  { name: '--ns-color-status-neutral', fallback: '#e5e7eb' },
+]
+
+const dataColours: Token[] = [
+  { name: '--ns-color-data-1', fallback: '#f4adb0' },
+  { name: '--ns-color-data-2', fallback: '#dcde77' },
+  { name: '--ns-color-data-3', fallback: '#f9cba6' },
+  { name: '--ns-color-data-4', fallback: '#a8d8f0' },
+  { name: '--ns-color-data-5', fallback: '#e8a9ff' },
+  { name: '--ns-color-data-6', fallback: '#cf68f4' },
+  { name: '--ns-color-data-7', fallback: '#e05359' },
+  { name: '--ns-color-data-8', fallback: '#ef7c20' },
+  { name: '--ns-color-data-9', fallback: '#8e23b3' },
 ]
 
 const fontSizes: Token[] = [
@@ -173,13 +237,11 @@ const DesignTokensPage = defineComponent({
             { style: 'font-family: var(--ns-font-family-display); margin-bottom: 0.5rem' },
             'Design Tokens',
           ),
-          h('p', { style: 'color: var(--ns-color-neutral-500); margin-bottom: 1.5rem' }, [
-            'All values are ',
-            h('strong', 'placeholders'),
-            ' — they will be updated when brand designs are finalised. Token ',
-            h('em', 'names'),
-            ' are stable.',
-          ]),
+          h(
+            'p',
+            { style: 'color: var(--ns-color-neutral-500); margin-bottom: 1.5rem' },
+            'All tokens sourced from the Nonsuch Figma design system.',
+          ),
 
           // Dark mode toggle
           h('div', { style: 'margin-bottom: 2rem' }, [
@@ -203,6 +265,21 @@ const DesignTokensPage = defineComponent({
 
           sectionTitle('Surface & On-Colours'),
           swatchGrid(surfaces),
+
+          sectionTitle('Text Colours'),
+          swatchGrid(textColours),
+
+          sectionTitle('Background Colours'),
+          swatchGrid(backgroundColours),
+
+          sectionTitle('Border Colours'),
+          swatchGrid(borderColours),
+
+          sectionTitle('Status Colours'),
+          swatchGrid(statusColours),
+
+          sectionTitle('Data Colours'),
+          swatchGrid(dataColours),
 
           // — Typography —
           sectionTitle('Typography Scale'),
