@@ -29,7 +29,7 @@
 
   /* — Semantic colours — */
   --ns-color-success: #c4c81d; /* butiq positive-500 */
-  --ns-color-warning: #f1b931; /* butiq warning-500 */
+  --ns-color-warning: #f4c75a; /* butiq color-status-warning */
   --ns-color-error: #a5282d; /* butiq negative-700 (color-status-negative) */
   --ns-color-info: #0069b4; /* butiq secondary-800 (color-status-info) */
 
