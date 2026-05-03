@@ -29,7 +29,7 @@
 
   /* — Semantic colours — */
   --ns-color-success: #c4c81d; /* butiq positive-500 */
-  --ns-color-warning: #f1b931; /* butiq warning-500 */
+  --ns-color-warning: #f4c75a; /* butiq color-status-warning */
   --ns-color-error: #a5282d; /* butiq negative-700 (color-status-negative) */
   --ns-color-info: #0069b4; /* butiq secondary-800 (color-status-info) */
 
@@ -195,10 +195,15 @@
 }
 
 /* --------------------------------------------------------
- * DARK MODE — PLACEHOLDER VALUES
+ * DARK MODE
  *
- * Awaiting dark-mode design in Figma. All values below are
- * temporary placeholders and must not be shipped to production.
+ * Sourced from butiq Figma "Semantics" variable collection
+ * (Light Mode + Dark Mode columns). 8 values are tagged
+ * "REC" — they were oversights in Figma (kept the light
+ * value in dark) and have been overridden with warm-brown
+ * recommendations that fit the dark palette. These should
+ * be reviewed against real components and ideally written
+ * back to Figma when finalised.
  *
  * Activated by any of:
  *   <html class="dark">
@@ -211,103 +216,181 @@
 :root.dark,
 [data-theme='dark'],
 .q-dark {
-  /* — Brand colours (dark) — */
-  --ns-color-primary: #60a5fa; /* PLACEHOLDER */
-  --ns-color-primary-hover: #93c5fd; /* PLACEHOLDER */
-  --ns-color-bg-brand: #d56307; /* PLACEHOLDER — awaiting dark Figma values */
-  --ns-color-bg-brand-active: #cc3c00; /* PLACEHOLDER — awaiting dark Figma values */
-  --ns-color-secondary: #a78bfa; /* PLACEHOLDER */
-  --ns-color-secondary-hover: #c4b5fd; /* PLACEHOLDER */
-  --ns-color-accent: #fbbf24; /* PLACEHOLDER */
-  --ns-color-accent-hover: #fcd34d; /* PLACEHOLDER */
+  /* — Brand colours — */
+  --ns-color-primary: #d56307; /* color-bg-brand-active */
+  --ns-color-primary-hover: #ef7c20; /* color-bg-brand */
+  --ns-color-secondary: #93dbff; /* color-status-accent */
+  --ns-color-secondary-hover: #a8d8f0; /* color-accent-hover */
+  --ns-color-accent: #93dbff; /* color-status-accent */
+  --ns-color-accent-hover: #a8d8f0; /* color-accent-hover */
 
-  /* — Semantic colours (dark) — */
-  --ns-color-success: #4ade80; /* PLACEHOLDER */
-  --ns-color-warning: #fbbf24; /* PLACEHOLDER */
-  --ns-color-error: #f87171; /* PLACEHOLDER */
-  --ns-color-info: #60a5fa; /* PLACEHOLDER */
+  /* — Semantic colours — */
+  --ns-color-success: #d8dc36; /* color-status-positive */
+  --ns-color-warning: #f4c75a; /* color-status-warning */
+  --ns-color-error: #e05359; /* color-status-negative */
+  --ns-color-info: #0069b4; /* color-status-info */
 
-  /* — Surface / background (dark) — */
-  --ns-color-background: #0f172a; /* PLACEHOLDER */
-  --ns-color-surface: #1e293b; /* PLACEHOLDER */
-  --ns-color-surface-variant: #334155; /* PLACEHOLDER */
+  /* — Surface / background — */
+  --ns-color-background: #120903; /* color-bg-canvas */
+  --ns-color-surface: #27140f; /* color-bg-surface */
+  --ns-color-surface-variant: #351d16; /* color-bg-subtle */
 
-  /* — On-colours (dark) — */
-  --ns-color-on-primary: #0f172a; /* PLACEHOLDER */
-  --ns-color-on-secondary: #0f172a; /* PLACEHOLDER */
-  --ns-color-on-accent: #0f172a; /* PLACEHOLDER */
-  --ns-color-on-background: #f1f5f9; /* PLACEHOLDER */
-  --ns-color-on-surface: #f1f5f9; /* PLACEHOLDER */
+  /* — On-colours — */
+  --ns-color-on-primary: #ffffff; /* color-text-on-brand */
+  --ns-color-on-secondary: #ffffff;
+  --ns-color-on-accent: #2d0b00; /* accent stays bright; dark text still pairs */
+  --ns-color-on-background: #f9e6d3; /* color-text-primary */
+  --ns-color-on-surface: #f9e6d3; /* color-text-primary */
 
-  /* — Neutral scale (dark — inverted) — */
-  --ns-color-neutral-50: #0f172a; /* PLACEHOLDER */
-  --ns-color-neutral-100: #1e293b; /* PLACEHOLDER */
-  --ns-color-neutral-200: #334155; /* PLACEHOLDER */
-  --ns-color-neutral-300: #475569; /* PLACEHOLDER */
-  --ns-color-neutral-400: #64748b; /* PLACEHOLDER */
-  --ns-color-neutral-500: #94a3b8; /* PLACEHOLDER */
-  --ns-color-neutral-600: #cbd5e1; /* PLACEHOLDER */
-  --ns-color-neutral-700: #e2e8f0; /* PLACEHOLDER */
-  --ns-color-neutral-800: #f1f5f9; /* PLACEHOLDER */
-  --ns-color-neutral-900: #f8fafc; /* PLACEHOLDER */
+  /* — Neutral scale — TODO: dark equivalents not yet in Figma */
+  /* Inheriting light values; revisit once the designer sets dark greys. */
 
-  /* — Shadows (dark — lighter opacity looks better on dark bg) — */
-  --ns-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3); /* PLACEHOLDER */
-  --ns-shadow-md:
-    0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3); /* PLACEHOLDER */
-  --ns-shadow-lg:
-    0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3); /* PLACEHOLDER */
-  --ns-shadow-xl:
-    0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.3); /* PLACEHOLDER */
+  /* — Text colours — */
+  --ns-color-text-secondary: #bc977c; /* color-text-secondary */
+  --ns-color-text-tertiary: #8a6f5a; /* REC — Figma kept light value (#9ca3af) */
+  --ns-color-text-brand: #ef7c20; /* color-text-brand */
+  --ns-color-text-brand-hover: #f9cba6; /* mirror of bg-brand-hover */
+  --ns-color-text-disabled: #d1d5db; /* color-text-disabled */
+  --ns-color-text-link: #64cbff; /* color-text-link */
+  --ns-color-text-link-hover: #a8d8f0; /* color-text-link-hover */
+
+  /* — Extended background colours — */
+  --ns-color-bg-brand-subtle: #3d1f10; /* REC — Figma kept light value (#fce5d2) */
+  --ns-color-bg-brand: #ef7c20; /* color-bg-brand */
+  --ns-color-bg-brand-hover: #f9cba6; /* color-bg-brand-hover */
+  --ns-color-bg-brand-active: #d56307; /* color-bg-brand-active */
+  --ns-color-bg-header: #21110c; /* color-bg-header */
+  --ns-color-bg-disabled: #2a1a10; /* REC — Figma kept light value (#e0e0e0) */
+  --ns-color-bg-menu-hover: #5c2a14; /* REC — Figma kept light value (#f9cba6) */
+  --ns-color-bg-menu-selected: #ef7c20; /* color-bg-menu-selected */
+
+  /* — Border colours — */
+  --ns-color-border: #3a2419; /* REC — Figma kept light value (#e5e7eb) */
+  --ns-color-border-subtle: #ffffff; /* color-border-subtle (intentional "invisible") */
+  --ns-color-border-focus: #93dbff; /* color-border-focus */
+  --ns-color-border-strong: #93dbff; /* color-border-strong */
+  --ns-color-border-disabled: #2e2018; /* REC — Figma kept light value (#d1d5db) */
+  --ns-color-border-brand: #ef7c20; /* color-border-brand */
+  --ns-color-border-brand-subtle: #60351d; /* color-border-brand-subtle */
+  --ns-color-border-positive: #d8dc36; /* color-border-positive */
+  --ns-color-border-warning: #f4c75a; /* color-border-warning */
+  --ns-color-border-negative: #e05359; /* color-border-negative */
+  --ns-color-border-info: #15acf8; /* color-border-info */
+  --ns-color-border-accent: #15acf8; /* color-border-accent */
+
+  /* — Extended status colours — */
+  --ns-color-success-light: #d8dc36; /* color-status-positive-light */
+  --ns-color-success-hover: #dcde77; /* color-status-positive-hover */
+  --ns-color-success-active: #c4c81d; /* color-status-positive-active */
+  --ns-color-warning-light: #f4c75a; /* color-status-warning-light */
+  --ns-color-warning-hover: #f8dc98; /* color-status-warning-hover */
+  --ns-color-warning-active: #f1b931; /* color-status-warning-active */
+  --ns-color-error-light: #e05359; /* color-status-negative-light */
+  --ns-color-error-hover: #ec7d81; /* color-status-negative-hover */
+  --ns-color-error-active: #cc363c; /* color-status-negative-active */
+  --ns-color-info-light: #0d2a3d; /* REC — Figma kept light value (#dceef7) */
+  --ns-color-info-hover: #15acf8; /* color-status-info-hover */
+  --ns-color-info-active: #004a7f; /* color-status-info-active */
+  --ns-color-accent-light: #edf6fb; /* color-accent-light */
+  --ns-color-accent-active: #15acf8; /* color-accent-active */
+  --ns-color-status-neutral: #e5e7eb; /* color-status-neutral (note: stays light in Figma) */
+
+  /* — Data visualisation colours — */
+  /* Chart palettes stay the same in both modes (per Figma). */
+
+  /* — Shadows (dark — heavier opacity reads better on dark bg) — */
+  --ns-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --ns-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --ns-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --ns-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.3);
 }
 
 /* --------------------------------------------------------
  * prefers-color-scheme fallback
  *
  * Applies dark tokens when the OS is in dark mode and
- * no explicit class/attribute override is set.
+ * no explicit class/attribute override is set. Mirrors the
+ * :root.dark block above — keep in sync.
  * ------------------------------------------------------ */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']):not(.light) {
-    /* — Brand colours (dark) — */
-    --ns-color-primary: #60a5fa;
-    --ns-color-primary-hover: #93c5fd;
-    --ns-color-secondary: #a78bfa;
-    --ns-color-secondary-hover: #c4b5fd;
-    --ns-color-accent: #fbbf24;
-    --ns-color-accent-hover: #fcd34d;
+    /* — Brand colours — */
+    --ns-color-primary: #d56307;
+    --ns-color-primary-hover: #ef7c20;
+    --ns-color-secondary: #93dbff;
+    --ns-color-secondary-hover: #a8d8f0;
+    --ns-color-accent: #93dbff;
+    --ns-color-accent-hover: #a8d8f0;
 
-    /* — Semantic colours (dark) — */
-    --ns-color-success: #4ade80;
-    --ns-color-warning: #fbbf24;
-    --ns-color-error: #f87171;
-    --ns-color-info: #60a5fa;
+    /* — Semantic colours — */
+    --ns-color-success: #d8dc36;
+    --ns-color-warning: #f4c75a;
+    --ns-color-error: #e05359;
+    --ns-color-info: #0069b4;
 
-    /* — Surface / background (dark) — */
-    --ns-color-background: #0f172a;
-    --ns-color-surface: #1e293b;
-    --ns-color-surface-variant: #334155;
+    /* — Surface / background — */
+    --ns-color-background: #120903;
+    --ns-color-surface: #27140f;
+    --ns-color-surface-variant: #351d16;
 
-    /* — On-colours (dark) — */
-    --ns-color-on-primary: #0f172a;
-    --ns-color-on-secondary: #0f172a;
-    --ns-color-on-accent: #0f172a;
-    --ns-color-on-background: #f1f5f9;
-    --ns-color-on-surface: #f1f5f9;
+    /* — On-colours — */
+    --ns-color-on-primary: #ffffff;
+    --ns-color-on-secondary: #ffffff;
+    --ns-color-on-accent: #2d0b00;
+    --ns-color-on-background: #f9e6d3;
+    --ns-color-on-surface: #f9e6d3;
 
-    /* — Neutral scale (dark — inverted) — */
-    --ns-color-neutral-50: #0f172a;
-    --ns-color-neutral-100: #1e293b;
-    --ns-color-neutral-200: #334155;
-    --ns-color-neutral-300: #475569;
-    --ns-color-neutral-400: #64748b;
-    --ns-color-neutral-500: #94a3b8;
-    --ns-color-neutral-600: #cbd5e1;
-    --ns-color-neutral-700: #e2e8f0;
-    --ns-color-neutral-800: #f1f5f9;
-    --ns-color-neutral-900: #f8fafc;
+    /* — Text colours — */
+    --ns-color-text-secondary: #bc977c;
+    --ns-color-text-tertiary: #8a6f5a;
+    --ns-color-text-brand: #ef7c20;
+    --ns-color-text-brand-hover: #f9cba6;
+    --ns-color-text-disabled: #d1d5db;
+    --ns-color-text-link: #64cbff;
+    --ns-color-text-link-hover: #a8d8f0;
 
-    /* — Shadows (dark) — */
+    /* — Extended background colours — */
+    --ns-color-bg-brand-subtle: #3d1f10;
+    --ns-color-bg-brand: #ef7c20;
+    --ns-color-bg-brand-hover: #f9cba6;
+    --ns-color-bg-brand-active: #d56307;
+    --ns-color-bg-header: #21110c;
+    --ns-color-bg-disabled: #2a1a10;
+    --ns-color-bg-menu-hover: #5c2a14;
+    --ns-color-bg-menu-selected: #ef7c20;
+
+    /* — Border colours — */
+    --ns-color-border: #3a2419;
+    --ns-color-border-subtle: #ffffff;
+    --ns-color-border-focus: #93dbff;
+    --ns-color-border-strong: #93dbff;
+    --ns-color-border-disabled: #2e2018;
+    --ns-color-border-brand: #ef7c20;
+    --ns-color-border-brand-subtle: #60351d;
+    --ns-color-border-positive: #d8dc36;
+    --ns-color-border-warning: #f4c75a;
+    --ns-color-border-negative: #e05359;
+    --ns-color-border-info: #15acf8;
+    --ns-color-border-accent: #15acf8;
+
+    /* — Extended status colours — */
+    --ns-color-success-light: #d8dc36;
+    --ns-color-success-hover: #dcde77;
+    --ns-color-success-active: #c4c81d;
+    --ns-color-warning-light: #f4c75a;
+    --ns-color-warning-hover: #f8dc98;
+    --ns-color-warning-active: #f1b931;
+    --ns-color-error-light: #e05359;
+    --ns-color-error-hover: #ec7d81;
+    --ns-color-error-active: #cc363c;
+    --ns-color-info-light: #0d2a3d;
+    --ns-color-info-hover: #15acf8;
+    --ns-color-info-active: #004a7f;
+    --ns-color-accent-light: #edf6fb;
+    --ns-color-accent-active: #15acf8;
+    --ns-color-status-neutral: #e5e7eb;
+
+    /* — Shadows — */
     --ns-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
     --ns-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
     --ns-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);

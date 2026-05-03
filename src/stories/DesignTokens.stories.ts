@@ -91,7 +91,7 @@ const statusColours: Token[] = [
   { name: '--ns-color-success-light', fallback: '#e7e9a5' },
   { name: '--ns-color-success-hover', fallback: '#e2e653' },
   { name: '--ns-color-success-active', fallback: '#919500' },
-  { name: '--ns-color-warning', fallback: '#f1b931' },
+  { name: '--ns-color-warning', fallback: '#f4c75a' },
   { name: '--ns-color-warning-light', fallback: '#fcf1d6' },
   { name: '--ns-color-warning-hover', fallback: '#f8dc98' },
   { name: '--ns-color-warning-active', fallback: '#f1b931' },
