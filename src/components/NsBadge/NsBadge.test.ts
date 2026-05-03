@@ -18,6 +18,42 @@ describe('NsBadge', () => {
     expect(wrapper.find('.q-badge').attributes('data-testid')).toBe('test-ns-badge')
   })
 
+  describe('variant', () => {
+    it('defaults to primary', () => {
+      const wrapper = mount(NsBadge)
+      expect(wrapper.find('.ns-badge--primary').exists()).toBe(true)
+    })
+
+    it.each([
+      'primary',
+      'secondary',
+      'accent',
+      'positive',
+      'positive-subtle',
+      'negative',
+      'negative-subtle',
+      'info',
+      'warning',
+      'warning-subtle',
+      'ghost',
+    ] as const)('applies the ns-badge--%s class', (variant) => {
+      const wrapper = mount(NsBadge, { props: { variant } })
+      expect(wrapper.find(`.ns-badge--${variant}`).exists()).toBe(true)
+    })
+  })
+
+  describe('size', () => {
+    it('defaults to dense', () => {
+      const wrapper = mount(NsBadge)
+      expect(wrapper.find('.ns-badge--dense').exists()).toBe(true)
+    })
+
+    it.each(['dense', 'medium'] as const)('applies the ns-badge--%s class', (size) => {
+      const wrapper = mount(NsBadge, { props: { size } })
+      expect(wrapper.find(`.ns-badge--${size}`).exists()).toBe(true)
+    })
+  })
+
   describe('accessibility', () => {
     it('forwards aria attributes', () => {
       const wrapper = mount(NsBadge, { attrs: { 'aria-label': 'Test label' } })

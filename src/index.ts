@@ -64,7 +64,7 @@ export { default as NsTooltip } from './components/NsTooltip/NsTooltip.vue'
 export type { NsTooltipProps, NsTooltipAnchor } from './components/NsTooltip/NsTooltip.vue'
 
 export { default as NsBadge } from './components/NsBadge/NsBadge.vue'
-export type { NsBadgeProps } from './components/NsBadge/NsBadge.vue'
+export type { NsBadgeProps, NsBadgeVariant, NsBadgeSize } from './components/NsBadge/NsBadge.vue'
 
 export { default as NsBreadcrumbs } from './components/NsBreadcrumbs/NsBreadcrumbs.vue'
 export type { NsBreadcrumbsProps } from './components/NsBreadcrumbs/NsBreadcrumbs.vue'
