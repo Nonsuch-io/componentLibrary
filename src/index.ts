@@ -55,7 +55,7 @@ export { default as NsAvatar } from './components/NsAvatar/NsAvatar.vue'
 export type { NsAvatarProps, NsAvatarSize } from './components/NsAvatar/NsAvatar.vue'
 
 export { default as NsChip } from './components/NsChip/NsChip.vue'
-export type { NsChipProps } from './components/NsChip/NsChip.vue'
+export type { NsChipProps, NsChipVariant } from './components/NsChip/NsChip.vue'
 
 export { default as NsList } from './components/NsList/NsList.vue'
 export type { NsListProps } from './components/NsList/NsList.vue'
