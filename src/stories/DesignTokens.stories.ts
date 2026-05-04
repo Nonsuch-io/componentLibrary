@@ -43,13 +43,19 @@ const neutrals: Token[] = [
 
 const surfaces: Token[] = [
   { name: '--ns-color-background', fallback: '#fefbf5' },
+  { name: '--ns-color-bg-canvas-subtle', fallback: '#fdfdf9' },
   { name: '--ns-color-surface', fallback: '#ffffff' },
+  { name: '--ns-color-bg-alt-surface', fallback: '#fdfdf9' },
   { name: '--ns-color-surface-variant', fallback: '#fef7ee' },
   { name: '--ns-color-on-primary', fallback: '#ffffff' },
   { name: '--ns-color-on-secondary', fallback: '#ffffff' },
   { name: '--ns-color-on-accent', fallback: '#2d0b00' },
   { name: '--ns-color-on-background', fallback: '#2d0b00' },
   { name: '--ns-color-on-surface', fallback: '#2d0b00' },
+  { name: '--ns-color-on-positive', fallback: '#2d0b00' },
+  { name: '--ns-color-on-warning', fallback: '#2d0b00' },
+  { name: '--ns-color-on-negative', fallback: '#ffffff' },
+  { name: '--ns-color-on-info', fallback: '#ffffff' },
 ]
 
 const textColours: Token[] = [
@@ -60,6 +66,11 @@ const textColours: Token[] = [
   { name: '--ns-color-text-disabled', fallback: '#909090' },
   { name: '--ns-color-text-link', fallback: '#64cbff' },
   { name: '--ns-color-text-link-hover', fallback: '#a8d8f0' },
+  { name: '--ns-color-text-positive', fallback: '#919500' },
+  { name: '--ns-color-text-warning', fallback: '#f7bc2b' },
+  { name: '--ns-color-text-negative', fallback: '#e2222a' },
+  { name: '--ns-color-text-info', fallback: '#0069b4' },
+  { name: '--ns-color-text-accent', fallback: '#79caf3' },
 ]
 
 const backgroundColours: Token[] = [
@@ -69,6 +80,11 @@ const backgroundColours: Token[] = [
   { name: '--ns-color-bg-disabled', fallback: '#e0e0e0' },
   { name: '--ns-color-bg-menu-hover', fallback: '#f9cba6' },
   { name: '--ns-color-bg-menu-selected', fallback: '#d56307' },
+  { name: '--ns-color-bg-positive', fallback: '#f3f4d2' },
+  { name: '--ns-color-bg-warning', fallback: '#f9e3ad' },
+  { name: '--ns-color-bg-negative', fallback: '#fedee0' },
+  { name: '--ns-color-bg-info', fallback: '#e0f1fa' },
+  { name: '--ns-color-bg-accent', fallback: '#b8e4fa' },
 ]
 
 const borderColours: Token[] = [

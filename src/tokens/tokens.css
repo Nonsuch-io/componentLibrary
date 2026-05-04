@@ -35,18 +35,25 @@
 
   /* — Surface / background — */
   --ns-color-background: #fefbf5; /* butiq neutrals-300 (color-bg-canvas) */
+  --ns-color-bg-canvas-subtle: #fdfdf9; /* color-bg-canvas-subtle */
   --ns-color-surface: #ffffff; /* butiq color-bg-surface */
+  --ns-color-bg-alt-surface: #fdfdf9; /* color-bg-alt-surface */
   --ns-color-surface-variant: #fef7ee; /* butiq neutrals-400 (color-bg-subtle) */
 
   /* — On-colours (text/icons on top of the corresponding colour) —
-   * butiq does not define explicit on-* variables; these values are chosen
-   * for WCAG AA contrast against the paired brand/surface tokens above.
+   * butiq does not define explicit on-* variables for primary/secondary;
+   * those are chosen for WCAG AA contrast. Status on-colours are sourced
+   * from butiq color-text-on-{status}.
    */
   --ns-color-on-primary: #ffffff;
   --ns-color-on-secondary: #ffffff;
-  --ns-color-on-accent: #2d0b00; /* butiq greys/black — dark text on light accent */
-  --ns-color-on-background: #2d0b00; /* butiq color-text-primary */
-  --ns-color-on-surface: #2d0b00; /* butiq color-text-primary */
+  --ns-color-on-accent: #2d0b00; /* color-text-on-accent */
+  --ns-color-on-background: #2d0b00; /* color-text-primary */
+  --ns-color-on-surface: #2d0b00; /* color-text-primary */
+  --ns-color-on-positive: #2d0b00; /* color-text-on-positive */
+  --ns-color-on-warning: #2d0b00; /* color-text-on-warning */
+  --ns-color-on-negative: #ffffff; /* color-text-on-negative */
+  --ns-color-on-info: #ffffff; /* color-text-on-info */
 
   /* — Neutral scale —
    * Maps 1:1 to butiq greys/grey-50..900. Note: butiq's grey scale is not
@@ -72,6 +79,11 @@
   --ns-color-text-disabled: #909090;
   --ns-color-text-link: #64cbff;
   --ns-color-text-link-hover: #a8d8f0;
+  --ns-color-text-positive: #919500; /* color-text-positive */
+  --ns-color-text-warning: #f7bc2b; /* color-text-warning */
+  --ns-color-text-negative: #e2222a; /* color-text-negative */
+  --ns-color-text-info: #0069b4; /* color-text-info */
+  --ns-color-text-accent: #79caf3; /* color-text-accent */
 
   /* — Extended background colours — */
   --ns-color-bg-brand-subtle: #fce5d2;
@@ -82,6 +94,13 @@
   --ns-color-bg-disabled: #e0e0e0;
   --ns-color-bg-menu-hover: #f9cba6;
   --ns-color-bg-menu-selected: #d56307;
+
+  /* — Status backgrounds (soft fills for status indicators) — */
+  --ns-color-bg-positive: #f3f4d2; /* color-bg-positive */
+  --ns-color-bg-warning: #f9e3ad; /* color-bg-warning */
+  --ns-color-bg-negative: #fedee0; /* color-bg-negative */
+  --ns-color-bg-info: #e0f1fa; /* color-bg-info */
+  --ns-color-bg-accent: #b8e4fa; /* color-bg-accent */
 
   /* — Border colours — */
   --ns-color-border: #e5e7eb;
@@ -229,7 +248,9 @@
 
   /* — Surface / background (dark) — */
   --ns-color-background: #0f172a; /* PLACEHOLDER */
+  --ns-color-bg-canvas-subtle: #522401; /* color-bg-canvas-subtle */
   --ns-color-surface: #1e293b; /* PLACEHOLDER */
+  --ns-color-bg-alt-surface: #351d16; /* color-bg-alt-surface */
   --ns-color-surface-variant: #334155; /* PLACEHOLDER */
 
   /* — On-colours (dark) — */
@@ -238,6 +259,24 @@
   --ns-color-on-accent: #0f172a; /* PLACEHOLDER */
   --ns-color-on-background: #f1f5f9; /* PLACEHOLDER */
   --ns-color-on-surface: #f1f5f9; /* PLACEHOLDER */
+  --ns-color-on-positive: #2d0b00; /* color-text-on-positive */
+  --ns-color-on-warning: #2d0b00; /* color-text-on-warning */
+  --ns-color-on-negative: #2d0b00; /* color-text-on-negative */
+  --ns-color-on-info: #ffffff; /* color-text-on-info */
+
+  /* — Text colours (status, dark) — */
+  --ns-color-text-positive: #d8dc36; /* color-text-positive */
+  --ns-color-text-warning: #f7bc2b; /* color-text-warning */
+  --ns-color-text-negative: #fd6d73; /* color-text-negative */
+  --ns-color-text-info: #15acf8; /* color-text-info */
+  --ns-color-text-accent: #93dbff; /* color-text-accent */
+
+  /* — Status backgrounds (dark) — */
+  --ns-color-bg-positive: #919500; /* color-bg-positive */
+  --ns-color-bg-warning: #eaa500; /* color-bg-warning */
+  --ns-color-bg-negative: #fd6d73; /* color-bg-negative */
+  --ns-color-bg-info: #004a7f; /* color-bg-info */
+  --ns-color-bg-accent: #64cbff; /* color-bg-accent */
 
   /* — Neutral scale (dark — inverted) — */
   --ns-color-neutral-50: #0f172a; /* PLACEHOLDER */
@@ -285,7 +324,9 @@
 
     /* — Surface / background (dark) — */
     --ns-color-background: #0f172a;
+    --ns-color-bg-canvas-subtle: #522401;
     --ns-color-surface: #1e293b;
+    --ns-color-bg-alt-surface: #351d16;
     --ns-color-surface-variant: #334155;
 
     /* — On-colours (dark) — */
@@ -294,6 +335,24 @@
     --ns-color-on-accent: #0f172a;
     --ns-color-on-background: #f1f5f9;
     --ns-color-on-surface: #f1f5f9;
+    --ns-color-on-positive: #2d0b00;
+    --ns-color-on-warning: #2d0b00;
+    --ns-color-on-negative: #2d0b00;
+    --ns-color-on-info: #ffffff;
+
+    /* — Text colours (status, dark) — */
+    --ns-color-text-positive: #d8dc36;
+    --ns-color-text-warning: #f7bc2b;
+    --ns-color-text-negative: #fd6d73;
+    --ns-color-text-info: #15acf8;
+    --ns-color-text-accent: #93dbff;
+
+    /* — Status backgrounds (dark) — */
+    --ns-color-bg-positive: #919500;
+    --ns-color-bg-warning: #eaa500;
+    --ns-color-bg-negative: #fd6d73;
+    --ns-color-bg-info: #004a7f;
+    --ns-color-bg-accent: #64cbff;
 
     /* — Neutral scale (dark — inverted) — */
     --ns-color-neutral-50: #0f172a;
