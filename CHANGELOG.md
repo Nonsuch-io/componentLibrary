@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.15.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.14.0...v0.15.0) (2026-05-04)
+
+
+### Features
+
+* **typography:** add label-xs (extra small label) style ([caa6b8b](https://github.com/Nonsuch-io/componentLibrary/commit/caa6b8b32485369e8f9dc071c605d9b4f7a8e6b8))
+
 ## [0.14.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.13.0...v0.14.0) (2026-05-02)
 
 
