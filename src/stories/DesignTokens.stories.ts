@@ -20,12 +20,12 @@ interface Token {
 }
 
 const colours: Token[] = [
-  { name: '--ns-color-primary', fallback: '#cc3c00' },
+  { name: '--ns-color-primary', fallback: '#c05400' },
   { name: '--ns-color-primary-hover', fallback: '#d56307' },
   { name: '--ns-color-secondary', fallback: '#93dbff' },
-  { name: '--ns-color-secondary-hover', fallback: '#a8d8f0' },
+  { name: '--ns-color-secondary-hover', fallback: '#b8e4fa' },
   { name: '--ns-color-accent', fallback: '#93dbff' },
-  { name: '--ns-color-accent-hover', fallback: '#a8d8f0' },
+  { name: '--ns-color-accent-hover', fallback: '#b8e4fa' },
 ]
 
 const neutrals: Token[] = [
@@ -56,15 +56,15 @@ const textColours: Token[] = [
   { name: '--ns-color-text-secondary', fallback: '#757575' },
   { name: '--ns-color-text-tertiary', fallback: '#9ca3af' },
   { name: '--ns-color-text-brand', fallback: '#d56307' },
-  { name: '--ns-color-text-brand-hover', fallback: '#ef7c20' },
+  { name: '--ns-color-text-brand-hover', fallback: '#f66b00' },
   { name: '--ns-color-text-disabled', fallback: '#909090' },
-  { name: '--ns-color-text-link', fallback: '#64cbff' },
-  { name: '--ns-color-text-link-hover', fallback: '#a8d8f0' },
+  { name: '--ns-color-text-link', fallback: '#79caf3' },
+  { name: '--ns-color-text-link-hover', fallback: '#b8e4fa' },
 ]
 
 const backgroundColours: Token[] = [
   { name: '--ns-color-bg-brand-subtle', fallback: '#fce5d2' },
-  { name: '--ns-color-bg-brand-hover', fallback: '#ef7c20' },
+  { name: '--ns-color-bg-brand-hover', fallback: '#f66b00' },
   { name: '--ns-color-bg-header', fallback: '#fdf4e7' },
   { name: '--ns-color-bg-disabled', fallback: '#e0e0e0' },
   { name: '--ns-color-bg-menu-hover', fallback: '#f9cba6' },
@@ -79,45 +79,40 @@ const borderColours: Token[] = [
   { name: '--ns-color-border-disabled', fallback: '#d1d5db' },
   { name: '--ns-color-border-brand', fallback: '#d56307' },
   { name: '--ns-color-border-brand-subtle', fallback: '#fce5d2' },
-  { name: '--ns-color-border-positive', fallback: '#aaae04' },
-  { name: '--ns-color-border-warning', fallback: '#f1b931' },
-  { name: '--ns-color-border-negative', fallback: '#cc363c' },
+  { name: '--ns-color-border-positive', fallback: '#919500' },
+  { name: '--ns-color-border-warning', fallback: '#f7bc2b' },
+  { name: '--ns-color-border-negative', fallback: '#e2222a' },
   { name: '--ns-color-border-info', fallback: '#0069b4' },
-  { name: '--ns-color-border-accent', fallback: '#15acf8' },
+  { name: '--ns-color-border-accent', fallback: '#64cbff' },
 ]
 
 const statusColours: Token[] = [
-  { name: '--ns-color-success', fallback: '#c4c81d' },
-  { name: '--ns-color-success-light', fallback: '#e7e9a5' },
+  { name: '--ns-color-success', fallback: '#d8dc36' },
   { name: '--ns-color-success-hover', fallback: '#e2e653' },
-  { name: '--ns-color-success-active', fallback: '#919500' },
-  { name: '--ns-color-warning', fallback: '#f1b931' },
-  { name: '--ns-color-warning-light', fallback: '#fcf1d6' },
-  { name: '--ns-color-warning-hover', fallback: '#f8dc98' },
-  { name: '--ns-color-warning-active', fallback: '#f1b931' },
-  { name: '--ns-color-error', fallback: '#a5282d' },
-  { name: '--ns-color-error-light', fallback: '#fce4e5' },
-  { name: '--ns-color-error-hover', fallback: '#e05359' },
-  { name: '--ns-color-error-active', fallback: '#8e262a' },
+  { name: '--ns-color-success-active', fallback: '#aaae04' },
+  { name: '--ns-color-warning', fallback: '#f7bc2b' },
+  { name: '--ns-color-warning-hover', fallback: '#f7c857' },
+  { name: '--ns-color-warning-active', fallback: '#ffb400' },
+  { name: '--ns-color-error', fallback: '#c7151c' },
+  { name: '--ns-color-error-hover', fallback: '#f2434a' },
+  { name: '--ns-color-error-active', fallback: '#b00007' },
   { name: '--ns-color-info', fallback: '#0069b4' },
-  { name: '--ns-color-info-light', fallback: '#dceef7' },
   { name: '--ns-color-info-hover', fallback: '#15acf8' },
   { name: '--ns-color-info-active', fallback: '#004a7f' },
-  { name: '--ns-color-accent-light', fallback: '#edf6fb' },
-  { name: '--ns-color-accent-active', fallback: '#15acf8' },
+  { name: '--ns-color-accent-active', fallback: '#79caf3' },
   { name: '--ns-color-status-neutral', fallback: '#e5e7eb' },
 ]
 
 const dataColours: Token[] = [
-  { name: '--ns-color-data-1', fallback: '#f4adb0' },
-  { name: '--ns-color-data-2', fallback: '#dcde77' },
-  { name: '--ns-color-data-3', fallback: '#f9cba6' },
-  { name: '--ns-color-data-4', fallback: '#a8d8f0' },
-  { name: '--ns-color-data-5', fallback: '#e8a9ff' },
-  { name: '--ns-color-data-6', fallback: '#cf68f4' },
-  { name: '--ns-color-data-7', fallback: '#e05359' },
-  { name: '--ns-color-data-8', fallback: '#ef7c20' },
-  { name: '--ns-color-data-9', fallback: '#8e23b3' },
+  { name: '--ns-color-data-1', fallback: '#f8e4ff' },
+  { name: '--ns-color-data-2', fallback: '#f0c6ff' },
+  { name: '--ns-color-data-3', fallback: '#e8a9ff' },
+  { name: '--ns-color-data-4', fallback: '#db8ef7' },
+  { name: '--ns-color-data-5', fallback: '#cf68f4' },
+  { name: '--ns-color-data-6', fallback: '#ba22f0' },
+  { name: '--ns-color-data-7', fallback: '#a11ed0' },
+  { name: '--ns-color-data-8', fallback: '#8e23b3' },
+  { name: '--ns-color-data-9', fallback: '#601779' },
 ]
 
 const fontSizes: Token[] = [
