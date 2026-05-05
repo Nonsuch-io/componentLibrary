@@ -4,6 +4,30 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.15.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.14.0...v0.15.0) (2026-05-04)
+
+
+### Features
+
+* **typography:** add label-xs (extra small label) style ([caa6b8b](https://github.com/Nonsuch-io/componentLibrary/commit/caa6b8b32485369e8f9dc071c605d9b4f7a8e6b8))
+
+## [0.14.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.13.0...v0.14.0) (2026-05-02)
+
+
+### Features
+
+* **button:** restyle NsButton to match Figma design system ([b86b60e](https://github.com/Nonsuch-io/componentLibrary/commit/b86b60e95590f0f7d42745d9e6ff3c92bad48e71))
+* **nav:** add NsNavSidebar and NsBottomNav components ([433063d](https://github.com/Nonsuch-io/componentLibrary/commit/433063d2c3fdf7164b6649e08266008b1deecc6b))
+* **tokens:** add two-layer SCSS typography token system ([1af19b9](https://github.com/Nonsuch-io/componentLibrary/commit/1af19b9806c8cb77a86b2cb0ff1c524e71acdb7b))
+* **tokens:** add two-layer SCSS typography token system ([0c9a41f](https://github.com/Nonsuch-io/componentLibrary/commit/0c9a41f131ad044a2c7b8aeb1bd994553499bcf3))
+* **tokens:** expand semantic colour tokens from Figma design system ([2c9f96d](https://github.com/Nonsuch-io/componentLibrary/commit/2c9f96d127a23c62c2737811ad3c5b4a7c29c47c))
+
+
+### Bug Fixes
+
+* **deps:** align vitest packages to 4.1.5 to fix CI ([2447e2a](https://github.com/Nonsuch-io/componentLibrary/commit/2447e2ad041909f67699ecf3a508da520248caee))
+* **tokens,components:** resolve PR [#78](https://github.com/Nonsuch-io/componentLibrary/issues/78) review feedback ([1af8b01](https://github.com/Nonsuch-io/componentLibrary/commit/1af8b0131c27ff91e3ff4c18043b59497e7a150c))
+
 ## [0.13.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.12.2...v0.13.0) (2026-04-16)
 
 

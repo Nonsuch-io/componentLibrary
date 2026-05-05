@@ -37,6 +37,7 @@ const rows = [
   { token: 'overline', sample: 'Overline label', props: '10px · medium · uppercase · ls 0.08em' },
   { token: 'body-sm', sample: 'Small body text', props: '12px · regular · lh 1.5' },
   { token: 'body-md', sample: 'Medium body text', props: '14px · regular · lh 1.5' },
+  { token: 'label-xs', sample: 'Extra small label', props: '10px · semibold · lh 1.6' },
   { token: 'label-sm', sample: 'Small label', props: '12px · semibold · lh 1.4' },
   { token: 'label-md', sample: 'Medium label', props: '14px · semibold · lh 1.4' },
   { token: 'heading-sm', sample: 'Small heading', props: '16px · semibold · lh 1.3' },
