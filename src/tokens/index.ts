@@ -3,65 +3,57 @@
  *
  * Re-exports the token stylesheet and provides TypeScript
  * helpers for type-safe token access in JavaScript.
+ *
+ * Colour token names mirror the Figma "Semantics" variable
+ * collection 1:1.
  */
 
 /** All available Nonsuch token names. */
 export type NsToken =
-  // Brand colours
-  | '--ns-color-primary'
-  | '--ns-color-primary-hover'
-  | '--ns-color-secondary'
-  | '--ns-color-secondary-hover'
-  | '--ns-color-accent'
-  | '--ns-color-accent-hover'
-  // Semantic colours
-  | '--ns-color-success'
-  | '--ns-color-warning'
-  | '--ns-color-error'
-  | '--ns-color-info'
-  // Surface / background
-  | '--ns-color-background'
-  | '--ns-color-surface'
-  | '--ns-color-surface-variant'
-  // On-colours
-  | '--ns-color-on-primary'
-  | '--ns-color-on-secondary'
-  | '--ns-color-on-accent'
-  | '--ns-color-on-background'
-  | '--ns-color-on-surface'
-  // Neutral scale
-  | '--ns-color-neutral-50'
-  | '--ns-color-neutral-100'
-  | '--ns-color-neutral-200'
-  | '--ns-color-neutral-300'
-  | '--ns-color-neutral-400'
-  | '--ns-color-neutral-500'
-  | '--ns-color-neutral-600'
-  | '--ns-color-neutral-700'
-  | '--ns-color-neutral-800'
-  | '--ns-color-neutral-900'
-  // Text colours
+  // Text
+  | '--ns-color-text-primary'
   | '--ns-color-text-secondary'
   | '--ns-color-text-tertiary'
   | '--ns-color-text-brand'
-  | '--ns-color-text-brand-hover'
   | '--ns-color-text-disabled'
+  | '--ns-color-text-inverse'
   | '--ns-color-text-link'
   | '--ns-color-text-link-hover'
-  // Extended background colours
-  | '--ns-color-bg-brand-subtle'
+  | '--ns-color-text-on-brand'
+  | '--ns-color-text-on-primary'
+  | '--ns-color-text-on-secondary'
+  | '--ns-color-text-on-tertiary'
+  | '--ns-color-text-on-tertiary-hover'
+  | '--ns-color-text-positive'
+  | '--ns-color-text-on-positive'
+  | '--ns-color-text-warning'
+  | '--ns-color-text-on-warning'
+  | '--ns-color-text-negative'
+  | '--ns-color-text-on-negative'
+  | '--ns-color-text-info'
+  | '--ns-color-text-on-info'
+  | '--ns-color-text-accent'
+  | '--ns-color-text-on-accent'
+  // Background
+  | '--ns-color-bg-canvas'
+  | '--ns-color-bg-surface'
+  | '--ns-color-bg-alt-surface'
+  | '--ns-color-bg-subtle'
+  | '--ns-color-bg-header'
   | '--ns-color-bg-brand'
+  | '--ns-color-bg-brand-subtle'
   | '--ns-color-bg-brand-hover'
   | '--ns-color-bg-brand-active'
-  | '--ns-color-bg-header'
   | '--ns-color-bg-disabled'
-  | '--ns-color-bg-menu-hover'
-  | '--ns-color-bg-menu-selected'
-  // Border colours
-  | '--ns-color-border'
+  | '--ns-color-bg-positive'
+  | '--ns-color-bg-warning'
+  | '--ns-color-bg-negative'
+  | '--ns-color-bg-info'
+  | '--ns-color-bg-accent'
+  // Border
+  | '--ns-color-border-default'
   | '--ns-color-border-subtle'
   | '--ns-color-border-focus'
-  | '--ns-color-border-strong'
   | '--ns-color-border-disabled'
   | '--ns-color-border-brand'
   | '--ns-color-border-brand-subtle'
@@ -70,23 +62,35 @@ export type NsToken =
   | '--ns-color-border-negative'
   | '--ns-color-border-info'
   | '--ns-color-border-accent'
-  // Extended status colours
-  | '--ns-color-success-light'
-  | '--ns-color-success-hover'
-  | '--ns-color-success-active'
-  | '--ns-color-warning-light'
-  | '--ns-color-warning-hover'
-  | '--ns-color-warning-active'
-  | '--ns-color-error-light'
-  | '--ns-color-error-hover'
-  | '--ns-color-error-active'
-  | '--ns-color-info-light'
-  | '--ns-color-info-hover'
-  | '--ns-color-info-active'
-  | '--ns-color-accent-light'
+  // Status
+  | '--ns-color-status-positive'
+  | '--ns-color-status-positive-hover'
+  | '--ns-color-status-positive-active'
+  | '--ns-color-status-warning'
+  | '--ns-color-status-warning-hover'
+  | '--ns-color-status-warning-active'
+  | '--ns-color-status-negative'
+  | '--ns-color-status-negative-hover'
+  | '--ns-color-status-negative-active'
+  | '--ns-color-status-info'
+  | '--ns-color-status-info-hover'
+  | '--ns-color-status-info-active'
+  | '--ns-color-status-accent'
+  | '--ns-color-accent-hover'
   | '--ns-color-accent-active'
   | '--ns-color-status-neutral'
-  // Data visualisation colours
+  // Button
+  | '--ns-color-btn-primary-bg'
+  | '--ns-color-btn-primary-bg-hover'
+  | '--ns-color-btn-primary-bg-active'
+  | '--ns-color-btn-secondary-bg'
+  | '--ns-color-btn-secondary-bg-hover'
+  | '--ns-color-btn-secondary-bg-active'
+  | '--ns-color-btn-secondary-bg-border'
+  | '--ns-color-btn-tertiary-bg'
+  | '--ns-color-btn-disabled-bg'
+  | '--ns-color-btn-disabled-bg-border'
+  // Data visualisation
   | '--ns-color-data-1'
   | '--ns-color-data-2'
   | '--ns-color-data-3'
@@ -117,6 +121,7 @@ export type NsToken =
   | '--ns-letter-spacing-normal'
   | '--ns-letter-spacing-wide'
   // Spacing
+  | '--ns-space-0'
   | '--ns-space-1'
   | '--ns-space-2'
   | '--ns-space-3'
@@ -157,8 +162,8 @@ export type NsToken =
  * ```ts
  * import { getToken } from '@nonsuch/component-library'
  *
- * const primary = getToken('--ns-color-primary')
- * // → '#3b82f6'
+ * const brand = getToken('--ns-color-bg-brand')
+ * // → '#d56307'
  * ```
  */
 export function getToken(name: NsToken, el: Element = document.documentElement): string {

@@ -229,7 +229,7 @@ $pill-h: 56px;
 @mixin gradient-border {
   border: 1.5px solid transparent;
   background:
-    linear-gradient(var(--ns-color-background), var(--ns-color-background)) padding-box,
+    linear-gradient(var(--ns-color-bg-canvas), var(--ns-color-bg-canvas)) padding-box,
     radial-gradient(ellipse at 30% 50%, rgba(242, 150, 77, 0.55) 0%, rgba(255, 255, 255, 0.55) 100%)
       border-box;
 }
@@ -263,7 +263,7 @@ $pill-h: 56px;
   min-width: 70px;
   padding: 0 14px;
   border-radius: $pill-radius;
-  color: var(--ns-color-on-surface);
+  color: var(--ns-color-text-primary);
   font-family: var(--ns-font-family-text);
   font-size: 12px;
   font-weight: 500;
@@ -274,7 +274,7 @@ $pill-h: 56px;
   &--active {
     background: $active-bg;
     border-color: transparent;
-    color: var(--ns-color-on-primary);
+    color: var(--ns-color-text-on-brand);
     font-weight: 700;
   }
 
@@ -329,13 +329,13 @@ $pill-h: 56px;
   border-radius: $pill-radius;
   cursor: pointer;
   transition: background 0.15s;
-  color: var(--ns-color-on-surface);
+  color: var(--ns-color-text-primary);
   @include gradient-border;
 
   &--active {
     background: $active-bg;
     border-color: transparent;
-    color: var(--ns-color-on-primary);
+    color: var(--ns-color-text-on-brand);
   }
 }
 

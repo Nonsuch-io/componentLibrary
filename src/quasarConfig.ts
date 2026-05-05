@@ -41,19 +41,21 @@ export interface QuasarConfigOverrides {
   [key: string]: unknown
 }
 
-/** Nonsuch brand colours — sourced from butiq Design System (Figma).
+/** Nonsuch brand colours — sourced from Figma "Semantics" collection.
  *  Values mirror the light-mode tokens in `tokens.css`. Keep in sync.
+ *  `dark` and `dark-page` aren't represented in the Figma semantic layer,
+ *  so they use the dark-mode bg-canvas / surface values directly.
  */
 const NS_BRAND: Required<QuasarBrandColors> = {
-  primary: '#cc3c00', // butiq primary-500
-  secondary: '#15acf8', // butiq secondary-700
-  accent: '#93dbff', // butiq secondary-500 (color-accent)
-  dark: '#3c3c3c', // butiq greys/grey-800
-  'dark-page': '#212121', // butiq greys/grey-900
-  positive: '#c4c81d', // butiq positive-500
-  negative: '#a5282d', // butiq negative-700 (color-status-negative)
-  info: '#0069b4', // butiq secondary-800 (color-status-info)
-  warning: '#f1b931', // butiq warning-500
+  primary: '#d56307', // color-bg-brand
+  secondary: '#93dbff', // color-status-accent
+  accent: '#93dbff', // color-status-accent
+  dark: '#27140f', // matches dark-mode color-bg-surface
+  'dark-page': '#120903', // matches dark-mode color-bg-canvas
+  positive: '#d8dc36', // color-status-positive
+  negative: '#c7151c', // color-status-negative
+  info: '#0069b4', // color-status-info
+  warning: '#f7bc2b', // color-status-warning
 }
 
 export function createQuasarConfig(overrides: QuasarConfigOverrides = {}): Record<string, unknown> {

@@ -8,147 +8,136 @@
  * Import in your app:
  *   import '@nonsuch/component-library/tokens.css'
  *
- * Current values are PLACEHOLDERS — they will be updated
- * when brand designs are finalised. Token *names* are stable.
+ * Colour names mirror the Figma "Semantics" variable
+ * collection 1:1 — what's named in Figma is what's named here.
+ * To re-sync after a Figma change, re-extract the Light + Dark
+ * Mode columns and update both blocks in this file.
  */
 
 /* --------------------------------------------------------
  * LIGHT MODE (default)
  * ------------------------------------------------------ */
 :root {
-  /* — Brand colours —
-   * Sourced from butiq Design System (Figma). Primary = orange ramp,
-   * secondary = blue ramp, accent = light-blue highlight (butiq color-accent).
-   */
-  --ns-color-primary: #cc3c00; /* butiq primary-500 */
-  --ns-color-primary-hover: #d56307; /* butiq primary-400 */
-  --ns-color-secondary: #93dbff; /* matches accent */
-  --ns-color-secondary-hover: #a8d8f0; /* matches accent-hover */
-  --ns-color-accent: #93dbff; /* butiq secondary-500 (color-accent) */
-  --ns-color-accent-hover: #a8d8f0; /* butiq secondary-400 */
-
-  /* — Semantic colours — */
-  --ns-color-success: #c4c81d; /* butiq positive-500 */
-  --ns-color-warning: #f1b931; /* butiq warning-500 */
-  --ns-color-error: #a5282d; /* butiq negative-700 (color-status-negative) */
-  --ns-color-info: #0069b4; /* butiq secondary-800 (color-status-info) */
-
-  /* — Surface / background — */
-  --ns-color-background: #fefbf5; /* butiq neutrals-300 (color-bg-canvas) */
-  --ns-color-surface: #ffffff; /* butiq color-bg-surface */
-  --ns-color-surface-variant: #fef7ee; /* butiq neutrals-400 (color-bg-subtle) */
-
-  /* — On-colours (text/icons on top of the corresponding colour) —
-   * butiq does not define explicit on-* variables; these values are chosen
-   * for WCAG AA contrast against the paired brand/surface tokens above.
-   */
-  --ns-color-on-primary: #ffffff;
-  --ns-color-on-secondary: #ffffff;
-  --ns-color-on-accent: #2d0b00; /* butiq greys/black — dark text on light accent */
-  --ns-color-on-background: #2d0b00; /* butiq color-text-primary */
-  --ns-color-on-surface: #2d0b00; /* butiq color-text-primary */
-
-  /* — Neutral scale —
-   * Maps 1:1 to butiq greys/grey-50..900. Note: butiq's grey scale is not
-   * strictly monotonic (grey-50 is mid-tone, grey-100 is lighter). Values
-   * reflect the design system's source of truth.
-   */
-  --ns-color-neutral-50: #c5c5c5;
-  --ns-color-neutral-100: #e5e7eb;
-  --ns-color-neutral-200: #e0e0e0;
-  --ns-color-neutral-300: #d1d5db;
-  --ns-color-neutral-400: #9ca3af;
-  --ns-color-neutral-500: #909090;
-  --ns-color-neutral-600: #757575;
-  --ns-color-neutral-700: #535353;
-  --ns-color-neutral-800: #3c3c3c;
-  --ns-color-neutral-900: #212121;
-
-  /* — Text colours — */
+  /* — Text — */
+  --ns-color-text-primary: #2d0b00;
   --ns-color-text-secondary: #757575;
   --ns-color-text-tertiary: #9ca3af;
   --ns-color-text-brand: #d56307;
-  --ns-color-text-brand-hover: #ef7c20;
   --ns-color-text-disabled: #909090;
-  --ns-color-text-link: #64cbff;
-  --ns-color-text-link-hover: #a8d8f0;
+  --ns-color-text-inverse: #ffffff;
+  --ns-color-text-link: #79caf3;
+  --ns-color-text-link-hover: #b8e4fa;
+  --ns-color-text-on-brand: #ffffff;
+  --ns-color-text-on-primary: #ffffff;
+  --ns-color-text-on-secondary: #d56307;
+  --ns-color-text-on-tertiary: #d56307;
+  --ns-color-text-on-tertiary-hover: #f66b00;
+  --ns-color-text-positive: #919500;
+  --ns-color-text-on-positive: #2d0b00;
+  --ns-color-text-warning: #f7bc2b;
+  --ns-color-text-on-warning: #2d0b00;
+  --ns-color-text-negative: #e2222a;
+  --ns-color-text-on-negative: #ffffff;
+  --ns-color-text-info: #0069b4;
+  --ns-color-text-on-info: #ffffff;
+  --ns-color-text-accent: #79caf3;
+  --ns-color-text-on-accent: #2d0b00;
 
-  /* — Extended background colours — */
-  --ns-color-bg-brand-subtle: #fce5d2;
-  --ns-color-bg-brand: #d56307;
-  --ns-color-bg-brand-hover: #ef7c20;
-  --ns-color-bg-brand-active: #cc3c00;
+  /* — Background — */
+  --ns-color-bg-canvas: #fefbf5;
+  --ns-color-bg-surface: #ffffff;
+  --ns-color-bg-alt-surface: #fdfdf9;
+  --ns-color-bg-subtle: #fef7ee;
   --ns-color-bg-header: #fdf4e7;
+  --ns-color-bg-brand: #d56307;
+  --ns-color-bg-brand-subtle: #fce5d2;
+  --ns-color-bg-brand-hover: #f66b00;
+  --ns-color-bg-brand-active: #c05400;
   --ns-color-bg-disabled: #e0e0e0;
-  --ns-color-bg-menu-hover: #f9cba6;
-  --ns-color-bg-menu-selected: #d56307;
+  --ns-color-bg-positive: #f3f4d2;
+  --ns-color-bg-warning: #f9e3ad;
+  --ns-color-bg-negative: #fedee0;
+  --ns-color-bg-info: #e0f1fa;
+  --ns-color-bg-accent: #b8e4fa;
 
-  /* — Border colours — */
-  --ns-color-border: #e5e7eb;
+  /* — Border — */
+  --ns-color-border-default: #e5e7eb;
   --ns-color-border-subtle: #ffffff;
   --ns-color-border-focus: #93dbff;
-  --ns-color-border-strong: #93dbff;
   --ns-color-border-disabled: #d1d5db;
   --ns-color-border-brand: #d56307;
   --ns-color-border-brand-subtle: #fce5d2;
-  --ns-color-border-positive: #aaae04;
-  --ns-color-border-warning: #f1b931;
-  --ns-color-border-negative: #cc363c;
+  --ns-color-border-positive: #919500;
+  --ns-color-border-warning: #f7bc2b;
+  --ns-color-border-negative: #e2222a;
   --ns-color-border-info: #0069b4;
-  --ns-color-border-accent: #15acf8;
+  --ns-color-border-accent: #64cbff;
 
-  /* — Extended status colours — */
-  --ns-color-success-light: #e7e9a5;
-  --ns-color-success-hover: #e2e653;
-  --ns-color-success-active: #919500;
-  --ns-color-warning-light: #fcf1d6;
-  --ns-color-warning-hover: #f8dc98;
-  --ns-color-warning-active: #f1b931;
-  --ns-color-error-light: #fce4e5;
-  --ns-color-error-hover: #e05359;
-  --ns-color-error-active: #8e262a;
-  --ns-color-info-light: #dceef7;
-  --ns-color-info-hover: #15acf8;
-  --ns-color-info-active: #004a7f;
-  --ns-color-accent-light: #edf6fb;
-  --ns-color-accent-active: #15acf8;
+  /* — Status — */
+  --ns-color-status-positive: #d8dc36;
+  --ns-color-status-positive-hover: #e2e653;
+  --ns-color-status-positive-active: #aaae04;
+  --ns-color-status-warning: #f7bc2b;
+  --ns-color-status-warning-hover: #f7c857;
+  --ns-color-status-warning-active: #ffb400;
+  --ns-color-status-negative: #c7151c;
+  --ns-color-status-negative-hover: #f2434a;
+  --ns-color-status-negative-active: #b00007;
+  --ns-color-status-info: #0069b4;
+  --ns-color-status-info-hover: #15acf8;
+  --ns-color-status-info-active: #004a7f;
+  --ns-color-status-accent: #93dbff;
+  --ns-color-accent-hover: #b8e4fa;
+  --ns-color-accent-active: #79caf3;
   --ns-color-status-neutral: #e5e7eb;
 
-  /* — Data visualisation colours — */
-  --ns-color-data-1: #f4adb0;
-  --ns-color-data-2: #dcde77;
-  --ns-color-data-3: #f9cba6;
-  --ns-color-data-4: #a8d8f0;
-  --ns-color-data-5: #e8a9ff;
-  --ns-color-data-6: #cf68f4;
-  --ns-color-data-7: #e05359;
-  --ns-color-data-8: #ef7c20;
-  --ns-color-data-9: #8e23b3;
+  /* — Button — */
+  --ns-color-btn-primary-bg: #d56307;
+  --ns-color-btn-primary-bg-hover: #f66b00;
+  --ns-color-btn-primary-bg-active: #c05400;
+  --ns-color-btn-secondary-bg: #fefbf5;
+  --ns-color-btn-secondary-bg-hover: #ffffff;
+  --ns-color-btn-secondary-bg-active: #fdf4e7;
+  --ns-color-btn-secondary-bg-border: #d56307;
+  --ns-color-btn-tertiary-bg: transparent; /* ghost button — placeholder, mode-agnostic */
+  --ns-color-btn-disabled-bg: #e0e0e0;
+  --ns-color-btn-disabled-bg-border: #9ca3af;
+
+  /* — Data visualisation — */
+  --ns-color-data-1: #f8e4ff;
+  --ns-color-data-2: #f0c6ff;
+  --ns-color-data-3: #e8a9ff;
+  --ns-color-data-4: #db8ef7;
+  --ns-color-data-5: #cf68f4;
+  --ns-color-data-6: #ba22f0;
+  --ns-color-data-7: #a11ed0;
+  --ns-color-data-8: #8e23b3;
+  --ns-color-data-9: #601779;
 
   /* — Typography — */
-  --ns-font-family-text: 'Fixel Text', 'Roboto', sans-serif; /* PLACEHOLDER */
-  --ns-font-family-display: 'Fixel Display', 'Roboto', sans-serif; /* PLACEHOLDER */
+  --ns-font-family-text: 'Fixel Text', 'Roboto', sans-serif;
+  --ns-font-family-display: 'Fixel Display', 'Roboto', sans-serif;
 
-  --ns-font-size-xs: 0.75rem; /* 12px — PLACEHOLDER */
-  --ns-font-size-sm: 0.875rem; /* 14px — PLACEHOLDER */
-  --ns-font-size-md: 1rem; /* 16px — PLACEHOLDER */
-  --ns-font-size-lg: 1.125rem; /* 18px — PLACEHOLDER */
-  --ns-font-size-xl: 1.25rem; /* 20px — PLACEHOLDER */
-  --ns-font-size-2xl: 1.5rem; /* 24px — PLACEHOLDER */
-  --ns-font-size-3xl: 1.875rem; /* 30px — PLACEHOLDER */
+  --ns-font-size-xs: 0.75rem;
+  --ns-font-size-sm: 0.875rem;
+  --ns-font-size-md: 1rem;
+  --ns-font-size-lg: 1.125rem;
+  --ns-font-size-xl: 1.25rem;
+  --ns-font-size-2xl: 1.5rem;
+  --ns-font-size-3xl: 1.875rem;
 
-  --ns-font-weight-regular: 400; /* PLACEHOLDER */
-  --ns-font-weight-medium: 500; /* PLACEHOLDER */
-  --ns-font-weight-semibold: 600; /* PLACEHOLDER */
-  --ns-font-weight-bold: 700; /* PLACEHOLDER */
+  --ns-font-weight-regular: 400;
+  --ns-font-weight-medium: 500;
+  --ns-font-weight-semibold: 600;
+  --ns-font-weight-bold: 700;
 
-  --ns-line-height-tight: 1.25; /* PLACEHOLDER */
-  --ns-line-height-normal: 1.5; /* PLACEHOLDER */
-  --ns-line-height-relaxed: 1.75; /* PLACEHOLDER */
+  --ns-line-height-tight: 1.25;
+  --ns-line-height-normal: 1.5;
+  --ns-line-height-relaxed: 1.75;
 
-  --ns-letter-spacing-tight: -0.01em; /* PLACEHOLDER */
-  --ns-letter-spacing-normal: 0; /* PLACEHOLDER */
-  --ns-letter-spacing-wide: 0.02em; /* PLACEHOLDER */
+  --ns-letter-spacing-tight: -0.01em;
+  --ns-letter-spacing-normal: 0;
+  --ns-letter-spacing-wide: 0.02em;
 
   /* — Spacing (4px grid) — */
   --ns-space-0: 0.125rem; /* 2px */
@@ -168,37 +157,31 @@
 
   /* — Border radius — */
   --ns-radius-none: 0;
-  --ns-radius-sm: 0.25rem; /* 4px — PLACEHOLDER */
-  --ns-radius-md: 0.5rem; /* 8px — PLACEHOLDER */
-  --ns-radius-lg: 0.75rem; /* 12px — PLACEHOLDER */
-  --ns-radius-xl: 1rem; /* 16px — PLACEHOLDER */
+  --ns-radius-sm: 0.25rem;
+  --ns-radius-md: 0.5rem;
+  --ns-radius-lg: 0.75rem;
+  --ns-radius-xl: 1rem;
   --ns-radius-full: 9999px;
 
   /* — Shadows / elevation — */
-  --ns-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05); /* PLACEHOLDER */
-  --ns-shadow-md:
-    0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); /* PLACEHOLDER */
-  --ns-shadow-lg:
-    0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); /* PLACEHOLDER */
-  --ns-shadow-xl:
-    0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1); /* PLACEHOLDER */
+  --ns-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --ns-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --ns-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --ns-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
 
   /* — Motion / transitions — */
-  --ns-duration-fast: 100ms; /* PLACEHOLDER */
-  --ns-duration-normal: 200ms; /* PLACEHOLDER */
-  --ns-duration-slow: 400ms; /* PLACEHOLDER */
+  --ns-duration-fast: 100ms;
+  --ns-duration-normal: 200ms;
+  --ns-duration-slow: 400ms;
 
-  --ns-easing-default: cubic-bezier(0.4, 0, 0.2, 1); /* PLACEHOLDER */
-  --ns-easing-in: cubic-bezier(0.4, 0, 1, 1); /* PLACEHOLDER */
-  --ns-easing-out: cubic-bezier(0, 0, 0.2, 1); /* PLACEHOLDER */
-  --ns-easing-in-out: cubic-bezier(0.4, 0, 0.2, 1); /* PLACEHOLDER */
+  --ns-easing-default: cubic-bezier(0.4, 0, 0.2, 1);
+  --ns-easing-in: cubic-bezier(0.4, 0, 1, 1);
+  --ns-easing-out: cubic-bezier(0, 0, 0.2, 1);
+  --ns-easing-in-out: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* --------------------------------------------------------
- * DARK MODE — PLACEHOLDER VALUES
- *
- * Awaiting dark-mode design in Figma. All values below are
- * temporary placeholders and must not be shipped to production.
+ * DARK MODE
  *
  * Activated by any of:
  *   <html class="dark">
@@ -211,103 +194,215 @@
 :root.dark,
 [data-theme='dark'],
 .q-dark {
-  /* — Brand colours (dark) — */
-  --ns-color-primary: #60a5fa; /* PLACEHOLDER */
-  --ns-color-primary-hover: #93c5fd; /* PLACEHOLDER */
-  --ns-color-bg-brand: #d56307; /* PLACEHOLDER — awaiting dark Figma values */
-  --ns-color-bg-brand-active: #cc3c00; /* PLACEHOLDER — awaiting dark Figma values */
-  --ns-color-secondary: #a78bfa; /* PLACEHOLDER */
-  --ns-color-secondary-hover: #c4b5fd; /* PLACEHOLDER */
-  --ns-color-accent: #fbbf24; /* PLACEHOLDER */
-  --ns-color-accent-hover: #fcd34d; /* PLACEHOLDER */
+  /* — Text — */
+  --ns-color-text-primary: #f9e6d3;
+  --ns-color-text-secondary: #bc977c;
+  --ns-color-text-tertiary: #8a6f5a;
+  --ns-color-text-brand: #d56307;
+  --ns-color-text-disabled: #d1d5db;
+  --ns-color-text-inverse: #2d0b00;
+  --ns-color-text-link: #93dbff;
+  --ns-color-text-link-hover: #93dbff;
+  --ns-color-text-on-brand: #ffffff;
+  --ns-color-text-on-primary: #ffffff;
+  --ns-color-text-on-secondary: #d56307;
+  --ns-color-text-on-tertiary: #d56307;
+  --ns-color-text-on-tertiary-hover: #c05400;
+  --ns-color-text-positive: #d8dc36;
+  --ns-color-text-on-positive: #2d0b00;
+  --ns-color-text-warning: #f7bc2b;
+  --ns-color-text-on-warning: #2d0b00;
+  --ns-color-text-negative: #fd6d73;
+  --ns-color-text-on-negative: #2d0b00;
+  --ns-color-text-info: #15acf8;
+  --ns-color-text-on-info: #ffffff;
+  --ns-color-text-accent: #93dbff;
+  --ns-color-text-on-accent: #2d0b00;
 
-  /* — Semantic colours (dark) — */
-  --ns-color-success: #4ade80; /* PLACEHOLDER */
-  --ns-color-warning: #fbbf24; /* PLACEHOLDER */
-  --ns-color-error: #f87171; /* PLACEHOLDER */
-  --ns-color-info: #60a5fa; /* PLACEHOLDER */
+  /* — Background — */
+  --ns-color-bg-canvas: #120903;
+  --ns-color-bg-surface: #27140f;
+  --ns-color-bg-alt-surface: #351d16;
+  --ns-color-bg-subtle: #351d16;
+  --ns-color-bg-header: #21110c;
+  --ns-color-bg-brand: #d56307;
+  --ns-color-bg-brand-subtle: #a44700;
+  --ns-color-bg-brand-hover: #c05400;
+  --ns-color-bg-brand-active: #f66b00;
+  --ns-color-bg-disabled: #757575;
+  --ns-color-bg-positive: #919500;
+  --ns-color-bg-warning: #eaa500;
+  --ns-color-bg-negative: #fd6d73;
+  --ns-color-bg-info: #004a7f;
+  --ns-color-bg-accent: #64cbff;
 
-  /* — Surface / background (dark) — */
-  --ns-color-background: #0f172a; /* PLACEHOLDER */
-  --ns-color-surface: #1e293b; /* PLACEHOLDER */
-  --ns-color-surface-variant: #334155; /* PLACEHOLDER */
+  /* — Border — */
+  --ns-color-border-default: #ae7e5b;
+  --ns-color-border-subtle: #ae7e5b;
+  --ns-color-border-focus: #64cbff;
+  --ns-color-border-disabled: #535353;
+  --ns-color-border-brand: #a44700;
+  --ns-color-border-brand-subtle: #60351d;
+  --ns-color-border-positive: #d8dc36;
+  --ns-color-border-warning: #f7bc2b;
+  --ns-color-border-negative: #fd6d73;
+  --ns-color-border-info: #15acf8;
+  --ns-color-border-accent: #15acf8;
 
-  /* — On-colours (dark) — */
-  --ns-color-on-primary: #0f172a; /* PLACEHOLDER */
-  --ns-color-on-secondary: #0f172a; /* PLACEHOLDER */
-  --ns-color-on-accent: #0f172a; /* PLACEHOLDER */
-  --ns-color-on-background: #f1f5f9; /* PLACEHOLDER */
-  --ns-color-on-surface: #f1f5f9; /* PLACEHOLDER */
+  /* — Status — */
+  --ns-color-status-positive: #aaae04;
+  --ns-color-status-positive-hover: #c4c81d;
+  --ns-color-status-positive-active: #919500;
+  --ns-color-status-warning: #eaa500;
+  --ns-color-status-warning-hover: #f8dc98;
+  --ns-color-status-warning-active: #f7bc2b;
+  --ns-color-status-negative: #fd6d73;
+  --ns-color-status-negative-hover: #f2434a;
+  --ns-color-status-negative-active: #e2222a;
+  --ns-color-status-info: #0069b4;
+  --ns-color-status-info-hover: #15acf8;
+  --ns-color-status-info-active: #004a7f;
+  --ns-color-status-accent: #79caf3;
+  --ns-color-accent-hover: #93dbff;
+  --ns-color-accent-active: #15acf8;
+  --ns-color-status-neutral: #e5e7eb;
 
-  /* — Neutral scale (dark — inverted) — */
-  --ns-color-neutral-50: #0f172a; /* PLACEHOLDER */
-  --ns-color-neutral-100: #1e293b; /* PLACEHOLDER */
-  --ns-color-neutral-200: #334155; /* PLACEHOLDER */
-  --ns-color-neutral-300: #475569; /* PLACEHOLDER */
-  --ns-color-neutral-400: #64748b; /* PLACEHOLDER */
-  --ns-color-neutral-500: #94a3b8; /* PLACEHOLDER */
-  --ns-color-neutral-600: #cbd5e1; /* PLACEHOLDER */
-  --ns-color-neutral-700: #e2e8f0; /* PLACEHOLDER */
-  --ns-color-neutral-800: #f1f5f9; /* PLACEHOLDER */
-  --ns-color-neutral-900: #f8fafc; /* PLACEHOLDER */
+  /* — Button — */
+  --ns-color-btn-primary-bg: #d56307;
+  --ns-color-btn-primary-bg-hover: #c05400;
+  --ns-color-btn-primary-bg-active: #f66b00;
+  --ns-color-btn-secondary-bg: #120903;
+  --ns-color-btn-secondary-bg-hover: #27140f;
+  --ns-color-btn-secondary-bg-active: #21110c;
+  --ns-color-btn-secondary-bg-border: #a44700;
+  --ns-color-btn-tertiary-bg: transparent;
+  --ns-color-btn-disabled-bg: #e0e0e0;
+  --ns-color-btn-disabled-bg-border: #9ca3af;
 
-  /* — Shadows (dark — lighter opacity looks better on dark bg) — */
-  --ns-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3); /* PLACEHOLDER */
-  --ns-shadow-md:
-    0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3); /* PLACEHOLDER */
-  --ns-shadow-lg:
-    0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3); /* PLACEHOLDER */
-  --ns-shadow-xl:
-    0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.3); /* PLACEHOLDER */
+  /* — Data visualisation — */
+  --ns-color-data-1: #601779;
+  --ns-color-data-2: #8e23b3;
+  --ns-color-data-3: #a11ed0;
+  --ns-color-data-4: #ba22f0;
+  --ns-color-data-5: #cf68f4;
+  --ns-color-data-6: #db8ef7;
+  --ns-color-data-7: #e8a9ff;
+  --ns-color-data-8: #f0c6ff;
+  --ns-color-data-9: #f8e4ff;
+
+  /* — Shadows (dark — heavier opacity reads better on dark bg) — */
+  --ns-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --ns-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --ns-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --ns-shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.3);
 }
 
 /* --------------------------------------------------------
  * prefers-color-scheme fallback
  *
  * Applies dark tokens when the OS is in dark mode and
- * no explicit class/attribute override is set.
+ * no explicit class/attribute override is set. Mirrors the
+ * :root.dark block above — keep in sync.
  * ------------------------------------------------------ */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']):not(.light) {
-    /* — Brand colours (dark) — */
-    --ns-color-primary: #60a5fa;
-    --ns-color-primary-hover: #93c5fd;
-    --ns-color-secondary: #a78bfa;
-    --ns-color-secondary-hover: #c4b5fd;
-    --ns-color-accent: #fbbf24;
-    --ns-color-accent-hover: #fcd34d;
+    /* — Text — */
+    --ns-color-text-primary: #f9e6d3;
+    --ns-color-text-secondary: #bc977c;
+    --ns-color-text-tertiary: #8a6f5a;
+    --ns-color-text-brand: #d56307;
+    --ns-color-text-disabled: #d1d5db;
+    --ns-color-text-inverse: #2d0b00;
+    --ns-color-text-link: #93dbff;
+    --ns-color-text-link-hover: #93dbff;
+    --ns-color-text-on-brand: #ffffff;
+    --ns-color-text-on-primary: #ffffff;
+    --ns-color-text-on-secondary: #d56307;
+    --ns-color-text-on-tertiary: #d56307;
+    --ns-color-text-on-tertiary-hover: #c05400;
+    --ns-color-text-positive: #d8dc36;
+    --ns-color-text-on-positive: #2d0b00;
+    --ns-color-text-warning: #f7bc2b;
+    --ns-color-text-on-warning: #2d0b00;
+    --ns-color-text-negative: #fd6d73;
+    --ns-color-text-on-negative: #2d0b00;
+    --ns-color-text-info: #15acf8;
+    --ns-color-text-on-info: #ffffff;
+    --ns-color-text-accent: #93dbff;
+    --ns-color-text-on-accent: #2d0b00;
 
-    /* — Semantic colours (dark) — */
-    --ns-color-success: #4ade80;
-    --ns-color-warning: #fbbf24;
-    --ns-color-error: #f87171;
-    --ns-color-info: #60a5fa;
+    /* — Background — */
+    --ns-color-bg-canvas: #120903;
+    --ns-color-bg-surface: #27140f;
+    --ns-color-bg-alt-surface: #351d16;
+    --ns-color-bg-subtle: #351d16;
+    --ns-color-bg-header: #21110c;
+    --ns-color-bg-brand: #d56307;
+    --ns-color-bg-brand-subtle: #a44700;
+    --ns-color-bg-brand-hover: #c05400;
+    --ns-color-bg-brand-active: #f66b00;
+    --ns-color-bg-disabled: #757575;
+    --ns-color-bg-positive: #919500;
+    --ns-color-bg-warning: #eaa500;
+    --ns-color-bg-negative: #fd6d73;
+    --ns-color-bg-info: #004a7f;
+    --ns-color-bg-accent: #64cbff;
 
-    /* — Surface / background (dark) — */
-    --ns-color-background: #0f172a;
-    --ns-color-surface: #1e293b;
-    --ns-color-surface-variant: #334155;
+    /* — Border — */
+    --ns-color-border-default: #ae7e5b;
+    --ns-color-border-subtle: #ae7e5b;
+    --ns-color-border-focus: #64cbff;
+    --ns-color-border-disabled: #535353;
+    --ns-color-border-brand: #a44700;
+    --ns-color-border-brand-subtle: #60351d;
+    --ns-color-border-positive: #d8dc36;
+    --ns-color-border-warning: #f7bc2b;
+    --ns-color-border-negative: #fd6d73;
+    --ns-color-border-info: #15acf8;
+    --ns-color-border-accent: #15acf8;
 
-    /* — On-colours (dark) — */
-    --ns-color-on-primary: #0f172a;
-    --ns-color-on-secondary: #0f172a;
-    --ns-color-on-accent: #0f172a;
-    --ns-color-on-background: #f1f5f9;
-    --ns-color-on-surface: #f1f5f9;
+    /* — Status — */
+    --ns-color-status-positive: #aaae04;
+    --ns-color-status-positive-hover: #c4c81d;
+    --ns-color-status-positive-active: #919500;
+    --ns-color-status-warning: #eaa500;
+    --ns-color-status-warning-hover: #f8dc98;
+    --ns-color-status-warning-active: #f7bc2b;
+    --ns-color-status-negative: #fd6d73;
+    --ns-color-status-negative-hover: #f2434a;
+    --ns-color-status-negative-active: #e2222a;
+    --ns-color-status-info: #0069b4;
+    --ns-color-status-info-hover: #15acf8;
+    --ns-color-status-info-active: #004a7f;
+    --ns-color-status-accent: #79caf3;
+    --ns-color-accent-hover: #93dbff;
+    --ns-color-accent-active: #15acf8;
+    --ns-color-status-neutral: #e5e7eb;
 
-    /* — Neutral scale (dark — inverted) — */
-    --ns-color-neutral-50: #0f172a;
-    --ns-color-neutral-100: #1e293b;
-    --ns-color-neutral-200: #334155;
-    --ns-color-neutral-300: #475569;
-    --ns-color-neutral-400: #64748b;
-    --ns-color-neutral-500: #94a3b8;
-    --ns-color-neutral-600: #cbd5e1;
-    --ns-color-neutral-700: #e2e8f0;
-    --ns-color-neutral-800: #f1f5f9;
-    --ns-color-neutral-900: #f8fafc;
+    /* — Button — */
+    --ns-color-btn-primary-bg: #d56307;
+    --ns-color-btn-primary-bg-hover: #c05400;
+    --ns-color-btn-primary-bg-active: #f66b00;
+    --ns-color-btn-secondary-bg: #120903;
+    --ns-color-btn-secondary-bg-hover: #27140f;
+    --ns-color-btn-secondary-bg-active: #21110c;
+    --ns-color-btn-secondary-bg-border: #a44700;
+    --ns-color-btn-tertiary-bg: transparent;
+    --ns-color-btn-disabled-bg: #e0e0e0;
+    --ns-color-btn-disabled-bg-border: #9ca3af;
 
-    /* — Shadows (dark) — */
+    /* — Data visualisation — */
+    --ns-color-data-1: #601779;
+    --ns-color-data-2: #8e23b3;
+    --ns-color-data-3: #a11ed0;
+    --ns-color-data-4: #ba22f0;
+    --ns-color-data-5: #cf68f4;
+    --ns-color-data-6: #db8ef7;
+    --ns-color-data-7: #e8a9ff;
+    --ns-color-data-8: #f0c6ff;
+    --ns-color-data-9: #f8e4ff;
+
+    /* — Shadows — */
     --ns-shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
     --ns-shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
     --ns-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);

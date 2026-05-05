@@ -66,7 +66,7 @@ const rows = [
 }
 
 .page-subtitle {
-  color: var(--ns-color-neutral-600, #475569);
+  color: var(--ns-color-text-secondary, #475569);
   margin-bottom: 2rem;
   font-size: 0.875rem;
 }
@@ -79,27 +79,27 @@ const rows = [
 .type-table th {
   text-align: left;
   padding: 0.5rem 1rem;
-  border-bottom: 2px solid var(--ns-color-neutral-200, #e2e8f0);
+  border-bottom: 2px solid var(--ns-color-border-default, #e2e8f0);
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--ns-color-neutral-500, #64748b);
+  color: var(--ns-color-text-tertiary, #64748b);
 }
 
 .type-table td {
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--ns-color-neutral-100, #f1f5f9);
+  border-bottom: 1px solid var(--ns-color-border-default, #f1f5f9);
   vertical-align: middle;
 }
 
 .token-name {
   font-size: 0.8rem;
-  color: var(--ns-color-primary, #cc3c00);
+  color: var(--ns-color-bg-brand-active, #cc3c00);
   white-space: nowrap;
 }
 
 .props {
   font-size: 0.75rem;
-  color: var(--ns-color-neutral-500, #64748b);
+  color: var(--ns-color-text-tertiary, #64748b);
 }
 </style>

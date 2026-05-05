@@ -8,10 +8,13 @@ import { defineComponent, h, ref } from 'vue'
  * ```ts
  * import '@nonsuch/component-library/tokens.css'
  * ```
+ *
+ * Colour tokens mirror the Figma "Semantics" variable collection 1:1.
+ * Section names and order match Figma's groups.
  */
 
 /* --------------------------------------------------------
- * Token definitions (used to render the page)
+ * Token definitions
  * ------------------------------------------------------ */
 
 interface Token {
@@ -19,105 +22,106 @@ interface Token {
   fallback: string
 }
 
-const colours: Token[] = [
-  { name: '--ns-color-primary', fallback: '#cc3c00' },
-  { name: '--ns-color-primary-hover', fallback: '#d56307' },
-  { name: '--ns-color-secondary', fallback: '#93dbff' },
-  { name: '--ns-color-secondary-hover', fallback: '#a8d8f0' },
-  { name: '--ns-color-accent', fallback: '#93dbff' },
-  { name: '--ns-color-accent-hover', fallback: '#a8d8f0' },
-]
-
-const neutrals: Token[] = [
-  { name: '--ns-color-neutral-50', fallback: '#c5c5c5' },
-  { name: '--ns-color-neutral-100', fallback: '#e5e7eb' },
-  { name: '--ns-color-neutral-200', fallback: '#e0e0e0' },
-  { name: '--ns-color-neutral-300', fallback: '#d1d5db' },
-  { name: '--ns-color-neutral-400', fallback: '#9ca3af' },
-  { name: '--ns-color-neutral-500', fallback: '#909090' },
-  { name: '--ns-color-neutral-600', fallback: '#757575' },
-  { name: '--ns-color-neutral-700', fallback: '#535353' },
-  { name: '--ns-color-neutral-800', fallback: '#3c3c3c' },
-  { name: '--ns-color-neutral-900', fallback: '#212121' },
-]
-
-const surfaces: Token[] = [
-  { name: '--ns-color-background', fallback: '#fefbf5' },
-  { name: '--ns-color-surface', fallback: '#ffffff' },
-  { name: '--ns-color-surface-variant', fallback: '#fef7ee' },
-  { name: '--ns-color-on-primary', fallback: '#ffffff' },
-  { name: '--ns-color-on-secondary', fallback: '#ffffff' },
-  { name: '--ns-color-on-accent', fallback: '#2d0b00' },
-  { name: '--ns-color-on-background', fallback: '#2d0b00' },
-  { name: '--ns-color-on-surface', fallback: '#2d0b00' },
-]
-
-const textColours: Token[] = [
+const text: Token[] = [
+  { name: '--ns-color-text-primary', fallback: '#2d0b00' },
   { name: '--ns-color-text-secondary', fallback: '#757575' },
   { name: '--ns-color-text-tertiary', fallback: '#9ca3af' },
   { name: '--ns-color-text-brand', fallback: '#d56307' },
-  { name: '--ns-color-text-brand-hover', fallback: '#ef7c20' },
   { name: '--ns-color-text-disabled', fallback: '#909090' },
-  { name: '--ns-color-text-link', fallback: '#64cbff' },
-  { name: '--ns-color-text-link-hover', fallback: '#a8d8f0' },
+  { name: '--ns-color-text-inverse', fallback: '#ffffff' },
+  { name: '--ns-color-text-link', fallback: '#79caf3' },
+  { name: '--ns-color-text-link-hover', fallback: '#b8e4fa' },
+  { name: '--ns-color-text-on-brand', fallback: '#ffffff' },
+  { name: '--ns-color-text-on-primary', fallback: '#ffffff' },
+  { name: '--ns-color-text-on-secondary', fallback: '#d56307' },
+  { name: '--ns-color-text-on-tertiary', fallback: '#d56307' },
+  { name: '--ns-color-text-on-tertiary-hover', fallback: '#f66b00' },
+  { name: '--ns-color-text-positive', fallback: '#919500' },
+  { name: '--ns-color-text-on-positive', fallback: '#2d0b00' },
+  { name: '--ns-color-text-warning', fallback: '#f7bc2b' },
+  { name: '--ns-color-text-on-warning', fallback: '#2d0b00' },
+  { name: '--ns-color-text-negative', fallback: '#e2222a' },
+  { name: '--ns-color-text-on-negative', fallback: '#ffffff' },
+  { name: '--ns-color-text-info', fallback: '#0069b4' },
+  { name: '--ns-color-text-on-info', fallback: '#ffffff' },
+  { name: '--ns-color-text-accent', fallback: '#79caf3' },
+  { name: '--ns-color-text-on-accent', fallback: '#2d0b00' },
 ]
 
-const backgroundColours: Token[] = [
-  { name: '--ns-color-bg-brand-subtle', fallback: '#fce5d2' },
-  { name: '--ns-color-bg-brand-hover', fallback: '#ef7c20' },
+const background: Token[] = [
+  { name: '--ns-color-bg-canvas', fallback: '#fefbf5' },
+  { name: '--ns-color-bg-surface', fallback: '#ffffff' },
+  { name: '--ns-color-bg-alt-surface', fallback: '#fdfdf9' },
+  { name: '--ns-color-bg-subtle', fallback: '#fef7ee' },
   { name: '--ns-color-bg-header', fallback: '#fdf4e7' },
+  { name: '--ns-color-bg-brand', fallback: '#d56307' },
+  { name: '--ns-color-bg-brand-subtle', fallback: '#fce5d2' },
+  { name: '--ns-color-bg-brand-hover', fallback: '#f66b00' },
+  { name: '--ns-color-bg-brand-active', fallback: '#c05400' },
   { name: '--ns-color-bg-disabled', fallback: '#e0e0e0' },
-  { name: '--ns-color-bg-menu-hover', fallback: '#f9cba6' },
-  { name: '--ns-color-bg-menu-selected', fallback: '#d56307' },
+  { name: '--ns-color-bg-positive', fallback: '#f3f4d2' },
+  { name: '--ns-color-bg-warning', fallback: '#f9e3ad' },
+  { name: '--ns-color-bg-negative', fallback: '#fedee0' },
+  { name: '--ns-color-bg-info', fallback: '#e0f1fa' },
+  { name: '--ns-color-bg-accent', fallback: '#b8e4fa' },
 ]
 
-const borderColours: Token[] = [
-  { name: '--ns-color-border', fallback: '#e5e7eb' },
+const border: Token[] = [
+  { name: '--ns-color-border-default', fallback: '#e5e7eb' },
   { name: '--ns-color-border-subtle', fallback: '#ffffff' },
   { name: '--ns-color-border-focus', fallback: '#93dbff' },
-  { name: '--ns-color-border-strong', fallback: '#93dbff' },
   { name: '--ns-color-border-disabled', fallback: '#d1d5db' },
   { name: '--ns-color-border-brand', fallback: '#d56307' },
   { name: '--ns-color-border-brand-subtle', fallback: '#fce5d2' },
-  { name: '--ns-color-border-positive', fallback: '#aaae04' },
-  { name: '--ns-color-border-warning', fallback: '#f1b931' },
-  { name: '--ns-color-border-negative', fallback: '#cc363c' },
+  { name: '--ns-color-border-positive', fallback: '#919500' },
+  { name: '--ns-color-border-warning', fallback: '#f7bc2b' },
+  { name: '--ns-color-border-negative', fallback: '#e2222a' },
   { name: '--ns-color-border-info', fallback: '#0069b4' },
-  { name: '--ns-color-border-accent', fallback: '#15acf8' },
+  { name: '--ns-color-border-accent', fallback: '#64cbff' },
 ]
 
-const statusColours: Token[] = [
-  { name: '--ns-color-success', fallback: '#c4c81d' },
-  { name: '--ns-color-success-light', fallback: '#e7e9a5' },
-  { name: '--ns-color-success-hover', fallback: '#e2e653' },
-  { name: '--ns-color-success-active', fallback: '#919500' },
-  { name: '--ns-color-warning', fallback: '#f1b931' },
-  { name: '--ns-color-warning-light', fallback: '#fcf1d6' },
-  { name: '--ns-color-warning-hover', fallback: '#f8dc98' },
-  { name: '--ns-color-warning-active', fallback: '#f1b931' },
-  { name: '--ns-color-error', fallback: '#a5282d' },
-  { name: '--ns-color-error-light', fallback: '#fce4e5' },
-  { name: '--ns-color-error-hover', fallback: '#e05359' },
-  { name: '--ns-color-error-active', fallback: '#8e262a' },
-  { name: '--ns-color-info', fallback: '#0069b4' },
-  { name: '--ns-color-info-light', fallback: '#dceef7' },
-  { name: '--ns-color-info-hover', fallback: '#15acf8' },
-  { name: '--ns-color-info-active', fallback: '#004a7f' },
-  { name: '--ns-color-accent-light', fallback: '#edf6fb' },
-  { name: '--ns-color-accent-active', fallback: '#15acf8' },
+const status: Token[] = [
+  { name: '--ns-color-status-positive', fallback: '#d8dc36' },
+  { name: '--ns-color-status-positive-hover', fallback: '#e2e653' },
+  { name: '--ns-color-status-positive-active', fallback: '#aaae04' },
+  { name: '--ns-color-status-warning', fallback: '#f7bc2b' },
+  { name: '--ns-color-status-warning-hover', fallback: '#f7c857' },
+  { name: '--ns-color-status-warning-active', fallback: '#ffb400' },
+  { name: '--ns-color-status-negative', fallback: '#c7151c' },
+  { name: '--ns-color-status-negative-hover', fallback: '#f2434a' },
+  { name: '--ns-color-status-negative-active', fallback: '#b00007' },
+  { name: '--ns-color-status-info', fallback: '#0069b4' },
+  { name: '--ns-color-status-info-hover', fallback: '#15acf8' },
+  { name: '--ns-color-status-info-active', fallback: '#004a7f' },
+  { name: '--ns-color-status-accent', fallback: '#93dbff' },
+  { name: '--ns-color-accent-hover', fallback: '#b8e4fa' },
+  { name: '--ns-color-accent-active', fallback: '#79caf3' },
   { name: '--ns-color-status-neutral', fallback: '#e5e7eb' },
 ]
 
-const dataColours: Token[] = [
-  { name: '--ns-color-data-1', fallback: '#f4adb0' },
-  { name: '--ns-color-data-2', fallback: '#dcde77' },
-  { name: '--ns-color-data-3', fallback: '#f9cba6' },
-  { name: '--ns-color-data-4', fallback: '#a8d8f0' },
-  { name: '--ns-color-data-5', fallback: '#e8a9ff' },
-  { name: '--ns-color-data-6', fallback: '#cf68f4' },
-  { name: '--ns-color-data-7', fallback: '#e05359' },
-  { name: '--ns-color-data-8', fallback: '#ef7c20' },
-  { name: '--ns-color-data-9', fallback: '#8e23b3' },
+const button: Token[] = [
+  { name: '--ns-color-btn-primary-bg', fallback: '#d56307' },
+  { name: '--ns-color-btn-primary-bg-hover', fallback: '#f66b00' },
+  { name: '--ns-color-btn-primary-bg-active', fallback: '#c05400' },
+  { name: '--ns-color-btn-secondary-bg', fallback: '#fefbf5' },
+  { name: '--ns-color-btn-secondary-bg-hover', fallback: '#ffffff' },
+  { name: '--ns-color-btn-secondary-bg-active', fallback: '#fdf4e7' },
+  { name: '--ns-color-btn-secondary-bg-border', fallback: '#d56307' },
+  { name: '--ns-color-btn-tertiary-bg', fallback: 'transparent' },
+  { name: '--ns-color-btn-disabled-bg', fallback: '#e0e0e0' },
+  { name: '--ns-color-btn-disabled-bg-border', fallback: '#9ca3af' },
+]
+
+const data: Token[] = [
+  { name: '--ns-color-data-1', fallback: '#f8e4ff' },
+  { name: '--ns-color-data-2', fallback: '#f0c6ff' },
+  { name: '--ns-color-data-3', fallback: '#e8a9ff' },
+  { name: '--ns-color-data-4', fallback: '#db8ef7' },
+  { name: '--ns-color-data-5', fallback: '#cf68f4' },
+  { name: '--ns-color-data-6', fallback: '#ba22f0' },
+  { name: '--ns-color-data-7', fallback: '#a11ed0' },
+  { name: '--ns-color-data-8', fallback: '#8e23b3' },
+  { name: '--ns-color-data-9', fallback: '#601779' },
 ]
 
 const fontSizes: Token[] = [
@@ -189,7 +193,7 @@ function tokenLabel(name: string) {
     'code',
     {
       style:
-        'font-size: 0.8rem; color: var(--ns-color-neutral-600); user-select: all; display: block; margin-top: 0.25rem',
+        'font-size: 0.8rem; color: var(--ns-color-text-secondary); user-select: all; display: block; margin-top: 0.25rem',
     },
     name,
   )
@@ -198,7 +202,7 @@ function tokenLabel(name: string) {
 function colourSwatch(token: Token) {
   return h('div', { style: 'text-align: center; min-width: 90px' }, [
     h('div', {
-      style: `width: 64px; height: 64px; border-radius: var(--ns-radius-md); background: var(${token.name}); border: 1px solid var(--ns-color-neutral-200); margin: 0 auto`,
+      style: `width: 64px; height: 64px; border-radius: var(--ns-radius-md); background: var(${token.name}); border: 1px solid var(--ns-color-border-default); margin: 0 auto`,
     }),
     tokenLabel(token.name.replace('--ns-color-', '')),
   ])
@@ -239,8 +243,8 @@ const DesignTokensPage = defineComponent({
           ),
           h(
             'p',
-            { style: 'color: var(--ns-color-neutral-500); margin-bottom: 1.5rem' },
-            'All tokens sourced from the Nonsuch Figma design system.',
+            { style: 'color: var(--ns-color-text-tertiary); margin-bottom: 1.5rem' },
+            'All colour tokens mirror the Figma "Semantics" variable collection 1:1.',
           ),
 
           // Dark mode toggle
@@ -250,36 +254,30 @@ const DesignTokensPage = defineComponent({
               {
                 onClick: toggleDark,
                 style:
-                  'padding: 0.5rem 1rem; border-radius: var(--ns-radius-md); border: 1px solid var(--ns-color-neutral-300); background: var(--ns-color-surface); color: var(--ns-color-on-surface); cursor: pointer; font-family: var(--ns-font-family-text)',
+                  'padding: 0.5rem 1rem; border-radius: var(--ns-radius-md); border: 1px solid var(--ns-color-border-default); background: var(--ns-color-bg-surface); color: var(--ns-color-text-primary); cursor: pointer; font-family: var(--ns-font-family-text)',
               },
               isDark.value ? '☀️  Switch to Light' : '🌙  Switch to Dark',
             ),
           ]),
 
-          // — Colours —
-          sectionTitle('Brand Colours'),
-          swatchGrid(colours),
+          // — Colour tokens, grouped to match Figma —
+          sectionTitle('Text'),
+          swatchGrid(text),
 
-          sectionTitle('Neutral Scale'),
-          swatchGrid(neutrals),
+          sectionTitle('Background'),
+          swatchGrid(background),
 
-          sectionTitle('Surface & On-Colours'),
-          swatchGrid(surfaces),
+          sectionTitle('Border'),
+          swatchGrid(border),
 
-          sectionTitle('Text Colours'),
-          swatchGrid(textColours),
+          sectionTitle('Status'),
+          swatchGrid(status),
 
-          sectionTitle('Background Colours'),
-          swatchGrid(backgroundColours),
+          sectionTitle('Button'),
+          swatchGrid(button),
 
-          sectionTitle('Border Colours'),
-          swatchGrid(borderColours),
-
-          sectionTitle('Status Colours'),
-          swatchGrid(statusColours),
-
-          sectionTitle('Data Colours'),
-          swatchGrid(dataColours),
+          sectionTitle('Data Visualisation'),
+          swatchGrid(data),
 
           // — Typography —
           sectionTitle('Typography Scale'),
@@ -329,7 +327,7 @@ const DesignTokensPage = defineComponent({
               ...spacings.map((t) =>
                 h('div', { style: 'display: flex; align-items: center; gap: 1rem' }, [
                   h('div', {
-                    style: `width: var(${t.name}); height: 24px; background: var(--ns-color-primary); border-radius: var(--ns-radius-sm)`,
+                    style: `width: var(${t.name}); height: 24px; background: var(--ns-color-bg-brand-active); border-radius: var(--ns-radius-sm)`,
                   }),
                   tokenLabel(`${t.name.replace('--ns-', '')} (${t.fallback})`),
                 ]),
@@ -346,7 +344,7 @@ const DesignTokensPage = defineComponent({
               ...radii.map((t) =>
                 h('div', { style: 'text-align: center' }, [
                   h('div', {
-                    style: `width: 64px; height: 64px; border-radius: var(${t.name}); background: var(--ns-color-primary); margin: 0 auto`,
+                    style: `width: 64px; height: 64px; border-radius: var(${t.name}); background: var(--ns-color-bg-brand-active); margin: 0 auto`,
                   }),
                   tokenLabel(t.name.replace('--ns-', '')),
                 ]),
@@ -360,7 +358,7 @@ const DesignTokensPage = defineComponent({
             ...shadows.map((t) =>
               h('div', { style: 'text-align: center' }, [
                 h('div', {
-                  style: `width: 96px; height: 64px; border-radius: var(--ns-radius-md); background: var(--ns-color-surface); box-shadow: var(${t.name}); margin: 0 auto`,
+                  style: `width: 96px; height: 64px; border-radius: var(--ns-radius-md); background: var(--ns-color-bg-surface); box-shadow: var(${t.name}); margin: 0 auto`,
                 }),
                 tokenLabel(t.name.replace('--ns-', '')),
               ]),
@@ -381,7 +379,7 @@ const DesignTokensPage = defineComponent({
                 ),
                 h(
                   'code',
-                  { style: 'font-size: 0.8rem; color: var(--ns-color-neutral-500)' },
+                  { style: 'font-size: 0.8rem; color: var(--ns-color-text-tertiary)' },
                   t.fallback,
                 ),
               ]),

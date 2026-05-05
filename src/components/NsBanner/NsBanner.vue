@@ -61,18 +61,18 @@ const ariaLive = computed(() =>
   border-radius: var(--ns-radius-md)
 
   &--info
-    background-color: var(--ns-color-info-bg, #e3f2fd)
-    color: var(--ns-color-info-text, #0d47a1)
+    background-color: var(--ns-color-bg-info, #e3f2fd)
+    color: var(--ns-color-text-info, #0d47a1)
 
   &--success
-    background-color: var(--ns-color-success-bg, #e8f5e9)
-    color: var(--ns-color-success-text, #1b5e20)
+    background-color: var(--ns-color-bg-positive, #e8f5e9)
+    color: var(--ns-color-text-positive, #1b5e20)
 
   &--warning
-    background-color: var(--ns-color-warning-bg, #fff3e0)
-    color: var(--ns-color-warning-text, #e65100)
+    background-color: var(--ns-color-bg-warning, #fff3e0)
+    color: var(--ns-color-text-warning, #e65100)
 
   &--error
-    background-color: var(--ns-color-error-bg, #ffebee)
-    color: var(--ns-color-error-text, #b71c1c)
+    background-color: var(--ns-color-bg-negative, #ffebee)
+    color: var(--ns-color-text-negative, #b71c1c)
 </style>
