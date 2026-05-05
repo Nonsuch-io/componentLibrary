@@ -9,4 +9,16 @@
 // Then in vite.config.ts:
 //   quasar({ sassVariables: 'src/quasar-variables.sass' })
 
-$body-font-family: 'Fixel Text', 'Roboto', sans-serif
+@use '../src/tokens/tokens-primitive' as *
+
+$body-font-family:       $font-family-base
+$typography-font-family: $font-family-base
+$body-font-size:         $font-size-md
+$body-line-height:       1.5
+
+$h1-size: $font-size-4xl
+$h2-size: $font-size-3xl
+$h3-size: $font-size-2xl
+$h4-size: $font-size-xl
+$h5-size: $font-size-lg
+$h6-size: $font-size-md

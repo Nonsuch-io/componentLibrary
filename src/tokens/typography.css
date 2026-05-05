@@ -1,0 +1,115 @@
+/*
+ * Nonsuch Typography Utility Classes
+ *
+ * Ready-to-use classes built from the semantic token layer.
+ * Import in your app:
+ *   import '@nonsuch/component-library/typography.css'
+ *
+ * Then apply classes directly to any element:
+ *   <p class="ns-body-md">...</p>
+ *   <h2 class="ns-heading-lg">...</h2>
+ */
+
+.ns-caption {
+  font-size: 0.625rem;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+.ns-overline {
+  font-size: 0.625rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1.6;
+}
+
+.ns-body-sm {
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.ns-body-md {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.ns-label-xs {
+  font-size: 0.625rem;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+.ns-label-sm {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ns-label-md {
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ns-heading-sm {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.ns-heading-sm-regular {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+.ns-heading-md {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.ns-heading-md-regular {
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.ns-heading-lg {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.ns-heading-lg-regular {
+  font-size: 1.5rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.ns-heading-xl {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.ns-heading-xl-regular {
+  font-size: 2rem;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.ns-heading-2xl {
+  font-size: 3rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.ns-heading-2xl-regular {
+  font-size: 3rem;
+  font-weight: 400;
+  line-height: 1.1;
+}

@@ -12,6 +12,9 @@ import '../fonts/global.css'
 // Nonsuch design tokens (CSS custom properties)
 import '../src/tokens/tokens.css'
 
+// Nonsuch typography utility classes
+import '../src/tokens/typography.css'
+
 // Register Quasar plugin for all stories
 setup((app) => {
   app.use(Quasar, {

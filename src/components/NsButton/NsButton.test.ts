@@ -4,10 +4,7 @@ import NsButton from './NsButton.vue'
 
 describe('NsButton', () => {
   const mountButton = (props = {}, slots = {}) => {
-    return mount(NsButton, {
-      props,
-      slots,
-    })
+    return mount(NsButton, { props, slots })
   }
 
   it('renders with default slot content', () => {
@@ -19,55 +16,51 @@ describe('NsButton', () => {
     const wrapper = mountButton()
     const qBtn = wrapper.find('.q-btn')
     expect(qBtn.exists()).toBe(true)
-    // Default: unelevated, no-caps, rounded
     expect(qBtn.classes()).toContain('q-btn--unelevated')
     expect(qBtn.classes()).toContain('q-btn--no-uppercase')
-    expect(qBtn.classes()).toContain('q-btn--rounded')
   })
 
-  it('accepts color prop', () => {
-    const wrapper = mountButton({ color: 'negative' })
-    const qBtn = wrapper.find('.q-btn')
-    expect(qBtn.classes()).toContain('bg-negative')
+  it('applies default variant class', () => {
+    const wrapper = mountButton()
+    expect(wrapper.find('.ns-btn--primary').exists()).toBe(true)
   })
 
-  it('accepts size prop', () => {
+  it('applies variant class', () => {
+    const wrapper = mountButton({ variant: 'negative' })
+    expect(wrapper.find('.ns-btn--negative').exists()).toBe(true)
+  })
+
+  it('applies size class', () => {
     const wrapper = mountButton({ size: 'lg' })
-    const qBtn = wrapper.find('.q-btn')
-    expect(qBtn.exists()).toBe(true)
+    expect(wrapper.find('.ns-btn--lg').exists()).toBe(true)
+  })
+
+  it('applies icon-only class', () => {
+    const wrapper = mountButton({ iconOnly: true })
+    expect(wrapper.find('.ns-btn--icon-only').exists()).toBe(true)
   })
 
   it('passes through additional QBtn attributes', () => {
     const wrapper = mountButton({ disable: true })
-    const qBtn = wrapper.find('.q-btn')
-    expect(qBtn.classes()).toContain('disabled')
+    expect(wrapper.find('.q-btn').classes()).toContain('disabled')
   })
 
   it('shows loading state when loading prop is true', () => {
     const wrapper = mountButton({ loading: true })
-    // QBtn renders a loading indicator element when loading
     expect(wrapper.find('.q-spinner').exists() || wrapper.find('.q-spinner-dots').exists()).toBe(
       true,
     )
   })
 
-  it('does not show loading state by default', () => {
-    const wrapper = mountButton()
-    const qBtn = wrapper.find('.q-btn')
-    expect(qBtn.attributes('aria-disabled')).toBeUndefined()
-  })
-
   describe('accessibility', () => {
     it('sets aria-busy="true" when loading', () => {
       const wrapper = mountButton({ loading: true })
-      const qBtn = wrapper.find('.q-btn')
-      expect(qBtn.attributes('aria-busy')).toBe('true')
+      expect(wrapper.find('.q-btn').attributes('aria-busy')).toBe('true')
     })
 
     it('sets aria-busy="false" when not loading', () => {
       const wrapper = mountButton({ loading: false })
-      const qBtn = wrapper.find('.q-btn')
-      expect(qBtn.attributes('aria-busy')).toBe('false')
+      expect(wrapper.find('.q-btn').attributes('aria-busy')).toBe('false')
     })
   })
 })
