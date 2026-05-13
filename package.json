@@ -81,7 +81,7 @@
   },
   "devDependencies": {
     "@commitlint/cli": "^20.4.3",
-    "@commitlint/config-conventional": "^20.4.3",
+    "@commitlint/config-conventional": "^21.0.1",
     "@eslint/js": "^10.0.1",
     "@phosphor-icons/vue": "^2.2.1",
     "@quasar/extras": "^1.17.0",
