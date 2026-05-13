@@ -5,6 +5,9 @@
   "type": "module",
   "sideEffects": false,
   "license": "MIT",
+  "engines": {
+    "node": ">=22.22.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Nonsuch-io/componentLibrary.git"
