@@ -36,6 +36,7 @@
   "scripts": {
     "dev": "storybook dev -p 6006",
     "build": "vite build && rm -f tsconfig.build.tsbuildinfo && vue-tsc -p tsconfig.build.json --emitDeclarationOnly",
+    "build:watch": "vite build --watch",
     "build:storybook": "storybook build",
     "typecheck": "vue-tsc -p tsconfig.app.json --noEmit",
     "lint": "eslint .",
