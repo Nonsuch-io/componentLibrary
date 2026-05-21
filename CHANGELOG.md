@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.16.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.15.0...v0.16.0) (2026-05-15)
+
+
+### Features
+
+* add build:watch script for live-link development ([5ec5c77](https://github.com/Nonsuch-io/componentLibrary/commit/5ec5c777150272a1aebd71055b118cbaad69e0ed))
+* add build:watch script for live-link DX ([4e9efdd](https://github.com/Nonsuch-io/componentLibrary/commit/4e9efdd8525160b1f33e1fa549c223e5b1571592))
+
 ## [0.15.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.14.0...v0.15.0) (2026-05-04)
 
 
