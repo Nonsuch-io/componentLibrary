@@ -16,7 +16,7 @@
           class="ns-eye__pupil"
           cx="12"
           cy="12"
-          r="2.4"
+          r="3"
           fill="none"
           stroke="currentColor"
           stroke-width="1.6"
@@ -67,34 +67,35 @@
       </g>
       <!--
         Peek state lashes — three short strokes on the *upper* eyelid that
-        fade in only during a peek. Each is ~3 units (shorter than the
+        fade in only during a peek. Each is ~2 units (shorter than the
         closed-state lashes) so the peek reads as halfway between open
-        and closed.
+        and closed. Anchors sit just below the upper almond edge so the
+        round line cap overlaps the eyelid cleanly.
       -->
       <g class="ns-eye__peek-lashes">
         <line
           x1="5.8"
-          y1="6.6"
-          x2="3.8"
-          y2="3.9"
+          y1="7.6"
+          x2="4.6"
+          y2="6"
           stroke="currentColor"
           stroke-width="1.6"
           stroke-linecap="round"
         />
         <line
           x1="12"
-          y1="5"
+          y1="6"
           x2="12"
-          y2="1.8"
+          y2="4"
           stroke="currentColor"
           stroke-width="1.6"
           stroke-linecap="round"
         />
         <line
           x1="18.2"
-          y1="6.6"
-          x2="20.2"
-          y2="3.9"
+          y1="7.6"
+          x2="19.4"
+          y2="6"
           stroke="currentColor"
           stroke-width="1.6"
           stroke-linecap="round"
