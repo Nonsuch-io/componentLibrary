@@ -1,7 +1,7 @@
 <template>
   <span ref="eyeRef" class="ns-eye" :class="stateClass" aria-hidden="true">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <!-- Open eye: almond outline + pupil that follows the cursor -->
+      <!-- Open eye: almond outline scales vertically for blink / peek -->
       <g class="ns-eye__content">
         <path
           class="ns-eye__shape"
@@ -12,11 +12,18 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         />
+      </g>
+      <!--
+        Pupil sits outside .ns-eye__content so it doesn't inherit the
+        vertical squish during peek — it stays a perfect circle and
+        fades in/out independently.
+      -->
+      <g class="ns-eye__pupil-group">
         <circle
           class="ns-eye__pupil"
           cx="12"
           cy="12"
-          r="3"
+          r="4"
           fill="none"
           stroke="currentColor"
           stroke-width="1.6"
@@ -157,9 +164,10 @@ function applyPupil() {
   const dx = pendingClientX - cx
   const dy = pendingClientY - cy
   const distance = Math.sqrt(dx * dx + dy * dy)
-  // Pupil stays inside the eye almond; the viewBox is 24 wide, so ~2.5 units
-  // of travel keeps the pupil visually within the eye outline.
-  const maxOffset = 2.5
+  // Pupil stays inside the eye almond. Outer pupil radius (r=4 + stroke
+  // 1.6 / 2 = 0.8) is 4.8; eye half-height is 7. Capping max travel at 2.0
+  // keeps the combined extent (6.8) inside the almond top/bottom edges.
+  const maxOffset = 2.0
   const angle = Math.atan2(dy, dx)
   // Normalise: cursors within ~80px of the eye centre give a near-linear
   // response; farther cursors saturate at maxOffset so the pupil never
@@ -302,6 +310,11 @@ onUnmounted(() => {
     opacity 180ms ease;
 }
 
+.ns-eye__pupil-group {
+  transform-origin: center;
+  transition: opacity 180ms ease;
+}
+
 .ns-eye__pupil {
   transform: translate(var(--pupil-x), var(--pupil-y));
   transition: transform 80ms linear;
@@ -326,6 +339,9 @@ onUnmounted(() => {
     transform: scaleY(1);
     opacity: 1;
   }
+  .ns-eye__pupil-group {
+    opacity: 1;
+  }
   .ns-eye__lid {
     opacity: 0;
     transform: scaleY(0.6);
@@ -335,6 +351,9 @@ onUnmounted(() => {
 .ns-eye--closed {
   .ns-eye__content {
     transform: scaleY(0);
+    opacity: 0;
+  }
+  .ns-eye__pupil-group {
     opacity: 0;
   }
   .ns-eye__lid {
@@ -347,6 +366,9 @@ onUnmounted(() => {
 .ns-eye--blinking {
   .ns-eye__content {
     animation: ns-eye-blink-content 220ms ease-in-out;
+  }
+  .ns-eye__pupil-group {
+    animation: ns-eye-blink-pupil 220ms ease-in-out;
   }
   .ns-eye__lid {
     animation: ns-eye-blink-lid 220ms ease-in-out;
@@ -362,6 +384,17 @@ onUnmounted(() => {
   45%,
   55% {
     transform: scaleY(0);
+    opacity: 0;
+  }
+}
+
+@keyframes ns-eye-blink-pupil {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45%,
+  55% {
     opacity: 0;
   }
 }
@@ -384,6 +417,9 @@ onUnmounted(() => {
   .ns-eye__content {
     animation: ns-eye-peek-content 2600ms ease-in-out;
   }
+  .ns-eye__pupil-group {
+    animation: ns-eye-peek-pupil 2600ms ease-in-out;
+  }
   .ns-eye__lid {
     animation: ns-eye-peek-lid 2600ms ease-in-out;
   }
@@ -401,6 +437,17 @@ onUnmounted(() => {
   15%,
   85% {
     transform: scaleY(0.7);
+    opacity: 1;
+  }
+}
+
+@keyframes ns-eye-peek-pupil {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  85% {
     opacity: 1;
   }
 }
