@@ -6,8 +6,7 @@
       :aria-label="isExpanded ? 'Collapse menu' : 'Expand menu'"
       @click="isExpanded = !isExpanded"
     >
-      <PhEye v-if="isExpanded" :size="18" weight="regular" aria-hidden="true" />
-      <PhEyeClosed v-else :size="18" weight="regular" aria-hidden="true" />
+      <AnimatedEye :open="isExpanded" />
       <span v-if="isExpanded" class="ns-nav-sidebar__toggle-label">Hide Menu</span>
     </button>
 
@@ -78,7 +77,7 @@
 
 <script setup lang="ts">
 import { ref, type Component } from 'vue'
-import { PhEye, PhEyeClosed } from '@phosphor-icons/vue'
+import AnimatedEye from './AnimatedEye.vue'
 
 export interface NsNavItem {
   id: string
@@ -211,6 +210,7 @@ $active-bg: var(--ns-color-bg-brand);
   .ns-nav-sidebar--expanded & {
     justify-content: flex-start;
   }
+
   border: none;
   border-radius: $pill-radius;
   background: transparent;
@@ -251,7 +251,7 @@ $active-bg: var(--ns-color-bg-brand);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--ns-space-0);
+  gap: 10px;
   height: $pill-h;
   padding: 0 10px;
   border-radius: $pill-radius;
@@ -270,7 +270,6 @@ $active-bg: var(--ns-color-bg-brand);
 
   .ns-nav-sidebar--expanded & {
     justify-content: flex-start;
-    gap: 10px;
   }
 
   &:hover:not(&--active) {
