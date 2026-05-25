@@ -1,6 +1,20 @@
 <template>
   <span ref="eyeRef" class="ns-eye" :class="stateClass" aria-hidden="true">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!--
+          Clip shape that mirrors the visible almond's scaleY animation,
+          so the pupil never spills past the visible eye edge — including
+          during peek (eye at scaleY 0.7) and blink.
+        -->
+        <clipPath :id="clipId">
+          <path
+            class="ns-eye__clip-shape"
+            d="M12 5 C 5 5, 1.5 12, 1.5 12 S 5 19, 12 19 C 19 19, 22.5 12, 22.5 12 S 19 5, 12 5 Z"
+          />
+        </clipPath>
+      </defs>
+
       <!-- Open eye: almond outline scales vertically for blink / peek -->
       <g class="ns-eye__content">
         <path
@@ -16,9 +30,10 @@
       <!--
         Pupil sits outside .ns-eye__content so it doesn't inherit the
         vertical squish during peek — it stays a perfect circle and
-        fades in/out independently.
+        fades in/out independently. Clip-path keeps it inside the
+        currently-visible eye almond.
       -->
-      <g class="ns-eye__pupil-group">
+      <g class="ns-eye__pupil-group" :clip-path="`url(#${clipId})`">
         <circle
           class="ns-eye__pupil"
           cx="12"
@@ -113,7 +128,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, useId, watch } from 'vue'
 
 interface Props {
   /** When true, the eye is open (sidebar expanded). When false, the eye is closed. */
@@ -132,6 +147,10 @@ const props = withDefaults(defineProps<Props>(), {
 const eyeRef = ref<HTMLElement | null>(null)
 const isBlinking = ref(false)
 const isPeeking = ref(false)
+
+// Unique per-instance ID for the SVG clipPath — avoids id collisions when
+// multiple sidebars / animated eyes render on the same page.
+const clipId = `ns-eye-clip-${useId()}`
 
 const stateClass = computed(() => ({
   'ns-eye--open': props.open,
@@ -310,6 +329,13 @@ onUnmounted(() => {
     opacity 180ms ease;
 }
 
+// Clip shape mirrors the visible eye's transform so the pupil clip stays
+// in sync with the almond as it scales for blink / peek / open / closed.
+.ns-eye__clip-shape {
+  transform-origin: center;
+  transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .ns-eye__pupil-group {
   transform-origin: center;
   transition: opacity 180ms ease;
@@ -339,6 +365,9 @@ onUnmounted(() => {
     transform: scaleY(1);
     opacity: 1;
   }
+  .ns-eye__clip-shape {
+    transform: scaleY(1);
+  }
   .ns-eye__pupil-group {
     opacity: 1;
   }
@@ -353,6 +382,9 @@ onUnmounted(() => {
     transform: scaleY(0);
     opacity: 0;
   }
+  .ns-eye__clip-shape {
+    transform: scaleY(0);
+  }
   .ns-eye__pupil-group {
     opacity: 0;
   }
@@ -366,6 +398,9 @@ onUnmounted(() => {
 .ns-eye--blinking {
   .ns-eye__content {
     animation: ns-eye-blink-content 220ms ease-in-out;
+  }
+  .ns-eye__clip-shape {
+    animation: ns-eye-blink-clip 220ms ease-in-out;
   }
   .ns-eye__pupil-group {
     animation: ns-eye-blink-pupil 220ms ease-in-out;
@@ -399,6 +434,17 @@ onUnmounted(() => {
   }
 }
 
+@keyframes ns-eye-blink-clip {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  45%,
+  55% {
+    transform: scaleY(0);
+  }
+}
+
 @keyframes ns-eye-blink-lid {
   0%,
   100% {
@@ -416,6 +462,9 @@ onUnmounted(() => {
 .ns-eye--peeking {
   .ns-eye__content {
     animation: ns-eye-peek-content 2600ms ease-in-out;
+  }
+  .ns-eye__clip-shape {
+    animation: ns-eye-peek-clip 2600ms ease-in-out;
   }
   .ns-eye__pupil-group {
     animation: ns-eye-peek-pupil 2600ms ease-in-out;
@@ -452,6 +501,17 @@ onUnmounted(() => {
   }
 }
 
+@keyframes ns-eye-peek-clip {
+  0%,
+  100% {
+    transform: scaleY(0);
+  }
+  15%,
+  85% {
+    transform: scaleY(0.7);
+  }
+}
+
 @keyframes ns-eye-peek-lid {
   0%,
   100% {
@@ -479,8 +539,11 @@ onUnmounted(() => {
 // ---- Accessibility: respect reduced motion ----
 @media (prefers-reduced-motion: reduce) {
   .ns-eye__content,
+  .ns-eye__clip-shape,
+  .ns-eye__pupil-group,
   .ns-eye__pupil,
-  .ns-eye__lid {
+  .ns-eye__lid,
+  .ns-eye__peek-lashes {
     transition: none !important;
     animation: none !important;
   }
