@@ -12,18 +12,54 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         />
-        <circle class="ns-eye__pupil" cx="12" cy="12" r="2.4" fill="currentColor" />
+        <circle
+          class="ns-eye__pupil"
+          cx="12"
+          cy="12"
+          r="2.4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+        />
       </g>
-      <!-- Closed eye: gentle downward curve -->
-      <path
-        class="ns-eye__lid"
-        d="M2.5 11 C 7 16, 17 16, 21.5 11"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.6"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
+      <!-- Closed eye: gentle downward curve with three eyelashes below -->
+      <g class="ns-eye__lid">
+        <path
+          d="M2.5 11 C 7 16, 17 16, 21.5 11"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <line
+          x1="5.5"
+          y1="14.6"
+          x2="4"
+          y2="17.4"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+        <line
+          x1="12"
+          y1="15.5"
+          x2="12"
+          y2="18.5"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+        <line
+          x1="18.5"
+          y1="14.6"
+          x2="20"
+          y2="17.4"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+      </g>
     </svg>
   </span>
 </template>
