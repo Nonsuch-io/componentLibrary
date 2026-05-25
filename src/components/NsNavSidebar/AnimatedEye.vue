@@ -34,8 +34,16 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 interface Props {
   /** When true, the eye is open (sidebar expanded). When false, the eye is closed. */
   open: boolean
+  /**
+   * Compresses the peek interval to 3-8 s instead of 20-30 min.
+   * Intended for Storybook / manual testing only — not part of the public API
+   * surface (this component is internal to NsNavSidebar).
+   */
+  debugPeek?: boolean
 }
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  debugPeek: false,
+})
 
 const eyeRef = ref<HTMLElement | null>(null)
 const isBlinking = ref(false)
@@ -104,11 +112,13 @@ function clearBlinkTimer() {
   }
 }
 
-// ---- Peek (20–30 min) when eye is closed ----
+// ---- Peek (20–30 min, or 3–8 s in debug mode) when eye is closed ----
 let peekTimer: ReturnType<typeof setTimeout> | null = null
 function schedulePeek() {
   clearPeekTimer()
-  const delay = 20 * 60_000 + Math.random() * 10 * 60_000
+  const delay = props.debugPeek
+    ? 3_000 + Math.random() * 5_000
+    : 20 * 60_000 + Math.random() * 10 * 60_000
   peekTimer = setTimeout(() => {
     isPeeking.value = true
     setTimeout(() => {
