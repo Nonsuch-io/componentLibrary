@@ -197,13 +197,20 @@ function applyPupil() {
 }
 
 // ---- Blink (5–30s) when eye is open ----
+// Two timers: the schedule timer (waits for the next blink) and the reset
+// timer (clears isBlinking after the 220ms animation). The reset timer must
+// be tracked too so unmount-during-blink doesn't leave a callback that
+// mutates a stale ref and reschedules on a dead instance.
 let blinkTimer: ReturnType<typeof setTimeout> | null = null
+let blinkResetTimer: ReturnType<typeof setTimeout> | null = null
 function scheduleBlink() {
   clearBlinkTimer()
   const delay = 5_000 + Math.random() * 25_000
   blinkTimer = setTimeout(() => {
+    blinkTimer = null
     isBlinking.value = true
-    setTimeout(() => {
+    blinkResetTimer = setTimeout(() => {
+      blinkResetTimer = null
       isBlinking.value = false
       if (props.open) scheduleBlink()
     }, 220)
@@ -214,18 +221,27 @@ function clearBlinkTimer() {
     clearTimeout(blinkTimer)
     blinkTimer = null
   }
+  if (blinkResetTimer) {
+    clearTimeout(blinkResetTimer)
+    blinkResetTimer = null
+  }
 }
 
 // ---- Peek (20–30 min, or 3–8 s in debug mode) when eye is closed ----
+// Same two-timer pattern as blink — schedule + reset both tracked so unmount
+// during the 2600 ms peek window doesn't leak a callback.
 let peekTimer: ReturnType<typeof setTimeout> | null = null
+let peekResetTimer: ReturnType<typeof setTimeout> | null = null
 function schedulePeek() {
   clearPeekTimer()
   const delay = props.debugPeek
     ? 3_000 + Math.random() * 5_000
     : 20 * 60_000 + Math.random() * 10 * 60_000
   peekTimer = setTimeout(() => {
+    peekTimer = null
     isPeeking.value = true
-    setTimeout(() => {
+    peekResetTimer = setTimeout(() => {
+      peekResetTimer = null
       isPeeking.value = false
       if (!props.open) schedulePeek()
     }, 2600)
@@ -235,6 +251,10 @@ function clearPeekTimer() {
   if (peekTimer) {
     clearTimeout(peekTimer)
     peekTimer = null
+  }
+  if (peekResetTimer) {
+    clearTimeout(peekResetTimer)
+    peekResetTimer = null
   }
 }
 
