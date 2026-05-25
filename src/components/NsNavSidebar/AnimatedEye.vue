@@ -65,6 +65,41 @@
           stroke-linecap="round"
         />
       </g>
+      <!--
+        Peek state lashes — three short strokes on the *upper* eyelid that
+        fade in only during a peek. Each is ~3 units (shorter than the
+        closed-state lashes) so the peek reads as halfway between open
+        and closed.
+      -->
+      <g class="ns-eye__peek-lashes">
+        <line
+          x1="5.8"
+          y1="6.6"
+          x2="3.8"
+          y2="3.9"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+        <line
+          x1="12"
+          y1="5"
+          x2="12"
+          y2="1.8"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+        <line
+          x1="18.2"
+          y1="6.6"
+          x2="20.2"
+          y2="3.9"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+      </g>
     </svg>
   </span>
 </template>
@@ -215,6 +250,17 @@ watch(
   },
 )
 
+// Reschedule the in-flight peek when debugPeek toggles. Otherwise the
+// existing timer keeps its stale delay (e.g. user flips debugPeek on while
+// waiting for a 20-min peek; timer keeps 20-min until next reschedule).
+watch(
+  () => props.debugPeek,
+  () => {
+    if (props.open || isPeeking.value || prefersReducedMotion()) return
+    schedulePeek()
+  },
+)
+
 onMounted(() => {
   if (prefersReducedMotion()) return
   ensureListener(props.open)
@@ -265,6 +311,12 @@ onUnmounted(() => {
   transition:
     opacity 180ms ease,
     transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ns-eye__peek-lashes {
+  opacity: 0;
+  transform-origin: center;
+  transition: opacity 180ms ease;
 }
 
 // ---- Static states ----
@@ -334,6 +386,9 @@ onUnmounted(() => {
   .ns-eye__lid {
     animation: ns-eye-peek-lid 2600ms ease-in-out;
   }
+  .ns-eye__peek-lashes {
+    animation: ns-eye-peek-lashes 2600ms ease-in-out;
+  }
 }
 
 @keyframes ns-eye-peek-content {
@@ -359,6 +414,17 @@ onUnmounted(() => {
   85% {
     opacity: 0.25;
     transform: scaleY(0.8);
+  }
+}
+
+@keyframes ns-eye-peek-lashes {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 1;
   }
 }
 
