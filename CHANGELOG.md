@@ -4,6 +4,26 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.17.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.16.0...v0.17.0) (2026-05-25)
+
+
+### Features
+
+* **AnimatedEye:** clip pupil to visible eye almond ([2ae06cd](https://github.com/Nonsuch-io/componentLibrary/commit/2ae06cd372578de2a8ed0986e9d0062fe4d42ecd))
+* **AnimatedEye:** keep pupil round in peek state, bump radius to 4 ([22159fc](https://github.com/Nonsuch-io/componentLibrary/commit/22159fc80ed455680edf748ebbe3370bb7d78f4e))
+* **AnimatedEye:** nudge peek lashes onto eyelid, bigger pupil ([5e414ea](https://github.com/Nonsuch-io/componentLibrary/commit/5e414ea8bcdd22db8274956dadf71b389ff25eb6))
+* **AnimatedEye:** peek shows upper lashes, fix debugPeek reactivity ([d15bfdc](https://github.com/Nonsuch-io/componentLibrary/commit/d15bfdc3d51eeade45f39b96cda37b99f582be6b))
+* **AnimatedEye:** unfilled pupil, three eyelashes on closed eye ([2b0493d](https://github.com/Nonsuch-io/componentLibrary/commit/2b0493dc819c080ffd12e85eed3f0d7987a50f30))
+* **NsNavSidebar:** animated eye toggle with blink, peek, and cursor tracking ([fa8f210](https://github.com/Nonsuch-io/componentLibrary/commit/fa8f2103e442d369b1d0cf734d169511b19d545b))
+* **NsNavSidebar:** animated eye toggle with blink, peek, and cursor tracking ([4f05979](https://github.com/Nonsuch-io/componentLibrary/commit/4f0597934454d9e7ec77b34c3fb64054e5283750))
+* **NsNavSidebar:** left-align contents in both states, add eye peek-debug story ([236f95b](https://github.com/Nonsuch-io/componentLibrary/commit/236f95b437597e27e1eb89d1d263f790990a8ca3))
+* **NsNavSidebar:** tune eyelash angles, recenter icons when collapsed ([9cdf181](https://github.com/Nonsuch-io/componentLibrary/commit/9cdf181412a1f12bd346627570c4aaac0ca08365))
+
+
+### Bug Fixes
+
+* **AnimatedEye:** track inner reset timers; address Sonnet review ([5aede06](https://github.com/Nonsuch-io/componentLibrary/commit/5aede0659ab1b836cc57aa84322c08dbeb4fed88))
+
 ## [0.16.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.15.0...v0.16.0) (2026-05-15)
 
 
