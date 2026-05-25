@@ -32,29 +32,34 @@
           stroke-linecap="round"
           stroke-linejoin="round"
         />
+        <!--
+          Lashes start on the closed-eye curve and extend along its outward
+          normal at each anchor — the outer two angle out, the middle drops
+          straight down. Each is ~4 units long.
+        -->
         <line
-          x1="5.5"
-          y1="14.6"
-          x2="4"
-          y2="17.4"
+          x1="5"
+          y1="13"
+          x2="2.8"
+          y2="16.5"
           stroke="currentColor"
           stroke-width="1.6"
           stroke-linecap="round"
         />
         <line
           x1="12"
-          y1="15.5"
+          y1="15"
           x2="12"
-          y2="18.5"
+          y2="19"
           stroke="currentColor"
           stroke-width="1.6"
           stroke-linecap="round"
         />
         <line
-          x1="18.5"
-          y1="14.6"
-          x2="20"
-          y2="17.4"
+          x1="19"
+          y1="13"
+          x2="21.2"
+          y2="16.5"
           stroke="currentColor"
           stroke-width="1.6"
           stroke-linecap="round"

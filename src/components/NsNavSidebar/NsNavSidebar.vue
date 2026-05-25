@@ -202,10 +202,15 @@ $active-bg: var(--ns-color-bg-brand);
 .ns-nav-sidebar__toggle-btn {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 10px;
   height: $pill-h;
   padding: 0 10px;
+
+  .ns-nav-sidebar--expanded & {
+    justify-content: flex-start;
+  }
+
   border: none;
   border-radius: $pill-radius;
   background: transparent;
@@ -245,7 +250,7 @@ $active-bg: var(--ns-color-bg-brand);
 .ns-nav-sidebar__pill {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 10px;
   height: $pill-h;
   padding: 0 10px;
@@ -262,6 +267,10 @@ $active-bg: var(--ns-color-bg-brand);
     background 150ms ease,
     color 150ms ease;
   @include gradient-border;
+
+  .ns-nav-sidebar--expanded & {
+    justify-content: flex-start;
+  }
 
   &:hover:not(&--active) {
     background:
