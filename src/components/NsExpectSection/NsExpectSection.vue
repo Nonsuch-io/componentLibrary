@@ -15,14 +15,14 @@
 .ns-expect-section {
   display: flex;
   align-items: center;
-  gap: 150px;
+  gap: var(--ns-space-16);
   width: 100%;
   padding: var(--ns-space-10) var(--ns-space-12);
   background: var(--ns-color-bg-dark);
   overflow: hidden;
 
   &__eyebrow {
-    flex: 0 0 324px;
+    flex: 0 0 410px;
   }
 
   &__content {
