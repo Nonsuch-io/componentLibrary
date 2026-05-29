@@ -12,65 +12,114 @@
 
     <!-- Main nav items -->
     <ul class="ns-nav-sidebar__list">
-      <li v-for="item in items" :key="item.id" class="ns-nav-sidebar__item">
-        <button
-          class="ns-nav-sidebar__pill"
-          :class="{ 'ns-nav-sidebar__pill--active': isActive(item) }"
-          :aria-current="isActive(item) ? 'page' : undefined"
-          :aria-expanded="item.sub?.length ? openSub === item.id : undefined"
-          @click="onItemClick(item)"
-        >
-          <component :is="item.icon" class="ns-nav-sidebar__icon" :size="20" weight="regular" />
-          <span v-if="isExpanded" class="ns-nav-sidebar__label">{{ item.label }}</span>
-          <svg
-            v-if="item.sub?.length"
-            class="ns-nav-sidebar__chevron"
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            viewBox="0 0 256 256"
-            fill="currentColor"
-            aria-hidden="true"
-          >
-            <path
-              d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"
-            />
-          </svg>
-        </button>
-
-        <!-- Sub-menu flyout -->
-        <div
-          v-if="item.sub?.length && (openSub === item.id || closingSub === item.id)"
-          class="ns-nav-sidebar__flyout"
-        >
-          <button
-            v-for="(subLabel, subIdx) in item.sub"
-            :key="subLabel"
-            class="ns-nav-sidebar__sub-pill"
+      <template v-for="item in items" :key="item.id">
+        <li v-if="item.separator" class="ns-nav-sidebar__separator" role="separator" />
+        <li class="ns-nav-sidebar__item">
+          <component
+            :is="item.to && !item.disable ? 'a' : 'button'"
+            :href="item.to && !item.disable ? item.to : undefined"
+            :type="item.to ? undefined : 'button'"
+            class="ns-nav-sidebar__pill"
             :class="{
-              'ns-nav-sidebar__sub-pill--active': modelValue === subId(item.id, subLabel),
-              'ns-nav-sidebar__sub-pill--closing': closingSub === item.id,
+              'ns-nav-sidebar__pill--active': isActive(item),
+              'ns-nav-sidebar__pill--disabled': item.disable,
             }"
-            :style="subItemStyle(subIdx, item.sub!.length, item.id)"
-            @click="onSubClick(item.id, subLabel)"
+            :aria-current="isActive(item) ? 'page' : undefined"
+            :aria-expanded="hasSub(item) ? openSub === item.id : undefined"
+            :aria-disabled="item.disable ? 'true' : undefined"
+            :tabindex="item.disable ? -1 : undefined"
+            @click="onItemClick(item, $event)"
           >
-            {{ subLabel }}
-          </button>
-        </div>
-      </li>
+            <NsIcon
+              v-if="typeof item.icon === 'string'"
+              :name="item.icon"
+              class="ns-nav-sidebar__icon"
+              size="20px"
+            />
+            <component
+              :is="item.icon"
+              v-else
+              class="ns-nav-sidebar__icon"
+              :size="20"
+              weight="regular"
+            />
+            <span v-if="isExpanded" class="ns-nav-sidebar__label">{{ item.label }}</span>
+            <svg
+              v-if="hasSub(item)"
+              class="ns-nav-sidebar__chevron"
+              xmlns="http://www.w3.org/2000/svg"
+              width="12"
+              height="12"
+              viewBox="0 0 256 256"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"
+              />
+            </svg>
+          </component>
+
+          <!-- Sub-menu flyout -->
+          <div
+            v-if="hasSub(item) && (openSub === item.id || closingSub === item.id)"
+            class="ns-nav-sidebar__flyout"
+          >
+            <component
+              :is="sub.to && !sub.disable ? 'a' : 'button'"
+              v-for="(sub, subIdx) in normalizedSub(item)"
+              :key="sub.id ?? sub.label"
+              :href="sub.to && !sub.disable ? sub.to : undefined"
+              :type="sub.to ? undefined : 'button'"
+              class="ns-nav-sidebar__sub-pill"
+              :class="{
+                'ns-nav-sidebar__sub-pill--active': modelValue === subId(item.id, sub),
+                'ns-nav-sidebar__sub-pill--closing': closingSub === item.id,
+                'ns-nav-sidebar__sub-pill--disabled': sub.disable,
+              }"
+              :aria-disabled="sub.disable ? 'true' : undefined"
+              :tabindex="sub.disable ? -1 : undefined"
+              :style="subItemStyle(subIdx, normalizedSub(item).length, item.id)"
+              @click="onSubClick(item.id, sub, $event)"
+            >
+              {{ sub.label }}
+            </component>
+          </div>
+        </li>
+      </template>
     </ul>
 
     <!-- Bottom item (e.g. Settings) -->
     <div v-if="bottomItem" class="ns-nav-sidebar__bottom">
-      <button
+      <component
+        :is="bottomItem.to && !bottomItem.disable ? 'a' : 'button'"
+        :href="bottomItem.to && !bottomItem.disable ? bottomItem.to : undefined"
+        :type="bottomItem.to ? undefined : 'button'"
         class="ns-nav-sidebar__pill"
-        :class="{ 'ns-nav-sidebar__pill--active': modelValue === bottomItem.id }"
-        :aria-current="modelValue === bottomItem.id ? 'page' : undefined"
-        @click="emit('update:modelValue', bottomItem.id)"
+        :class="{
+          'ns-nav-sidebar__pill--active': isActive(bottomItem),
+          'ns-nav-sidebar__pill--disabled': bottomItem.disable,
+        }"
+        :aria-current="isActive(bottomItem) ? 'page' : undefined"
+        :aria-disabled="bottomItem.disable ? 'true' : undefined"
+        :tabindex="bottomItem.disable ? -1 : undefined"
+        @click="onItemClick(bottomItem, $event)"
       >
-        <component :is="bottomItem.icon" class="ns-nav-sidebar__icon" :size="20" weight="regular" />
+        <NsIcon
+          v-if="typeof bottomItem.icon === 'string'"
+          :name="bottomItem.icon"
+          class="ns-nav-sidebar__icon"
+          size="20px"
+        />
+        <component
+          :is="bottomItem.icon"
+          v-else
+          class="ns-nav-sidebar__icon"
+          :size="20"
+          weight="regular"
+        />
         <span v-if="isExpanded" class="ns-nav-sidebar__label">{{ bottomItem.label }}</span>
-      </button>
+      </component>
     </div>
   </nav>
 </template>
@@ -78,12 +127,46 @@
 <script setup lang="ts">
 import { ref, type Component } from 'vue'
 import AnimatedEye from './AnimatedEye.vue'
+import NsIcon from '../NsIcon/NsIcon.vue'
+
+/**
+ * A sub-item under a parent nav item.
+ * Can also be provided as a plain string (backward-compatible shorthand) —
+ * NsNavSidebar normalises strings to `{ label: <string> }` internally.
+ */
+export interface NsNavSubItem {
+  /** Stable id used for v-model selection. If omitted, derived from `<parent.id>/<kebab-label>`. */
+  id?: string
+  label: string
+  /** When set, the sub-pill renders as `<a href>` and the browser handles navigation. */
+  to?: string
+  /** Disables interaction; aria-disabled + tabindex=-1 + visual fade. */
+  disable?: boolean
+}
 
 export interface NsNavItem {
   id: string
   label: string
-  icon: Component
-  sub?: string[]
+  /**
+   * Icon as either a Vue Component (e.g. Phosphor) or a material-icon name string
+   * (wrapped in NsIcon internally for Quasar parity).
+   */
+  icon: string | Component
+  /**
+   * Navigation target. When set, the pill renders as `<a href>` instead of `<button>`,
+   * matching Quasar's QItem `to` convention. Note: this is `<a href>`, not `<router-link>` —
+   * consumers wanting SPA navigation should intercept the emitted click event with
+   * `e.preventDefault()` and call `router.push(item.to)`.
+   */
+  to?: string
+  /** Explicit active state override (in addition to the id/sub derived match). */
+  active?: boolean
+  /** Disables interaction (aria-disabled, non-focusable, visually faded). */
+  disable?: boolean
+  /** When true, renders a visual divider before this item. */
+  separator?: boolean
+  /** Sub-items shown in a flyout when this item is tapped. */
+  sub?: string[] | NsNavSubItem[]
 }
 
 export interface NsNavSidebarProps {
@@ -100,6 +183,7 @@ const props = withDefaults(defineProps<NsNavSidebarProps>(), {
 
 const emit = defineEmits<{
   'update:modelValue': [id: string]
+  click: [event: MouseEvent, item: NsNavItem | NsNavSubItem]
 }>()
 
 const isExpanded = ref(props.defaultExpanded)
@@ -107,14 +191,24 @@ const openSub = ref<string | null>(null)
 const closingSub = ref<string | null>(null)
 const closeTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
-function subId(parentId: string, subLabel: string): string {
-  return `${parentId}/${subLabel.toLowerCase().replace(/ /g, '-')}`
+function normalizedSub(item: NsNavItem): NsNavSubItem[] {
+  if (!item.sub) return []
+  return item.sub.map((s) => (typeof s === 'string' ? { label: s } : s))
+}
+
+function hasSub(item: NsNavItem): boolean {
+  return !!item.sub && item.sub.length > 0
+}
+
+function subId(parentId: string, sub: NsNavSubItem): string {
+  return sub.id ?? `${parentId}/${sub.label.toLowerCase().replace(/ /g, '-')}`
 }
 
 function isActive(item: NsNavItem): boolean {
+  if (item.active === true) return true
   if (props.modelValue === item.id) return true
   if (item.sub) {
-    return item.sub.some((sub) => props.modelValue === subId(item.id, sub))
+    return normalizedSub(item).some((sub) => props.modelValue === subId(item.id, sub))
   }
   return false
 }
@@ -138,7 +232,7 @@ function openSubMenu(id: string) {
 
 function closeSubMenu(id: string) {
   const item = props.items.find((i) => i.id === id)
-  const subCount = item?.sub?.length ?? 0
+  const subCount = item ? normalizedSub(item).length : 0
   closingSub.value = id
   const timer = setTimeout(
     () => {
@@ -151,8 +245,13 @@ function closeSubMenu(id: string) {
   closeTimers.set(id, timer)
 }
 
-function onItemClick(item: NsNavItem) {
-  if (!item.sub?.length) {
+function onItemClick(item: NsNavItem, event: MouseEvent) {
+  if (item.disable) {
+    event.preventDefault()
+    return
+  }
+  emit('click', event, item)
+  if (!hasSub(item)) {
     if (openSub.value) closeSubMenu(openSub.value)
     emit('update:modelValue', item.id)
     return
@@ -165,9 +264,14 @@ function onItemClick(item: NsNavItem) {
   }
 }
 
-function onSubClick(parentId: string, subLabel: string) {
+function onSubClick(parentId: string, sub: NsNavSubItem, event: MouseEvent) {
+  if (sub.disable) {
+    event.preventDefault()
+    return
+  }
+  emit('click', event, sub)
   closeSubMenu(parentId)
-  emit('update:modelValue', subId(parentId, subLabel))
+  emit('update:modelValue', subId(parentId, sub))
 }
 </script>
 
@@ -246,6 +350,15 @@ $active-bg: var(--ns-color-bg-brand);
   position: relative;
 }
 
+// Divider rendered before items that have separator: true
+.ns-nav-sidebar__separator {
+  height: 1px;
+  margin: 4px 8px;
+  background: var(--ns-color-border-default, currentColor);
+  opacity: 0.2;
+  list-style: none;
+}
+
 // Main pill
 .ns-nav-sidebar__pill {
   display: flex;
@@ -263,6 +376,7 @@ $active-bg: var(--ns-color-bg-brand);
   white-space: nowrap;
   overflow: hidden;
   width: 100%;
+  text-decoration: none; // for <a> rendering
   transition:
     background 150ms ease,
     color 150ms ease;
@@ -272,7 +386,7 @@ $active-bg: var(--ns-color-bg-brand);
     justify-content: flex-start;
   }
 
-  &:hover:not(&--active) {
+  &:hover:not(&--active):not(&--disabled) {
     background:
       radial-gradient(ellipse at center, rgba(213, 99, 7, 0.22) 0%, transparent 90%) padding-box,
       linear-gradient(var(--ns-color-background), var(--ns-color-background)) padding-box,
@@ -289,6 +403,12 @@ $active-bg: var(--ns-color-bg-brand);
     background: $active-bg;
     border-color: transparent;
     color: var(--ns-color-on-primary);
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 }
 
@@ -333,10 +453,11 @@ $active-bg: var(--ns-color-bg-brand);
   font-weight: 500;
   white-space: nowrap;
   cursor: pointer;
+  text-decoration: none; // for <a> rendering
   transition: background 150ms ease;
   @include gradient-border;
 
-  &:hover:not(&--active) {
+  &:hover:not(&--active):not(&--disabled) {
     background:
       radial-gradient(ellipse at center, rgba(213, 99, 7, 0.22) 0%, transparent 90%) padding-box,
       linear-gradient(var(--ns-color-background), var(--ns-color-background)) padding-box,
@@ -353,6 +474,12 @@ $active-bg: var(--ns-color-bg-brand);
     background: $active-bg;
     border-color: transparent;
     color: var(--ns-color-on-primary);
+  }
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 }
 

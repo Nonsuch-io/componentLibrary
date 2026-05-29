@@ -84,4 +84,143 @@ describe('NsNavSidebar', () => {
     await wrapper.findAll('.ns-nav-sidebar__sub-pill')[0].trigger('click')
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['products/all-products'])
   })
+
+  describe('accessibility', () => {
+    it('sets aria-current="page" on the active pill', () => {
+      const wrapper = mount$({ modelValue: 'settings' })
+      const pills = wrapper.findAll('.ns-nav-sidebar__pill')
+      expect(pills[2].attributes('aria-current')).toBe('page')
+    })
+
+    it('sets aria-disabled and tabindex=-1 on disabled items', () => {
+      const wrapper = mount$({
+        items: [
+          { id: 'home', label: 'Home', icon: MockIcon },
+          { id: 'archived', label: 'Archived', icon: MockIcon, disable: true },
+        ],
+      })
+      const pills = wrapper.findAll('.ns-nav-sidebar__pill')
+      expect(pills[1].attributes('aria-disabled')).toBe('true')
+      expect(pills[1].attributes('tabindex')).toBe('-1')
+    })
+
+    it('renders a separator with role="separator"', () => {
+      const wrapper = mount$({
+        items: [
+          { id: 'home', label: 'Home', icon: MockIcon },
+          { id: 'settings', label: 'Settings', icon: MockIcon, separator: true },
+        ],
+      })
+      const sep = wrapper.find('.ns-nav-sidebar__separator')
+      expect(sep.exists()).toBe(true)
+      expect(sep.attributes('role')).toBe('separator')
+    })
+  })
+
+  describe('Quasar-aligned API', () => {
+    it('renders pill as <a href> when item.to is set', () => {
+      const wrapper = mount$({
+        items: [{ id: 'home', label: 'Home', icon: MockIcon, to: '/home' }],
+      })
+      const pill = wrapper.find('.ns-nav-sidebar__pill')
+      expect(pill.element.tagName).toBe('A')
+      expect(pill.attributes('href')).toBe('/home')
+    })
+
+    it('renders pill as <button> when item.to is not set', () => {
+      const wrapper = mount$()
+      const pill = wrapper.find('.ns-nav-sidebar__pill')
+      expect(pill.element.tagName).toBe('BUTTON')
+    })
+
+    it('does not render href on a disabled item even when to is set', () => {
+      const wrapper = mount$({
+        items: [{ id: 'home', label: 'Home', icon: MockIcon, to: '/home', disable: true }],
+      })
+      const pill = wrapper.find('.ns-nav-sidebar__pill')
+      expect(pill.element.tagName).toBe('BUTTON')
+      expect(pill.attributes('href')).toBeUndefined()
+    })
+
+    it('honors explicit active prop on an item', () => {
+      const wrapper = mount$({
+        modelValue: 'home',
+        items: [
+          { id: 'home', label: 'Home', icon: MockIcon },
+          { id: 'sale', label: 'Sale', icon: MockIcon, active: true },
+        ],
+      })
+      const pills = wrapper.findAll('.ns-nav-sidebar__pill')
+      expect(pills[0].classes()).toContain('ns-nav-sidebar__pill--active')
+      expect(pills[1].classes()).toContain('ns-nav-sidebar__pill--active')
+    })
+
+    it('does not emit update:modelValue when a disabled item is clicked', async () => {
+      const wrapper = mount$({
+        items: [{ id: 'home', label: 'Home', icon: MockIcon, disable: true }],
+      })
+      await wrapper.find('.ns-nav-sidebar__pill').trigger('click')
+      expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    })
+
+    it('emits click event with the item payload', async () => {
+      const wrapper = mount$()
+      await wrapper.findAll('.ns-nav-sidebar__pill')[0].trigger('click')
+      const clicks = wrapper.emitted('click')
+      expect(clicks).toBeTruthy()
+      expect(clicks![0][1]).toMatchObject({ id: 'home', label: 'Home' })
+    })
+
+    it('renders a string icon via NsIcon wrapper', () => {
+      const wrapper = mount$({
+        items: [{ id: 'home', label: 'Home', icon: 'dashboard' }],
+      })
+      const pill = wrapper.find('.ns-nav-sidebar__pill')
+      // NsIcon wraps QIcon; the inner element should carry the 'q-icon' class
+      expect(pill.find('.q-icon').exists()).toBe(true)
+    })
+
+    it('accepts sub items as rich objects with their own to', () => {
+      const wrapper = mount$({
+        items: [
+          {
+            id: 'shop',
+            label: 'Shop',
+            icon: MockIcon,
+            sub: [
+              { id: 'tops', label: 'Tops', to: '/shop/tops' },
+              { id: 'bottoms', label: 'Bottoms', to: '/shop/bottoms' },
+            ],
+          },
+        ],
+      })
+      // Open the flyout
+      return wrapper
+        .findAll('.ns-nav-sidebar__pill')[0]
+        .trigger('click')
+        .then(() => {
+          const subPills = wrapper.findAll('.ns-nav-sidebar__sub-pill')
+          expect(subPills.length).toBe(2)
+          expect(subPills[0].element.tagName).toBe('A')
+          expect(subPills[0].attributes('href')).toBe('/shop/tops')
+          expect(subPills[0].text()).toBe('Tops')
+        })
+    })
+
+    it('uses sub-item explicit id over derived id', async () => {
+      const wrapper = mount$({
+        items: [
+          {
+            id: 'shop',
+            label: 'Shop',
+            icon: MockIcon,
+            sub: [{ id: 'custom-id', label: 'Tops' }],
+          },
+        ],
+      })
+      await wrapper.findAll('.ns-nav-sidebar__pill')[0].trigger('click')
+      await wrapper.findAll('.ns-nav-sidebar__sub-pill')[0].trigger('click')
+      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['custom-id'])
+    })
+  })
 })
