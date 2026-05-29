@@ -7,12 +7,7 @@
     :loading="loading"
     :padding="buttonPadding"
     :aria-busy="loading"
-    :class="[
-      'ns-btn',
-      `ns-btn--${variant}`,
-      `ns-btn--${size}`,
-      { 'ns-btn--icon-only': iconOnly, 'ns-btn--pushed': pushed },
-    ]"
+    :class="['ns-btn', `ns-btn--${variant}`, `ns-btn--${size}`, { 'ns-btn--icon-only': iconOnly }]"
   >
     <slot />
     <template #loading>
@@ -36,6 +31,7 @@ export type NsButtonVariant =
   | 'negative'
   | 'warning'
   | 'marketing'
+  | 'marketing-pushed'
 
 export type NsButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -45,8 +41,6 @@ export interface NsButtonProps {
   /** Square icon-only layout — use when no label slot is provided */
   iconOnly?: boolean
   loading?: boolean
-  /** Marketing variant only — switches to positive colour scheme (submitted/confirmed state) */
-  pushed?: boolean
 }
 
 const props = withDefaults(defineProps<NsButtonProps>(), {
@@ -54,7 +48,6 @@ const props = withDefaults(defineProps<NsButtonProps>(), {
   size: 'md',
   iconOnly: false,
   loading: false,
-  pushed: false,
 })
 
 const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = {
@@ -66,7 +59,8 @@ const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = 
 }
 
 const buttonPadding = computed(() => {
-  if (props.variant === 'marketing') return props.iconOnly ? '12px' : '16px 20px'
+  if (props.variant === 'marketing' || props.variant === 'marketing-pushed')
+    return props.iconOnly ? '12px' : '16px 20px'
   return paddingMap[props.size][props.iconOnly ? 'iconOnly' : 'default']
 })
 </script>
@@ -263,16 +257,30 @@ const buttonPadding = computed(() => {
   }
 }
 
-// ---- Marketing ----
-.ns-btn--marketing {
-  background: var(--ns-color-text-primary);
-  color: white;
+// ---- Marketing (shared base) ----
+.ns-btn--marketing,
+.ns-btn--marketing-pushed {
   border-radius: 9999px;
   font-size: 1.5rem;
 
   :deep(.q-btn__content) {
     gap: 12px;
   }
+
+  &.disabled {
+    background: var(--ns-color-bg-disabled);
+    color: var(--ns-color-text-disabled);
+
+    :deep(img) {
+      filter: brightness(0.565);
+    }
+  }
+}
+
+// ---- Marketing ----
+.ns-btn--marketing {
+  background: var(--ns-color-text-primary);
+  color: white;
 
   :deep(img) {
     filter: brightness(0) invert(1);
@@ -285,31 +293,23 @@ const buttonPadding = computed(() => {
   &:active:not(.disabled) {
     background: #1e0700;
   }
+}
 
-  &.ns-btn--pushed {
-    background: var(--ns-color-status-positive);
-    color: var(--ns-color-text-on-accent);
+// ---- Marketing pushed ----
+.ns-btn--marketing-pushed {
+  background: var(--ns-color-status-positive);
+  color: var(--ns-color-text-on-accent);
 
-    :deep(img) {
-      filter: none;
-    }
-
-    &:hover:not(.disabled) {
-      background: var(--ns-color-status-positive-hover);
-    }
-
-    &:active:not(.disabled) {
-      background: var(--ns-color-status-positive-active);
-    }
+  :deep(img) {
+    filter: none;
   }
 
-  &.disabled {
-    background: var(--ns-color-bg-disabled);
-    color: var(--ns-color-text-disabled);
+  &:hover:not(.disabled) {
+    background: var(--ns-color-status-positive-hover);
+  }
 
-    :deep(img) {
-      filter: brightness(0.565);
-    }
+  &:active:not(.disabled) {
+    background: var(--ns-color-status-positive-active);
   }
 }
 </style>

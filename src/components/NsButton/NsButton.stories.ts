@@ -146,7 +146,7 @@ export const MarketingCTA: Story = {
           I want to know more
           <img :src="imgButtonArrow" style="width: 54px; height: 13px;" alt="" />
         </NsButton>
-        <NsButton variant="marketing" pushed>
+        <NsButton variant="marketing-pushed">
           You're on the list
           <img :src="imgDoodleCheck" style="width: 43px; height: 25px;" alt="" />
         </NsButton>

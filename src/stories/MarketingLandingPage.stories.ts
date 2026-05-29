@@ -105,14 +105,12 @@ export const FullPage: Story = {
             </NsEyebrowTag>
           </template>
           <template #headline>
-            <div style="font-size: 5.75rem; font-weight: 600; line-height: 1.1; color: #2d0b00;">
-              Run your shop.
-            </div>
+            <div>Run your shop.</div>
             <div style="display: flex; align-items: baseline; white-space: nowrap;">
-              <span style="font-size: 5.75rem; font-weight: 600; line-height: 1.1; color: #2d0b00; margin-right: 8px;">Not your</span>
+              <span style="margin-right: 8px;">Not your</span>
               <NsHighlightSpan>software.</NsHighlightSpan>
             </div>
-            <p style="font-size: 1.5rem; font-weight: 400; line-height: 1.2; color: #2d0b00; padding-top: 16px; margin: 0; max-width: 641px;">
+            <p style="font-size: 1.5rem; font-weight: 400; line-height: 1.2; padding-top: 16px; margin: 0; max-width: 641px;">
               If Shopify has become a workaround rather than a solution, it might be time to see what else is out there.
             </p>
           </template>
@@ -121,7 +119,7 @@ export const FullPage: Story = {
               <img :src="imgDoodleArrows" style="position: absolute; width: 214px; height: 145px; right: -10px; bottom: calc(100% - 5px); pointer-events: none;" alt="" />
               <NsMarketingEmailCapture v-model="email">
                 <template #cta>
-                  <NsButton variant="marketing" :pushed="submitted" @click="submitted = true">
+                  <NsButton :variant="submitted ? 'marketing-pushed' : 'marketing'" @click="submitted = true">
                     <template v-if="submitted">
                       You're on the list
                       <img :src="imgDoodleCheck" style="width: 43px; height: 25px;" alt="" />
@@ -150,7 +148,7 @@ export const FullPage: Story = {
               <template #label>What to expect</template>
               <template #heading>In your Inbox</template>
               <template #icon>
-                <img :src="imgSendingEmail" style="width: 120px; height: 120px; object-fit: contain;" alt="" />
+                <img :src="imgSendingEmail" alt="" />
               </template>
             </NsSectionEyebrow>
           </template>
@@ -168,15 +166,15 @@ export const FullPage: Story = {
               <template #label>More About</template>
               <template #heading>butiq</template>
               <template #icon>
-                <img :src="imgLaptopGirl" style="width: 120px; height: 120px; object-fit: contain;" alt="" />
+                <img :src="imgLaptopGirl" alt="" />
               </template>
             </NsSectionEyebrow>
           </template>
           <div style="height: 1px; width: 100%; background: #2d0b00;"></div>
-          <p style="font-size: 1.5rem; font-weight: 400; line-height: 1.2; margin: 0;">
+          <p style="margin: 0;">
             Owned and operated in Alberta, butiq is launching a way to manage all your in-store processes - from staff management to inventory reordering - while still handling your online sales and order fulfillment without the gaps.
           </p>
-          <p style="font-size: 1.5rem; font-weight: 400; line-height: 1.2; margin: 0;">
+          <p style="margin: 0;">
             butiq was built by an experienced team of developers, designers, and success managers who have all actually worked in retail, which is why the priorities are different. It is built to handle the back-of-house so you can pay attention to the actual shop and designed to run in the background, not become another thing to manage.
           </p>
           <div style="height: 1px; width: 100%; background: #2d0b00;"></div>

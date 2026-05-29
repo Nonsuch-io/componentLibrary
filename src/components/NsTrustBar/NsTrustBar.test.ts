@@ -8,9 +8,26 @@ const items = [
   { text: 'Just an early look', icon: 'check.svg' },
 ]
 
+function mockMatchMedia(reducedMotion: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: reducedMotion && query === '(prefers-reduced-motion: reduce)',
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    }),
+  })
+}
+
 describe('NsTrustBar', () => {
   beforeEach(() => {
     vi.useFakeTimers()
+    mockMatchMedia(false)
   })
 
   afterEach(() => {
@@ -60,6 +77,14 @@ describe('NsTrustBar', () => {
     await wrapper.vm.$nextTick()
     expect(wrapper.text()).toContain('No credit card')
     vi.advanceTimersByTime(1)
+    await wrapper.vm.$nextTick()
+    expect(wrapper.text()).toContain('No commitment')
+  })
+
+  it('should still cycle items when prefers-reduced-motion is set', async () => {
+    mockMatchMedia(true)
+    const wrapper = mount(NsTrustBar, { props: { items, interval: 1000 } })
+    vi.advanceTimersByTime(1000)
     await wrapper.vm.$nextTick()
     expect(wrapper.text()).toContain('No commitment')
   })

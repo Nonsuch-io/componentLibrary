@@ -24,11 +24,11 @@ export const Default: Story = {
           </NsSectionEyebrow>
         </template>
         <div style="height: 1px; width: 100%; background: #2d0b00;"></div>
-        <p style="font-size: 1.5rem; font-weight: 400; line-height: 1.2; margin: 0; color: #fef7ee;">
+        <p style="margin: 0;">
           Owned and operated in Alberta, butiq is launching a way to manage all your in-store
           processes while still handling your online sales and order fulfillment without the gaps.
         </p>
-        <p style="font-size: 1.5rem; font-weight: 400; line-height: 1.2; margin: 0; color: #fef7ee;">
+        <p style="margin: 0;">
           Built by an experienced team who have all actually worked in retail, which is why the
           priorities are different.
         </p>

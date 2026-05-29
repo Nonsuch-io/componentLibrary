@@ -21,8 +21,12 @@
   justify-content: space-between;
   width: 100%;
   height: 66px;
-  padding: 16px var(--ns-space-6);
+  padding: 16px var(--ns-space-4);
   background: var(--ns-color-bg-brand);
+
+  @media (min-width: 1024px) {
+    padding: 16px var(--ns-space-6);
+  }
 
   &__logo {
     display: flex;

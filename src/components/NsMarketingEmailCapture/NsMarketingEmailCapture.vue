@@ -40,15 +40,21 @@ const isFocused = ref(false)
 <style lang="scss" scoped>
 .ns-marketing-email-capture {
   display: flex;
-  align-items: center;
-  background: var(--ns-color-bg-surface);
-  border-radius: var(--ns-radius-full);
-  padding: 8px 8px 8px 32px;
+  flex-direction: column;
+  gap: var(--ns-space-3);
   width: 100%;
   transition: box-shadow 150ms ease;
 
-  &--focused {
-    box-shadow: 0 0 0 3px var(--ns-color-border-focus);
+  @media (min-width: 1024px) {
+    flex-direction: row;
+    align-items: center;
+    background: var(--ns-color-bg-surface);
+    border-radius: var(--ns-radius-full);
+    padding: 8px 8px 8px 32px;
+
+    &--focused {
+      box-shadow: 0 0 0 3px var(--ns-color-border-focus);
+    }
   }
 
   &__input {
@@ -56,11 +62,28 @@ const isFocused = ref(false)
     min-width: 0;
     border: none;
     outline: none;
-    background: transparent;
+    background: var(--ns-color-bg-surface);
+    border-radius: var(--ns-radius-full);
+    padding: var(--ns-space-4) var(--ns-space-6);
     font-family: var(--ns-font-family-text);
     font-size: 1.25rem;
     line-height: 1.25;
     color: var(--ns-color-text-primary);
+
+    &:focus {
+      box-shadow: 0 0 0 3px var(--ns-color-border-focus);
+      outline: none;
+    }
+
+    @media (min-width: 1024px) {
+      background: transparent;
+      border-radius: 0;
+      padding: 0;
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
 
     &::placeholder {
       color: var(--ns-color-text-tertiary);

@@ -49,14 +49,12 @@ export const Default: Story = {
             </NsEyebrowTag>
           </template>
           <template #headline>
-            <div style="font-family: 'Fixel Text', sans-serif; font-size: 5.75rem; font-weight: 600; line-height: 1.1; color: #2d0b00;">
-              Run your shop.
-            </div>
+            <div>Run your shop.</div>
             <div style="display: flex; align-items: baseline; white-space: nowrap;">
-              <span style="font-family: 'Fixel Text', sans-serif; font-size: 5.75rem; font-weight: 600; line-height: 1.1; color: #2d0b00; margin-right: 8px;">Not your</span>
+              <span style="margin-right: 8px;">Not your</span>
               <NsHighlightSpan>software.</NsHighlightSpan>
             </div>
-            <p style="font-family: 'Fixel Text', sans-serif; font-size: 1.5rem; font-weight: 400; line-height: 1.2; color: #2d0b00; padding-top: 16px; margin: 0; max-width: 641px;">
+            <p style="font-size: 1.5rem; font-weight: 400; line-height: 1.2; padding-top: 16px; margin: 0; max-width: 641px;">
               If Shopify has become a workaround rather than a solution, it might be time to see what else is out there.
             </p>
           </template>
@@ -65,7 +63,7 @@ export const Default: Story = {
               <img :src="imgDoodleArrows" style="position: absolute; width: 214px; height: 145px; right: -10px; bottom: calc(100% - 5px); pointer-events: none;" alt="" />
               <NsMarketingEmailCapture v-model="email">
                 <template #cta>
-                  <NsButton variant="marketing" :pushed="submitted" @click="submitted = true">
+                  <NsButton :variant="submitted ? 'marketing-pushed' : 'marketing'" @click="submitted = true">
                     <template v-if="submitted">
                       You're on the list
                       <img :src="imgDoodleCheck" style="width: 43px; height: 25px;" alt="" />

@@ -51,7 +51,11 @@ onUnmounted(() => {
 .ns-trust-bar {
   width: 100%;
   background: var(--ns-color-bg-highlight);
-  padding: var(--ns-space-3) var(--ns-space-12);
+  padding: var(--ns-space-3) var(--ns-space-4);
+
+  @media (min-width: 1024px) {
+    padding: var(--ns-space-3) var(--ns-space-12);
+  }
 
   &__viewport {
     position: relative;
@@ -86,6 +90,18 @@ onUnmounted(() => {
 .ns-trust-bar-enter-active,
 .ns-trust-bar-leave-active {
   transition: transform 400ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-trust-bar-enter-active,
+  .ns-trust-bar-leave-active {
+    transition: none;
+  }
+
+  .ns-trust-bar-enter-from,
+  .ns-trust-bar-leave-to {
+    transform: none;
+  }
 }
 
 .ns-trust-bar-enter-from {

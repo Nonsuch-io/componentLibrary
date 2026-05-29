@@ -44,11 +44,16 @@ defineProps<NsStepRowProps>()
   &__text {
     flex: 1;
     font-family: var(--ns-font-family-text);
-    font-size: 1.5rem;
+    font-size: var(--ns-font-size-xl);
     font-weight: 400;
-    line-height: 1.2;
+    line-height: 1.25;
     color: var(--ns-color-text-on-dark);
     margin: 0;
+
+    @media (min-width: 1024px) {
+      font-size: 1.5rem;
+      line-height: 1.2;
+    }
   }
 }
 </style>
