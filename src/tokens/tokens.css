@@ -61,6 +61,7 @@
   --ns-color-bg-negative: #fedee0;
   --ns-color-bg-info: #e0f1fa;
   --ns-color-bg-accent: #b8e4fa;
+  --ns-color-bg-dark: #2d0b00;
 
   /* — Border — */
   --ns-color-border-default: #e5e7eb;
@@ -127,6 +128,7 @@
   --ns-font-size-xl: 1.25rem;
   --ns-font-size-2xl: 1.5rem;
   --ns-font-size-3xl: 1.875rem;
+  --ns-font-size-display: 5.75rem;
 
   --ns-font-weight-regular: 400;
   --ns-font-weight-medium: 500;
@@ -239,6 +241,7 @@
   --ns-color-bg-negative: #fd6d73;
   --ns-color-bg-info: #004a7f;
   --ns-color-bg-accent: #64cbff;
+  --ns-color-bg-dark: #2d0b00;
 
   /* — Border — */
   --ns-color-border-default: #ae7e5b;
@@ -353,6 +356,7 @@
     --ns-color-bg-negative: #fd6d73;
     --ns-color-bg-info: #004a7f;
     --ns-color-bg-accent: #64cbff;
+    --ns-color-bg-dark: #2d0b00;
 
     /* — Border — */
     --ns-color-border-default: #ae7e5b;

@@ -13,6 +13,7 @@
 <script setup lang="ts">
 import NsNumberTile from '../NsNumberTile/NsNumberTile.vue'
 
+/** Designed for use on dark backgrounds (e.g. NsExpectSection). Text uses --ns-color-text-on-dark. */
 export interface NsStepRowProps {
   number: number | string
 }
@@ -36,7 +37,7 @@ defineProps<NsStepRowProps>()
 
   &__content {
     display: flex;
-    gap: 43px;
+    gap: var(--ns-space-10);
     align-items: center;
   }
 

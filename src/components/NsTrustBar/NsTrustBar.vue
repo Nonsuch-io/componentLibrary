@@ -51,7 +51,7 @@ onUnmounted(() => {
 .ns-trust-bar {
   width: 100%;
   background: var(--ns-color-bg-highlight);
-  padding: 11px var(--ns-space-12);
+  padding: var(--ns-space-3) var(--ns-space-12);
 
   &__viewport {
     position: relative;
@@ -66,7 +66,7 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 11px;
+    gap: var(--ns-space-3);
     font-family: var(--ns-font-family-text);
     font-size: 1.25rem;
     font-weight: 600;

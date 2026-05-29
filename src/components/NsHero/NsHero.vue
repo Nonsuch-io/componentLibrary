@@ -23,7 +23,7 @@
 .ns-hero {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: var(--ns-space-3);
   width: 100%;
   min-height: 640px;
   padding: var(--ns-space-10) var(--ns-space-12);
@@ -48,7 +48,7 @@
     flex-direction: column;
     gap: var(--ns-space-4);
     font-family: var(--ns-font-family-text);
-    font-size: 5.75rem;
+    font-size: var(--ns-font-size-display);
     font-weight: 600;
     line-height: 1.1;
     color: var(--ns-color-text-primary);

@@ -18,7 +18,7 @@
   gap: 150px;
   width: 100%;
   padding: var(--ns-space-10) var(--ns-space-12);
-  background: var(--ns-color-text-primary);
+  background: var(--ns-color-bg-dark);
   overflow: hidden;
 
   &__eyebrow {

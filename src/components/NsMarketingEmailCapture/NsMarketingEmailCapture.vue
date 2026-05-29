@@ -41,8 +41,8 @@ const isFocused = ref(false)
 .ns-marketing-email-capture {
   display: flex;
   align-items: center;
-  background: white;
-  border-radius: 9999px;
+  background: var(--ns-color-bg-surface);
+  border-radius: var(--ns-radius-full);
   padding: 8px 8px 8px 32px;
   width: 100%;
   transition: box-shadow 150ms ease;
@@ -63,7 +63,7 @@ const isFocused = ref(false)
     color: var(--ns-color-text-primary);
 
     &::placeholder {
-      color: #9ca3af;
+      color: var(--ns-color-text-tertiary);
     }
   }
 }
