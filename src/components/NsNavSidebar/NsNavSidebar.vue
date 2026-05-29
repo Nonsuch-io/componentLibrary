@@ -2,6 +2,7 @@
   <nav class="ns-nav-sidebar" :class="{ 'ns-nav-sidebar--expanded': isExpanded }">
     <!-- Toggle button -->
     <button
+      v-if="showToggle"
       class="ns-nav-sidebar__toggle-btn"
       :aria-label="isExpanded ? 'Collapse menu' : 'Expand menu'"
       @click="isExpanded = !isExpanded"
@@ -125,7 +126,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onUnmounted, type Component } from 'vue'
+import { ref, computed, onUnmounted, type Component } from 'vue'
 import AnimatedEye from './AnimatedEye.vue'
 import NsIcon from '../NsIcon/NsIcon.vue'
 
@@ -149,9 +150,10 @@ export interface NsNavItem {
   label: string
   /**
    * Icon as either a Vue Component (e.g. Phosphor) or a material-icon name string
-   * (wrapped in NsIcon internally for Quasar parity).
+   * (wrapped in NsIcon internally for Quasar parity). Optional — items without
+   * an icon render label-only.
    */
-  icon: string | Component
+  icon?: string | Component
   /**
    * Navigation target. When set, the pill renders as `<a href>` instead of `<button>`,
    * matching Quasar's QItem `to` convention. Note: this is `<a href>`, not `<router-link>` —
@@ -173,20 +175,43 @@ export interface NsNavSidebarProps {
   items: NsNavItem[]
   bottomItem?: NsNavItem
   modelValue: string
+  /** Initial expanded state when uncontrolled. Ignored if `expanded` is provided. */
   defaultExpanded?: boolean
+  /**
+   * Controlled expanded state (v-model:expanded). When provided, the sidebar
+   * mirrors this value and emits `update:expanded` instead of managing state
+   * internally. Useful when a parent (e.g. NsAppShell's drawer) needs to drive
+   * mini/full mode.
+   */
+  expanded?: boolean
+  /**
+   * Whether to render the toggle button (animated eye). Defaults to true.
+   * Pass false when a parent already provides its own collapse affordance.
+   */
+  showToggle?: boolean
 }
 
 const props = withDefaults(defineProps<NsNavSidebarProps>(), {
   bottomItem: undefined,
   defaultExpanded: true,
+  expanded: undefined,
+  showToggle: true,
 })
 
 const emit = defineEmits<{
   'update:modelValue': [id: string]
+  'update:expanded': [expanded: boolean]
   click: [event: MouseEvent, item: NsNavItem | NsNavSubItem]
 }>()
 
-const isExpanded = ref(props.defaultExpanded)
+const internalExpanded = ref(props.expanded ?? props.defaultExpanded)
+const isExpanded = computed({
+  get: () => props.expanded ?? internalExpanded.value,
+  set: (value: boolean) => {
+    internalExpanded.value = value
+    emit('update:expanded', value)
+  },
+})
 const openSub = ref<string | null>(null)
 const closingSub = ref<string | null>(null)
 const closeTimers = new Map<string, ReturnType<typeof setTimeout>>()
