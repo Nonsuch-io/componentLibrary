@@ -18,14 +18,14 @@
           <component
             :is="item.to && !item.disable ? 'a' : 'button'"
             :href="item.to && !item.disable ? item.to : undefined"
-            :type="item.to ? undefined : 'button'"
+            :type="item.to && !item.disable ? undefined : 'button'"
             class="ns-nav-sidebar__pill"
             :class="{
               'ns-nav-sidebar__pill--active': isActive(item),
               'ns-nav-sidebar__pill--disabled': item.disable,
             }"
             :aria-current="isActive(item) ? 'page' : undefined"
-            :aria-expanded="hasSub(item) ? openSub === item.id : undefined"
+            :aria-expanded="hasSub(item) && !item.disable ? openSub === item.id : undefined"
             :aria-disabled="item.disable ? 'true' : undefined"
             :tabindex="item.disable ? -1 : undefined"
             @click="onItemClick(item, $event)"
@@ -70,7 +70,7 @@
               v-for="(sub, subIdx) in normalizedSub(item)"
               :key="sub.id ?? sub.label"
               :href="sub.to && !sub.disable ? sub.to : undefined"
-              :type="sub.to ? undefined : 'button'"
+              :type="sub.to && !sub.disable ? undefined : 'button'"
               class="ns-nav-sidebar__sub-pill"
               :class="{
                 'ns-nav-sidebar__sub-pill--active': modelValue === subId(item.id, sub),
@@ -94,7 +94,7 @@
       <component
         :is="bottomItem.to && !bottomItem.disable ? 'a' : 'button'"
         :href="bottomItem.to && !bottomItem.disable ? bottomItem.to : undefined"
-        :type="bottomItem.to ? undefined : 'button'"
+        :type="bottomItem.to && !bottomItem.disable ? undefined : 'button'"
         class="ns-nav-sidebar__pill"
         :class="{
           'ns-nav-sidebar__pill--active': isActive(bottomItem),
@@ -125,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, type Component } from 'vue'
+import { ref, onUnmounted, type Component } from 'vue'
 import AnimatedEye from './AnimatedEye.vue'
 import NsIcon from '../NsIcon/NsIcon.vue'
 
@@ -273,6 +273,13 @@ function onSubClick(parentId: string, sub: NsNavSubItem, event: MouseEvent) {
   closeSubMenu(parentId)
   emit('update:modelValue', subId(parentId, sub))
 }
+
+// Cancel any in-flight flyout-close timers so they don't fire after unmount
+// and mutate refs on a dead instance.
+onUnmounted(() => {
+  closeTimers.forEach((t) => clearTimeout(t))
+  closeTimers.clear()
+})
 </script>
 
 <style lang="scss" scoped>

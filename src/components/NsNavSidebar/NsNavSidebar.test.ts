@@ -222,5 +222,30 @@ describe('NsNavSidebar', () => {
       await wrapper.findAll('.ns-nav-sidebar__sub-pill')[0].trigger('click')
       expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['custom-id'])
     })
+
+    it('does not emit update:modelValue when a disabled sub-item is clicked', async () => {
+      const wrapper = mount$({
+        items: [
+          {
+            id: 'shop',
+            label: 'Shop',
+            icon: MockIcon,
+            sub: [{ id: 'archived', label: 'Archived', disable: true }],
+          },
+        ],
+      })
+      await wrapper.findAll('.ns-nav-sidebar__pill')[0].trigger('click')
+      await wrapper.findAll('.ns-nav-sidebar__sub-pill')[0].trigger('click')
+      expect(wrapper.emitted('update:modelValue')).toBeFalsy()
+    })
+
+    it('renders a button without type=submit when item has to + disable both set', () => {
+      const wrapper = mount$({
+        items: [{ id: 'home', label: 'Home', icon: MockIcon, to: '/home', disable: true }],
+      })
+      const pill = wrapper.find('.ns-nav-sidebar__pill')
+      expect(pill.element.tagName).toBe('BUTTON')
+      expect(pill.attributes('type')).toBe('button')
+    })
   })
 })
