@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import NsButton from './NsButton.vue'
+import imgButtonArrow from '../../assets/marketing/icon-arrow-button.svg?url'
+import imgDoodleCheck from '../../assets/marketing/icon-checkmark.svg?url'
 
 const meta = {
   title: 'Components/NsButton',
@@ -8,7 +10,16 @@ const meta = {
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary', 'tertiary', 'accent', 'positive', 'negative', 'warning'],
+      options: [
+        'primary',
+        'secondary',
+        'tertiary',
+        'accent',
+        'positive',
+        'negative',
+        'warning',
+        'marketing',
+      ],
     },
     size: {
       control: 'select',
@@ -120,6 +131,29 @@ export const Loading: Story = {
         <NsButton size="md" loading>Medium</NsButton>
         <NsButton size="lg" loading>Large</NsButton>
         <NsButton size="xl" loading>Extra Large</NsButton>
+      </div>
+    `,
+  }),
+}
+
+export const MarketingCTA: Story = {
+  render: () => ({
+    components: { NsButton },
+    setup: () => ({ imgButtonArrow, imgDoodleCheck }),
+    template: `
+      <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; padding: 32px; background: #fdf4e7;">
+        <NsButton variant="marketing">
+          I want to know more
+          <img :src="imgButtonArrow" style="width: 54px; height: 13px;" alt="" />
+        </NsButton>
+        <NsButton variant="marketing" pushed>
+          You're on the list
+          <img :src="imgDoodleCheck" style="width: 43px; height: 25px;" alt="" />
+        </NsButton>
+        <NsButton variant="marketing" disable>
+          I want to know more
+          <img :src="imgButtonArrow" style="width: 54px; height: 13px;" alt="" />
+        </NsButton>
       </div>
     `,
   }),

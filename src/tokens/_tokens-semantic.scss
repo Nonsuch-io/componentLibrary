@@ -97,3 +97,32 @@
   font-weight: $font-weight-regular;
   line-height: 1.1;
 }
+
+%display {
+  font-family: $font-family-display-italic;
+  font-size: $font-size-display;
+  font-weight: $font-weight-semibold;
+  font-style: italic;
+  line-height: 1.1;
+}
+
+%overline-lg {
+  font-size: $font-size-5xl;
+  font-weight: $font-weight-regular;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+%overline-md {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  text-transform: uppercase;
+  line-height: 1.28;
+}
+
+%overline-md-bold {
+  font-size: $font-size-md;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  line-height: 1.28;
+}

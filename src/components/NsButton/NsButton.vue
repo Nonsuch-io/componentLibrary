@@ -7,7 +7,12 @@
     :loading="loading"
     :padding="buttonPadding"
     :aria-busy="loading"
-    :class="['ns-btn', `ns-btn--${variant}`, `ns-btn--${size}`, { 'ns-btn--icon-only': iconOnly }]"
+    :class="[
+      'ns-btn',
+      `ns-btn--${variant}`,
+      `ns-btn--${size}`,
+      { 'ns-btn--icon-only': iconOnly, 'ns-btn--pushed': pushed },
+    ]"
   >
     <slot />
     <template #loading>
@@ -30,6 +35,7 @@ export type NsButtonVariant =
   | 'positive'
   | 'negative'
   | 'warning'
+  | 'marketing'
 
 export type NsButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -39,6 +45,8 @@ export interface NsButtonProps {
   /** Square icon-only layout — use when no label slot is provided */
   iconOnly?: boolean
   loading?: boolean
+  /** Marketing variant only — switches to positive colour scheme (submitted/confirmed state) */
+  pushed?: boolean
 }
 
 const props = withDefaults(defineProps<NsButtonProps>(), {
@@ -46,6 +54,7 @@ const props = withDefaults(defineProps<NsButtonProps>(), {
   size: 'md',
   iconOnly: false,
   loading: false,
+  pushed: false,
 })
 
 const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = {
@@ -56,9 +65,10 @@ const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = 
   xl: { default: '20px', iconOnly: '12px' },
 }
 
-const buttonPadding = computed(
-  () => paddingMap[props.size][props.iconOnly ? 'iconOnly' : 'default'],
-)
+const buttonPadding = computed(() => {
+  if (props.variant === 'marketing') return props.iconOnly ? '12px' : '16px 20px'
+  return paddingMap[props.size][props.iconOnly ? 'iconOnly' : 'default']
+})
 </script>
 
 <style lang="scss" scoped>
@@ -250,6 +260,56 @@ const buttonPadding = computed(
   &.disabled {
     background: var(--ns-color-bg-disabled);
     color: var(--ns-color-text-disabled);
+  }
+}
+
+// ---- Marketing ----
+.ns-btn--marketing {
+  background: var(--ns-color-text-primary);
+  color: white;
+  border-radius: 9999px;
+  font-size: 1.5rem;
+
+  :deep(.q-btn__content) {
+    gap: 12px;
+  }
+
+  :deep(img) {
+    filter: brightness(0) invert(1);
+  }
+
+  &:hover:not(.disabled) {
+    background: #3d1500;
+  }
+
+  &:active:not(.disabled) {
+    background: #1e0700;
+  }
+
+  &.ns-btn--pushed {
+    background: var(--ns-color-status-positive);
+    color: var(--ns-color-text-on-accent);
+
+    :deep(img) {
+      filter: none;
+    }
+
+    &:hover:not(.disabled) {
+      background: var(--ns-color-status-positive-hover);
+    }
+
+    &:active:not(.disabled) {
+      background: var(--ns-color-status-positive-active);
+    }
+  }
+
+  &.disabled {
+    background: var(--ns-color-bg-disabled);
+    color: var(--ns-color-text-disabled);
+
+    :deep(img) {
+      filter: brightness(0.565);
+    }
   }
 }
 </style>
