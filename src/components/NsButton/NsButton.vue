@@ -30,6 +30,8 @@ export type NsButtonVariant =
   | 'positive'
   | 'negative'
   | 'warning'
+  | 'marketing'
+  | 'marketing-pushed'
 
 export type NsButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -56,9 +58,11 @@ const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = 
   xl: { default: '20px', iconOnly: '12px' },
 }
 
-const buttonPadding = computed(
-  () => paddingMap[props.size][props.iconOnly ? 'iconOnly' : 'default'],
-)
+const buttonPadding = computed(() => {
+  if (props.variant === 'marketing' || props.variant === 'marketing-pushed')
+    return props.iconOnly ? '12px' : '16px 20px'
+  return paddingMap[props.size][props.iconOnly ? 'iconOnly' : 'default']
+})
 </script>
 
 <style lang="scss" scoped>
@@ -250,6 +254,62 @@ const buttonPadding = computed(
   &.disabled {
     background: var(--ns-color-bg-disabled);
     color: var(--ns-color-text-disabled);
+  }
+}
+
+// ---- Marketing (shared base) ----
+.ns-btn--marketing,
+.ns-btn--marketing-pushed {
+  border-radius: 9999px;
+  font-size: 1.5rem;
+
+  :deep(.q-btn__content) {
+    gap: 12px;
+  }
+
+  &.disabled {
+    background: var(--ns-color-bg-disabled);
+    color: var(--ns-color-text-disabled);
+
+    :deep(img) {
+      filter: brightness(0.565);
+    }
+  }
+}
+
+// ---- Marketing ----
+.ns-btn--marketing {
+  background: var(--ns-color-text-primary);
+  color: white;
+
+  :deep(img) {
+    filter: brightness(0) invert(1);
+  }
+
+  &:hover:not(.disabled) {
+    background: #3d1500;
+  }
+
+  &:active:not(.disabled) {
+    background: #1e0700;
+  }
+}
+
+// ---- Marketing pushed ----
+.ns-btn--marketing-pushed {
+  background: var(--ns-color-status-positive);
+  color: var(--ns-color-text-on-accent);
+
+  :deep(img) {
+    filter: none;
+  }
+
+  &:hover:not(.disabled) {
+    background: var(--ns-color-status-positive-hover);
+  }
+
+  &:active:not(.disabled) {
+    background: var(--ns-color-status-positive-active);
   }
 }
 </style>

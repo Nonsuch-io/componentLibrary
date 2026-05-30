@@ -42,6 +42,7 @@
   --ns-color-text-on-info: #ffffff;
   --ns-color-text-accent: #79caf3;
   --ns-color-text-on-accent: #2d0b00;
+  --ns-color-text-on-dark: #fef7ee;
 
   /* — Background — */
   --ns-color-bg-canvas: #fefbf5;
@@ -55,10 +56,12 @@
   --ns-color-bg-brand-active: #c05400;
   --ns-color-bg-disabled: #e0e0e0;
   --ns-color-bg-positive: #f3f4d2;
+  --ns-color-bg-highlight: #c4c81d;
   --ns-color-bg-warning: #f9e3ad;
   --ns-color-bg-negative: #fedee0;
   --ns-color-bg-info: #e0f1fa;
   --ns-color-bg-accent: #b8e4fa;
+  --ns-color-bg-dark: #2d0b00;
 
   /* — Border — */
   --ns-color-border-default: #e5e7eb;
@@ -125,6 +128,7 @@
   --ns-font-size-xl: 1.25rem;
   --ns-font-size-2xl: 1.5rem;
   --ns-font-size-3xl: 1.875rem;
+  --ns-font-size-display: 5.75rem;
 
   --ns-font-weight-regular: 400;
   --ns-font-weight-medium: 500;
@@ -218,6 +222,7 @@
   --ns-color-text-on-info: #ffffff;
   --ns-color-text-accent: #93dbff;
   --ns-color-text-on-accent: #2d0b00;
+  --ns-color-text-on-dark: #fef7ee;
 
   /* — Background — */
   --ns-color-bg-canvas: #120903;
@@ -231,10 +236,12 @@
   --ns-color-bg-brand-active: #f66b00;
   --ns-color-bg-disabled: #757575;
   --ns-color-bg-positive: #919500;
+  --ns-color-bg-highlight: #aaae04;
   --ns-color-bg-warning: #eaa500;
   --ns-color-bg-negative: #fd6d73;
   --ns-color-bg-info: #004a7f;
   --ns-color-bg-accent: #64cbff;
+  --ns-color-bg-dark: #2d0b00;
 
   /* — Border — */
   --ns-color-border-default: #ae7e5b;
@@ -330,6 +337,7 @@
     --ns-color-text-on-info: #ffffff;
     --ns-color-text-accent: #93dbff;
     --ns-color-text-on-accent: #2d0b00;
+    --ns-color-text-on-dark: #fef7ee;
 
     /* — Background — */
     --ns-color-bg-canvas: #120903;
@@ -343,10 +351,12 @@
     --ns-color-bg-brand-active: #f66b00;
     --ns-color-bg-disabled: #757575;
     --ns-color-bg-positive: #919500;
+    --ns-color-bg-highlight: #aaae04;
     --ns-color-bg-warning: #eaa500;
     --ns-color-bg-negative: #fd6d73;
     --ns-color-bg-info: #004a7f;
     --ns-color-bg-accent: #64cbff;
+    --ns-color-bg-dark: #2d0b00;
 
     /* — Border — */
     --ns-color-border-default: #ae7e5b;

@@ -169,6 +169,28 @@ export type { NsToolbarProps } from './components/NsToolbar/NsToolbar.vue'
 export { default as NsToolbarTitle } from './components/NsToolbarTitle/NsToolbarTitle.vue'
 export type { NsToolbarTitleProps } from './components/NsToolbarTitle/NsToolbarTitle.vue'
 
+// Marketing
+export { default as NsAboutSection } from './components/NsAboutSection/NsAboutSection.vue'
+export { default as NsEyebrowTag } from './components/NsEyebrowTag/NsEyebrowTag.vue'
+export { default as NsExpectSection } from './components/NsExpectSection/NsExpectSection.vue'
+export { default as NsHighlightSpan } from './components/NsHighlightSpan/NsHighlightSpan.vue'
+export { default as NsHero } from './components/NsHero/NsHero.vue'
+export { default as NsNumberTile } from './components/NsNumberTile/NsNumberTile.vue'
+export type { NsNumberTileProps } from './components/NsNumberTile/NsNumberTile.vue'
+export { default as NsSectionEyebrow } from './components/NsSectionEyebrow/NsSectionEyebrow.vue'
+export { default as NsSiteFooter } from './components/NsSiteFooter/NsSiteFooter.vue'
+export type {
+  NsSiteFooterProps,
+  NsSiteFooterSocialLink,
+} from './components/NsSiteFooter/NsSiteFooter.vue'
+export { default as NsSiteHeader } from './components/NsSiteHeader/NsSiteHeader.vue'
+export { default as NsStepList } from './components/NsStepList/NsStepList.vue'
+export { default as NsStepRow } from './components/NsStepRow/NsStepRow.vue'
+export type { NsStepRowProps } from './components/NsStepRow/NsStepRow.vue'
+export { default as NsTrustBar } from './components/NsTrustBar/NsTrustBar.vue'
+export { default as NsMarketingEmailCapture } from './components/NsMarketingEmailCapture/NsMarketingEmailCapture.vue'
+export type { NsMarketingEmailCaptureProps } from './components/NsMarketingEmailCapture/NsMarketingEmailCapture.vue'
+
 // Templates
 export { default as NsAppShell } from './components/NsAppShell/NsAppShell.vue'
 export type { NsAppShellProps } from './components/NsAppShell/NsAppShell.vue'
