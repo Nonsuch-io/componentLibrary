@@ -248,4 +248,29 @@ describe('NsNavSidebar', () => {
       expect(pill.attributes('type')).toBe('button')
     })
   })
+
+  describe('controlled expanded (v-model:expanded)', () => {
+    it('mirrors the expanded prop when controlled', () => {
+      const wrapper = mount$({ expanded: false })
+      expect(wrapper.find('.ns-nav-sidebar--expanded').exists()).toBe(false)
+    })
+
+    it('emits update:expanded when the toggle is clicked in controlled mode', async () => {
+      const wrapper = mount$({ expanded: true })
+      await wrapper.find('.ns-nav-sidebar__toggle-btn').trigger('click')
+      expect(wrapper.emitted('update:expanded')?.[0]).toEqual([false])
+    })
+
+    it('updates the rendered state when expanded prop changes', async () => {
+      const wrapper = mount$({ expanded: true })
+      expect(wrapper.find('.ns-nav-sidebar--expanded').exists()).toBe(true)
+      await wrapper.setProps({ expanded: false })
+      expect(wrapper.find('.ns-nav-sidebar--expanded').exists()).toBe(false)
+    })
+
+    it('hides the toggle button when showToggle is false', () => {
+      const wrapper = mount$({ showToggle: false })
+      expect(wrapper.find('.ns-nav-sidebar__toggle-btn').exists()).toBe(false)
+    })
+  })
 })
