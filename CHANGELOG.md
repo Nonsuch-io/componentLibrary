@@ -4,6 +4,18 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.19.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.18.0...v0.19.0) (2026-05-30)
+
+
+### Features
+
+* **NsAppShell:** swap drawer internals to NsNavSidebar ([75807d8](https://github.com/Nonsuch-io/componentLibrary/commit/75807d81d544586ac84567238c8fedd2178b4ebc))
+
+
+### Bug Fixes
+
+* **NsAppShell:** size drawer to fit NsNavSidebar without clipping ovals ([47ff93f](https://github.com/Nonsuch-io/componentLibrary/commit/47ff93f9e49891e6c9b95d8e61f9ee013e695d19))
+
 ## [0.18.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.17.0...v0.18.0) (2026-05-29)
 
 
