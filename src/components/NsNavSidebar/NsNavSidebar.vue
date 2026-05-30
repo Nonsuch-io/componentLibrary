@@ -310,7 +310,10 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 $pill-h: 44px;
 $pill-radius: 999px;
-$icon-size: 60px;
+// Collapsed container width — chosen so pills render as ovals (~60×44)
+// rather than circles (~44×44), giving the icon and sub-menu chevron
+// room to coexist when the sidebar is collapsed.
+$icon-size: 76px;
 $active-bg: var(--ns-color-bg-brand);
 
 @mixin gradient-border {
