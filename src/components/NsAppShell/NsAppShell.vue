@@ -113,11 +113,16 @@
       </NsToolbar>
     </NsHeader>
 
-    <!-- Side drawer -->
+    <!-- Side drawer.
+         width / mini-width are sized to match NsNavSidebar's container
+         widths (166 expanded / 76 mini) plus 2px to clear the bordered
+         1px right border without clipping the pill ovals. -->
     <NsDrawer
       v-model="drawerOpen"
       :breakpoint="drawerBreakpoint"
       :mini="shouldUseMini"
+      :width="168"
+      :mini-width="78"
       bordered
       class="ns-app-shell__drawer"
       :behavior="isDesktop ? 'desktop' : 'mobile'"
