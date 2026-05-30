@@ -4,6 +4,71 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.18.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.17.0...v0.18.0) (2026-05-29)
+
+
+### Features
+
+* **NsNavSidebar:** quasar-aligned API (separator/active/to/disable/string-icon/sub-objects) ([94e8cb8](https://github.com/Nonsuch-io/componentLibrary/commit/94e8cb868a4114efa673cf858dd0d4606d9ca6a8))
+* **NsNavSidebar:** quasar-aligned API (separator/active/to/disable/string-icon/sub-objects) ([4052d2c](https://github.com/Nonsuch-io/componentLibrary/commit/4052d2c8a600a45e2f7cae83ae57f08a9984d874))
+
+
+### Bug Fixes
+
+* **NsNavSidebar:** button type, unmount timer leak, exported sub-item type ([f024023](https://github.com/Nonsuch-io/componentLibrary/commit/f02402336a80c4c02ba5c83f9f9e2ef40ed4c7d0))
+
+## [0.17.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.16.0...v0.17.0) (2026-05-25)
+
+
+### Features
+
+* **AnimatedEye:** clip pupil to visible eye almond ([2ae06cd](https://github.com/Nonsuch-io/componentLibrary/commit/2ae06cd372578de2a8ed0986e9d0062fe4d42ecd))
+* **AnimatedEye:** keep pupil round in peek state, bump radius to 4 ([22159fc](https://github.com/Nonsuch-io/componentLibrary/commit/22159fc80ed455680edf748ebbe3370bb7d78f4e))
+* **AnimatedEye:** nudge peek lashes onto eyelid, bigger pupil ([5e414ea](https://github.com/Nonsuch-io/componentLibrary/commit/5e414ea8bcdd22db8274956dadf71b389ff25eb6))
+* **AnimatedEye:** peek shows upper lashes, fix debugPeek reactivity ([d15bfdc](https://github.com/Nonsuch-io/componentLibrary/commit/d15bfdc3d51eeade45f39b96cda37b99f582be6b))
+* **AnimatedEye:** unfilled pupil, three eyelashes on closed eye ([2b0493d](https://github.com/Nonsuch-io/componentLibrary/commit/2b0493dc819c080ffd12e85eed3f0d7987a50f30))
+* **NsNavSidebar:** animated eye toggle with blink, peek, and cursor tracking ([fa8f210](https://github.com/Nonsuch-io/componentLibrary/commit/fa8f2103e442d369b1d0cf734d169511b19d545b))
+* **NsNavSidebar:** animated eye toggle with blink, peek, and cursor tracking ([4f05979](https://github.com/Nonsuch-io/componentLibrary/commit/4f0597934454d9e7ec77b34c3fb64054e5283750))
+* **NsNavSidebar:** left-align contents in both states, add eye peek-debug story ([236f95b](https://github.com/Nonsuch-io/componentLibrary/commit/236f95b437597e27e1eb89d1d263f790990a8ca3))
+* **NsNavSidebar:** tune eyelash angles, recenter icons when collapsed ([9cdf181](https://github.com/Nonsuch-io/componentLibrary/commit/9cdf181412a1f12bd346627570c4aaac0ca08365))
+
+
+### Bug Fixes
+
+* **AnimatedEye:** track inner reset timers; address Sonnet review ([5aede06](https://github.com/Nonsuch-io/componentLibrary/commit/5aede0659ab1b836cc57aa84322c08dbeb4fed88))
+
+## [0.16.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.15.0...v0.16.0) (2026-05-15)
+
+
+### Features
+
+* add build:watch script for live-link development ([5ec5c77](https://github.com/Nonsuch-io/componentLibrary/commit/5ec5c777150272a1aebd71055b118cbaad69e0ed))
+* add build:watch script for live-link DX ([4e9efdd](https://github.com/Nonsuch-io/componentLibrary/commit/4e9efdd8525160b1f33e1fa549c223e5b1571592))
+
+## [0.15.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.14.0...v0.15.0) (2026-05-04)
+
+
+### Features
+
+* **typography:** add label-xs (extra small label) style ([caa6b8b](https://github.com/Nonsuch-io/componentLibrary/commit/caa6b8b32485369e8f9dc071c605d9b4f7a8e6b8))
+
+## [0.14.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.13.0...v0.14.0) (2026-05-02)
+
+
+### Features
+
+* **button:** restyle NsButton to match Figma design system ([b86b60e](https://github.com/Nonsuch-io/componentLibrary/commit/b86b60e95590f0f7d42745d9e6ff3c92bad48e71))
+* **nav:** add NsNavSidebar and NsBottomNav components ([433063d](https://github.com/Nonsuch-io/componentLibrary/commit/433063d2c3fdf7164b6649e08266008b1deecc6b))
+* **tokens:** add two-layer SCSS typography token system ([1af19b9](https://github.com/Nonsuch-io/componentLibrary/commit/1af19b9806c8cb77a86b2cb0ff1c524e71acdb7b))
+* **tokens:** add two-layer SCSS typography token system ([0c9a41f](https://github.com/Nonsuch-io/componentLibrary/commit/0c9a41f131ad044a2c7b8aeb1bd994553499bcf3))
+* **tokens:** expand semantic colour tokens from Figma design system ([2c9f96d](https://github.com/Nonsuch-io/componentLibrary/commit/2c9f96d127a23c62c2737811ad3c5b4a7c29c47c))
+
+
+### Bug Fixes
+
+* **deps:** align vitest packages to 4.1.5 to fix CI ([2447e2a](https://github.com/Nonsuch-io/componentLibrary/commit/2447e2ad041909f67699ecf3a508da520248caee))
+* **tokens,components:** resolve PR [#78](https://github.com/Nonsuch-io/componentLibrary/issues/78) review feedback ([1af8b01](https://github.com/Nonsuch-io/componentLibrary/commit/1af8b0131c27ff91e3ff4c18043b59497e7a150c))
+
 ## [0.13.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.12.2...v0.13.0) (2026-04-16)
 
 

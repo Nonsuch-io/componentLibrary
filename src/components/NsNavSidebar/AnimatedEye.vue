@@ -1,0 +1,571 @@
+<template>
+  <span ref="eyeRef" class="ns-eye" :class="stateClass" aria-hidden="true">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!--
+          Clip shape that mirrors the visible almond's scaleY animation,
+          so the pupil never spills past the visible eye edge — including
+          during peek (eye at scaleY 0.7) and blink.
+        -->
+        <clipPath :id="clipId">
+          <path
+            class="ns-eye__clip-shape"
+            d="M12 5 C 5 5, 1.5 12, 1.5 12 S 5 19, 12 19 C 19 19, 22.5 12, 22.5 12 S 19 5, 12 5 Z"
+          />
+        </clipPath>
+      </defs>
+
+      <!-- Open eye: almond outline scales vertically for blink / peek -->
+      <g class="ns-eye__content">
+        <path
+          class="ns-eye__shape"
+          d="M12 5 C 5 5, 1.5 12, 1.5 12 S 5 19, 12 19 C 19 19, 22.5 12, 22.5 12 S 19 5, 12 5 Z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </g>
+      <!--
+        Pupil sits outside .ns-eye__content so it doesn't inherit the
+        vertical squish during peek — it stays a perfect circle and
+        fades in/out independently. Clip-path keeps it inside the
+        currently-visible eye almond.
+      -->
+      <g class="ns-eye__pupil-group" :clip-path="`url(#${clipId})`">
+        <circle
+          class="ns-eye__pupil"
+          cx="12"
+          cy="12"
+          r="4"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+        />
+      </g>
+      <!-- Closed eye: gentle downward curve with three eyelashes below -->
+      <g class="ns-eye__lid">
+        <path
+          d="M2.5 11 C 7 16, 17 16, 21.5 11"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+        <!--
+          Lashes start on the closed-eye curve and extend along its outward
+          normal at each anchor — the outer two angle out, the middle drops
+          straight down. Each is ~4 units long.
+        -->
+        <line
+          x1="5"
+          y1="13"
+          x2="2.8"
+          y2="16.5"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+        <line
+          x1="12"
+          y1="15"
+          x2="12"
+          y2="19"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+        <line
+          x1="19"
+          y1="13"
+          x2="21.2"
+          y2="16.5"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+      </g>
+      <!--
+        Peek state lashes — three short strokes on the *upper* eyelid that
+        fade in only during a peek. Each is ~2 units (shorter than the
+        closed-state lashes) so the peek reads as halfway between open
+        and closed. Anchors sit just below the upper almond edge so the
+        round line cap overlaps the eyelid cleanly.
+      -->
+      <g class="ns-eye__peek-lashes">
+        <line
+          x1="5.8"
+          y1="7.6"
+          x2="4.6"
+          y2="6"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+        <line
+          x1="12"
+          y1="6"
+          x2="12"
+          y2="4"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+        <line
+          x1="18.2"
+          y1="7.6"
+          x2="19.4"
+          y2="6"
+          stroke="currentColor"
+          stroke-width="1.6"
+          stroke-linecap="round"
+        />
+      </g>
+    </svg>
+  </span>
+</template>
+
+<script setup lang="ts">
+import { ref, computed, onMounted, onUnmounted, useId, watch } from 'vue'
+
+interface Props {
+  /** When true, the eye is open (sidebar expanded). When false, the eye is closed. */
+  open: boolean
+  /**
+   * Compresses the peek interval to 3-8 s instead of 20-30 min.
+   * Intended for Storybook / manual testing only — not part of the public API
+   * surface (this component is internal to NsNavSidebar).
+   */
+  debugPeek?: boolean
+}
+const props = withDefaults(defineProps<Props>(), {
+  debugPeek: false,
+})
+
+const eyeRef = ref<HTMLElement | null>(null)
+const isBlinking = ref(false)
+const isPeeking = ref(false)
+
+// Unique per-instance ID for the SVG clipPath — avoids id collisions when
+// multiple sidebars / animated eyes render on the same page.
+const clipId = `ns-eye-clip-${useId()}`
+
+const stateClass = computed(() => ({
+  'ns-eye--open': props.open,
+  'ns-eye--closed': !props.open,
+  'ns-eye--blinking': isBlinking.value,
+  'ns-eye--peeking': isPeeking.value,
+}))
+
+// ---- Cursor tracking ----
+// The pupil is translated via CSS variables. Updates are rAF-throttled so a
+// hot mousemove only does work once per frame.
+let rafId: number | null = null
+let pendingClientX = 0
+let pendingClientY = 0
+
+function onMouseMove(e: MouseEvent) {
+  pendingClientX = e.clientX
+  pendingClientY = e.clientY
+  if (rafId !== null) return
+  rafId = requestAnimationFrame(applyPupil)
+}
+
+function applyPupil() {
+  rafId = null
+  const el = eyeRef.value
+  if (!el) return
+  const rect = el.getBoundingClientRect()
+  const cx = rect.left + rect.width / 2
+  const cy = rect.top + rect.height / 2
+  const dx = pendingClientX - cx
+  const dy = pendingClientY - cy
+  const distance = Math.sqrt(dx * dx + dy * dy)
+  // Pupil stays inside the eye almond. Outer pupil radius (r=4 + stroke
+  // 1.6 / 2 = 0.8) is 4.8; eye half-height is 7. Capping max travel at 2.0
+  // keeps the combined extent (6.8) inside the almond top/bottom edges.
+  const maxOffset = 2.0
+  const angle = Math.atan2(dy, dx)
+  // Normalise: cursors within ~80px of the eye centre give a near-linear
+  // response; farther cursors saturate at maxOffset so the pupil never
+  // visibly clips the eye outline.
+  const r = Math.min(distance / 80, 1) * maxOffset
+  el.style.setProperty('--pupil-x', `${Math.cos(angle) * r}px`)
+  el.style.setProperty('--pupil-y', `${Math.sin(angle) * r}px`)
+}
+
+// ---- Blink (5–30s) when eye is open ----
+// Two timers: the schedule timer (waits for the next blink) and the reset
+// timer (clears isBlinking after the 220ms animation). The reset timer must
+// be tracked too so unmount-during-blink doesn't leave a callback that
+// mutates a stale ref and reschedules on a dead instance.
+let blinkTimer: ReturnType<typeof setTimeout> | null = null
+let blinkResetTimer: ReturnType<typeof setTimeout> | null = null
+function scheduleBlink() {
+  clearBlinkTimer()
+  const delay = 5_000 + Math.random() * 25_000
+  blinkTimer = setTimeout(() => {
+    blinkTimer = null
+    isBlinking.value = true
+    blinkResetTimer = setTimeout(() => {
+      blinkResetTimer = null
+      isBlinking.value = false
+      if (props.open) scheduleBlink()
+    }, 220)
+  }, delay)
+}
+function clearBlinkTimer() {
+  if (blinkTimer) {
+    clearTimeout(blinkTimer)
+    blinkTimer = null
+  }
+  if (blinkResetTimer) {
+    clearTimeout(blinkResetTimer)
+    blinkResetTimer = null
+  }
+}
+
+// ---- Peek (20–30 min, or 3–8 s in debug mode) when eye is closed ----
+// Same two-timer pattern as blink — schedule + reset both tracked so unmount
+// during the 2600 ms peek window doesn't leak a callback.
+let peekTimer: ReturnType<typeof setTimeout> | null = null
+let peekResetTimer: ReturnType<typeof setTimeout> | null = null
+function schedulePeek() {
+  clearPeekTimer()
+  const delay = props.debugPeek
+    ? 3_000 + Math.random() * 5_000
+    : 20 * 60_000 + Math.random() * 10 * 60_000
+  peekTimer = setTimeout(() => {
+    peekTimer = null
+    isPeeking.value = true
+    peekResetTimer = setTimeout(() => {
+      peekResetTimer = null
+      isPeeking.value = false
+      if (!props.open) schedulePeek()
+    }, 2600)
+  }, delay)
+}
+function clearPeekTimer() {
+  if (peekTimer) {
+    clearTimeout(peekTimer)
+    peekTimer = null
+  }
+  if (peekResetTimer) {
+    clearTimeout(peekResetTimer)
+    peekResetTimer = null
+  }
+}
+
+// ---- Mousemove listener lifecycle ----
+// Only attached while the pupil is actually visible (eye open, or briefly
+// during a peek). Saves CPU when the eye is closed and idle.
+let listenerAttached = false
+function ensureListener(shouldTrack: boolean) {
+  if (typeof window === 'undefined') return
+  if (shouldTrack && !listenerAttached) {
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
+    listenerAttached = true
+  } else if (!shouldTrack && listenerAttached) {
+    window.removeEventListener('mousemove', onMouseMove)
+    listenerAttached = false
+  }
+}
+
+function prefersReducedMotion(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof window.matchMedia === 'function' &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+}
+
+watch([() => props.open, isPeeking], ([open, peeking]) => {
+  ensureListener(open || peeking)
+})
+
+watch(
+  () => props.open,
+  (open) => {
+    isBlinking.value = false
+    isPeeking.value = false
+    clearBlinkTimer()
+    clearPeekTimer()
+    if (prefersReducedMotion()) return
+    if (open) scheduleBlink()
+    else schedulePeek()
+  },
+)
+
+// Reschedule the in-flight peek when debugPeek toggles. Otherwise the
+// existing timer keeps its stale delay (e.g. user flips debugPeek on while
+// waiting for a 20-min peek; timer keeps 20-min until next reschedule).
+watch(
+  () => props.debugPeek,
+  () => {
+    if (props.open || isPeeking.value || prefersReducedMotion()) return
+    schedulePeek()
+  },
+)
+
+onMounted(() => {
+  if (prefersReducedMotion()) return
+  ensureListener(props.open)
+  if (props.open) scheduleBlink()
+  else schedulePeek()
+})
+
+onUnmounted(() => {
+  ensureListener(false)
+  if (rafId !== null) cancelAnimationFrame(rafId)
+  clearBlinkTimer()
+  clearPeekTimer()
+})
+</script>
+
+<style lang="scss" scoped>
+.ns-eye {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  --pupil-x: 0px;
+  --pupil-y: 0px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+    overflow: visible;
+  }
+}
+
+.ns-eye__content {
+  transform-origin: center;
+  transition:
+    transform 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 180ms ease;
+}
+
+// Clip shape mirrors the visible eye's transform so the pupil clip stays
+// in sync with the almond as it scales for blink / peek / open / closed.
+.ns-eye__clip-shape {
+  transform-origin: center;
+  transition: transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ns-eye__pupil-group {
+  transform-origin: center;
+  transition: opacity 180ms ease;
+}
+
+.ns-eye__pupil {
+  transform: translate(var(--pupil-x), var(--pupil-y));
+  transition: transform 80ms linear;
+}
+
+.ns-eye__lid {
+  transform-origin: center;
+  transition:
+    opacity 180ms ease,
+    transform 180ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ns-eye__peek-lashes {
+  opacity: 0;
+  transform-origin: center;
+  transition: opacity 180ms ease;
+}
+
+// ---- Static states ----
+.ns-eye--open {
+  .ns-eye__content {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  .ns-eye__clip-shape {
+    transform: scaleY(1);
+  }
+  .ns-eye__pupil-group {
+    opacity: 1;
+  }
+  .ns-eye__lid {
+    opacity: 0;
+    transform: scaleY(0.6);
+  }
+}
+
+.ns-eye--closed {
+  .ns-eye__content {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  .ns-eye__clip-shape {
+    transform: scaleY(0);
+  }
+  .ns-eye__pupil-group {
+    opacity: 0;
+  }
+  .ns-eye__lid {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+// ---- Blink (eye open → briefly closed → open) ----
+.ns-eye--blinking {
+  .ns-eye__content {
+    animation: ns-eye-blink-content 220ms ease-in-out;
+  }
+  .ns-eye__clip-shape {
+    animation: ns-eye-blink-clip 220ms ease-in-out;
+  }
+  .ns-eye__pupil-group {
+    animation: ns-eye-blink-pupil 220ms ease-in-out;
+  }
+  .ns-eye__lid {
+    animation: ns-eye-blink-lid 220ms ease-in-out;
+  }
+}
+
+@keyframes ns-eye-blink-content {
+  0%,
+  100% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+  45%,
+  55% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+}
+
+@keyframes ns-eye-blink-pupil {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  45%,
+  55% {
+    opacity: 0;
+  }
+}
+
+@keyframes ns-eye-blink-clip {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+  45%,
+  55% {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes ns-eye-blink-lid {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scaleY(0.6);
+  }
+  45%,
+  55% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+// ---- Peek (eye closed → briefly half-open → closed) ----
+.ns-eye--peeking {
+  .ns-eye__content {
+    animation: ns-eye-peek-content 2600ms ease-in-out;
+  }
+  .ns-eye__clip-shape {
+    animation: ns-eye-peek-clip 2600ms ease-in-out;
+  }
+  .ns-eye__pupil-group {
+    animation: ns-eye-peek-pupil 2600ms ease-in-out;
+  }
+  .ns-eye__lid {
+    animation: ns-eye-peek-lid 2600ms ease-in-out;
+  }
+  .ns-eye__peek-lashes {
+    animation: ns-eye-peek-lashes 2600ms ease-in-out;
+  }
+}
+
+@keyframes ns-eye-peek-content {
+  0%,
+  100% {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+  15%,
+  85% {
+    transform: scaleY(0.7);
+    opacity: 1;
+  }
+}
+
+@keyframes ns-eye-peek-pupil {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+}
+
+@keyframes ns-eye-peek-clip {
+  0%,
+  100% {
+    transform: scaleY(0);
+  }
+  15%,
+  85% {
+    transform: scaleY(0.7);
+  }
+}
+
+@keyframes ns-eye-peek-lid {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+  15%,
+  85% {
+    opacity: 0.25;
+    transform: scaleY(0.8);
+  }
+}
+
+@keyframes ns-eye-peek-lashes {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+}
+
+// ---- Accessibility: respect reduced motion ----
+@media (prefers-reduced-motion: reduce) {
+  .ns-eye__content,
+  .ns-eye__clip-shape,
+  .ns-eye__pupil-group,
+  .ns-eye__pupil,
+  .ns-eye__lid,
+  .ns-eye__peek-lashes {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+</style>

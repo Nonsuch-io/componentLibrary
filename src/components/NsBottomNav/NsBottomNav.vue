@@ -4,16 +4,16 @@
     <div v-if="mainActiveSub" class="ns-bottom-nav__sub-row-wrap">
       <div class="ns-bottom-nav__sub-row">
         <button
-          v-for="(subLabel, i) in mainActiveSub.items"
-          :key="subLabel"
+          v-for="(sub, i) in mainActiveSub.items"
+          :key="sub.id ?? sub.label"
           class="ns-bottom-nav__sub-pill"
           :class="{
-            'ns-bottom-nav__sub-pill--active': modelValue === subId(mainActiveSub.id, subLabel),
+            'ns-bottom-nav__sub-pill--active': modelValue === subId(mainActiveSub.id, sub),
           }"
           :style="subPillStyle(i, mainActiveSub.items.length, closingSub === mainActiveSub.id)"
-          @click="handleSelect(subId(mainActiveSub.id, subLabel))"
+          @click="handleSelect(subId(mainActiveSub.id, sub))"
         >
-          {{ subLabel }}
+          {{ sub.label }}
         </button>
       </div>
     </div>
@@ -24,16 +24,16 @@
         <!-- Sub-row for MORE items (above the popup pill row) -->
         <div v-if="moreActiveSub" class="ns-bottom-nav__sub-row">
           <button
-            v-for="(subLabel, i) in moreActiveSub.items"
-            :key="subLabel"
+            v-for="(sub, i) in moreActiveSub.items"
+            :key="sub.id ?? sub.label"
             class="ns-bottom-nav__sub-pill"
             :class="{
-              'ns-bottom-nav__sub-pill--active': modelValue === subId(moreActiveSub.id, subLabel),
+              'ns-bottom-nav__sub-pill--active': modelValue === subId(moreActiveSub.id, sub),
             }"
             :style="subPillStyle(i, moreActiveSub.items.length, closingSub === moreActiveSub.id)"
-            @click="handleSelect(subId(moreActiveSub.id, subLabel))"
+            @click="handleSelect(subId(moreActiveSub.id, sub))"
           >
-            {{ subLabel }}
+            {{ sub.label }}
           </button>
         </div>
 
@@ -49,7 +49,8 @@
             }"
             @click.stop="handleTap(item)"
           >
-            <component :is="item.icon" :size="22" weight="regular" />
+            <NsIcon v-if="typeof item.icon === 'string'" :name="item.icon" size="22px" />
+            <component :is="item.icon" v-else :size="22" weight="regular" />
             <span class="ns-bottom-nav__label">{{ item.label }}</span>
             <span v-if="item.sub?.length && !isPillActive(item)" class="ns-bottom-nav__chevron"
               >›</span
@@ -68,7 +69,13 @@
         :class="{ 'ns-bottom-nav__pill--active': isPillActive(item) }"
         @click.stop="handleTap(item, true)"
       >
-        <component :is="item.icon" class="ns-bottom-nav__icon" :size="22" weight="regular" />
+        <NsIcon
+          v-if="typeof item.icon === 'string'"
+          :name="item.icon"
+          class="ns-bottom-nav__icon"
+          size="22px"
+        />
+        <component :is="item.icon" v-else class="ns-bottom-nav__icon" :size="22" weight="regular" />
         <span class="ns-bottom-nav__label">{{ item.label }}</span>
         <span v-if="item.sub?.length && !isPillActive(item)" class="ns-bottom-nav__chevron">›</span>
       </button>
@@ -103,7 +110,8 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import type { NsNavItem } from '../NsNavSidebar/NsNavSidebar.vue'
+import type { NsNavItem, NsNavSubItem } from '../NsNavSidebar/NsNavSidebar.vue'
+import NsIcon from '../NsIcon/NsIcon.vue'
 
 export interface NsBottomNavProps {
   /** Items always visible in the main bar */
@@ -126,8 +134,13 @@ const openSub = ref<string | null>(null)
 const closingSub = ref<string | null>(null)
 let closeTimer: ReturnType<typeof setTimeout> | null = null
 
-function subId(parentId: string, subLabel: string): string {
-  return `${parentId}/${subLabel.toLowerCase().replace(/ /g, '-')}`
+function normalizedSub(item: NsNavItem): NsNavSubItem[] {
+  if (!item.sub) return []
+  return item.sub.map((s) => (typeof s === 'string' ? { label: s } : s))
+}
+
+function subId(parentId: string, sub: NsNavSubItem): string {
+  return sub.id ?? `${parentId}/${sub.label.toLowerCase().replace(/ /g, '-')}`
 }
 
 function isPillActive(item: NsNavItem): boolean {
@@ -139,7 +152,7 @@ const mainActiveSub = computed(() => {
   if (!id) return null
   const item = props.mainItems.find((i) => i.id === id)
   if (!item?.sub?.length) return null
-  return { id, items: item.sub }
+  return { id, items: normalizedSub(item) }
 })
 
 const moreActiveSub = computed(() => {
@@ -147,7 +160,7 @@ const moreActiveSub = computed(() => {
   if (!id) return null
   const item = props.moreItems.find((i) => i.id === id)
   if (!item?.sub?.length) return null
-  return { id, items: item.sub }
+  return { id, items: normalizedSub(item) }
 })
 
 function subPillStyle(idx: number, total: number, isClosing: boolean): Record<string, string> {

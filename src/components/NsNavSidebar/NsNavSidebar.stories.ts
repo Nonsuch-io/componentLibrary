@@ -87,3 +87,45 @@ export const WithSubItemActive: Story = {
     `,
   }),
 }
+
+/**
+ * Quasar-aligned API features in one place:
+ *
+ * - Material-icon **string** icon (`icon: 'dashboard'`) — wrapped in NsIcon
+ * - `to` for navigation — renders pill as `<a href>`
+ * - `active` explicit override
+ * - `disable` (Quasar spelling) — non-interactive + aria-disabled + faded
+ * - `separator` — divider before the item
+ * - `sub` as rich objects with per-item `to`
+ */
+export const QuasarAlignedAPI: Story = {
+  render: () => ({
+    components: { NsNavSidebar },
+    setup() {
+      const active = ref('shop')
+      const items: NsNavItem[] = [
+        { id: 'dashboard', label: 'Dashboard', icon: 'dashboard', to: '/dashboard' },
+        { id: 'orders', label: 'Orders', icon: 'receipt', to: '/orders' },
+        {
+          id: 'shop',
+          label: 'Shop',
+          icon: 'storefront',
+          active: true,
+          sub: [
+            { id: 'shop-tops', label: 'Tops', to: '/shop/tops' },
+            { id: 'shop-bottoms', label: 'Bottoms', to: '/shop/bottoms' },
+            { id: 'shop-archive', label: 'Archive', disable: true },
+          ],
+        },
+        { id: 'archived', label: 'Archived', icon: 'archive', disable: true },
+        { id: 'settings', label: 'Settings', icon: 'settings', to: '/settings', separator: true },
+      ]
+      return { active, items }
+    },
+    template: `
+      <div style="display: flex; height: 600px; background: var(--ns-color-background); padding: 24px;">
+        <NsNavSidebar v-model="active" :items="items" />
+      </div>
+    `,
+  }),
+}

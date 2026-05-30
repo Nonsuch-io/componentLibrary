@@ -26,6 +26,12 @@
   line-height: 1.5;
 }
 
+%label-xs {
+  font-size: $font-size-xs;
+  font-weight: $font-weight-semibold;
+  line-height: 1.6;
+}
+
 %label-sm {
   font-size: $font-size-sm;
   font-weight: $font-weight-semibold;
