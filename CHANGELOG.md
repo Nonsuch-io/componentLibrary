@@ -4,6 +4,19 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.18.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.17.0...v0.18.0) (2026-05-29)
+
+
+### Features
+
+* **NsNavSidebar:** quasar-aligned API (separator/active/to/disable/string-icon/sub-objects) ([94e8cb8](https://github.com/Nonsuch-io/componentLibrary/commit/94e8cb868a4114efa673cf858dd0d4606d9ca6a8))
+* **NsNavSidebar:** quasar-aligned API (separator/active/to/disable/string-icon/sub-objects) ([4052d2c](https://github.com/Nonsuch-io/componentLibrary/commit/4052d2c8a600a45e2f7cae83ae57f08a9984d874))
+
+
+### Bug Fixes
+
+* **NsNavSidebar:** button type, unmount timer leak, exported sub-item type ([f024023](https://github.com/Nonsuch-io/componentLibrary/commit/f02402336a80c4c02ba5c83f9f9e2ef40ed4c7d0))
+
 ## [0.17.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.16.0...v0.17.0) (2026-05-25)
 
 
