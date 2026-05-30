@@ -113,50 +113,33 @@
       </NsToolbar>
     </NsHeader>
 
-    <!-- Side drawer -->
+    <!-- Side drawer.
+         width / mini-width are sized to match NsNavSidebar's container
+         widths (166 expanded / 76 mini) plus 2px to clear the bordered
+         1px right border without clipping the pill ovals. -->
     <NsDrawer
       v-model="drawerOpen"
       :breakpoint="drawerBreakpoint"
       :mini="shouldUseMini"
+      :width="168"
+      :mini-width="78"
       bordered
       class="ns-app-shell__drawer"
       :behavior="isDesktop ? 'desktop' : 'mobile'"
       side="left"
       @update:model-value="onDrawerToggle"
     >
-      <!-- Collapsible toggle at top of drawer -->
-      <NsItem
-        v-if="collapsible && isDesktop"
-        clickable
-        class="ns-app-shell__collapse-toggle"
-        @click="toggleCollapse"
-      >
-        <NsItemSection avatar>
-          <NsIcon :name="shouldUseMini ? 'menu' : 'chevron_left'" />
-        </NsItemSection>
-        <NsItemSection>
-          <NsItemLabel>Hide Menu</NsItemLabel>
-        </NsItemSection>
-      </NsItem>
-
       <slot name="drawer-header" :mini="shouldUseMini" />
 
-      <NsList v-if="drawerItems.length > 0">
-        <template v-for="item in drawerItems" :key="item.name">
-          <NsSeparator v-if="item.separator" />
-          <NsItem :to="item.to" :active="item.active" clickable class="ns-app-shell__nav-item">
-            <NsItemSection v-if="item.icon" avatar>
-              <NsIcon :name="item.icon" />
-            </NsItemSection>
-            <NsItemSection>
-              <NsItemLabel>{{ item.label }}</NsItemLabel>
-            </NsItemSection>
-            <NsItemSection v-if="item.children && item.children.length > 0" side>
-              <NsIcon name="chevron_right" size="sm" />
-            </NsItemSection>
-          </NsItem>
-        </template>
-      </NsList>
+      <NsNavSidebar
+        v-if="drawerItems.length > 0"
+        :model-value="activeNavId"
+        :items="mappedDrawerItems"
+        :expanded="!shouldUseMini"
+        :show-toggle="collapsible && isDesktop"
+        class="ns-app-shell__nav-sidebar"
+        @update:expanded="onNavExpandedChange"
+      />
 
       <slot name="drawer-footer" />
     </NsDrawer>
@@ -215,6 +198,8 @@ import NsItemLabel from '../NsItemLabel/NsItemLabel.vue'
 import NsSeparator from '../NsSeparator/NsSeparator.vue'
 import NsAvatar from '../NsAvatar/NsAvatar.vue'
 import NsMenu from '../NsMenu/NsMenu.vue'
+import NsNavSidebar from '../NsNavSidebar/NsNavSidebar.vue'
+import type { NsNavItem } from '../NsNavSidebar/NsNavSidebar.vue'
 import { nsBreakpoints } from '../../breakpoints'
 
 /**
@@ -318,10 +303,48 @@ function onTabChange(val: string | number) {
   emit('update:modelValue', String(val))
 }
 
-function toggleCollapse() {
-  isCollapsed.value = !isCollapsed.value
+/**
+ * Wired from the NsNavSidebar's animated-eye toggle (replaces the old
+ * collapsible chevron). When the sidebar reports its expanded state,
+ * we mirror it to isCollapsed and emit drawer-collapse so consumers
+ * have the same event surface they had before.
+ */
+function onNavExpandedChange(expanded: boolean) {
+  isCollapsed.value = !expanded
   emit('drawer-collapse', isCollapsed.value)
 }
+
+/**
+ * id of the currently-active drawer item, derived from the consumer's
+ * `active: true` flag on NsAppShellNavItem. NsNavSidebar's v-model:modelValue
+ * is honored via the explicit `active` prop on each NsNavItem (added in
+ * sub-task 1), so this is mostly informational — passing the id keeps the
+ * v-model contract consistent.
+ */
+const activeNavId = computed(() => {
+  const active = props.drawerItems.find((i) => i.active)
+  return active?.name ?? ''
+})
+
+/**
+ * Map NsAppShellNavItem → NsNavItem so NsNavSidebar can render the same items.
+ * Field mapping: name → id, children → sub (objects).
+ */
+const mappedDrawerItems = computed<NsNavItem[]>(() =>
+  props.drawerItems.map((item) => ({
+    id: item.name,
+    label: item.label,
+    icon: item.icon,
+    to: item.to,
+    active: item.active,
+    separator: item.separator,
+    sub: item.children?.map((c) => ({
+      id: c.name,
+      label: c.label,
+      to: c.to,
+    })),
+  })),
+)
 
 function emitSearch() {
   emit('search', searchQuery.value)

@@ -266,8 +266,9 @@ describe('NsAppShell', () => {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
       })
-      // The settings item has separator: true
-      expect(wrapper.find('.ns-separator').exists()).toBe(true)
+      // The settings item has separator: true — NsNavSidebar renders a
+      // <li class="ns-nav-sidebar__separator" role="separator"> before it.
+      expect(wrapper.find('.ns-nav-sidebar__separator').exists()).toBe(true)
     })
   })
 
@@ -477,9 +478,9 @@ describe('NsAppShell', () => {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
       })
-      const navItems = wrapper.findAll('.ns-app-shell__nav-item')
+      // NsNavSidebar pills have height: 44px via the $pill-h sass variable.
+      const navItems = wrapper.findAll('.ns-nav-sidebar__pill')
       expect(navItems.length).toBeGreaterThan(0)
-      // CSS enforces min-height of 44px
     })
   })
 
@@ -488,32 +489,32 @@ describe('NsAppShell', () => {
       mockScreenWidth.value = 1440 // desktop (lg+)
     })
 
-    it('shows collapse toggle at desktop when collapsible is true (default)', () => {
+    it('shows the NsNavSidebar toggle at desktop when collapsible is true (default)', () => {
       const wrapper = mount(NsAppShell, {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
       })
-      expect(wrapper.find('.ns-app-shell__collapse-toggle').exists()).toBe(true)
+      expect(wrapper.find('.ns-nav-sidebar__toggle-btn').exists()).toBe(true)
     })
 
-    it('hides collapse toggle when collapsible is false', () => {
+    it('hides the toggle when collapsible is false', () => {
       const wrapper = mount(NsAppShell, {
         props: { drawerItems: sampleNavItems, collapsible: false },
         slots: { default: 'Content' },
       })
-      expect(wrapper.find('.ns-app-shell__collapse-toggle').exists()).toBe(false)
+      expect(wrapper.find('.ns-nav-sidebar__toggle-btn').exists()).toBe(false)
     })
 
-    it('hides collapse toggle on mobile', () => {
+    it('hides the toggle on mobile', () => {
       mockScreenWidth.value = 375
       const wrapper = mount(NsAppShell, {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
       })
-      expect(wrapper.find('.ns-app-shell__collapse-toggle').exists()).toBe(false)
+      expect(wrapper.find('.ns-nav-sidebar__toggle-btn').exists()).toBe(false)
     })
 
-    it('toggles mini mode when collapse button is clicked', async () => {
+    it('toggles mini mode when the NsNavSidebar toggle is clicked', async () => {
       const wrapper = mount(NsAppShell, {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
@@ -522,43 +523,44 @@ describe('NsAppShell', () => {
       // Initially not mini at lg+ (not tablet, not collapsed)
       expect(drawer.props('mini')).toBe(false)
 
-      // Click the collapse toggle
-      await wrapper.find('.ns-app-shell__collapse-toggle').trigger('click')
+      // Click the NsNavSidebar animated-eye toggle
+      await wrapper.find('.ns-nav-sidebar__toggle-btn').trigger('click')
 
       // Now should be in mini mode
       expect(drawer.props('mini')).toBe(true)
     })
 
-    it('emits drawer-collapse event when toggled', async () => {
+    it('emits drawer-collapse event when the toggle is clicked', async () => {
       const wrapper = mount(NsAppShell, {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
       })
-      await wrapper.find('.ns-app-shell__collapse-toggle').trigger('click')
+      await wrapper.find('.ns-nav-sidebar__toggle-btn').trigger('click')
       expect(wrapper.emitted('drawer-collapse')?.[0]).toEqual([true])
 
       // Toggle back
-      await wrapper.find('.ns-app-shell__collapse-toggle').trigger('click')
+      await wrapper.find('.ns-nav-sidebar__toggle-btn').trigger('click')
       expect(wrapper.emitted('drawer-collapse')?.[1]).toEqual([false])
     })
 
-    it('shows chevron_left icon when drawer is expanded', () => {
+    it('renders the animated eye in the open state when drawer is expanded', () => {
       const wrapper = mount(NsAppShell, {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
       })
-      const toggleIcon = wrapper.find('.ns-app-shell__collapse-toggle .ns-icon')
-      expect(toggleIcon.text()).toContain('chevron_left')
+      const eye = wrapper.find('.ns-nav-sidebar__toggle-btn .ns-eye')
+      expect(eye.exists()).toBe(true)
+      expect(eye.classes()).toContain('ns-eye--open')
     })
 
-    it('shows menu icon when drawer is collapsed to mini', async () => {
+    it('renders the animated eye in the closed state when drawer is collapsed to mini', async () => {
       const wrapper = mount(NsAppShell, {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
       })
-      await wrapper.find('.ns-app-shell__collapse-toggle').trigger('click')
-      const toggleIcon = wrapper.find('.ns-app-shell__collapse-toggle .ns-icon')
-      expect(toggleIcon.text()).toContain('menu')
+      await wrapper.find('.ns-nav-sidebar__toggle-btn').trigger('click')
+      const eye = wrapper.find('.ns-nav-sidebar__toggle-btn .ns-eye')
+      expect(eye.classes()).toContain('ns-eye--closed')
     })
   })
 
@@ -568,11 +570,12 @@ describe('NsAppShell', () => {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
       })
-      // Products has children, should show chevron_right
-      const navItems = wrapper.findAll('.ns-app-shell__nav-item')
-      const productsItem = navItems.find((item) => item.text().includes('Products'))
+      // Products has children. NsNavSidebar renders an inline SVG chevron with
+      // class `.ns-nav-sidebar__chevron` inside the matching pill.
+      const pills = wrapper.findAll('.ns-nav-sidebar__pill')
+      const productsItem = pills.find((p) => p.text().includes('Products'))
       expect(productsItem).toBeTruthy()
-      expect(productsItem!.text()).toContain('chevron_right')
+      expect(productsItem!.find('.ns-nav-sidebar__chevron').exists()).toBe(true)
     })
 
     it('does not show chevron on nav items without children', () => {
@@ -580,10 +583,10 @@ describe('NsAppShell', () => {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
       })
-      const navItems = wrapper.findAll('.ns-app-shell__nav-item')
-      const dashboardItem = navItems.find((item) => item.text().includes('Dashboard'))
+      const pills = wrapper.findAll('.ns-nav-sidebar__pill')
+      const dashboardItem = pills.find((p) => p.text().includes('Dashboard'))
       expect(dashboardItem).toBeTruthy()
-      expect(dashboardItem!.text()).not.toContain('chevron_right')
+      expect(dashboardItem!.find('.ns-nav-sidebar__chevron').exists()).toBe(false)
     })
 
     it('does not show chevron when children array is empty', () => {
@@ -594,8 +597,8 @@ describe('NsAppShell', () => {
         props: { drawerItems: itemsWithEmptyChildren },
         slots: { default: 'Content' },
       })
-      const navItem = wrapper.find('.ns-app-shell__nav-item')
-      expect(navItem.text()).not.toContain('chevron_right')
+      const pill = wrapper.find('.ns-nav-sidebar__pill')
+      expect(pill.find('.ns-nav-sidebar__chevron').exists()).toBe(false)
     })
   })
 
