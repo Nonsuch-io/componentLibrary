@@ -326,6 +326,8 @@ $active-bg: var(--ns-color-bg-brand);
   flex-direction: column;
   gap: 6px;
   width: $icon-size;
+  padding: var(--ns-space-2);
+  box-sizing: border-box;
   transition: width 250ms cubic-bezier(0.4, 0, 0.2, 1);
   flex-shrink: 0;
 
