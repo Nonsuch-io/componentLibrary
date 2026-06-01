@@ -32,7 +32,7 @@ export default defineConfig({
       formats: ['es'],
     },
     rollupOptions: {
-      external: ['vue', 'quasar', /^quasar\//, /^@quasar\//],
+      external: ['vue', 'quasar', /^quasar\//, /^@quasar\//, /^@phosphor-icons\//],
     },
   },
 })
