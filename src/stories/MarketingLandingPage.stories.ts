@@ -20,13 +20,11 @@ import imgDoodleX from '../assets/marketing/icon-x.svg?url'
 import imgDoodleCheck from '../assets/marketing/icon-checkmark.svg?url'
 import imgBluesky from '../assets/marketing/icon-bluesky.svg?url'
 import imgInstagram from '../assets/marketing/icon-instagram.svg?url'
-
-const imgHeaderWordmark =
-  'http://localhost:3845/assets/0729b8cf93958d1076c80331bac123779f43aa2d.svg'
-const imgCanadaFlag = 'http://localhost:3845/assets/221c38a30f4d2ca8b5d4338ff906ea54dfbb45c2.png'
-const imgSquareLogo = 'http://localhost:3845/assets/1c3f5be0b7b680255201f9068cd036c80d11c1f4.svg'
-const imgSendingEmail = 'http://localhost:3845/assets/eb6c59affdea9a3c9b494d8722bb6e38433eb32b.png'
-const imgLaptopGirl = 'http://localhost:3845/assets/6b42529352dde1c16ecaa60b91b9c9a2bbcd855a.png'
+import imgHeaderWordmark from '../assets/marketing/icon-brand-logo.svg?url'
+import imgCanadaFlag from '../assets/marketing/icon-flag-canada.svg?url'
+import imgSquareLogo from '../assets/marketing/icon-logo-badge.svg?url'
+import imgSendingEmail from '../assets/marketing/icon-incoming-envelope.svg?url'
+import imgLaptopGirl from '../assets/marketing/icon-woman-technologist.svg?url'
 
 const trustItems: NsTrustBarItem[] = [
   { text: 'No credit card', icon: imgDoodleX },
@@ -83,7 +81,7 @@ export const FullPage: Story = {
       }
     },
     template: `
-      <div style="background: #fdf4e7; font-family: 'Fixel Text', sans-serif;">
+      <div style="background: var(--ns-color-bg-header); font-family: var(--ns-font-family-text);">
 
         <!-- Header -->
         <NsSiteHeader>
@@ -170,14 +168,14 @@ export const FullPage: Story = {
               </template>
             </NsSectionEyebrow>
           </template>
-          <div style="height: 1px; width: 100%; background: #2d0b00;"></div>
+          <div style="height: 1px; width: 100%; background: var(--ns-color-text-primary);"></div>
           <p style="margin: 0;">
             Owned and operated in Alberta, butiq is launching a way to manage all your in-store processes - from staff management to inventory reordering - while still handling your online sales and order fulfillment without the gaps.
           </p>
           <p style="margin: 0;">
             butiq was built by an experienced team of developers, designers, and success managers who have all actually worked in retail, which is why the priorities are different. It is built to handle the back-of-house so you can pay attention to the actual shop and designed to run in the background, not become another thing to manage.
           </p>
-          <div style="height: 1px; width: 100%; background: #2d0b00;"></div>
+          <div style="height: 1px; width: 100%; background: var(--ns-color-text-primary);"></div>
         </NsAboutSection>
 
         <!-- Footer -->
