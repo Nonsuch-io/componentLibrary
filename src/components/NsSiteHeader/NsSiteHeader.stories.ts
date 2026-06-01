@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import NsSiteHeader from './NsSiteHeader.vue'
 
-const imgLogo = 'http://localhost:3845/assets/0729b8cf93958d1076c80331bac123779f43aa2d.svg'
+import imgLogo from '../../assets/marketing/icon-brand-logo.svg?url'
 
 const meta = {
   title: 'Marketing/NsSiteHeader',
