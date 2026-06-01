@@ -4,6 +4,8 @@ import NsSectionEyebrow from '../NsSectionEyebrow/NsSectionEyebrow.vue'
 import NsStepList from '../NsStepList/NsStepList.vue'
 import NsStepRow from '../NsStepRow/NsStepRow.vue'
 
+import imgIncomingEnvelope from '../../assets/marketing/icon-incoming-envelope.svg?url'
+
 const meta = {
   title: 'Marketing/NsExpectSection',
   component: NsExpectSection,
@@ -17,12 +19,16 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   render: () => ({
     components: { NsExpectSection, NsSectionEyebrow, NsStepList, NsStepRow },
+    setup: () => ({ imgIncomingEnvelope }),
     template: `
       <NsExpectSection>
         <template #eyebrow>
           <NsSectionEyebrow label-color="brand">
             <template #label>What to expect</template>
             <template #heading>In your Inbox</template>
+            <template #icon>
+              <img :src="imgIncomingEnvelope" alt="" />
+            </template>
           </NsSectionEyebrow>
         </template>
         <NsStepList>
