@@ -114,7 +114,7 @@ export const FullPage: Story = {
           </template>
           <template #capture>
             <div style="position: relative; max-width: 842px; width: 100%;">
-              <img :src="imgDoodleArrows" style="position: absolute; width: 214px; height: 145px; right: -10px; bottom: calc(100% - 5px); pointer-events: none;" alt="" />
+              <img :src="imgDoodleArrows" class="ns-hero__capture-doodle" alt="" />
               <NsMarketingEmailCapture v-model="email">
                 <template #cta>
                   <NsButton :variant="submitted ? 'marketing-pushed' : 'marketing'" @click="submitted = true">

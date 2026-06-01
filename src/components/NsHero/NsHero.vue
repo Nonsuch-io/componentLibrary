@@ -86,4 +86,37 @@
     }
   }
 }
+
+/*
+ * Optional decorative element above the capture input.
+ *
+ * Consumers can place a decorative graphic (e.g. a doodle arrow pointing at
+ * the call-to-action) inside the capture slot — apply
+ * .ns-hero__capture-doodle to it and wrap the capture content in a
+ * `position: relative` container so the absolute positioning works.
+ *
+ * Mobile (<1024px): hovers above the centre of the capture, rotated -45deg.
+ * Desktop (>=1024px): hovers above the top-right of the capture, no rotation.
+ *
+ * :deep() is required because the doodle is rendered as slot content (owned
+ * by the parent's CSS scope, not NsHero's).
+ */
+:deep(.ns-hero__capture-doodle) {
+  position: absolute;
+  width: 8rem;
+  height: auto;
+  pointer-events: none;
+  bottom: calc(100% + 0.5rem);
+  left: 50%;
+  transform: translateX(-50%) rotate(-45deg);
+  transform-origin: center;
+
+  @media (min-width: 1024px) {
+    width: 13rem;
+    left: auto;
+    right: 1.25rem;
+    bottom: calc(100% + 1.25rem);
+    transform: none;
+  }
+}
 </style>
