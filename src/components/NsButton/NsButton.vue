@@ -186,11 +186,11 @@ const buttonPadding = computed(() => {
   color: var(--ns-color-text-on-accent);
 
   &:hover:not(.disabled) {
-    background: var(--ns-color-accent-hover);
+    background: var(--ns-color-status-accent-hover);
   }
 
   &:active:not(.disabled) {
-    background: var(--ns-color-accent-active);
+    background: var(--ns-color-status-accent-active);
     color: var(--ns-color-text-on-brand);
   }
 
