@@ -36,7 +36,7 @@ const trustItems: NsTrustBarItem[] = [
 ]
 
 const meta = {
-  title: 'Marketing/Landing Page',
+  title: 'Marketing/Templates/Landing Page',
   tags: ['autodocs'],
   parameters: { layout: 'fullscreen' },
 } satisfies Meta
