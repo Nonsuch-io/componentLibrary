@@ -15,6 +15,26 @@ function extractTokenNames(source: string): string[] {
 
 const allTokens = extractTokenNames(css)
 
+/**
+ * Extract tokens defined in just the light-mode :root block (everything
+ * before the first dark-mode selector).
+ */
+function extractLightTokenNames(source: string): string[] {
+  const end = source.indexOf(':root.dark')
+  return extractTokenNames(end > -1 ? source.slice(0, end) : source)
+}
+
+/**
+ * Extract tokens defined in the first dark-mode block (:root.dark … }).
+ */
+function extractDarkTokenNames(source: string): string[] {
+  const start = source.indexOf(':root.dark')
+  if (start === -1) return []
+  // Find the closing brace of this block
+  const end = source.indexOf('\n}\n', start)
+  return extractTokenNames(source.slice(start, end > -1 ? end : undefined))
+}
+
 describe('tokens.css', () => {
   it('is non-empty and contains CSS custom properties', () => {
     expect(css.length).toBeGreaterThan(0)
@@ -39,7 +59,6 @@ describe('tokens.css', () => {
     '--ns-color-text-inverse',
     '--ns-color-text-link',
     '--ns-color-text-link-hover',
-    '--ns-color-text-on-brand',
     '--ns-color-text-on-primary',
     '--ns-color-text-on-secondary',
     '--ns-color-text-on-tertiary',
@@ -54,41 +73,60 @@ describe('tokens.css', () => {
     '--ns-color-text-on-info',
     '--ns-color-text-accent',
     '--ns-color-text-on-accent',
+    '--ns-color-text-on-dark',
   ]
   it.each(textTokens)('defines text token %s', (name) => {
     expect(allTokens).toContain(name)
   })
 
-  // background
+  // background — Figma canonical names
   const backgroundTokens = [
     '--ns-color-bg-canvas',
     '--ns-color-bg-surface',
-    '--ns-color-bg-alt-surface',
+    '--ns-color-bg-surface-alt',
     '--ns-color-bg-subtle',
-    '--ns-color-bg-header',
-    '--ns-color-bg-brand',
-    '--ns-color-bg-brand-subtle',
-    '--ns-color-bg-brand-hover',
-    '--ns-color-bg-brand-active',
+    '--ns-color-bg-app-header',
+    '--ns-color-bg-primary',
+    '--ns-color-bg-primary-subtle',
+    '--ns-color-bg-primary-hover',
+    '--ns-color-bg-primary-active',
     '--ns-color-bg-disabled',
     '--ns-color-bg-positive',
     '--ns-color-bg-warning',
     '--ns-color-bg-negative',
     '--ns-color-bg-info',
     '--ns-color-bg-accent',
+    '--ns-color-bg-dark',
+    '--ns-color-bg-dialog',
+    '--ns-color-bg-sidebar',
+    '--ns-color-bg-input',
+    '--ns-color-bg-menu',
   ]
   it.each(backgroundTokens)('defines background token %s', (name) => {
     expect(allTokens).toContain(name)
   })
 
-  // border
+  // background — legacy aliases still present for backwards compat
+  const backgroundAliases = [
+    '--ns-color-bg-brand',
+    '--ns-color-bg-brand-subtle',
+    '--ns-color-bg-brand-hover',
+    '--ns-color-bg-brand-active',
+    '--ns-color-bg-alt-surface',
+    '--ns-color-bg-header',
+  ]
+  it.each(backgroundAliases)('retains legacy background alias %s', (name) => {
+    expect(allTokens).toContain(name)
+  })
+
+  // border — Figma canonical names
   const borderTokens = [
     '--ns-color-border-default',
     '--ns-color-border-subtle',
     '--ns-color-border-focus',
     '--ns-color-border-disabled',
-    '--ns-color-border-brand',
-    '--ns-color-border-brand-subtle',
+    '--ns-color-border-primary',
+    '--ns-color-border-primary-subtle',
     '--ns-color-border-positive',
     '--ns-color-border-warning',
     '--ns-color-border-negative',
@@ -99,8 +137,34 @@ describe('tokens.css', () => {
     expect(allTokens).toContain(name)
   })
 
-  // status
-  const statusTokens = [
+  // core semantic / interactive (Quasar-aligned, formerly status-*)
+  const semanticTokens = [
+    '--ns-color-primary',
+    '--ns-color-secondary',
+    '--ns-color-dark',
+    '--ns-color-positive',
+    '--ns-color-positive-hover',
+    '--ns-color-positive-active',
+    '--ns-color-warning',
+    '--ns-color-warning-hover',
+    '--ns-color-warning-active',
+    '--ns-color-negative',
+    '--ns-color-negative-hover',
+    '--ns-color-negative-active',
+    '--ns-color-info',
+    '--ns-color-info-hover',
+    '--ns-color-info-active',
+    '--ns-color-accent',
+    '--ns-color-accent-hover',
+    '--ns-color-accent-active',
+    '--ns-color-status-neutral',
+  ]
+  it.each(semanticTokens)('defines semantic token %s', (name) => {
+    expect(allTokens).toContain(name)
+  })
+
+  // status-* aliases still present for backwards compat
+  const statusAliases = [
     '--ns-color-status-positive',
     '--ns-color-status-positive-hover',
     '--ns-color-status-positive-active',
@@ -114,11 +178,10 @@ describe('tokens.css', () => {
     '--ns-color-status-info-hover',
     '--ns-color-status-info-active',
     '--ns-color-status-accent',
-    '--ns-color-accent-hover',
-    '--ns-color-accent-active',
-    '--ns-color-status-neutral',
+    '--ns-color-status-accent-hover',
+    '--ns-color-status-accent-active',
   ]
-  it.each(statusTokens)('defines status token %s', (name) => {
+  it.each(statusAliases)('retains legacy status alias %s', (name) => {
     expect(allTokens).toContain(name)
   })
 
@@ -230,13 +293,12 @@ describe('tokens.css', () => {
     expect(css).toContain('prefers-color-scheme: dark')
   })
 
-  it('overrides colour tokens in dark mode', () => {
-    // The dark block should redefine at least the canvas + brand colours
-    const darkBlock = css.slice(css.indexOf(':root.dark'))
-    const darkTokens = extractTokenNames(darkBlock)
-    expect(darkTokens).toContain('--ns-color-bg-canvas')
-    expect(darkTokens).toContain('--ns-color-bg-surface')
-    expect(darkTokens).toContain('--ns-color-text-primary')
-    expect(darkTokens).toContain('--ns-color-bg-brand')
+  it('every light-mode colour token has a dark-mode counterpart', () => {
+    const lightColorTokens = extractLightTokenNames(css).filter((t) => t.startsWith('--ns-color-'))
+    const darkColorTokens = extractDarkTokenNames(css)
+
+    for (const token of lightColorTokens) {
+      expect(darkColorTokens, `dark mode is missing an override for ${token}`).toContain(token)
+    }
   })
 })
