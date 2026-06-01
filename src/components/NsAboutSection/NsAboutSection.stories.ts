@@ -29,7 +29,7 @@ export const Default: Story = {
             </template>
           </NsSectionEyebrow>
         </template>
-        <div style="height: 1px; width: 100%; background: #2d0b00;"></div>
+        <hr style="width: 100%; margin: 0; border: none; border-top: 1px solid var(--ns-color-text-primary);" />
         <p style="margin: 0;">
           Owned and operated in Alberta, butiq is launching a way to manage all your in-store
           processes while still handling your online sales and order fulfillment without the gaps.
@@ -38,7 +38,7 @@ export const Default: Story = {
           Built by an experienced team who have all actually worked in retail, which is why the
           priorities are different.
         </p>
-        <div style="height: 1px; width: 100%; background: #2d0b00;"></div>
+        <hr style="width: 100%; margin: 0; border: none; border-top: 1px solid var(--ns-color-text-primary);" />
       </NsAboutSection>
     `,
   }),

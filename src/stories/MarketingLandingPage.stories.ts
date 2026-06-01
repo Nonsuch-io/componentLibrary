@@ -168,14 +168,14 @@ export const FullPage: Story = {
               </template>
             </NsSectionEyebrow>
           </template>
-          <div style="height: 1px; width: 100%; background: var(--ns-color-text-primary);"></div>
+          <hr style="width: 100%; margin: 0; border: none; border-top: 1px solid var(--ns-color-text-primary);" />
           <p style="margin: 0;">
             Owned and operated in Alberta, butiq is launching a way to manage all your in-store processes - from staff management to inventory reordering - while still handling your online sales and order fulfillment without the gaps.
           </p>
           <p style="margin: 0;">
             butiq was built by an experienced team of developers, designers, and success managers who have all actually worked in retail, which is why the priorities are different. It is built to handle the back-of-house so you can pay attention to the actual shop and designed to run in the background, not become another thing to manage.
           </p>
-          <div style="height: 1px; width: 100%; background: var(--ns-color-text-primary);"></div>
+          <hr style="width: 100%; margin: 0; border: none; border-top: 1px solid var(--ns-color-text-primary);" />
         </NsAboutSection>
 
         <!-- Footer -->
