@@ -58,4 +58,10 @@ export interface NsLocaleMessages {
     tooShort: string
     tooLong: string
   }
+
+  /** Marketing-component strings (NsMarketingEmailCapture, etc.) */
+  marketing: {
+    emailAddress: string
+    emailPlaceholder: string
+  }
 }

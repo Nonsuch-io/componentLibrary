@@ -6,8 +6,8 @@
     <input
       class="ns-marketing-email-capture__input"
       type="email"
-      aria-label="Email address"
-      :placeholder="placeholder"
+      :aria-label="resolvedAriaLabel"
+      :placeholder="resolvedPlaceholder"
       :value="modelValue"
       @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       @focus="isFocused = true"
@@ -18,23 +18,50 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+/**
+ * NsMarketingEmailCapture — Pill-style email capture for marketing pages.
+ *
+ * Renders a raw <input type="email"> rather than wrapping NsInput, because
+ * the marketing pill design needs a borderless, transparent input that
+ * integrates into a parent-styled container (with the CTA button beside
+ * it inside the same pill on desktop). NsInput wraps Quasar's QInput,
+ * which renders four layers of wrapping DOM with its own padding,
+ * borders, and focus styling — fighting that to look "marketing pill"
+ * would require extensive :deep() overrides on Quasar internals, which
+ * is fragile across Quasar updates. The raw input here keeps the
+ * accessibility essentials (type=email, aria-label, focus-visible box-
+ * shadow) and the marketing-specific styling stays simple.
+ *
+ * Strings (aria-label, placeholder) follow the documented locale
+ * resolution order: explicit prop → injected NsLocaleMessages → en-CA
+ * built-ins.
+ */
+import { computed, ref } from 'vue'
+import { useNsLocale } from '../../composables/useNsLocale'
 
 export interface NsMarketingEmailCaptureProps {
   modelValue?: string
+  /** Visible placeholder text. Falls back to the injected locale's marketing.emailPlaceholder, then en-CA. */
   placeholder?: string
+  /** Accessible name for the input. Falls back to the injected locale's marketing.emailAddress, then en-CA. */
+  ariaLabel?: string
 }
 
-withDefaults(defineProps<NsMarketingEmailCaptureProps>(), {
+const props = withDefaults(defineProps<NsMarketingEmailCaptureProps>(), {
   modelValue: '',
-  placeholder: 'your@email.com',
+  placeholder: undefined,
+  ariaLabel: undefined,
 })
 
 defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
+const locale = useNsLocale()
 const isFocused = ref(false)
+
+const resolvedPlaceholder = computed(() => props.placeholder ?? locale.marketing.emailPlaceholder)
+const resolvedAriaLabel = computed(() => props.ariaLabel ?? locale.marketing.emailAddress)
 </script>
 
 <style lang="scss" scoped>

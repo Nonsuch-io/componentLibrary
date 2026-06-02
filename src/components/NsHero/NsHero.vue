@@ -35,7 +35,13 @@
       'capture  media';
     row-gap: var(--ns-space-8);
     column-gap: var(--ns-space-3);
-    min-height: 640px;
+    /*
+     * Deliberate one-off layout dimension: ensures the hero retains a
+     * minimum visual presence above the fold even when the headline /
+     * capture content is short. Not promoted to a design token because
+     * it's specific to this section, not a shared system value.
+     */
+    min-height: var(--ns-hero-min-height, 40rem);
     padding: var(--ns-space-10) var(--ns-space-12);
   }
 

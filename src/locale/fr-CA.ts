@@ -42,4 +42,9 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     tooShort: 'Trop court',
     tooLong: 'Trop long',
   },
+
+  marketing: {
+    emailAddress: 'Adresse courriel',
+    emailPlaceholder: 'votre@courriel.com',
+  },
 }
