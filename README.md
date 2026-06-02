@@ -376,7 +376,9 @@ Want to add or improve components? Check out [CONTRIBUTING.md](./CONTRIBUTING.md
 
 ## Credits
 
-### Third-party assets
+### Third-party assets & libraries
+
+The library uses [Phosphor Icons](https://phosphoricons.com/) (via [`@phosphor-icons/vue`](https://github.com/phosphor-icons/vue)) as its default icon system. Phosphor Icons are © Phosphor Icons and contributors, licensed under [MIT](https://github.com/phosphor-icons/core/blob/main/LICENSE).
 
 Some illustrative icons used in the **Marketing** component stories are derived from [Twemoji](https://github.com/twitter/twemoji) — specifically:
 

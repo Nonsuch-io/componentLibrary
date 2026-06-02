@@ -13,7 +13,7 @@
           class="ns-app-shell__menu-btn"
           @click="toggleDrawer"
         >
-          <NsIcon name="menu" />
+          <PhList :size="ICON_SIZE_BUTTON" weight="regular" />
         </NsButton>
 
         <slot name="header-left" />
@@ -32,7 +32,7 @@
               @keyup.enter="emitSearch"
             >
               <template #prepend>
-                <NsIcon name="search" />
+                <PhMagnifyingGlass :size="ICON_SIZE_INLINE" weight="regular" />
               </template>
             </NsInput>
           </div>
@@ -45,7 +45,7 @@
             class="ns-app-shell__search-btn"
             @click="searchExpanded = !searchExpanded"
           >
-            <NsIcon name="search" />
+            <PhMagnifyingGlass :size="ICON_SIZE_BUTTON" weight="regular" />
           </NsButton>
         </template>
 
@@ -79,7 +79,8 @@
                   @click="onUserMenuAction(item.name)"
                 >
                   <NsItemSection v-if="item.icon" avatar>
-                    <NsIcon :name="item.icon" />
+                    <NsIcon v-if="typeof item.icon === 'string'" :name="item.icon" size="20px" />
+                    <component :is="item.icon" v-else :size="ICON_SIZE_INLINE" weight="regular" />
                   </NsItemSection>
                   <NsItemSection>
                     <NsItemLabel>{{ item.label }}</NsItemLabel>
@@ -102,11 +103,11 @@
           @keyup.enter="emitSearch"
         >
           <template #prepend>
-            <NsIcon name="search" />
+            <PhMagnifyingGlass :size="ICON_SIZE_INLINE" weight="regular" />
           </template>
           <template #append>
             <NsButton flat round dense aria-label="Close search" @click="searchExpanded = false">
-              <NsIcon name="close" />
+              <PhX :size="ICON_SIZE_BUTTON" weight="regular" />
             </NsButton>
           </template>
         </NsInput>
@@ -177,6 +178,11 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import { useQuasar } from 'quasar'
+import { PhList, PhMagnifyingGlass, PhX } from '@phosphor-icons/vue'
+
+// 24px for standalone button icons, 20px for icons inside input slots / menus
+const ICON_SIZE_BUTTON = 24
+const ICON_SIZE_INLINE = 20
 import type { NsAppShellTab, NsAppShellNavItem, NsAppShellUserMenuItem } from './types'
 import NsLayout from '../NsLayout/NsLayout.vue'
 import NsHeader from '../NsHeader/NsHeader.vue'

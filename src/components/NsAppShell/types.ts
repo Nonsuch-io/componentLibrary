@@ -1,10 +1,12 @@
+import type { Component } from 'vue'
+
 /** Represents a tab item for the mobile bottom navigation bar. */
 export interface NsAppShellTab {
   /** Unique identifier for the tab */
   name: string
   /** Display label for the tab */
   label: string
-  /** Material icon name */
+  /** Quasar/Material icon name string (Phosphor components not supported here — rendered via q-tab) */
   icon: string
 }
 
@@ -14,8 +16,8 @@ export interface NsAppShellUserMenuItem {
   name: string
   /** Display label */
   label: string
-  /** Material icon name */
-  icon?: string
+  /** Vue component (e.g. a Phosphor icon) or an icon-name string passed to NsIcon */
+  icon?: string | Component
   /** Separator before this item */
   separator?: boolean
 }
@@ -26,8 +28,8 @@ export interface NsAppShellNavItem {
   name: string
   /** Display label */
   label: string
-  /** Material icon name */
-  icon?: string
+  /** Vue component (e.g. a Phosphor icon) or an icon-name string passed to NsIcon */
+  icon?: string | Component
   /** Route path or URL */
   to?: string
   /** Whether this item is currently active */

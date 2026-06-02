@@ -663,5 +663,32 @@ describe('NsAppShell', () => {
       expect(btn.exists()).toBe(true)
       // CSS enforces min-width/min-height of 44px via --ns-touch-target
     })
+
+    it('renders NsIcon when user menu item icon is a string', () => {
+      // Stub NsMenu to a passthrough so menu content is always rendered (QMenu is lazy/teleported)
+      const wrapper = mount(NsAppShell, {
+        props: {
+          userInitials: 'JD',
+          userMenuItems: [{ name: 'profile', label: 'Profile', icon: 'person' }],
+        },
+        global: { stubs: { NsMenu: { template: '<div><slot /></div>' } } },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.findComponent({ name: 'QIcon' }).exists()).toBe(true)
+    })
+
+    it('renders a Vue component when user menu item icon is a component', () => {
+      const StubIcon = { name: 'StubIcon', template: '<svg class="stub-icon" />' }
+      // Stub NsMenu to a passthrough so menu content is always rendered (QMenu is lazy/teleported)
+      const wrapper = mount(NsAppShell, {
+        props: {
+          userInitials: 'JD',
+          userMenuItems: [{ name: 'profile', label: 'Profile', icon: StubIcon }],
+        },
+        global: { stubs: { NsMenu: { template: '<div><slot /></div>' } } },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.find('.stub-icon').exists()).toBe(true)
+    })
   })
 })
