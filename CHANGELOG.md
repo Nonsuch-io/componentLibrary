@@ -4,6 +4,18 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.21.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.20.0...v0.21.0) (2026-06-02)
+
+
+### Features
+
+* **icons:** add Phosphor Icons as default icon library ([7553281](https://github.com/Nonsuch-io/componentLibrary/commit/755328162e33e851be137da446833c143c4e1a40))
+
+
+### Bug Fixes
+
+* **icons:** address PR 131 review feedback ([f45fd35](https://github.com/Nonsuch-io/componentLibrary/commit/f45fd350fe315d58fbad76e94232c9e195ef8a7e))
+
 ## [0.20.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.19.0...v0.20.0) (2026-06-02)
 
 
