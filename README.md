@@ -374,6 +374,12 @@ Each custom component lives in its own directory with co-located story and test 
 
 Want to add or improve components? Check out [CONTRIBUTING.md](./CONTRIBUTING.md) for a friendly step-by-step guide — no deep Vue experience required!
 
+## Credits
+
+### Third-party assets & libraries
+
+The library uses [Phosphor Icons](https://phosphoricons.com/) (via [`@phosphor-icons/vue`](https://github.com/phosphor-icons/vue)) as its default icon system. Phosphor Icons are © Phosphor Icons and contributors, licensed under [MIT](https://github.com/phosphor-icons/core/blob/main/LICENSE).
+
 ## License
 
 MIT — see [LICENSE](./LICENSE)

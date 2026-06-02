@@ -16,7 +16,7 @@ export interface NsAppShellUserMenuItem {
   name: string
   /** Display label */
   label: string
-  /** Phosphor icon component or Material icon name string */
+  /** Vue component (e.g. a Phosphor icon) or an icon-name string passed to NsIcon */
   icon?: string | Component
   /** Separator before this item */
   separator?: boolean
@@ -28,7 +28,7 @@ export interface NsAppShellNavItem {
   name: string
   /** Display label */
   label: string
-  /** Phosphor icon component or Material icon name string */
+  /** Vue component (e.g. a Phosphor icon) or an icon-name string passed to NsIcon */
   icon?: string | Component
   /** Route path or URL */
   to?: string
