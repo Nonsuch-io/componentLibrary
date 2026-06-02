@@ -10,8 +10,8 @@ import imgDoodleArrows from '../../assets/marketing/icon-doodle-arrows.svg?url'
 import imgButtonArrow from '../../assets/marketing/icon-arrow-button.svg?url'
 import imgDoodleCheck from '../../assets/marketing/icon-checkmark.svg?url'
 
-const imgCanadaFlag = 'http://localhost:3845/assets/221c38a30f4d2ca8b5d4338ff906ea54dfbb45c2.png'
-const imgSquareLogo = 'http://localhost:3845/assets/1c3f5be0b7b680255201f9068cd036c80d11c1f4.svg'
+import imgCanadaFlag from '../../assets/marketing/icon-flag-canada.svg?url'
+import imgSquareLogo from '../../assets/marketing/icon-logo-badge.svg?url'
 
 const meta = {
   title: 'Marketing/NsHero',
@@ -60,7 +60,7 @@ export const Default: Story = {
           </template>
           <template #capture>
             <div style="position: relative; max-width: 842px; width: 100%;">
-              <img :src="imgDoodleArrows" style="position: absolute; width: 214px; height: 145px; right: -10px; bottom: calc(100% - 5px); pointer-events: none;" alt="" />
+              <img :src="imgDoodleArrows" class="ns-hero__capture-doodle" alt="" />
               <NsMarketingEmailCapture v-model="email">
                 <template #cta>
                   <NsButton :variant="submitted ? 'marketing-pushed' : 'marketing'" @click="submitted = true">

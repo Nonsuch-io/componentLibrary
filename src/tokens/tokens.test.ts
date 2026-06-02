@@ -301,4 +301,77 @@ describe('tokens.css', () => {
       expect(darkColorTokens, `dark mode is missing an override for ${token}`).toContain(token)
     }
   })
+
+  /**
+   * Extract token → value declarations from a CSS block.
+   * Values are trimmed; trailing comments and whitespace are stripped.
+   */
+  function extractTokenDeclarations(source: string): Map<string, string> {
+    const map = new Map<string, string>()
+    const matches = source.matchAll(/(--ns-[\w-]+)\s*:\s*([^;]+);/g)
+    for (const m of matches) {
+      map.set(m[1], m[2].replace(/\s*\/\*.*$/, '').trim())
+    }
+    return map
+  }
+
+  /** The `@media (prefers-color-scheme: dark)` block — body only. */
+  function extractMediaDarkBlock(source: string): string {
+    const start = source.indexOf('@media (prefers-color-scheme: dark)')
+    if (start === -1) return ''
+    // Walk braces to find the matching closing }
+    let depth = 0
+    let i = start
+    while (i < source.length) {
+      const ch = source[i]
+      if (ch === '{') depth++
+      else if (ch === '}') {
+        depth--
+        if (depth === 0) return source.slice(start, i + 1)
+      }
+      i++
+    }
+    return source.slice(start)
+  }
+
+  /** The `:root.dark, [data-theme='dark'], .q-dark` block — body only. */
+  function extractRootDarkBlock(source: string): string {
+    const start = source.indexOf(':root.dark')
+    if (start === -1) return ''
+    const end = source.indexOf('\n}\n', start)
+    return source.slice(start, end > -1 ? end : undefined)
+  }
+
+  it('every light-mode colour token also has a prefers-color-scheme: dark override', () => {
+    const lightColorTokens = extractLightTokenNames(css).filter((t) => t.startsWith('--ns-color-'))
+    const mediaDarkBlock = extractMediaDarkBlock(css)
+    const mediaTokens = extractTokenNames(mediaDarkBlock)
+
+    for (const token of lightColorTokens) {
+      expect(
+        mediaTokens,
+        `@media (prefers-color-scheme: dark) is missing an override for ${token}`,
+      ).toContain(token)
+    }
+  })
+
+  it(':root.dark and @media (prefers-color-scheme: dark) define identical values', () => {
+    const rootDarkDecls = extractTokenDeclarations(extractRootDarkBlock(css))
+    const mediaDarkDecls = extractTokenDeclarations(extractMediaDarkBlock(css))
+
+    // Catches the kind of drift where someone updates one dark block but not
+    // the other (e.g. --ns-color-text-disabled has #60351d in :root.dark but
+    // #d1d5db in the @media block). The two MUST stay in sync.
+    for (const [token, rootValue] of rootDarkDecls) {
+      const mediaValue = mediaDarkDecls.get(token)
+      expect(
+        mediaValue,
+        `token ${token} is in :root.dark but missing from @media (prefers-color-scheme: dark)`,
+      ).toBeDefined()
+      expect(
+        mediaValue,
+        `token ${token} has different values in :root.dark vs @media (prefers-color-scheme: dark)`,
+      ).toBe(rootValue)
+    }
+  })
 })

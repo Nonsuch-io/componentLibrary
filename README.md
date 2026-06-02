@@ -380,6 +380,16 @@ Want to add or improve components? Check out [CONTRIBUTING.md](./CONTRIBUTING.md
 
 The library uses [Phosphor Icons](https://phosphoricons.com/) (via [`@phosphor-icons/vue`](https://github.com/phosphor-icons/vue)) as its default icon system. Phosphor Icons are © Phosphor Icons and contributors, licensed under [MIT](https://github.com/phosphor-icons/core/blob/main/LICENSE).
 
+Some illustrative icons used in the **Marketing** component stories are derived from [Twemoji](https://github.com/twitter/twemoji) — specifically:
+
+- `icon-flag-canada.svg`
+- `icon-woman-technologist.svg`
+- `icon-incoming-envelope.svg`
+
+Twemoji graphics are © Twitter, Inc and other contributors, licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). When redistributing these assets, please retain this attribution.
+
+The remaining marketing icons (`icon-brand-logo`, `icon-logo-badge`, `icon-arrow-button`, `icon-checkmark`, `icon-doodle-arrows`, `icon-x`, `icon-bluesky`, `icon-instagram`, `icon-butiq-logo`) are original work by Nonsuch.
+
 ## License
 
 MIT — see [LICENSE](./LICENSE)

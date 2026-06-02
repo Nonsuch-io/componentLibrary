@@ -4,6 +4,34 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.20.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.19.0...v0.20.0) (2026-06-02)
+
+
+### Features
+
+* marketing landing page component suite + Figma token rename ([7cc0949](https://github.com/Nonsuch-io/componentLibrary/commit/7cc0949e306df3ada1b86fe810f2285e7399a0cc))
+* **marketing:** locale-aware aria-label + small NsHero polish ([1ea5c4e](https://github.com/Nonsuch-io/componentLibrary/commit/1ea5c4e68765634129b232b9391b749bce28e920))
+* **NsLandingLayout:** extract marketing landing page scaffold into a component ([4327570](https://github.com/Nonsuch-io/componentLibrary/commit/4327570cae0efcecb8a40c14caddcd1a9eaa3b9e))
+
+
+### Bug Fixes
+
+* **marketing:** replace broken icon URLs and wire up full landing page ([e540d79](https://github.com/Nonsuch-io/componentLibrary/commit/e540d79efd111b8cb40b1509edc8c5b17d9e14ae))
+* **NsHero:** hoist doodle styles out of scoped block to fix desktop layout ([d9928d7](https://github.com/Nonsuch-io/componentLibrary/commit/d9928d7620f4ac6a5fa30d7581a4ca4ce17c0f50))
+* **tokens:** align [@media](https://github.com/media) dark text-disabled + enforce parity in tests ([21be554](https://github.com/Nonsuch-io/componentLibrary/commit/21be5540fab97a8fdc87452918b1b0496e16b46a))
+
+## [0.19.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.18.0...v0.19.0) (2026-05-30)
+
+
+### Features
+
+* **NsAppShell:** swap drawer internals to NsNavSidebar ([75807d8](https://github.com/Nonsuch-io/componentLibrary/commit/75807d81d544586ac84567238c8fedd2178b4ebc))
+
+
+### Bug Fixes
+
+* **NsAppShell:** size drawer to fit NsNavSidebar without clipping ovals ([47ff93f](https://github.com/Nonsuch-io/componentLibrary/commit/47ff93f9e49891e6c9b95d8e61f9ee013e695d19))
+
 ## [0.18.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.17.0...v0.18.0) (2026-05-29)
 
 

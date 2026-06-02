@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
 import NsMarketingEmailCapture from './NsMarketingEmailCapture.vue'
+import { NsLocaleKey } from '../../composables/useNsLocale'
+import { nsLocaleEnCA } from '../../locale/en-CA'
 
 describe('NsMarketingEmailCapture', () => {
   it('should render an email input', () => {
@@ -58,6 +60,57 @@ describe('NsMarketingEmailCapture', () => {
     it('should have an aria-label on the input', () => {
       const wrapper = mount(NsMarketingEmailCapture)
       expect(wrapper.find('input').attributes('aria-label')).toBeTruthy()
+    })
+
+    it('should use the default aria-label from en-CA locale', () => {
+      const wrapper = mount(NsMarketingEmailCapture)
+      expect(wrapper.find('input').attributes('aria-label')).toBe('Email address')
+    })
+
+    it('should use a custom aria-label when provided via prop', () => {
+      const wrapper = mount(NsMarketingEmailCapture, {
+        props: { ariaLabel: 'Newsletter signup email' },
+      })
+      expect(wrapper.find('input').attributes('aria-label')).toBe('Newsletter signup email')
+    })
+  })
+
+  describe('locale integration', () => {
+    it('should use injected locale for aria-label and placeholder', () => {
+      const wrapper = mount(NsMarketingEmailCapture, {
+        global: {
+          provide: {
+            [NsLocaleKey as symbol]: {
+              ...nsLocaleEnCA,
+              marketing: {
+                emailAddress: 'Courriel',
+                emailPlaceholder: 'vous@exemple.ca',
+              },
+            },
+          },
+        },
+      })
+      expect(wrapper.find('input').attributes('aria-label')).toBe('Courriel')
+      expect(wrapper.find('input').attributes('placeholder')).toBe('vous@exemple.ca')
+    })
+
+    it('should let explicit props override injected locale', () => {
+      const wrapper = mount(NsMarketingEmailCapture, {
+        props: { placeholder: 'Override', ariaLabel: 'Override label' },
+        global: {
+          provide: {
+            [NsLocaleKey as symbol]: {
+              ...nsLocaleEnCA,
+              marketing: {
+                emailAddress: 'Locale label',
+                emailPlaceholder: 'Locale placeholder',
+              },
+            },
+          },
+        },
+      })
+      expect(wrapper.find('input').attributes('aria-label')).toBe('Override label')
+      expect(wrapper.find('input').attributes('placeholder')).toBe('Override')
     })
   })
 })
