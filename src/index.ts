@@ -207,6 +207,8 @@ export type {
 export { default as NsAuthLayout } from './components/NsAuthLayout/NsAuthLayout.vue'
 export type { NsAuthLayoutProps } from './components/NsAuthLayout/NsAuthLayout.vue'
 
+export { default as NsLandingLayout } from './components/NsLandingLayout/NsLandingLayout.vue'
+
 export { default as NsDashboardGrid } from './components/NsDashboardGrid/NsDashboardGrid.vue'
 export type {
   NsDashboardGridProps,
