@@ -113,3 +113,32 @@
   font-weight: 400;
   line-height: 1.1;
 }
+
+.ns-display {
+  font-family: 'Fixel Italic Variable 20240409', sans-serif;
+  font-size: 5.75rem;
+  font-weight: 600;
+  font-style: italic;
+  line-height: 1.1;
+}
+
+.ns-overline-lg {
+  font-size: 1.75rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.ns-overline-md {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  line-height: 1.28;
+}
+
+.ns-overline-md-bold {
+  font-size: 0.875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1.28;
+}

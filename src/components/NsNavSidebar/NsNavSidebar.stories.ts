@@ -51,7 +51,7 @@ export const Expanded: Story = {
       return { active, sampleItems, bottomItem }
     },
     template: `
-      <div style="display: flex; height: 600px; background: var(--ns-color-background); padding: 24px;">
+      <div style="display: flex; height: 600px; background: var(--ns-color-bg-canvas); padding: 24px;">
         <NsNavSidebar v-model="active" :items="sampleItems" :bottom-item="bottomItem" :default-expanded="true" />
       </div>
     `,
@@ -66,7 +66,7 @@ export const Collapsed: Story = {
       return { active, sampleItems, bottomItem }
     },
     template: `
-      <div style="display: flex; height: 600px; background: var(--ns-color-background); padding: 24px;">
+      <div style="display: flex; height: 600px; background: var(--ns-color-bg-canvas); padding: 24px;">
         <NsNavSidebar v-model="active" :items="sampleItems" :bottom-item="bottomItem" :default-expanded="false" />
       </div>
     `,
@@ -81,7 +81,7 @@ export const WithSubItemActive: Story = {
       return { active, sampleItems, bottomItem }
     },
     template: `
-      <div style="display: flex; height: 600px; background: var(--ns-color-background); padding: 24px;">
+      <div style="display: flex; height: 600px; background: var(--ns-color-bg-canvas); padding: 24px;">
         <NsNavSidebar v-model="active" :items="sampleItems" :bottom-item="bottomItem" />
       </div>
     `,

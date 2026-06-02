@@ -319,7 +319,7 @@ $active-bg: var(--ns-color-bg-brand);
 @mixin gradient-border {
   border: 1.5px solid transparent;
   background:
-    linear-gradient(var(--ns-color-background), var(--ns-color-background)) padding-box,
+    linear-gradient(var(--ns-color-bg-canvas), var(--ns-color-bg-canvas)) padding-box,
     radial-gradient(ellipse at 30% 50%, rgba(242, 150, 77, 0.55) 0%, rgba(255, 255, 255, 0.55) 100%)
       border-box;
 }
@@ -405,7 +405,7 @@ $active-bg: var(--ns-color-bg-brand);
   height: $pill-h;
   padding: 0 10px;
   border-radius: $pill-radius;
-  color: var(--ns-color-on-surface);
+  color: var(--ns-color-text-primary);
   font-family: var(--ns-font-family-text);
   font-size: 14px;
   font-weight: 500;
@@ -426,7 +426,7 @@ $active-bg: var(--ns-color-bg-brand);
   &:hover:not(&--active):not(&--disabled) {
     background:
       radial-gradient(ellipse at center, rgba(213, 99, 7, 0.22) 0%, transparent 90%) padding-box,
-      linear-gradient(var(--ns-color-background), var(--ns-color-background)) padding-box,
+      linear-gradient(var(--ns-color-bg-canvas), var(--ns-color-bg-canvas)) padding-box,
       radial-gradient(
           ellipse at 30% 50%,
           rgba(242, 150, 77, 0.55) 0%,
@@ -439,7 +439,7 @@ $active-bg: var(--ns-color-bg-brand);
   &--active {
     background: $active-bg;
     border-color: transparent;
-    color: var(--ns-color-on-primary);
+    color: var(--ns-color-text-on-brand);
   }
 
   &--disabled {
@@ -484,7 +484,7 @@ $active-bg: var(--ns-color-bg-brand);
   height: 40px;
   padding: 0 18px;
   border-radius: $pill-radius;
-  color: var(--ns-color-on-surface);
+  color: var(--ns-color-text-primary);
   font-family: var(--ns-font-family-text);
   font-size: 13px;
   font-weight: 500;
@@ -497,7 +497,7 @@ $active-bg: var(--ns-color-bg-brand);
   &:hover:not(&--active):not(&--disabled) {
     background:
       radial-gradient(ellipse at center, rgba(213, 99, 7, 0.22) 0%, transparent 90%) padding-box,
-      linear-gradient(var(--ns-color-background), var(--ns-color-background)) padding-box,
+      linear-gradient(var(--ns-color-bg-canvas), var(--ns-color-bg-canvas)) padding-box,
       radial-gradient(
           ellipse at 30% 50%,
           rgba(242, 150, 77, 0.55) 0%,
@@ -510,7 +510,7 @@ $active-bg: var(--ns-color-bg-brand);
   &--active {
     background: $active-bg;
     border-color: transparent;
-    color: var(--ns-color-on-primary);
+    color: var(--ns-color-text-on-brand);
   }
 
   &--disabled {

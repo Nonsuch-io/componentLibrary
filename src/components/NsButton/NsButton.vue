@@ -30,6 +30,8 @@ export type NsButtonVariant =
   | 'positive'
   | 'negative'
   | 'warning'
+  | 'marketing'
+  | 'marketing-pushed'
 
 export type NsButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 
@@ -56,9 +58,11 @@ const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = 
   xl: { default: '20px', iconOnly: '12px' },
 }
 
-const buttonPadding = computed(
-  () => paddingMap[props.size][props.iconOnly ? 'iconOnly' : 'default'],
-)
+const buttonPadding = computed(() => {
+  if (props.variant === 'marketing' || props.variant === 'marketing-pushed')
+    return props.iconOnly ? '12px' : '16px 20px'
+  return paddingMap[props.size][props.iconOnly ? 'iconOnly' : 'default']
+})
 </script>
 
 <style lang="scss" scoped>
@@ -117,7 +121,7 @@ const buttonPadding = computed(
 // ---- Primary ----
 .ns-btn--primary {
   background: var(--ns-color-bg-brand);
-  color: var(--ns-color-on-primary);
+  color: var(--ns-color-text-on-brand);
 
   &:hover:not(.disabled) {
     background: var(--ns-color-bg-brand-hover);
@@ -135,20 +139,20 @@ const buttonPadding = computed(
 
 // ---- Secondary ----
 .ns-btn--secondary {
-  background: var(--ns-color-background);
+  background: var(--ns-color-bg-canvas);
   color: var(--ns-color-text-brand);
   box-shadow: inset 0 0 0 1px var(--ns-color-border-brand);
 
   &:hover:not(.disabled) {
-    background: var(--ns-color-surface);
+    background: var(--ns-color-bg-surface);
     color: var(--ns-color-bg-brand-hover);
     box-shadow: inset 0 0 0 1px var(--ns-color-bg-brand-hover);
   }
 
   &:active:not(.disabled) {
     background: var(--ns-color-bg-header);
-    color: var(--ns-color-primary);
-    box-shadow: inset 0 0 0 1px var(--ns-color-primary);
+    color: var(--ns-color-bg-brand-active);
+    box-shadow: inset 0 0 0 1px var(--ns-color-bg-brand-active);
   }
 
   &.disabled {
@@ -178,16 +182,16 @@ const buttonPadding = computed(
 
 // ---- Accent ----
 .ns-btn--accent {
-  background: var(--ns-color-accent);
-  color: var(--ns-color-on-accent);
+  background: var(--ns-color-status-accent);
+  color: var(--ns-color-text-on-accent);
 
   &:hover:not(.disabled) {
-    background: var(--ns-color-accent-hover);
+    background: var(--ns-color-status-accent-hover);
   }
 
   &:active:not(.disabled) {
-    background: var(--ns-color-accent-active);
-    color: var(--ns-color-on-primary);
+    background: var(--ns-color-status-accent-active);
+    color: var(--ns-color-text-on-brand);
   }
 
   &.disabled {
@@ -198,15 +202,15 @@ const buttonPadding = computed(
 
 // ---- Positive ----
 .ns-btn--positive {
-  background: var(--ns-color-success);
-  color: var(--ns-color-on-accent);
+  background: var(--ns-color-status-positive);
+  color: var(--ns-color-text-on-accent);
 
   &:hover:not(.disabled) {
-    background: var(--ns-color-success-hover);
+    background: var(--ns-color-status-positive-hover);
   }
 
   &:active:not(.disabled) {
-    background: var(--ns-color-success-active);
+    background: var(--ns-color-status-positive-active);
   }
 
   &.disabled {
@@ -217,15 +221,15 @@ const buttonPadding = computed(
 
 // ---- Negative ----
 .ns-btn--negative {
-  background: var(--ns-color-error);
-  color: var(--ns-color-on-primary);
+  background: var(--ns-color-status-negative);
+  color: var(--ns-color-text-on-brand);
 
   &:hover:not(.disabled) {
-    background: var(--ns-color-error-hover);
+    background: var(--ns-color-status-negative-hover);
   }
 
   &:active:not(.disabled) {
-    background: var(--ns-color-error-active);
+    background: var(--ns-color-status-negative-active);
   }
 
   &.disabled {
@@ -236,20 +240,76 @@ const buttonPadding = computed(
 
 // ---- Warning ----
 .ns-btn--warning {
-  background: var(--ns-color-warning);
-  color: var(--ns-color-on-accent);
+  background: var(--ns-color-status-warning);
+  color: var(--ns-color-text-on-accent);
 
   &:hover:not(.disabled) {
-    background: var(--ns-color-warning-hover);
+    background: var(--ns-color-status-warning-hover);
   }
 
   &:active:not(.disabled) {
-    background: var(--ns-color-warning-active);
+    background: var(--ns-color-status-warning-active);
   }
 
   &.disabled {
     background: var(--ns-color-bg-disabled);
     color: var(--ns-color-text-disabled);
+  }
+}
+
+// ---- Marketing (shared base) ----
+.ns-btn--marketing,
+.ns-btn--marketing-pushed {
+  border-radius: 9999px;
+  font-size: 1.5rem;
+
+  :deep(.q-btn__content) {
+    gap: 12px;
+  }
+
+  &.disabled {
+    background: var(--ns-color-bg-disabled);
+    color: var(--ns-color-text-disabled);
+
+    :deep(img) {
+      filter: brightness(0.565);
+    }
+  }
+}
+
+// ---- Marketing ----
+.ns-btn--marketing {
+  background: var(--ns-color-text-primary);
+  color: white;
+
+  :deep(img) {
+    filter: brightness(0) invert(1);
+  }
+
+  &:hover:not(.disabled) {
+    background: #3d1500;
+  }
+
+  &:active:not(.disabled) {
+    background: #1e0700;
+  }
+}
+
+// ---- Marketing pushed ----
+.ns-btn--marketing-pushed {
+  background: var(--ns-color-status-positive);
+  color: var(--ns-color-text-on-accent);
+
+  :deep(img) {
+    filter: none;
+  }
+
+  &:hover:not(.disabled) {
+    background: var(--ns-color-status-positive-hover);
+  }
+
+  &:active:not(.disabled) {
+    background: var(--ns-color-status-positive-active);
   }
 }
 </style>

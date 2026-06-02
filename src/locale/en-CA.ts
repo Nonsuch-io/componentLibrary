@@ -45,4 +45,9 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     tooShort: 'Too short',
     tooLong: 'Too long',
   },
+
+  marketing: {
+    emailAddress: 'Email address',
+    emailPlaceholder: 'your@email.com',
+  },
 }

@@ -53,7 +53,7 @@ export const Default: Story = {
       return { active, mainItems, moreItems }
     },
     template: `
-      <div style="display: flex; align-items: flex-end; justify-content: center; height: 300px; background: var(--ns-color-background); padding: 16px;">
+      <div style="display: flex; align-items: flex-end; justify-content: center; height: 300px; background: var(--ns-color-bg-canvas); padding: 16px;">
         <NsBottomNav v-model="active" :main-items="mainItems" :more-items="moreItems" />
       </div>
     `,
@@ -68,7 +68,7 @@ export const WithSubOpen: Story = {
       return { active, mainItems, moreItems }
     },
     template: `
-      <div style="display: flex; align-items: flex-end; justify-content: center; height: 300px; background: var(--ns-color-background); padding: 16px;">
+      <div style="display: flex; align-items: flex-end; justify-content: center; height: 300px; background: var(--ns-color-bg-canvas); padding: 16px;">
         <NsBottomNav v-model="active" :main-items="mainItems" :more-items="moreItems" />
       </div>
     `,

@@ -61,7 +61,7 @@
     },
     {
       "path": "dist/nonsuch-components.css",
-      "limit": "4 kB",
+      "limit": "6 kB",
       "gzip": true
     }
   ],
