@@ -602,6 +602,32 @@ describe('NsAppShell', () => {
     })
   })
 
+  describe('bottom tab icon types', () => {
+    beforeEach(() => {
+      mockScreenWidth.value = 375
+    })
+
+    it('renders a string icon via q-tab when tab.icon is a string', () => {
+      const tabs: NsAppShellTab[] = [{ name: 'home', label: 'Home', icon: 'home' }]
+      const wrapper = mount(NsAppShell, {
+        props: { tabs },
+        slots: { default: 'Content' },
+      })
+      const qtab = wrapper.findComponent({ name: 'QTab' })
+      expect(qtab.props('icon')).toBe('home')
+    })
+
+    it('renders a Vue component when tab.icon is a Component', () => {
+      const StubIcon = { name: 'StubIcon', template: '<svg class="stub-tab-icon" />' }
+      const tabs: NsAppShellTab[] = [{ name: 'home', label: 'Home', icon: StubIcon }]
+      const wrapper = mount(NsAppShell, {
+        props: { tabs },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.find('.stub-tab-icon').exists()).toBe(true)
+    })
+  })
+
   describe('user avatar menu', () => {
     it('renders user avatar button when userInitials is provided', () => {
       const wrapper = mount(NsAppShell, {

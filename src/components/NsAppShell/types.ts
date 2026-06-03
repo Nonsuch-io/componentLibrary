@@ -6,8 +6,8 @@ export interface NsAppShellTab {
   name: string
   /** Display label for the tab */
   label: string
-  /** Quasar/Material icon name string (Phosphor components not supported here — rendered via q-tab) */
-  icon: string
+  /** Vue component (e.g. a Phosphor icon) or an icon-name string passed to NsIcon via q-tab */
+  icon: string | Component
 }
 
 /** Represents an item in the user avatar dropdown menu. */
