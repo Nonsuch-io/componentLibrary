@@ -43,6 +43,8 @@ updates:
       vue:
         patterns:
           - vue
+      quasar:
+        patterns:
           - quasar
           - '@quasar/*'
 
