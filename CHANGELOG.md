@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.22.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.21.0...v0.22.0) (2026-06-03)
+
+
+### Features
+
+* **NsTab:** accept Phosphor icon components alongside string names ([36ef0bf](https://github.com/Nonsuch-io/componentLibrary/commit/36ef0bf685bec6ef772d73120aeb1ac7423708b4))
+* **NsTab:** accept Phosphor icon components alongside string names ([3dcd70a](https://github.com/Nonsuch-io/componentLibrary/commit/3dcd70aa8564d0d1ad4029bac20d236ddaff39cd))
+
 ## [0.21.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.20.0...v0.21.0) (2026-06-02)
 
 
