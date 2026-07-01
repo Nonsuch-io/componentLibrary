@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.22.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.22.0...v0.22.1) (2026-07-01)
+
+
+### Bug Fixes
+
+* **exports:** point ./style.css at emitted nonsuch-components.css ([0236946](https://github.com/Nonsuch-io/componentLibrary/commit/02369468177cd98a941c93136d552fc9f06d98f1))
+* **exports:** point ./style.css at emitted nonsuch-components.css ([2941778](https://github.com/Nonsuch-io/componentLibrary/commit/2941778ad71c59fe6cdea577fa7436f27c5e3a6c))
+
 ## [0.22.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.21.0...v0.22.0) (2026-06-03)
 
 
