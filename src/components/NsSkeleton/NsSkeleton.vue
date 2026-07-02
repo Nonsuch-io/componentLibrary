@@ -38,13 +38,7 @@ export type NsSkeletonType =
   | 'QAvatar'
 
 export type NsSkeletonAnimation =
-  | 'wave'
-  | 'pulse'
-  | 'pulse-x'
-  | 'pulse-y'
-  | 'fade'
-  | 'blink'
-  | 'none'
+  'wave' | 'pulse' | 'pulse-x' | 'pulse-y' | 'fade' | 'blink' | 'none'
 
 export interface NsSkeletonProps {
   /** Shape type — use component names for accurate matching */
