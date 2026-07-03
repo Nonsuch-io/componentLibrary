@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
+import { describe, it, expect, afterEach, vi } from 'vitest'
+import { mount, type VueWrapper } from '@vue/test-utils'
+import { defineComponent, h, nextTick } from 'vue'
 import NsNavSidebar from './NsNavSidebar.vue'
 import type { NsNavItem } from './NsNavSidebar.vue'
 
@@ -14,10 +14,35 @@ const items: NsNavItem[] = [
 
 const bottomItem: NsNavItem = { id: 'profile', label: 'Profile', icon: MockIcon }
 
-const mount$ = (props = {}) =>
-  mount(NsNavSidebar, {
+// The sub-menu flyout is teleported to <body>, so it lives outside the wrapper.
+// Track wrappers and attach to the document so unmount cleans the teleport.
+let wrappers: VueWrapper[] = []
+
+const mount$ = (props = {}) => {
+  const wrapper = mount(NsNavSidebar, {
     props: { items, modelValue: 'home', ...props },
+    attachTo: document.body,
   })
+  wrappers.push(wrapper)
+  return wrapper
+}
+
+afterEach(() => {
+  vi.useRealTimers()
+  wrappers.forEach((w) => w.unmount())
+  wrappers = []
+  document.body.innerHTML = ''
+})
+
+/** Sub-pills render in the teleported flyout on <body>, not inside the wrapper. */
+const flyoutSubPills = (): HTMLElement[] =>
+  Array.from(document.body.querySelectorAll('.ns-nav-sidebar__sub-pill'))
+
+/** Fire a native click on a teleported (non-wrapper) element and flush. */
+const clickEl = async (el: Element) => {
+  el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+  await nextTick()
+}
 
 describe('NsNavSidebar', () => {
   it('renders all nav items', () => {
@@ -74,14 +99,13 @@ describe('NsNavSidebar', () => {
   it('shows sub-menu on click', async () => {
     const wrapper = mount$()
     await wrapper.findAll('.ns-nav-sidebar__pill')[1].trigger('click')
-    const subPills = wrapper.findAll('.ns-nav-sidebar__sub-pill')
-    expect(subPills.length).toBe(2)
+    expect(flyoutSubPills().length).toBe(2)
   })
 
   it('emits sub-item id on sub-item click', async () => {
     const wrapper = mount$()
     await wrapper.findAll('.ns-nav-sidebar__pill')[1].trigger('click')
-    await wrapper.findAll('.ns-nav-sidebar__sub-pill')[0].trigger('click')
+    await clickEl(flyoutSubPills()[0])
     expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['products/all-products'])
   })
 
@@ -199,11 +223,11 @@ describe('NsNavSidebar', () => {
         .findAll('.ns-nav-sidebar__pill')[0]
         .trigger('click')
         .then(() => {
-          const subPills = wrapper.findAll('.ns-nav-sidebar__sub-pill')
+          const subPills = flyoutSubPills()
           expect(subPills.length).toBe(2)
-          expect(subPills[0].element.tagName).toBe('A')
-          expect(subPills[0].attributes('href')).toBe('/shop/tops')
-          expect(subPills[0].text()).toBe('Tops')
+          expect(subPills[0].tagName).toBe('A')
+          expect(subPills[0].getAttribute('href')).toBe('/shop/tops')
+          expect(subPills[0].textContent?.trim()).toBe('Tops')
         })
     })
 
@@ -219,7 +243,7 @@ describe('NsNavSidebar', () => {
         ],
       })
       await wrapper.findAll('.ns-nav-sidebar__pill')[0].trigger('click')
-      await wrapper.findAll('.ns-nav-sidebar__sub-pill')[0].trigger('click')
+      await clickEl(flyoutSubPills()[0])
       expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['custom-id'])
     })
 
@@ -235,7 +259,7 @@ describe('NsNavSidebar', () => {
         ],
       })
       await wrapper.findAll('.ns-nav-sidebar__pill')[0].trigger('click')
-      await wrapper.findAll('.ns-nav-sidebar__sub-pill')[0].trigger('click')
+      await clickEl(flyoutSubPills()[0])
       expect(wrapper.emitted('update:modelValue')).toBeFalsy()
     })
 
@@ -271,6 +295,117 @@ describe('NsNavSidebar', () => {
     it('hides the toggle button when showToggle is false', () => {
       const wrapper = mount$({ showToggle: false })
       expect(wrapper.find('.ns-nav-sidebar__toggle-btn').exists()).toBe(false)
+    })
+  })
+
+  describe('teleported flyout behavior', () => {
+    const twoSubMenus = [
+      { id: 'a', label: 'A', icon: MockIcon, sub: ['A1', 'A2'] },
+      { id: 'b', label: 'B', icon: MockIcon, sub: ['B1'] },
+    ]
+
+    it('links the open pill to the flyout via aria-controls', async () => {
+      const wrapper = mount$()
+      const pill = wrapper.findAll('.ns-nav-sidebar__pill')[1]
+      await pill.trigger('click')
+      const flyout = document.body.querySelector('.ns-nav-sidebar__flyout')!
+      const id = flyout.getAttribute('id')
+      expect(id).toBeTruthy()
+      expect(pill.attributes('aria-controls')).toBe(id)
+      expect(pill.attributes('aria-expanded')).toBe('true')
+    })
+
+    it('keeps the newly opened flyout when switching submenus (stale-timer guard)', async () => {
+      vi.useFakeTimers()
+      const wrapper = mount$({ items: twoSubMenus })
+      const pills = wrapper.findAll('.ns-nav-sidebar__pill')
+      await pills[0].trigger('click') // open A (close timer would fire ~290ms)
+      await pills[1].trigger('click') // switch to B before that
+      vi.advanceTimersByTime(1000) // let any stale A-timer fire
+      await nextTick()
+      const labels = flyoutSubPills().map((p) => p.textContent?.trim())
+      expect(labels).toContain('B1')
+      expect(labels).not.toContain('A1')
+    })
+
+    it('closes the flyout on outside pointerdown', async () => {
+      vi.useFakeTimers()
+      const wrapper = mount$()
+      await wrapper.findAll('.ns-nav-sidebar__pill')[1].trigger('click')
+      expect(flyoutSubPills().length).toBe(2)
+      document.body.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+      vi.advanceTimersByTime(1000)
+      await nextTick()
+      expect(flyoutSubPills().length).toBe(0)
+    })
+
+    it('does NOT close when pointerdown lands inside the flyout', async () => {
+      const wrapper = mount$()
+      await wrapper.findAll('.ns-nav-sidebar__pill')[1].trigger('click')
+      const subPill = flyoutSubPills()[0]
+      subPill.dispatchEvent(new Event('pointerdown', { bubbles: true }))
+      await nextTick()
+      expect(flyoutSubPills().length).toBe(2)
+    })
+
+    it('returns focus to the anchor pill after selecting a button sub-item', async () => {
+      const wrapper = mount$()
+      const productsPill = wrapper.findAll('.ns-nav-sidebar__pill')[1]
+      await productsPill.trigger('click')
+      await clickEl(flyoutSubPills()[0]) // 'All Products' — a button sub (no `to`)
+      expect(document.activeElement).toBe(productsPill.element)
+    })
+
+    it('closes the flyout on Escape', async () => {
+      vi.useFakeTimers()
+      const wrapper = mount$()
+      await wrapper.findAll('.ns-nav-sidebar__pill')[1].trigger('click')
+      expect(flyoutSubPills().length).toBe(2)
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+      vi.advanceTimersByTime(1000)
+      await nextTick()
+      expect(flyoutSubPills().length).toBe(0)
+    })
+
+    it('mirrors a dark ancestor context onto the teleported flyout', async () => {
+      const host = document.createElement('div')
+      host.className = 'q-dark'
+      document.body.appendChild(host)
+      const wrapper = mount(NsNavSidebar, {
+        props: { items, modelValue: 'home' },
+        attachTo: host,
+      })
+      wrappers.push(wrapper)
+      await wrapper.findAll('.ns-nav-sidebar__pill')[1].trigger('click')
+      const flyout = document.body.querySelector('.ns-nav-sidebar__flyout')!
+      expect(flyout.getAttribute('data-theme')).toBe('dark')
+      host.remove()
+    })
+
+    it('leaves the flyout un-themed in a light context', async () => {
+      const wrapper = mount$()
+      await wrapper.findAll('.ns-nav-sidebar__pill')[1].trigger('click')
+      const flyout = document.body.querySelector('.ns-nav-sidebar__flyout')!
+      expect(flyout.getAttribute('data-theme')).toBeNull()
+    })
+
+    it('observes the anchor pill to track size/position changes while open', async () => {
+      const observe = vi.fn()
+      const disconnect = vi.fn()
+      const orig = globalThis.ResizeObserver
+      class MockResizeObserver {
+        observe = observe
+        unobserve = vi.fn()
+        disconnect = disconnect
+      }
+      globalThis.ResizeObserver = MockResizeObserver as unknown as typeof ResizeObserver
+      try {
+        const wrapper = mount$()
+        await wrapper.findAll('.ns-nav-sidebar__pill')[1].trigger('click')
+        expect(observe).toHaveBeenCalledTimes(1)
+      } finally {
+        globalThis.ResizeObserver = orig
+      }
     })
   })
 })

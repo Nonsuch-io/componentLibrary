@@ -27,6 +27,9 @@
             }"
             :aria-current="isActive(item) ? 'page' : undefined"
             :aria-expanded="hasSub(item) && !item.disable ? openSub === item.id : undefined"
+            :aria-controls="
+              hasSub(item) && !item.disable && openSub === item.id ? flyoutId : undefined
+            "
             :aria-disabled="item.disable ? 'true' : undefined"
             :tabindex="item.disable ? -1 : undefined"
             @click="onItemClick(item, $event)"
@@ -60,35 +63,44 @@
               />
             </svg>
           </component>
-
-          <!-- Sub-menu flyout -->
-          <div
-            v-if="hasSub(item) && (openSub === item.id || closingSub === item.id)"
-            class="ns-nav-sidebar__flyout"
-          >
-            <component
-              :is="sub.to && !sub.disable ? 'a' : 'button'"
-              v-for="(sub, subIdx) in normalizedSub(item)"
-              :key="sub.id ?? sub.label"
-              :href="sub.to && !sub.disable ? sub.to : undefined"
-              :type="sub.to && !sub.disable ? undefined : 'button'"
-              class="ns-nav-sidebar__sub-pill"
-              :class="{
-                'ns-nav-sidebar__sub-pill--active': modelValue === subId(item.id, sub),
-                'ns-nav-sidebar__sub-pill--closing': closingSub === item.id,
-                'ns-nav-sidebar__sub-pill--disabled': sub.disable,
-              }"
-              :aria-disabled="sub.disable ? 'true' : undefined"
-              :tabindex="sub.disable ? -1 : undefined"
-              :style="subItemStyle(subIdx, normalizedSub(item).length, item.id)"
-              @click="onSubClick(item.id, sub, $event)"
-            >
-              {{ sub.label }}
-            </component>
-          </div>
         </li>
       </template>
     </ul>
+
+    <!-- Sub-menu flyout — teleported to <body> so it escapes the drawer's
+         overflow clipping (q-drawer__content .scroll = overflow:auto, and
+         ns-app-shell__drawer = overflow:hidden). Only one flyout is open at a
+         time, so we render a single instance positioned against its anchor. -->
+    <Teleport to="body">
+      <div
+        v-if="activeFlyout"
+        :id="flyoutId"
+        ref="flyoutRootEl"
+        class="ns-nav-sidebar__flyout"
+        :style="flyoutStyle"
+        :data-theme="flyoutTheme"
+      >
+        <component
+          :is="sub.to && !sub.disable ? 'a' : 'button'"
+          v-for="(sub, subIdx) in activeFlyout.subs"
+          :key="sub.id ?? sub.label"
+          :href="sub.to && !sub.disable ? sub.to : undefined"
+          :type="sub.to && !sub.disable ? undefined : 'button'"
+          class="ns-nav-sidebar__sub-pill"
+          :class="{
+            'ns-nav-sidebar__sub-pill--active': modelValue === subId(activeFlyout.id, sub),
+            'ns-nav-sidebar__sub-pill--closing': activeFlyout.closing,
+            'ns-nav-sidebar__sub-pill--disabled': sub.disable,
+          }"
+          :aria-disabled="sub.disable ? 'true' : undefined"
+          :tabindex="sub.disable ? -1 : undefined"
+          :style="subItemStyle(subIdx, activeFlyout.subs.length, activeFlyout.id)"
+          @click="onSubClick(activeFlyout.id, sub, $event)"
+        >
+          {{ sub.label }}
+        </component>
+      </div>
+    </Teleport>
 
     <!-- Bottom item (e.g. Settings) -->
     <div v-if="bottomItem" class="ns-nav-sidebar__bottom">
@@ -126,7 +138,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onUnmounted, type Component } from 'vue'
+import { ref, computed, onUnmounted, watch, nextTick, useId, type Component } from 'vue'
 import AnimatedEye from './AnimatedEye.vue'
 import NsIcon from '../NsIcon/NsIcon.vue'
 
@@ -216,6 +228,137 @@ const openSub = ref<string | null>(null)
 const closingSub = ref<string | null>(null)
 const closeTimers = new Map<string, ReturnType<typeof setTimeout>>()
 
+// The flyout is teleported to <body>, so it can't be absolutely positioned
+// relative to its pill. We capture the anchor pill on open and drive the
+// flyout's position with `position: fixed` off its bounding rect.
+const anchorEl = ref<HTMLElement | null>(null)
+const flyoutRootEl = ref<HTMLElement | null>(null)
+const flyoutStyle = ref<Record<string, string>>({})
+// Mirrors the anchor's dark-theme context onto the teleported flyout. The flyout
+// lives on <body>, so it won't inherit dark mode applied to a sub-<body> ancestor
+// (Quasar's .q-dark on the drawer, or a wrapper's [data-theme="dark"]).
+const flyoutTheme = ref<'dark' | undefined>(undefined)
+// Stable id linking the anchor pill (aria-controls) to the flyout it opens.
+const flyoutId = useId()
+
+// Selectors that tokens.css treats as a dark-mode trigger (plus Quasar's own).
+const DARK_CONTEXT_SELECTOR = '.q-dark, .body--dark, .dark, [data-theme="dark"]'
+
+/**
+ * The single item whose flyout is currently open (or animating closed). Only
+ * one is ever visible at a time, so we hoist one flyout out of the item loop
+ * and teleport it, rather than rendering one per item inside the clipped drawer.
+ */
+const activeFlyout = computed(() => {
+  const id = openSub.value ?? closingSub.value
+  if (!id) return null
+  const item = props.items.find((i) => i.id === id)
+  if (!item || !hasSub(item)) return null
+  return { id, label: item.label, subs: normalizedSub(item), closing: closingSub.value === id }
+})
+
+function updateFlyoutPosition() {
+  const el = anchorEl.value
+  if (!el) return
+  const r = el.getBoundingClientRect()
+  flyoutStyle.value = {
+    position: 'fixed',
+    top: `${r.top}px`,
+    left: `${r.right + 8}px`,
+  }
+}
+
+function syncFlyoutTheme() {
+  flyoutTheme.value = anchorEl.value?.closest(DARK_CONTEXT_SELECTOR) ? 'dark' : undefined
+}
+
+// --- viewport (scroll / resize) tracking ---
+function attachViewportListeners() {
+  detachViewportListeners()
+  // capture: true so we also catch scrolling of the drawer's inner content,
+  // not just the window — the flyout must track its anchor as the nav scrolls.
+  window.addEventListener('scroll', updateFlyoutPosition, true)
+  window.addEventListener('resize', updateFlyoutPosition)
+}
+function detachViewportListeners() {
+  window.removeEventListener('scroll', updateFlyoutPosition, true)
+  window.removeEventListener('resize', updateFlyoutPosition)
+}
+
+// --- anchor-size tracking: the sidebar collapse and the drawer mini↔full
+// transition animate `width` with no scroll event, which would otherwise strand
+// the flyout beside a pill that has since moved. ---
+let anchorResizeObserver: ResizeObserver | null = null
+function observeAnchor() {
+  disconnectAnchorObserver()
+  if (typeof ResizeObserver === 'undefined' || !anchorEl.value) return
+  anchorResizeObserver = new ResizeObserver(() => updateFlyoutPosition())
+  anchorResizeObserver.observe(anchorEl.value)
+}
+function disconnectAnchorObserver() {
+  anchorResizeObserver?.disconnect()
+  anchorResizeObserver = null
+}
+
+// --- dismiss on outside pointerdown: the flyout now lives on <body>, so it can
+// outlive its visual context (e.g. a mobile drawer sliding closed behind it, or
+// the sidebar collapsing). Close it when a pointerdown lands outside both the
+// flyout and its anchor pill. ---
+function onDocumentPointerDown(e: Event) {
+  // Already animating closed — don't re-arm the close timer, which would keep
+  // the (invisible but still hit-testable) flyout lingering in the DOM.
+  if (closingSub.value) return
+  const target = e.target as Node | null
+  if (!target) return
+  if (anchorEl.value?.contains(target)) return
+  if (flyoutRootEl.value?.contains(target)) return
+  if (openSub.value) closeSubMenu(openSub.value)
+}
+// Close on Escape (from anywhere) and return focus to the anchor pill.
+function onDocumentKeydown(e: KeyboardEvent) {
+  if (e.key !== 'Escape') return
+  const id = openSub.value ?? closingSub.value
+  if (!id) return
+  const anchor = anchorEl.value
+  closeSubMenu(id)
+  anchor?.focus()
+}
+function attachDismissListener() {
+  document.addEventListener('pointerdown', onDocumentPointerDown, true)
+  document.addEventListener('keydown', onDocumentKeydown, true)
+}
+function detachDismissListener() {
+  document.removeEventListener('pointerdown', onDocumentPointerDown, true)
+  document.removeEventListener('keydown', onDocumentKeydown, true)
+}
+
+// Reposition, sync theme, wire listeners, and move focus whenever a flyout
+// opens; tear it all down when it closes.
+watch(
+  () => activeFlyout.value?.id,
+  (id) => {
+    if (id) {
+      syncFlyoutTheme()
+      updateFlyoutPosition()
+      attachViewportListeners()
+      observeAnchor()
+      attachDismissListener()
+      // Move focus into the freshly opened menu — the flyout is teleported out
+      // of the nav's tab position, so keyboard/SR users need it brought to them.
+      nextTick(() => {
+        flyoutRootEl.value
+          ?.querySelector<HTMLElement>('.ns-nav-sidebar__sub-pill:not([aria-disabled="true"])')
+          ?.focus()
+      })
+    } else {
+      detachViewportListeners()
+      disconnectAnchorObserver()
+      detachDismissListener()
+      anchorEl.value = null
+    }
+  },
+)
+
 function normalizedSub(item: NsNavItem): NsNavSubItem[] {
   if (!item.sub) return []
   return item.sub.map((s) => (typeof s === 'string' ? { label: s } : s))
@@ -247,22 +390,25 @@ function subItemStyle(idx: number, total: number, itemId: string): Record<string
 }
 
 function openSubMenu(id: string) {
-  if (closeTimers.has(id)) {
-    clearTimeout(closeTimers.get(id)!)
-    closeTimers.delete(id)
-  }
+  // Clear every pending close timer — not just this id's — so a stale timer from
+  // the previously open menu can't fire and close the one we're opening.
+  closeTimers.forEach((t) => clearTimeout(t))
+  closeTimers.clear()
   closingSub.value = null
   openSub.value = id
 }
 
 function closeSubMenu(id: string) {
+  const existing = closeTimers.get(id)
+  if (existing) clearTimeout(existing)
   const item = props.items.find((i) => i.id === id)
   const subCount = item ? normalizedSub(item).length : 0
   closingSub.value = id
   const timer = setTimeout(
     () => {
-      openSub.value = null
-      closingSub.value = null
+      // Guard against clobbering a different menu that opened in the meantime.
+      if (openSub.value === id) openSub.value = null
+      if (closingSub.value === id) closingSub.value = null
       closeTimers.delete(id)
     },
     subCount * 45 + 200,
@@ -285,6 +431,8 @@ function onItemClick(item: NsNavItem, event: MouseEvent) {
     closeSubMenu(item.id)
   } else {
     if (openSub.value) closeSubMenu(openSub.value)
+    // The clicked pill is the anchor the teleported flyout positions against.
+    anchorEl.value = event.currentTarget as HTMLElement
     openSubMenu(item.id)
   }
 }
@@ -297,6 +445,9 @@ function onSubClick(parentId: string, sub: NsNavSubItem, event: MouseEvent) {
   emit('click', event, sub)
   closeSubMenu(parentId)
   emit('update:modelValue', subId(parentId, sub))
+  // Button sub-items don't navigate, so return focus to the anchor pill instead
+  // of letting it drop to <body> when the closing flyout is removed.
+  if (!sub.to) anchorEl.value?.focus()
 }
 
 // Cancel any in-flight flyout-close timers so they don't fire after unmount
@@ -304,6 +455,9 @@ function onSubClick(parentId: string, sub: NsNavSubItem, event: MouseEvent) {
 onUnmounted(() => {
   closeTimers.forEach((t) => clearTimeout(t))
   closeTimers.clear()
+  detachViewportListeners()
+  disconnectAnchorObserver()
+  detachDismissListener()
 })
 </script>
 
@@ -466,15 +620,14 @@ $active-bg: var(--ns-color-bg-brand);
   }
 }
 
-// Flyout
+// Flyout — teleported to <body>; `position: fixed` + top/left are supplied
+// inline from the anchor pill's rect (see updateFlyoutPosition). z-index sits
+// above Quasar drawers/overlays, matching QMenu's layer.
 .ns-nav-sidebar__flyout {
-  position: absolute;
-  left: calc(100% + 8px);
-  top: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  z-index: 100;
+  z-index: 6000;
   min-width: 140px;
 }
 
@@ -516,6 +669,12 @@ $active-bg: var(--ns-color-bg-brand);
   &--disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // While animating out the flyout is fading (opacity 0) but still in the DOM;
+  // don't let its sub-pills hit-test over the content beneath.
+  &--closing {
     pointer-events: none;
   }
 }
