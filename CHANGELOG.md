@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.22.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.22.1...v0.22.2) (2026-07-03)
+
+
+### Bug Fixes
+
+* **NsNavSidebar:** teleport sub-menu flyout to escape drawer overflow clipping ([8e027e4](https://github.com/Nonsuch-io/componentLibrary/commit/8e027e4c15dffa6b8ee17e5696e480490034d112))
+* **NsNavSidebar:** teleport sub-menu flyout to escape drawer overflow clipping ([05f58f0](https://github.com/Nonsuch-io/componentLibrary/commit/05f58f0a8e291177dab2854e512bb835cdc25832))
+
 ## [0.22.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.22.0...v0.22.1) (2026-07-01)
 
 
