@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { ref } from 'vue'
 import { expect, userEvent, within } from 'storybook/test'
 import NsAppShell from './NsAppShell.vue'
 import NsButton from '../NsButton/NsButton.vue'
@@ -69,6 +70,7 @@ const meta: Meta<typeof NsAppShell> = {
   argTypes: {
     showSearch: { control: 'boolean' },
     miniDrawer: { control: 'boolean' },
+    collapsed: { control: 'boolean' },
     drawerBreakpoint: { control: 'number' },
   },
   parameters: {
@@ -259,6 +261,35 @@ export const Tablet: Story = {
           <span class="text-weight-bold text-subtitle1 q-ml-sm">Acme</span>
         </template>
         ${pageContent}
+      </NsAppShell>
+    `,
+  }),
+}
+
+// Demonstrates v-model:collapsed. In a real app, initialise `collapsed` from a
+// cookie (SSR — the server renders the correct width with no flash) or from
+// localStorage (SPA), and persist it on change (e.g. watch(collapsed, save)).
+export const PersistedCollapse: Story = {
+  render: (args) => ({
+    components: { NsAppShell },
+    setup() {
+      const collapsed = ref(false)
+      return { args, collapsed }
+    },
+    template: `
+      <NsAppShell v-bind="args" v-model:collapsed="collapsed">
+        <template #header-left>
+          <span class="text-weight-bold text-subtitle1 q-ml-sm">Acme</span>
+        </template>
+        <div class="q-pa-md">
+          <h5 class="text-h5 q-mb-md">Persisted collapse</h5>
+          <p>Bound <code>collapsed</code>: <strong>{{ collapsed }}</strong></p>
+          <p>
+            Toggle the sidebar eye — the bound value updates. A real app persists
+            it (cookie for SSR, localStorage for a SPA) and passes the saved value
+            back on load to restore the rail.
+          </p>
+        </div>
       </NsAppShell>
     `,
   }),

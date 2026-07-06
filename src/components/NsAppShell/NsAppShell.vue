@@ -234,6 +234,15 @@ export interface NsAppShellProps {
   fullDrawerBreakpoint?: number
   /** Show a collapse/expand toggle at the top of the drawer */
   collapsible?: boolean
+  /**
+   * Controlled collapse state for the desktop drawer (`v-model:collapsed`).
+   * When provided, the app owns the value — persist it however you like (a
+   * cookie for SSR so the server renders the right width with no flash, or
+   * localStorage for a SPA) — and the component emits `update:collapsed`.
+   * When omitted, the drawer manages its own collapse state internally.
+   * Note: `miniDrawer` still force-collapses regardless of this value.
+   */
+  collapsed?: boolean
   /** Currently active tab name */
   modelValue?: string
   /** User display name shown in the avatar dropdown */
@@ -252,6 +261,7 @@ const props = withDefaults(defineProps<NsAppShellProps>(), {
   drawerBreakpoint: () => nsBreakpoints.md,
   fullDrawerBreakpoint: () => nsBreakpoints.lg,
   collapsible: true,
+  collapsed: undefined,
   modelValue: undefined,
   userName: undefined,
   userInitials: undefined,
@@ -263,6 +273,7 @@ const emit = defineEmits<{
   'tab-change': [name: string | number]
   'drawer-toggle': [open: boolean]
   'drawer-collapse': [collapsed: boolean]
+  'update:collapsed': [collapsed: boolean]
   'update:modelValue': [name: string]
   'user-menu-action': [name: string]
 }>()
@@ -277,8 +288,19 @@ const isTablet = computed(
   () => $q.screen.width >= props.drawerBreakpoint && $q.screen.width < props.fullDrawerBreakpoint,
 )
 
-/** User-toggled collapse state */
-const isCollapsed = ref(false)
+/**
+ * User-toggled collapse state. Controlled when the `collapsed` prop is provided
+ * (`v-model:collapsed`), otherwise managed internally — mirroring the
+ * controlled/uncontrolled `expanded` pattern in NsNavSidebar.
+ */
+const internalCollapsed = ref(props.collapsed ?? false)
+const isCollapsed = computed({
+  get: () => props.collapsed ?? internalCollapsed.value,
+  set: (value: boolean) => {
+    internalCollapsed.value = value
+    emit('update:collapsed', value)
+  },
+})
 
 /** Mini mode: auto-enabled at tablet range, when collapsed, or when explicitly set via miniDrawer prop */
 const shouldUseMini = computed(
@@ -311,13 +333,13 @@ function onTabChange(val: string | number) {
 
 /**
  * Wired from the NsNavSidebar's animated-eye toggle (replaces the old
- * collapsible chevron). When the sidebar reports its expanded state,
- * we mirror it to isCollapsed and emit drawer-collapse so consumers
- * have the same event surface they had before.
+ * collapsible chevron). When the sidebar reports its expanded state, we mirror
+ * it into the collapse model (which emits `update:collapsed` for
+ * `v-model:collapsed`) and keep emitting the legacy `drawer-collapse` event.
  */
 function onNavExpandedChange(expanded: boolean) {
-  isCollapsed.value = !expanded
-  emit('drawer-collapse', isCollapsed.value)
+  isCollapsed.value = !expanded // emits update:collapsed via the computed setter
+  emit('drawer-collapse', !expanded)
 }
 
 /**

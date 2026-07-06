@@ -543,6 +543,41 @@ describe('NsAppShell', () => {
       expect(wrapper.emitted('drawer-collapse')?.[1]).toEqual([false])
     })
 
+    it('restores mini state from a controlled collapsed prop (v-model:collapsed)', () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems, collapsed: true },
+        slots: { default: 'Content' },
+      })
+      expect(wrapper.findComponent({ name: 'QDrawer' }).props('mini')).toBe(true)
+    })
+
+    it('emits update:collapsed on toggle and can still expand when controlled (no miniDrawer pin)', async () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems, collapsed: true },
+        slots: { default: 'Content' },
+      })
+      const drawer = wrapper.findComponent({ name: 'QDrawer' })
+
+      // Toggle requests expand; controlled value is unchanged until the parent updates it
+      await wrapper.find('.ns-nav-sidebar__toggle-btn').trigger('click')
+      expect(wrapper.emitted('update:collapsed')?.[0]).toEqual([false])
+      expect(drawer.props('mini')).toBe(true)
+
+      // Parent honours the v-model update → drawer expands (would stay pinned mini with miniDrawer)
+      await wrapper.setProps({ collapsed: false })
+      expect(drawer.props('mini')).toBe(false)
+    })
+
+    it('emits update:collapsed alongside drawer-collapse in uncontrolled mode', async () => {
+      const wrapper = mount(NsAppShell, {
+        props: { drawerItems: sampleNavItems },
+        slots: { default: 'Content' },
+      })
+      await wrapper.find('.ns-nav-sidebar__toggle-btn').trigger('click')
+      expect(wrapper.emitted('update:collapsed')?.[0]).toEqual([true])
+      expect(wrapper.emitted('drawer-collapse')?.[0]).toEqual([true])
+    })
+
     it('renders the animated eye in the open state when drawer is expanded', () => {
       const wrapper = mount(NsAppShell, {
         props: { drawerItems: sampleNavItems },
