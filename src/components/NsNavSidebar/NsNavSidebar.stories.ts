@@ -129,3 +129,29 @@ export const QuasarAlignedAPI: Story = {
     `,
   }),
 }
+
+/**
+ * The bottom item (e.g. Settings) can itself carry `sub` items. Its flyout is
+ * teleported like any other and clamps upward so it stays on-screen despite the
+ * anchor sitting at the bottom of the sidebar. Click "Settings" to open it.
+ */
+export const BottomItemSubmenu: Story = {
+  render: () => ({
+    components: { NsNavSidebar },
+    setup() {
+      const active = ref('home')
+      const settingsWithSub: NsNavItem = {
+        id: 'settings',
+        label: 'Settings',
+        icon: PhGear,
+        sub: ['Profile', 'Billing', 'Team', 'Preferences'],
+      }
+      return { active, sampleItems, settingsWithSub }
+    },
+    template: `
+      <div style="display: flex; height: 600px; background: var(--ns-color-bg-canvas); padding: 24px;">
+        <NsNavSidebar v-model="active" :items="sampleItems" :bottom-item="settingsWithSub" :default-expanded="true" />
+      </div>
+    `,
+  }),
+}

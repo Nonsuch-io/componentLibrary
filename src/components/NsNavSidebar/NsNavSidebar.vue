@@ -30,6 +30,7 @@
             :aria-controls="
               hasSub(item) && !item.disable && openSub === item.id ? flyoutId : undefined
             "
+            :aria-haspopup="hasSub(item) && !item.disable ? 'true' : undefined"
             :aria-disabled="item.disable ? 'true' : undefined"
             :tabindex="item.disable ? -1 : undefined"
             @click="onItemClick(item, $event)"
@@ -114,6 +115,15 @@
           'ns-nav-sidebar__pill--disabled': bottomItem.disable,
         }"
         :aria-current="isActive(bottomItem) ? 'page' : undefined"
+        :aria-expanded="
+          hasSub(bottomItem) && !bottomItem.disable ? openSub === bottomItem.id : undefined
+        "
+        :aria-controls="
+          hasSub(bottomItem) && !bottomItem.disable && openSub === bottomItem.id
+            ? flyoutId
+            : undefined
+        "
+        :aria-haspopup="hasSub(bottomItem) && !bottomItem.disable ? 'true' : undefined"
         :aria-disabled="bottomItem.disable ? 'true' : undefined"
         :tabindex="bottomItem.disable ? -1 : undefined"
         @click="onItemClick(bottomItem, $event)"
@@ -132,6 +142,20 @@
           weight="regular"
         />
         <span v-if="isExpanded" class="ns-nav-sidebar__label">{{ bottomItem.label }}</span>
+        <svg
+          v-if="hasSub(bottomItem)"
+          class="ns-nav-sidebar__chevron"
+          xmlns="http://www.w3.org/2000/svg"
+          width="12"
+          height="12"
+          viewBox="0 0 256 256"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M181.66,133.66l-80,80a8,8,0,0,1-11.32-11.32L164.69,128,90.34,53.66a8,8,0,0,1,11.32-11.32l80,80A8,8,0,0,1,181.66,133.66Z"
+          />
+        </svg>
       </component>
     </div>
   </nav>
@@ -252,20 +276,47 @@ const DARK_CONTEXT_SELECTOR = '.q-dark, .body--dark, .dark, [data-theme="dark"]'
 const activeFlyout = computed(() => {
   const id = openSub.value ?? closingSub.value
   if (!id) return null
-  const item = props.items.find((i) => i.id === id)
+  const item = findFlyoutItem(id)
   if (!item || !hasSub(item)) return null
   return { id, label: item.label, subs: normalizedSub(item), closing: closingSub.value === id }
 })
 
+const FLYOUT_GAP = 8
+
 function updateFlyoutPosition() {
-  const el = anchorEl.value
-  if (!el) return
-  const r = el.getBoundingClientRect()
-  flyoutStyle.value = {
-    position: 'fixed',
-    top: `${r.top}px`,
-    left: `${r.right + 8}px`,
+  const anchor = anchorEl.value
+  if (!anchor) return
+  const a = anchor.getBoundingClientRect()
+  const flyout = flyoutRootEl.value
+  // Fall back to the CSS min-width before the flyout has been measured (the
+  // pre-render call); the nextTick call re-runs with real dimensions.
+  const fw = flyout?.offsetWidth || 140
+  const fh = flyout?.offsetHeight || 0
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+  const rtl = anchor.closest('[dir="rtl"]') !== null
+
+  const rightOfPill = a.right + FLYOUT_GAP
+  const leftOfPill = a.left - fw - FLYOUT_GAP
+
+  // Preferred side flips for RTL; each side flips again if it would overflow the
+  // viewport, so the flyout is never clipped off-screen.
+  let left: number
+  if (rtl) {
+    left = leftOfPill >= FLYOUT_GAP ? leftOfPill : rightOfPill
+  } else {
+    left = rightOfPill + fw <= vw - FLYOUT_GAP ? rightOfPill : leftOfPill
   }
+  left = Math.max(FLYOUT_GAP, Math.min(left, vw - fw - FLYOUT_GAP))
+
+  // Vertical clamp keeps it on-screen when the anchor sits near the bottom edge
+  // (e.g. the bottom item's flyout).
+  let top = a.top
+  if (fh > 0 && top + fh > vh - FLYOUT_GAP) {
+    top = Math.max(FLYOUT_GAP, vh - fh - FLYOUT_GAP)
+  }
+
+  flyoutStyle.value = { position: 'fixed', top: `${top}px`, left: `${left}px` }
 }
 
 function syncFlyoutTheme() {
@@ -323,13 +374,26 @@ function onDocumentKeydown(e: KeyboardEvent) {
   closeSubMenu(id)
   anchor?.focus()
 }
+// Close when focus leaves both the flyout and its anchor (e.g. Tab past the last
+// sub-item). The flyout is teleported to <body>, so it isn't adjacent to the
+// anchor in the tab order — without this, focus can silently walk out of it.
+function onDocumentFocusIn(e: FocusEvent) {
+  if (closingSub.value) return
+  const target = e.target as Node | null
+  if (!target) return
+  if (anchorEl.value?.contains(target)) return
+  if (flyoutRootEl.value?.contains(target)) return
+  if (openSub.value) closeSubMenu(openSub.value)
+}
 function attachDismissListener() {
   document.addEventListener('pointerdown', onDocumentPointerDown, true)
   document.addEventListener('keydown', onDocumentKeydown, true)
+  document.addEventListener('focusin', onDocumentFocusIn, true)
 }
 function detachDismissListener() {
   document.removeEventListener('pointerdown', onDocumentPointerDown, true)
   document.removeEventListener('keydown', onDocumentKeydown, true)
+  document.removeEventListener('focusin', onDocumentFocusIn, true)
 }
 
 // Reposition, sync theme, wire listeners, and move focus whenever a flyout
@@ -343,9 +407,12 @@ watch(
       attachViewportListeners()
       observeAnchor()
       attachDismissListener()
-      // Move focus into the freshly opened menu — the flyout is teleported out
-      // of the nav's tab position, so keyboard/SR users need it brought to them.
       nextTick(() => {
+        // Re-run now that the flyout is in the DOM and measurable, so the
+        // edge-flip / clamp use its real width and height.
+        updateFlyoutPosition()
+        // Move focus into the freshly opened menu — the flyout is teleported out
+        // of the nav's tab position, so keyboard/SR users need it brought to them.
         flyoutRootEl.value
           ?.querySelector<HTMLElement>('.ns-nav-sidebar__sub-pill:not([aria-disabled="true"])')
           ?.focus()
@@ -366,6 +433,12 @@ function normalizedSub(item: NsNavItem): NsNavSubItem[] {
 
 function hasSub(item: NsNavItem): boolean {
   return !!item.sub && item.sub.length > 0
+}
+
+/** Items that can own a flyout: the main list plus the optional bottom item. */
+function findFlyoutItem(id: string): NsNavItem | undefined {
+  if (props.bottomItem?.id === id) return props.bottomItem
+  return props.items.find((i) => i.id === id)
 }
 
 function subId(parentId: string, sub: NsNavSubItem): string {
@@ -401,7 +474,7 @@ function openSubMenu(id: string) {
 function closeSubMenu(id: string) {
   const existing = closeTimers.get(id)
   if (existing) clearTimeout(existing)
-  const item = props.items.find((i) => i.id === id)
+  const item = findFlyoutItem(id)
   const subCount = item ? normalizedSub(item).length : 0
   closingSub.value = id
   const timer = setTimeout(
