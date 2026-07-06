@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.23.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.22.2...v0.23.0) (2026-07-06)
+
+
+### Features
+
+* **NsAppShell:** add v-model:collapsed for persistable drawer collapse ([ac809e4](https://github.com/Nonsuch-io/componentLibrary/commit/ac809e4703e966fa986d962b15a9f24ae189b8c7))
+* **NsAppShell:** add v-model:collapsed for persistable drawer collapse ([fb9dbd5](https://github.com/Nonsuch-io/componentLibrary/commit/fb9dbd541d763110bcaab87fa150a13430da9f57))
+
 ## [0.22.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.22.1...v0.22.2) (2026-07-03)
 
 
