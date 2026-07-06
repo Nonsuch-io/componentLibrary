@@ -23,10 +23,10 @@ importers:
         version: 10.0.1(eslint@10.6.0(jiti@2.6.1))
       '@quasar/extras':
         specifier: ^2.0.0
-        version: 2.0.1
+        version: 2.0.2
       '@quasar/vite-plugin':
         specifier: ^1.10.0
-        version: 1.12.0(@vitejs/plugin-vue@6.0.7(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.6.1)(sass-embedded@1.100.0)(sass@1.100.0)(yaml@2.9.0))(vue@3.5.39(typescript@6.0.3)))(quasar@2.20.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.6.1)(sass-embedded@1.100.0)(sass@1.100.0)(yaml@2.9.0))(vue@3.5.39(typescript@6.0.3))
+        version: 1.12.0(@vitejs/plugin-vue@6.0.7(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.6.1)(sass-embedded@1.100.0)(sass@1.100.0)(yaml@2.9.0))(vue@3.5.39(typescript@6.0.3)))(quasar@2.21.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.6.1)(sass-embedded@1.100.0)(sass@1.100.0)(yaml@2.9.0))(vue@3.5.39(typescript@6.0.3))
       '@size-limit/file':
         specifier: ^12.0.1
         version: 12.1.0(size-limit@12.1.0(jiti@2.6.1))
@@ -86,7 +86,7 @@ importers:
         version: 3.9.4
       quasar:
         specifier: ^2.18.6
-        version: 2.20.1
+        version: 2.21.1
       sass-embedded:
         specifier: ^1.97.3
         version: 1.100.0
@@ -853,8 +853,8 @@ packages:
   '@polka/url@1.0.0-next.29':
     resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
 
-  '@quasar/extras@2.0.1':
-    resolution: {integrity: sha512-gieBBROuXkVhvqXtbcVg4pHR5FDcaK+F9PaY2K2t8+EuK8OB/0aJq306DeF5+/Bqv8ixIXT9KhpRZj0HotaOew==}
+  '@quasar/extras@2.0.2':
+    resolution: {integrity: sha512-BkH/iBISDbLNl5qAdsVNpa/0hxHbd1VwfML4dRwTUb8oGeLqlr00yjYM648KGYB1C8plwhU7LyGziE1JpSa6ZA==}
 
   '@quasar/vite-plugin@1.12.0':
     resolution: {integrity: sha512-EME6h0bhsHJgpRGeJA2BvC7R5rtZGg/FWCeWAH34c0wcV77n5iIRC3jsp9Ju6gW557sOiczJXxChmhYikTrWEw==}
@@ -2558,8 +2558,8 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
 
-  quasar@2.20.1:
-    resolution: {integrity: sha512-C+uFyt9/D2B2Dad/c9tGSlyWLMsrz+ROJLm3FKFdY9i+vc1Mk2q/+JyHBmQnuvQCEpUrdiXqcWQbpmZhuvo60A==}
+  quasar@2.21.1:
+    resolution: {integrity: sha512-fB+i8BzKjfU5dbQK8lv+bGthZ4SAYQiRWi0HDrFQSYvQoV5437o45dnCQpQBcwO/tnaKAFzglsahbXxOc43mww==}
     engines: {node: '>= 10.18.1', npm: '>= 6.13.4', yarn: '>= 1.21.1'}
 
   react-dom@19.2.7:
@@ -3787,12 +3787,12 @@ snapshots:
 
   '@polka/url@1.0.0-next.29': {}
 
-  '@quasar/extras@2.0.1': {}
+  '@quasar/extras@2.0.2': {}
 
-  '@quasar/vite-plugin@1.12.0(@vitejs/plugin-vue@6.0.7(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.6.1)(sass-embedded@1.100.0)(sass@1.100.0)(yaml@2.9.0))(vue@3.5.39(typescript@6.0.3)))(quasar@2.20.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.6.1)(sass-embedded@1.100.0)(sass@1.100.0)(yaml@2.9.0))(vue@3.5.39(typescript@6.0.3))':
+  '@quasar/vite-plugin@1.12.0(@vitejs/plugin-vue@6.0.7(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.6.1)(sass-embedded@1.100.0)(sass@1.100.0)(yaml@2.9.0))(vue@3.5.39(typescript@6.0.3)))(quasar@2.21.1)(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.6.1)(sass-embedded@1.100.0)(sass@1.100.0)(yaml@2.9.0))(vue@3.5.39(typescript@6.0.3))':
     dependencies:
       '@vitejs/plugin-vue': 6.0.7(vite@8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.6.1)(sass-embedded@1.100.0)(sass@1.100.0)(yaml@2.9.0))(vue@3.5.39(typescript@6.0.3))
-      quasar: 2.20.1
+      quasar: 2.21.1
       vite: 8.1.0(@types/node@26.0.0)(esbuild@0.28.1)(jiti@2.6.1)(sass-embedded@1.100.0)(sass@1.100.0)(yaml@2.9.0)
       vue: 3.5.39(typescript@6.0.3)
 
@@ -5497,7 +5497,7 @@ snapshots:
 
   punycode@2.3.1: {}
 
-  quasar@2.20.1: {}
+  quasar@2.21.1: {}
 
   react-dom@19.2.7(react@19.2.7):
     dependencies:
