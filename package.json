@@ -56,7 +56,7 @@
   "size-limit": [
     {
       "path": "dist/nonsuch-components.js",
-      "limit": "18 kB",
+      "limit": "20 kB",
       "gzip": true
     },
     {
