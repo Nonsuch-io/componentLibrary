@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.24.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.23.0...v0.24.0) (2026-07-07)
+
+
+### Features
+
+* **NsNavSidebar:** flyout edge-flip/clamp/RTL, bottom-item support, a11y ([ee32667](https://github.com/Nonsuch-io/componentLibrary/commit/ee32667ea9885d4febabcb66d581685dec426388))
+* **NsNavSidebar:** flyout edge-flip/clamp/RTL, bottom-item support, a11y ([0aeb375](https://github.com/Nonsuch-io/componentLibrary/commit/0aeb375fe3ed0fca2ec054dcccaec975f2555810))
+
 ## [0.23.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.22.2...v0.23.0) (2026-07-06)
 
 
