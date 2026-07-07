@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.24.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.1...v0.24.2) (2026-07-07)
+
+
+### Bug Fixes
+
+* **dependabot:** use default-days cooldown for github-actions ([00400a2](https://github.com/Nonsuch-io/componentLibrary/commit/00400a2c6e50c549b6647aff7f637c48d2d53728))
+
 ## [0.24.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.0...v0.24.1) (2026-07-07)
 
 
