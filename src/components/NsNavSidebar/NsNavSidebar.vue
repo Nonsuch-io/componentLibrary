@@ -162,8 +162,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onUnmounted, watch, nextTick, useId, type Component } from 'vue'
-import AnimatedEye from './AnimatedEye.vue'
+import {
+  ref,
+  computed,
+  onUnmounted,
+  watch,
+  nextTick,
+  useId,
+  defineAsyncComponent,
+  type Component,
+} from 'vue'
+// Lazy-loaded: AnimatedEye is a decorative ~1.5–2 kB gz blink animation that only
+// renders when the collapse toggle is shown. Splitting it into its own async
+// chunk keeps it out of the main bundle (and off consumers who set showToggle=false).
+const AnimatedEye = defineAsyncComponent(() => import('./AnimatedEye.vue'))
 import NsIcon from '../NsIcon/NsIcon.vue'
 
 /**

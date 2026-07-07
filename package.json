@@ -55,11 +55,43 @@
   },
   "size-limit": [
     {
+      "name": "full library (gzip)",
       "path": "dist/nonsuch-components.js",
-      "limit": "20 kB",
-      "gzip": true
+      "import": "*",
+      "limit": "24 kB",
+      "gzip": true,
+      "ignore": [
+        "vue",
+        "quasar",
+        "@phosphor-icons/vue"
+      ]
     },
     {
+      "name": "single component: NsButton (tree-shaking guard)",
+      "path": "dist/nonsuch-components.js",
+      "import": "{ NsButton }",
+      "limit": "3 kB",
+      "gzip": true,
+      "ignore": [
+        "vue",
+        "quasar",
+        "@phosphor-icons/vue"
+      ]
+    },
+    {
+      "name": "app shell (heaviest import)",
+      "path": "dist/nonsuch-components.js",
+      "import": "{ NsAppShell }",
+      "limit": "10 kB",
+      "gzip": true,
+      "ignore": [
+        "vue",
+        "quasar",
+        "@phosphor-icons/vue"
+      ]
+    },
+    {
+      "name": "styles",
       "path": "dist/nonsuch-components.css",
       "limit": "6 kB",
       "gzip": true
@@ -89,7 +121,7 @@
     "@eslint/js": "^10.0.1",
     "@quasar/extras": "^2.0.0",
     "@quasar/vite-plugin": "^1.10.0",
-    "@size-limit/file": "^12.0.1",
+    "@size-limit/preset-small-lib": "^12.1.0",
     "@storybook/addon-a11y": "^10.2.19",
     "@storybook/addon-docs": "^10.2.19",
     "@storybook/addon-vitest": "^10.2.19",

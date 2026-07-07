@@ -578,14 +578,22 @@ describe('NsAppShell', () => {
       expect(wrapper.emitted('drawer-collapse')?.[0]).toEqual([true])
     })
 
-    it('renders the animated eye in the open state when drawer is expanded', () => {
+    // AnimatedEye is lazy-loaded (defineAsyncComponent), so wait for the chunk
+    // to resolve before asserting on it.
+    const waitForEye = (wrapper: ReturnType<typeof mount>) =>
+      vi.waitFor(() =>
+        expect(wrapper.find('.ns-nav-sidebar__toggle-btn .ns-eye').exists()).toBe(true),
+      )
+
+    it('renders the animated eye in the open state when drawer is expanded', async () => {
       const wrapper = mount(NsAppShell, {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
       })
-      const eye = wrapper.find('.ns-nav-sidebar__toggle-btn .ns-eye')
-      expect(eye.exists()).toBe(true)
-      expect(eye.classes()).toContain('ns-eye--open')
+      await waitForEye(wrapper)
+      expect(wrapper.find('.ns-nav-sidebar__toggle-btn .ns-eye').classes()).toContain(
+        'ns-eye--open',
+      )
     })
 
     it('renders the animated eye in the closed state when drawer is collapsed to mini', async () => {
@@ -593,9 +601,11 @@ describe('NsAppShell', () => {
         props: { drawerItems: sampleNavItems },
         slots: { default: 'Content' },
       })
+      await waitForEye(wrapper)
       await wrapper.find('.ns-nav-sidebar__toggle-btn').trigger('click')
-      const eye = wrapper.find('.ns-nav-sidebar__toggle-btn .ns-eye')
-      expect(eye.classes()).toContain('ns-eye--closed')
+      expect(wrapper.find('.ns-nav-sidebar__toggle-btn .ns-eye').classes()).toContain(
+        'ns-eye--closed',
+      )
     })
   })
 
