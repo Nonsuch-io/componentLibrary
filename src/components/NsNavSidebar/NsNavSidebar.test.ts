@@ -408,4 +408,128 @@ describe('NsNavSidebar', () => {
       }
     })
   })
+
+  describe('flyout follow-ups (4gp bottomItem, 8pi a11y, s7g positioning)', () => {
+    const mockRect = (el: HTMLElement, r: Partial<DOMRect>) => {
+      el.getBoundingClientRect = () =>
+        ({
+          left: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          width: 0,
+          height: 0,
+          x: 0,
+          y: 0,
+          toJSON() {},
+          ...r,
+        }) as DOMRect
+    }
+    const setViewport = (w: number, h: number) => {
+      Object.defineProperty(window, 'innerWidth', { value: w, configurable: true })
+      Object.defineProperty(window, 'innerHeight', { value: h, configurable: true })
+    }
+    const openFlyoutEl = () => document.body.querySelector('.ns-nav-sidebar__flyout') as HTMLElement
+
+    // --- 4gp: bottomItem flyout ---
+    it('renders and opens a flyout for a bottomItem with sub-items', async () => {
+      const wrapper = mount$({
+        bottomItem: {
+          id: 'settings',
+          label: 'Settings',
+          icon: MockIcon,
+          sub: ['Profile', 'Billing'],
+        },
+      })
+      const bottomPill = wrapper.find('.ns-nav-sidebar__bottom .ns-nav-sidebar__pill')
+      expect(bottomPill.attributes('aria-haspopup')).toBe('true')
+      await bottomPill.trigger('click')
+      expect(flyoutSubPills().map((p) => p.textContent?.trim())).toEqual(['Profile', 'Billing'])
+      expect(bottomPill.attributes('aria-expanded')).toBe('true')
+    })
+
+    it('emits the sub-item id when a bottomItem sub-item is clicked', async () => {
+      const wrapper = mount$({
+        bottomItem: { id: 'settings', label: 'Settings', icon: MockIcon, sub: ['Profile'] },
+      })
+      await wrapper.find('.ns-nav-sidebar__bottom .ns-nav-sidebar__pill').trigger('click')
+      await clickEl(flyoutSubPills()[0])
+      expect(wrapper.emitted('update:modelValue')?.[0]).toEqual(['settings/profile'])
+    })
+
+    // --- 8pi: a11y ---
+    it('sets aria-haspopup only on pills that have sub-items', () => {
+      const wrapper = mount$()
+      const pills = wrapper.findAll('.ns-nav-sidebar__pill')
+      expect(pills[1].attributes('aria-haspopup')).toBe('true') // Products (has sub)
+      expect(pills[0].attributes('aria-haspopup')).toBeUndefined() // Home (no sub)
+    })
+
+    it('closes the flyout when focus leaves it (focusout)', async () => {
+      vi.useFakeTimers()
+      const wrapper = mount$()
+      await wrapper.findAll('.ns-nav-sidebar__pill')[1].trigger('click')
+      expect(flyoutSubPills().length).toBe(2)
+      const outside = document.createElement('button')
+      document.body.appendChild(outside)
+      outside.dispatchEvent(new FocusEvent('focusin', { bubbles: true }))
+      vi.advanceTimersByTime(1000)
+      await nextTick()
+      expect(flyoutSubPills().length).toBe(0)
+      outside.remove()
+    })
+
+    // --- s7g: positioning (rects mocked — happy-dom has no layout) ---
+    it('opens the flyout to the left of the pill under RTL', async () => {
+      setViewport(1024, 768)
+      const host = document.createElement('div')
+      host.setAttribute('dir', 'rtl')
+      document.body.appendChild(host)
+      const wrapper = mount(NsNavSidebar, { props: { items, modelValue: 'home' }, attachTo: host })
+      wrappers.push(wrapper)
+      const pill = wrapper.findAll('.ns-nav-sidebar__pill')[1]
+      mockRect(pill.element as HTMLElement, { left: 500, right: 560, top: 100, bottom: 140 })
+      await pill.trigger('click')
+      await nextTick()
+      // fw falls back to the 140 min-width in happy-dom: 500 - 140 - 8 = 352
+      expect(openFlyoutEl().style.left).toBe('352px')
+      host.remove()
+    })
+
+    it('flips the flyout to the left when it would overflow the right edge', async () => {
+      setViewport(1024, 768)
+      const wrapper = mount$()
+      const pill = wrapper.findAll('.ns-nav-sidebar__pill')[1]
+      mockRect(pill.element as HTMLElement, { left: 900, right: 1000, top: 50, bottom: 90 })
+      await pill.trigger('click')
+      await nextTick()
+      // right side (1008 + 140 = 1148) overflows 1016 → flip left: 900 - 140 - 8 = 752
+      expect(openFlyoutEl().style.left).toBe('752px')
+    })
+
+    it('opens to the right of the pill when there is room (no flip)', async () => {
+      setViewport(1024, 768)
+      const wrapper = mount$()
+      const pill = wrapper.findAll('.ns-nav-sidebar__pill')[1]
+      mockRect(pill.element as HTMLElement, { left: 100, right: 160, top: 50, bottom: 90 })
+      await pill.trigger('click')
+      await nextTick()
+      expect(openFlyoutEl().style.left).toBe('168px') // 160 + 8
+    })
+
+    it('clamps the flyout vertically when the anchor is near the bottom edge', async () => {
+      setViewport(1024, 768)
+      const wrapper = mount$()
+      const pill = wrapper.findAll('.ns-nav-sidebar__pill')[1]
+      mockRect(pill.element as HTMLElement, { left: 100, right: 160, top: 700, bottom: 740 })
+      await pill.trigger('click')
+      await nextTick()
+      const flyout = openFlyoutEl()
+      Object.defineProperty(flyout, 'offsetHeight', { value: 300, configurable: true })
+      window.dispatchEvent(new Event('resize'))
+      await nextTick()
+      // top 700 + 300 = 1000 > 760 → clamp to 768 - 300 - 8 = 460
+      expect(flyout.style.top).toBe('460px')
+    })
+  })
 })
