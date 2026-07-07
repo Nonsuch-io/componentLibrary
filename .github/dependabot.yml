@@ -1,3 +1,10 @@
+# Auto-merge behaviour (see .github/workflows/dependabot-auto-merge.yml):
+# patch + minor updates are auto-approved and auto-merged once CI passes.
+#
+# NOTE: the "Protect main" ruleset requires 1 approving review on every PR. The
+# workflow only auto-approves non-major updates, so **major bumps need a manual
+# approval** (or an admin bypass) before they can merge — they will not
+# auto-merge on their own by design.
 version: 2
 updates:
   - package-ecosystem: npm
