@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.24.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.0...v0.24.1) (2026-07-07)
+
+
+### Performance Improvements
+
+* **NsNavSidebar:** lazy-load AnimatedEye + size-limit tree-shaking guards (componentLibrary-rvs) ([f1c0208](https://github.com/Nonsuch-io/componentLibrary/commit/f1c0208fec19abce7087b88357c53f3aec1f9c07))
+* **NsNavSidebar:** lazy-load AnimatedEye + size-limit tree-shaking guards (componentLibrary-rvs) ([e6f1483](https://github.com/Nonsuch-io/componentLibrary/commit/e6f1483fcc52546114b196acf7dfd43c0ab9edac))
+
 ## [0.24.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.23.0...v0.24.0) (2026-07-07)
 
 
