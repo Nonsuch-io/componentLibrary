@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.24.3](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.2...v0.24.3) (2026-07-15)
+
+
+### Bug Fixes
+
+* **NsAppShell:** pin the side nav so its tall content scrolls internally (componentLibrary-0ne) ([488c55d](https://github.com/Nonsuch-io/componentLibrary/commit/488c55d933af7f565ec577b559115c20a8009a3a))
+* **NsAppShell:** pin the side nav so its tall content scrolls internally (componentLibrary-0ne) ([6545d9d](https://github.com/Nonsuch-io/componentLibrary/commit/6545d9d1b78b7f2b8271449d6de524447b8ba67f))
+
 ## [0.24.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.1...v0.24.2) (2026-07-07)
 
 
