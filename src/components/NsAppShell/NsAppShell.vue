@@ -1,5 +1,5 @@
 <template>
-  <NsLayout class="ns-app-shell" view="hHh lpR fFf">
+  <NsLayout class="ns-app-shell" view="hHh LpR fFf">
     <!-- Header -->
     <NsHeader class="ns-app-shell__header" elevated>
       <NsToolbar>
