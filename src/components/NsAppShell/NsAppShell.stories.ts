@@ -294,3 +294,87 @@ export const PersistedCollapse: Story = {
     `,
   }),
 }
+
+// A nav long enough to overflow the viewport, so we can verify the pinned nav
+// still lets every item be reached by scrolling INSIDE the drawer
+// (componentLibrary-0ne). The play function measures real layout in Chromium —
+// this is the regression guard, and it was RED before the fix: overflow:hidden on
+// .ns-app-shell__drawer clipped the tall nav and the bottom items were unreachable.
+const manyNavItems: NsAppShellNavItem[] = Array.from({ length: 30 }, (_, i) => ({
+  name: `item-${i}`,
+  label: `Nav item ${i + 1}`,
+  icon: 'chevron_right',
+  to: `/item-${i}`,
+  active: i === 0,
+}))
+
+export const ScrollingNav: Story = {
+  args: {
+    drawerItems: manyNavItems,
+    // Low breakpoints so the persistent full drawer shows regardless of the
+    // headless viewport width.
+    drawerBreakpoint: 400,
+    fullDrawerBreakpoint: 400,
+  },
+  render: (args) => ({
+    components: { NsAppShell },
+    setup: () => ({ args }),
+    template: `
+      <NsAppShell v-bind="args">
+        <div style="padding:16px">
+          <div v-for="n in 40" :key="n" style="height:40px">Page row {{ n }}</div>
+        </div>
+      </NsAppShell>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const doc = canvasElement.ownerDocument
+    const win = doc.defaultView!
+
+    const nav = canvasElement.querySelector('.ns-nav-sidebar') as HTMLElement
+    expect(nav).not.toBeNull()
+
+    // Precondition: the nav must actually be taller than the viewport, or this
+    // story proves nothing. If this fails, add more items.
+    expect(nav.getBoundingClientRect().height).toBeGreaterThan(win.innerHeight)
+
+    // Find the scrollable ancestor between the nav and the drawer root — the
+    // element Quasar/we intend to scroll.
+    const drawer = canvasElement.querySelector('.ns-app-shell__drawer') as HTMLElement
+    let scroller: HTMLElement | null = nav.parentElement
+    while (scroller && scroller !== drawer && scroller.scrollHeight <= scroller.clientHeight) {
+      scroller = scroller.parentElement
+    }
+    expect(scroller, 'no scrollable container wraps the tall nav — it is clipped').not.toBeNull()
+
+    // Its computed overflow-y must permit scrolling, not clip.
+    const overflowY = win.getComputedStyle(scroller!).overflowY
+    expect(['auto', 'scroll'], `scroll container overflow-y is "${overflowY}"`).toContain(overflowY)
+
+    // Pinned: scrolling the PAGE must not move the nav (the behavior chosen in
+    // componentLibrary-0ne — pin, don't scroll away). Before the fix the drawer
+    // was position:absolute and scrolled off with the page.
+    const topBefore = nav.getBoundingClientRect().top
+    win.scrollTo(0, win.document.documentElement.scrollHeight)
+    await new Promise((r) => setTimeout(r, 50))
+    expect(
+      nav.getBoundingClientRect().top,
+      'nav scrolled away with the page instead of staying pinned',
+    ).toBeCloseTo(topBefore, 0)
+    win.scrollTo(0, 0)
+
+    // The real test: scroll to the bottom and confirm the LAST nav item is
+    // actually reachable (on-screen), not stuck below the fold.
+    scroller!.scrollTop = scroller!.scrollHeight
+    await new Promise((r) => setTimeout(r, 50))
+    const lastLabel = Array.from(nav.querySelectorAll('*')).find(
+      (el) => el.textContent?.trim() === 'Nav item 30',
+    ) as HTMLElement
+    expect(lastLabel).toBeTruthy()
+    const r = lastLabel.getBoundingClientRect()
+    expect(r.bottom, 'last nav item is not reachable by scrolling').toBeLessThanOrEqual(
+      win.innerHeight + 1,
+    )
+    expect(r.top).toBeGreaterThanOrEqual(0)
+  },
+}
