@@ -73,11 +73,35 @@ For larger beads with independent subtasks, dispatch **Worker** subagents to imp
    - The branch name (already checked out)
 4. **Workers implement using TDD** — write tests, implement, run quality gates, return a structured report
 5. **Parent reviews each Worker report** — inspects modified files, verifies quality, resolves any conflicts
-6. **Parent commits, pushes, and creates PR** — workers never touch git or beads
+6. **Parent dispatches an `independent-reviewer`** (a **different model**) against the branch — required before any PR that touches non-test source; see [Independent review](#independent-review--before-opening-a-pr) below. Background is fine.
+7. **Parent commits, pushes, and creates PR** — workers never touch git or beads
 
 ### Parallel safety:
 
 Workers can run in parallel **only** when their file scopes don't overlap. If two subtasks modify the same file, dispatch them sequentially.
+
+---
+
+## Independent review — before opening a PR
+
+**Before opening a PR that touches non-test source, dispatch an `independent-reviewer` against the branch, run as a DIFFERENT model from the author.** A requirement, not a judgement call — background is fine, so it runs while you move on. It is step 6 of the Worker workflow above, and it applies equally to work you did directly.
+
+**"Low risk" is not a skip reason.** Neither is _small_, _a pure style tweak_, _just a prop rename_, or _my tests all pass_. Those are the author's assessment of the author's own work — exactly what the review exists to check. To skip, get the operator's agreement; never skip silently.
+
+**The different model is the structural point:** the same model re-makes the same assumptions, so self-review is blind in a way more care cannot fix. In a component library the blind spots have a shape:
+
+- **Accessibility that passes every unit test.** A lost focus trap, a dropped `aria-*`, a keyboard path that no longer reaches a control — the suite is green because nothing asserts the thing a screen-reader or keyboard user actually hits.
+- **Contract drift a consumer feels, not the library.** A renamed prop, a changed slot or emit, a flipped default — types compile and the component's own tests pass, while a consuming app silently breaks. The reviewer reasons about the consumer the author wasn't looking at.
+- **Wireframe / interaction regressions with no assertion behind them.** The wireframe wins (see Mobile-First Design), but "matches the wireframe" is rarely a test — a spacing, breakpoint, or gesture regression sails through green.
+- **i18n** — a hardcoded string, or a key that only exists in one locale.
+
+**Done means:** findings surfaced to the operator with honest severity (BLOCKER / SHOULD-FIX / NIT), then applied — or explicitly deferred with a follow-up bead. Reviewed-and-quietly-ignored is not done. A clean result is also a real result: it costs little and confirms the calls you were unsure of; a skipped review that would have found something costs a bug in `main`.
+
+**Where it lives:** the reviewer is shared across the nonsuch repos — one source of truth, version-controlled in the control-plane repo at `switchboard/.claude/agents/independent-reviewer.md` and symlinked machine-wide to `~/.claude/agents/`. Do **not** fork a copy back into this repo; if it gets a componentLibrary case wrong, fix it at the source.
+
+**Do NOT make it "model-agnostic" by deleting its `model:` line** — an agent with no model inherits the _parent's_, and since the nonsuch agents are Opus that yields Opus reviewing Opus: a review that looks independent and isn't. Select the model per invocation.
+
+**Choosing a model:** **sonnet** for logic, systemic and contract reasoning (prop/slot contracts, cross-package drift); **fable** for boundary, data-loss and tool-output surfaces. On substantial changes run both — convergence buys confidence, divergence buys coverage.
 
 ---
 
