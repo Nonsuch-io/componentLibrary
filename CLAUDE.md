@@ -53,6 +53,14 @@ bd close <id>         # Complete work
 
 <!-- END BEADS INTEGRATION -->
 
+## Independent review — before opening a PR
+
+**Before opening a PR that touches non-test source, dispatch an `independent-reviewer` against the branch, run as a DIFFERENT model from the author.** A requirement, not a judgement call (background is fine). "Low risk / small / just a prop rename / my tests pass" are **not** skip reasons — they are the author's assessment of the author's own work, which is exactly what the review checks. To skip, get the operator's agreement; never skip silently.
+
+The different-model gate is structural: the same model re-makes the same assumptions, so self-review is blind in a way more care can't fix. In a component library the blind spots have a shape — **accessibility that passes every unit test** (a lost focus trap, a dropped `aria-*`, a keyboard path that no longer reaches a control); **contract drift a consumer feels, not the library** (a renamed prop or changed slot/emit — types compile, the component's tests pass, a consuming app breaks); **wireframe/interaction regressions** with no assertion behind them; and **i18n** (a hardcoded string, a key in only one locale).
+
+**Done** = findings surfaced with honest severity (BLOCKER / SHOULD-FIX / NIT), then applied or deferred with a follow-up bead — not quietly ignored. The reviewer is shared across the nonsuch repos, version-controlled at `switchboard/.claude/agents/independent-reviewer.md` and symlinked to `~/.claude/agents/`; **do not delete its `model:` line** (a model-less agent inherits the parent's — Opus reviewing Opus). Pick the model per invocation: **sonnet** for logic/systemic/contract (prop/slot contracts, cross-package drift), **fable** for boundary/data-loss/tool-output. Run both on substantial changes. Full section in [AGENTS.md](AGENTS.md#independent-review--before-opening-a-pr).
+
 ## Build & Test
 
 _Add your build and test commands here_
