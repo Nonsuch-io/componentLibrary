@@ -13,6 +13,7 @@ const meta: Meta<typeof NsInput> = {
     label: { control: 'text' },
     outlined: { control: 'boolean' },
     dense: { control: 'boolean' },
+    disable: { control: 'boolean' },
   },
 }
 
@@ -41,5 +42,19 @@ export const WithValidation: Story = {
 export const NoLabel: Story = {
   args: {
     label: undefined,
+  },
+}
+
+/**
+ * Figma specifies a `State=Disabled` variant, so it is documented here.
+ *
+ * NOTE THE SPELLING: Quasar uses `disable`, never `disabled` — and `disabled` fails SILENTLY,
+ * doing nothing at all with no warning (componentLibrary-ob8). This story exists partly so the
+ * correct name is visible to anyone reading the docs.
+ */
+export const Disabled: Story = {
+  args: {
+    label: 'Email address',
+    disable: true,
   },
 }

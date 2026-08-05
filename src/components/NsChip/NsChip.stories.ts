@@ -13,6 +13,7 @@ const meta: Meta<typeof NsChip> = {
     clickable: false,
   },
   argTypes: {
+    disable: { control: 'boolean' },
     color: { control: 'text' },
     textColor: { control: 'text' },
     outline: { control: 'boolean' },
@@ -58,4 +59,16 @@ export const Dense: Story = {
     setup: () => ({ args }),
     template: '<NsChip v-bind="args">Dense</NsChip>',
   }),
+}
+
+/**
+ * Figma specifies a `State=Disabled` variant, so it is documented here.
+ *
+ * NOTE THE SPELLING: Quasar uses `disable`, never `disabled` — and `disabled` fails SILENTLY
+ * (componentLibrary-ob8).
+ */
+export const Disabled: Story = {
+  args: {
+    disable: true,
+  },
 }
