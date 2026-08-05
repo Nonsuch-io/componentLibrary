@@ -1,7 +1,11 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
-import { useNsAttrConflictWarning, type NsAttrConflict } from './useNsAttrConflictWarning'
+import {
+  useNsAttrConflictWarning,
+  type NsAttrConflict,
+  __resetAttrConflictWarnings,
+} from './useNsAttrConflictWarning'
 
 // Helper: a bare component that runs the guard against a fixed conflict list,
 // mirroring how a real Ns wrapper (e.g. NsButton) would call it in setup().
@@ -20,6 +24,7 @@ const Harness = defineComponent({
 })
 
 describe('useNsAttrConflictWarning', () => {
+  beforeEach(() => __resetAttrConflictWarnings())
   afterEach(() => {
     vi.unstubAllEnvs()
     vi.restoreAllMocks()
@@ -81,8 +86,8 @@ describe('useNsAttrConflictWarning', () => {
     expect(warnSpy).not.toHaveBeenCalled()
   })
 
-  it('does not warn when import.meta.env.DEV is false, proving the production guard works', () => {
-    vi.stubEnv('DEV', false)
+  it('does not warn when NODE_ENV is production, proving the production guard works', () => {
+    vi.stubEnv('NODE_ENV', 'production')
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
     mount(Harness, { attrs: { color: 'primary' } })

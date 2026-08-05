@@ -1,8 +1,10 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import NsButton from './NsButton.vue'
+import { __resetAttrConflictWarnings } from '@/composables/useNsAttrConflictWarning'
 
 describe('NsButton', () => {
+  beforeEach(() => __resetAttrConflictWarnings())
   const mountButton = (props = {}, slots = {}) => {
     return mount(NsButton, { props, slots })
   }
@@ -80,7 +82,7 @@ describe('NsButton', () => {
       { textColor: 'primary' },
       { flat: true },
       { outline: true },
-      { unelevated: true },
+
       { push: true },
       { glossy: true },
     ]
@@ -115,8 +117,8 @@ describe('NsButton', () => {
       expect(warnSpy).not.toHaveBeenCalled()
     })
 
-    it('does not warn in production, proving the DEV guard actually gates the check', () => {
-      vi.stubEnv('DEV', false)
+    it('does not warn in production, proving the NODE_ENV guard actually gates the check', () => {
+      vi.stubEnv('NODE_ENV', 'production')
       const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
 
       mount(NsButton, { attrs: { flat: true, color: 'primary' }, slots: { default: 'Click Me' } })

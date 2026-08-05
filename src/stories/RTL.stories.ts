@@ -61,14 +61,14 @@ export const ButtonsRTL: Story = {
     template: `
       <RtlWrapper>
         <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px;">
-          <NsButton color="primary" icon="arrow_back">رجوع</NsButton>
-          <NsButton color="secondary" icon-right="arrow_forward">التالي</NsButton>
-          <NsButton color="accent" icon="shopping_cart">أضف إلى السلة</NsButton>
+          <NsButton variant="primary" icon="arrow_back">رجوع</NsButton>
+          <NsButton variant="secondary" icon-right="arrow_forward">التالي</NsButton>
+          <NsButton variant="accent" icon="shopping_cart">أضف إلى السلة</NsButton>
         </div>
         <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-          <NsButton color="primary" loading>جاري التحميل</NsButton>
-          <NsButton color="positive">حفظ</NsButton>
-          <NsButton color="negative">حذف</NsButton>
+          <NsButton variant="primary" loading>جاري التحميل</NsButton>
+          <NsButton variant="positive">حفظ</NsButton>
+          <NsButton variant="negative">حذف</NsButton>
         </div>
       </RtlWrapper>
     `,

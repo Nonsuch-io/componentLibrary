@@ -51,7 +51,12 @@ const props = withDefaults(defineProps<NsButtonProps>(), {
   loading: false,
 })
 
-// componentLibrary-nk3: NsButton declares neither `color` nor `flat` (and
+// componentLibrary-nk3: `unelevated` is deliberately NOT in this list. It is hardcoded on the
+// q-btn AFTER v-bind="$attrs", so mergeProps always resolves ours and a consumer-passed value
+// is inert — warning about it would be a false positive, and a guard that is wrong once gets
+// ignored for the cases that matter (fable).
+//
+// NsButton declares neither `color` nor `flat` (and
 // friends), so they fall through $attrs to QBtn and can silently collide
 // with the `.ns-btn--*` variant CSS below (e.g. flat + color="primary"
 // renders orange text on an orange background — both systems agree on the
@@ -63,9 +68,15 @@ useNsAttrConflictWarning('NsButton', [
   { attrs: ['text-color', 'textColor'], useInstead: 'variant' },
   { attrs: ['flat'], useInstead: 'variant' },
   { attrs: ['outline'], useInstead: 'variant' },
-  { attrs: ['unelevated'], useInstead: 'variant' },
   { attrs: ['push'], useInstead: 'variant' },
   { attrs: ['glossy'], useInstead: 'variant' },
+  // Size/shape collisions, not colour ones. Quasar's .q-btn--dense sets min-height and
+  // .q-btn--round sets min-width/min-height, both of which LAND and fight the Ns size system —
+  // while .q-btn--round's border-radius LOSES to our scoped .ns-btn radius, producing a
+  // half-Quasar, half-Ns mongrel. Exactly the class of collision this guard exists for.
+  { attrs: ['dense'], useInstead: 'size' },
+  { attrs: ['round'], useInstead: 'iconOnly' },
+  { attrs: ['fab', 'fab-mini', 'fabMini'], useInstead: 'size' },
 ])
 
 const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = {
