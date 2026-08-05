@@ -21,6 +21,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { QSpinnerDots } from 'quasar'
+import { useNsAttrConflictWarning } from '../../composables/useNsAttrConflictWarning'
 
 export type NsButtonVariant =
   | 'primary'
@@ -49,6 +50,23 @@ const props = withDefaults(defineProps<NsButtonProps>(), {
   iconOnly: false,
   loading: false,
 })
+
+// componentLibrary-nk3: NsButton declares neither `color` nor `flat` (and
+// friends), so they fall through $attrs to QBtn and can silently collide
+// with the `.ns-btn--*` variant CSS below (e.g. flat + color="primary"
+// renders orange text on an orange background — both systems agree on the
+// same brand colour, which is exactly what makes it invisible). This is a
+// dev-only warning, not a reconciliation: it does NOT make the combination
+// render correctly, it only makes the collision loud instead of silent.
+useNsAttrConflictWarning('NsButton', [
+  { attrs: ['color'], useInstead: 'variant' },
+  { attrs: ['text-color', 'textColor'], useInstead: 'variant' },
+  { attrs: ['flat'], useInstead: 'variant' },
+  { attrs: ['outline'], useInstead: 'variant' },
+  { attrs: ['unelevated'], useInstead: 'variant' },
+  { attrs: ['push'], useInstead: 'variant' },
+  { attrs: ['glossy'], useInstead: 'variant' },
+])
 
 const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = {
   xs: { default: '4px 8px', iconOnly: '8px' },
@@ -279,7 +297,12 @@ const buttonPadding = computed(() => {
 
 // ---- Marketing ----
 .ns-btn--marketing {
-  background: var(--ns-color-text-primary);
+  // componentLibrary-nk3: was var(--ns-color-text-primary), a TEXT token
+  // that flips with the theme (#2d0b00 light / #fef7ee dark) while the
+  // `color: white` below is hardcoded and cannot flip — 1.06:1 contrast in
+  // dark mode. --ns-color-bg-dark is #2d0b00 in BOTH modes (it doesn't flip),
+  // so this preserves the light-mode look exactly and fixes dark mode.
+  background: var(--ns-color-bg-dark);
   color: white;
 
   :deep(img) {
