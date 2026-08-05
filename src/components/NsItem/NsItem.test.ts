@@ -25,3 +25,10 @@ describe('NsItem', () => {
     })
   })
 })
+
+describe('disable', () => {
+  it('declares a disable prop rather than relying on attrs fallthrough', () => {
+    const wrapper = mount(NsItem, { props: { disable: true } })
+    expect(wrapper.props('disable')).toBe(true)
+  })
+})

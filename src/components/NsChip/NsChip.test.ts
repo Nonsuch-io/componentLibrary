@@ -49,4 +49,11 @@ describe('NsChip', () => {
     })
     expect(wrapper.find('.q-chip').attributes('data-testid')).toBe('my-chip')
   })
+
+  it('declares a disable prop rather than relying on attrs fallthrough', () => {
+    const wrapper = mount(NsChip, { props: { disable: true }, slots: { default: 'Tag' } })
+    // If `disable` were not a declared prop, it would land in $attrs
+    // instead of $props, and wrapper.props('disable') would be undefined.
+    expect(wrapper.props('disable')).toBe(true)
+  })
 })

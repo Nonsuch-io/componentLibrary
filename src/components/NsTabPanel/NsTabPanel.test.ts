@@ -32,4 +32,11 @@ describe('NsTabPanel', () => {
       expect(wrapper.find('.q-tab-panel').attributes('aria-label')).toBe('Test label')
     })
   })
+
+  it('declares a disable prop rather than relying on attrs fallthrough', () => {
+    const wrapper = mount(NsTabPanel, { props: { ...defaultProps, disable: true } })
+    // If `disable` were not a declared prop, it would land in $attrs
+    // instead of $props, and wrapper.props('disable') would be undefined.
+    expect(wrapper.props('disable')).toBe(true)
+  })
 })
