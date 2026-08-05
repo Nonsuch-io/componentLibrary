@@ -1,8 +1,10 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import NsButton from './NsButton.vue'
+import { __resetAttrConflictWarnings } from '@/composables/useNsAttrConflictWarning'
 
 describe('NsButton', () => {
+  beforeEach(() => __resetAttrConflictWarnings())
   const mountButton = (props = {}, slots = {}) => {
     return mount(NsButton, { props, slots })
   }
@@ -61,6 +63,68 @@ describe('NsButton', () => {
     it('sets aria-busy="false" when not loading', () => {
       const wrapper = mountButton({ loading: false })
       expect(wrapper.find('.q-btn').attributes('aria-busy')).toBe('false')
+    })
+  })
+
+  // componentLibrary-nk3: NsButton declares neither `color` nor `flat` (and
+  // friends), so they fall through $attrs to QBtn and can silently collide
+  // with our own `.ns-btn--*` variant CSS (e.g. flat + color="primary"
+  // rendering orange text on an orange background). This does NOT make the
+  // combination work — it only makes the collision loud in dev.
+  describe('Quasar styling attr conflicts (componentLibrary-nk3)', () => {
+    afterEach(() => {
+      vi.restoreAllMocks()
+    })
+
+    const conflictingAttrs: Array<Record<string, unknown>> = [
+      { color: 'primary' },
+      { 'text-color': 'primary' },
+      { textColor: 'primary' },
+      { flat: true },
+      { outline: true },
+
+      { push: true },
+      { glossy: true },
+    ]
+
+    it.each(conflictingAttrs)('warns in dev when %o is passed', (attrs) => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+      mount(NsButton, { attrs, slots: { default: 'Click Me' } })
+
+      expect(warnSpy).toHaveBeenCalled()
+      const message = warnSpy.mock.calls[0][0] as string
+      expect(message).toContain('NsButton')
+      expect(message).toContain('variant')
+    })
+
+    it('does not warn for ordinary passthrough attrs', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+      mount(NsButton, {
+        attrs: { 'aria-label': 'Submit', 'data-testid': 'submit-btn', to: '/home', type: 'submit' },
+        slots: { default: 'Click Me' },
+      })
+
+      expect(warnSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not warn when only variant is used', () => {
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+      mount(NsButton, { props: { variant: 'tertiary' }, slots: { default: 'Click Me' } })
+
+      expect(warnSpy).not.toHaveBeenCalled()
+    })
+
+    it('does not warn in production, proving the NODE_ENV guard actually gates the check', () => {
+      vi.stubEnv('NODE_ENV', 'production')
+      const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {})
+
+      mount(NsButton, { attrs: { flat: true, color: 'primary' }, slots: { default: 'Click Me' } })
+
+      expect(warnSpy).not.toHaveBeenCalled()
+      vi.unstubAllEnvs()
     })
   })
 })

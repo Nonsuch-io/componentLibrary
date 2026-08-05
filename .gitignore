@@ -43,3 +43,6 @@ AGENTS.local.md
 .beads/issues.jsonl
 .beads/interactions.jsonl
 .beads/metadata.json
+
+# Agent review worktrees — transient, never committed
+.claude/worktrees/

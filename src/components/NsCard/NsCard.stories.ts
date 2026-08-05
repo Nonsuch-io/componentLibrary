@@ -40,8 +40,8 @@ export const WithActions: Story = {
       <NsCard v-bind="args">
         <p>This card has action buttons in the footer.</p>
         <template #actions>
-          <NsButton color="primary">Add to cart</NsButton>
-          <NsButton flat color="grey">Save for later</NsButton>
+          <NsButton variant="primary">Add to cart</NsButton>
+          <NsButton variant="tertiary">Save for later</NsButton>
         </template>
       </NsCard>
     `,
