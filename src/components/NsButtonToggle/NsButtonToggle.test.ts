@@ -48,4 +48,11 @@ describe('NsButtonToggle', () => {
     await buttons[1].trigger('click')
     expect(wrapper.emitted('update:modelValue')).toBeTruthy()
   })
+
+  it('declares a disable prop rather than relying on attrs fallthrough', () => {
+    const wrapper = mount(NsButtonToggle, { props: { ...defaultProps, disable: true } })
+    // If `disable` were not a declared prop, it would land in $attrs
+    // instead of $props, and wrapper.props('disable') would be undefined.
+    expect(wrapper.props('disable')).toBe(true)
+  })
 })

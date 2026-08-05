@@ -1,5 +1,11 @@
 <template>
-  <q-btn-toggle v-bind="$attrs" v-model="model" :options="options" class="ns-button-toggle">
+  <q-btn-toggle
+    v-bind="$attrs"
+    v-model="model"
+    :options="options"
+    :disable="disable"
+    class="ns-button-toggle"
+  >
     <slot />
   </q-btn-toggle>
 </template>
@@ -16,11 +22,14 @@ export interface NsButtonToggleProps {
   modelValue?: unknown
   /** Toggle button options */
   options?: Array<{ label: string; value: unknown }>
+  /** Disable the toggle group */
+  disable?: boolean
 }
 
 const props = withDefaults(defineProps<NsButtonToggleProps>(), {
   modelValue: undefined,
   options: () => [],
+  disable: false,
 })
 
 const emit = defineEmits<{ 'update:modelValue': [value: unknown] }>()

@@ -81,6 +81,14 @@ describe('NsTab', () => {
     })
   })
 
+  it('declares a disable prop rather than relying on attrs fallthrough', () => {
+    const wrapper = mountTabWithProps({ label: 'Home', disable: true })
+    const nsTab = wrapper.findComponent(NsTab)
+    // If `disable` were not a declared prop, it would land in $attrs
+    // instead of $props, and nsTab.props('disable') would be undefined.
+    expect(nsTab.props('disable')).toBe(true)
+  })
+
   describe('accessibility', () => {
     it('renders with tab role', () => {
       const wrapper = mountTab()

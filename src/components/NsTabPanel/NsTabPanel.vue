@@ -1,5 +1,5 @@
 <template>
-  <q-tab-panel v-bind="$attrs" :name="name" class="ns-tab-panel">
+  <q-tab-panel v-bind="$attrs" :name="name" :disable="disable" class="ns-tab-panel">
     <slot />
   </q-tab-panel>
 </template>
@@ -14,9 +14,13 @@
 export interface NsTabPanelProps {
   /** Unique panel name (must match the tab's name) */
   name: string | number
+  /** Disable the panel */
+  disable?: boolean
 }
 
-defineProps<NsTabPanelProps>()
+withDefaults(defineProps<NsTabPanelProps>(), {
+  disable: false,
+})
 </script>
 
 <style lang="sass" scoped>

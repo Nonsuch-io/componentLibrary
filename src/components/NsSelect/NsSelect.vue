@@ -10,6 +10,7 @@
     :multiple="multiple"
     :emit-value="emitValue"
     :map-options="mapOptions"
+    :disable="disable"
     class="ns-select"
     @update:model-value="$emit('update:modelValue', $event)"
   >
@@ -50,6 +51,8 @@ export interface NsSelectProps {
   mapOptions?: boolean
   /** Validation rules — array of Quasar validation rules */
   rules?: ValidationRule[]
+  /** Disable the select */
+  disable?: boolean
 }
 
 withDefaults(defineProps<NsSelectProps>(), {
@@ -62,6 +65,7 @@ withDefaults(defineProps<NsSelectProps>(), {
   emitValue: false,
   mapOptions: false,
   rules: undefined,
+  disable: false,
 })
 
 defineEmits<{

@@ -7,6 +7,7 @@
     :dense="dense"
     :removable="removable"
     :clickable="clickable"
+    :disable="disable"
     class="ns-chip"
     @remove="$emit('remove')"
   >
@@ -35,6 +36,8 @@ export interface NsChipProps {
   removable?: boolean
   /** Make the chip clickable */
   clickable?: boolean
+  /** Disable the chip */
+  disable?: boolean
 }
 
 withDefaults(defineProps<NsChipProps>(), {
@@ -44,6 +47,7 @@ withDefaults(defineProps<NsChipProps>(), {
   dense: false,
   removable: false,
   clickable: false,
+  disable: false,
 })
 
 defineEmits<{

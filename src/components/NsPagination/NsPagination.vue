@@ -1,5 +1,5 @@
 <template>
-  <q-pagination v-bind="$attrs" v-model="model" :max="max" class="ns-pagination">
+  <q-pagination v-bind="$attrs" v-model="model" :max="max" :disable="disable" class="ns-pagination">
     <slot />
   </q-pagination>
 </template>
@@ -16,11 +16,14 @@ export interface NsPaginationProps {
   modelValue?: number
   /** Total number of pages */
   max?: number
+  /** Disable the pagination controls */
+  disable?: boolean
 }
 
 const props = withDefaults(defineProps<NsPaginationProps>(), {
   modelValue: 1,
   max: 1,
+  disable: false,
 })
 
 const emit = defineEmits<{ 'update:modelValue': [value: number] }>()

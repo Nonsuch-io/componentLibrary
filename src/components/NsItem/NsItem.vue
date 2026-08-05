@@ -1,5 +1,5 @@
 <template>
-  <q-item v-bind="$attrs" class="ns-item">
+  <q-item v-bind="$attrs" :disable="disable" class="ns-item">
     <slot />
   </q-item>
 </template>
@@ -11,10 +11,14 @@
  * Provides Nonsuch design-token integration and a consistent API surface.
  * All QItem props and events are forwarded via $attrs.
  */
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface NsItemProps {}
+export interface NsItemProps {
+  /** Put the item in disabled mode (Quasar spells it `disable`, not `disabled`) */
+  disable?: boolean
+}
 
-defineProps<NsItemProps>()
+withDefaults(defineProps<NsItemProps>(), {
+  disable: false,
+})
 </script>
 
 <style lang="sass" scoped>

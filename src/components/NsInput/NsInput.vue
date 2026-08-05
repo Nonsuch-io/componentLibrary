@@ -6,6 +6,7 @@
     :outlined="outlined"
     :dense="dense"
     :rules="rules"
+    :disable="disable"
     class="ns-input"
     @update:model-value="$emit('update:modelValue', $event)"
   >
@@ -36,6 +37,8 @@ export interface NsInputProps {
   dense?: boolean
   /** Validation rules — array of Quasar validation rules */
   rules?: ValidationRule[]
+  /** Disable the input */
+  disable?: boolean
 }
 
 withDefaults(defineProps<NsInputProps>(), {
@@ -44,6 +47,7 @@ withDefaults(defineProps<NsInputProps>(), {
   outlined: true,
   dense: false,
   rules: undefined,
+  disable: false,
 })
 
 defineEmits<{

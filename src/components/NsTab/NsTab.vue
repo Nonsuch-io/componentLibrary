@@ -1,5 +1,5 @@
 <template>
-  <q-tab v-bind="qTabAttrs" class="ns-tab">
+  <q-tab v-bind="qTabAttrs" :disable="disable" class="ns-tab">
     <!-- When icon is a slot, render it inside a q-tab__icon wrapper -->
     <div v-if="$slots.icon" class="q-tab__icon">
       <slot name="icon" />
@@ -40,9 +40,14 @@ const ICON_SIZE = 24
 export interface NsTabProps {
   /** Vue component (e.g. a Phosphor icon) or a Quasar/Material icon name string */
   icon?: string | Component
+  /** Disable the tab */
+  disable?: boolean
 }
 
-const props = defineProps<NsTabProps>()
+const props = withDefaults(defineProps<NsTabProps>(), {
+  icon: undefined,
+  disable: false,
+})
 const attrs = useAttrs()
 
 /**
