@@ -4,6 +4,15 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.24.4](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.3...v0.24.4) (2026-08-05)
+
+
+### Bug Fixes
+
+* **button:** make the warning survive the library build (fable review) ([7d375cc](https://github.com/Nonsuch-io/componentLibrary/commit/7d375cc698b139025ff2a25da3fdda985cc4401a))
+* **button:** warn on Quasar styling attrs, and fix marketing dark mode (componentLibrary-nk3) ([a605338](https://github.com/Nonsuch-io/componentLibrary/commit/a605338e10c9b37274a5a1a3a5b6b37039743a1a))
+* **button:** warn on Quasar styling attrs, and fix marketing dark mode (componentLibrary-nk3) ([dc819b7](https://github.com/Nonsuch-io/componentLibrary/commit/dc819b72dd66227eb7e12eea25faceb44b3d8d64))
+
 ## [0.24.3](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.2...v0.24.3) (2026-07-15)
 
 
