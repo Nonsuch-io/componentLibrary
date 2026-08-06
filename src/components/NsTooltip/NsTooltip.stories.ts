@@ -41,3 +41,19 @@ export const ShortDelay: Story = {
     `,
   }),
 }
+
+// componentLibrary-sj1: keyboard and screen-reader access. Tab to the button
+// to show the tooltip on focus (not just hover), and press Escape to dismiss
+// it without losing focus.
+export const KeyboardAccessible: Story = {
+  render: (args) => ({
+    components: { NsTooltip },
+    setup: () => ({ args }),
+    template: `
+      <button style="padding: 8px 16px">
+        Tab to me, then press Escape
+        <NsTooltip v-bind="args">Shown on focus as well as hover</NsTooltip>
+      </button>
+    `,
+  }),
+}
