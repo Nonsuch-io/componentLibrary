@@ -38,7 +38,17 @@ describe.skipIf(!built)('the attr-conflict warning survives the library build', 
 })
 
 describe.skipIf(built)('bundle not built', () => {
-  it('skips — run `pnpm build` first; CI builds before testing', () => {
-    expect(built).toBe(false)
+  it('fails in CI, skips locally — a skip must never read as a pass in the gate', () => {
+    // The comment this replaced said "CI builds before testing". That was FALSE:
+    // ci.yml ran Test before Build and dist/ is gitignored, so on every PR this
+    // whole file skipped and reported green, and the assertions guarding the
+    // published bundle had never once executed in the gate protecting main.
+    // The workflow is reordered; this makes the remaining failure mode loud
+    // rather than trusting that ordering forever.
+    expect(
+      process.env.CI,
+      'dist/ is absent in CI: the build must run before tests, or the assertions ' +
+        'in this file silently do not execute. Run `pnpm build` first.',
+    ).toBeFalsy()
   })
 })
