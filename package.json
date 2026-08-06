@@ -26,6 +26,9 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/nonsuch-components.js"
     },
+    "./global": {
+      "types": "./dist/global-components.d.ts"
+    },
     "./style.css": "./dist/nonsuch-components.css",
     "./fonts.css": "./fonts/fonts.css",
     "./fonts/global.css": "./fonts/global.css",

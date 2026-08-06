@@ -217,6 +217,7 @@ export type {
 
 // Plugin
 export { createNonsuch } from './plugin'
+export { nsComponentRegistry } from './component-registry'
 export type { NsPluginOptions } from './plugin'
 
 // Quasar config helper

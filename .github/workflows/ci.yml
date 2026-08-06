@@ -37,6 +37,9 @@ jobs:
       - name: Type-check
         run: pnpm typecheck
 
+      - name: Build
+        run: pnpm build
+
       - name: Test
         run: pnpm test
 
@@ -45,9 +48,6 @@ jobs:
 
       - name: Coverage
         run: pnpm test:coverage
-
-      - name: Build
-        run: pnpm build
 
       - name: Check bundle size
         run: pnpm size:check
