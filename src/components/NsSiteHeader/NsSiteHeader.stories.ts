@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import NsSiteHeader from './NsSiteHeader.vue'
-
-import imgLogo from '../../assets/marketing/icon-brand-logo.svg?url'
+import {
+  placeholderWordmarkSrc,
+  placeholderLogoAlt,
+} from '../../stories/placeholderMarketingContent'
 
 const meta = {
   title: 'Marketing/NsSiteHeader',
@@ -16,11 +18,11 @@ type Story = StoryObj<typeof meta>
 export const Default: Story = {
   render: () => ({
     components: { NsSiteHeader },
-    setup: () => ({ imgLogo }),
+    setup: () => ({ placeholderWordmarkSrc, placeholderLogoAlt }),
     template: `
       <NsSiteHeader>
         <template #logo>
-          <img :src="imgLogo" style="height: 27px; width: 72px;" alt="butiq" />
+          <img :src="placeholderWordmarkSrc" style="height: 27px; width: 72px;" :alt="placeholderLogoAlt" />
         </template>
         <template #nav>
           <span style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; color: white;">Home</span>

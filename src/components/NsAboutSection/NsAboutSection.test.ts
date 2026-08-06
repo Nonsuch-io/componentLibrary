@@ -5,10 +5,10 @@ import NsAboutSection from './NsAboutSection.vue'
 describe('NsAboutSection', () => {
   it('should render default slot content', () => {
     const wrapper = mount(NsAboutSection, {
-      slots: { default: '<p class="body">About butiq</p>' },
+      slots: { default: '<p class="body">About Acme</p>' },
     })
     expect(wrapper.find('.body').exists()).toBe(true)
-    expect(wrapper.text()).toContain('About butiq')
+    expect(wrapper.text()).toContain('About Acme')
   })
 
   it('should render eyebrow slot content', () => {

@@ -388,7 +388,7 @@ Some illustrative icons used in the **Marketing** component stories are derived 
 
 Twemoji graphics are © Twitter, Inc and other contributors, licensed under [CC-BY 4.0](https://creativecommons.org/licenses/by/4.0/). When redistributing these assets, please retain this attribution.
 
-The remaining marketing icons (`icon-brand-logo`, `icon-logo-badge`, `icon-arrow-button`, `icon-checkmark`, `icon-doodle-arrows`, `icon-x`, `icon-bluesky`, `icon-instagram`, `icon-butiq-logo`) are original work by Nonsuch.
+The remaining marketing icons (`icon-arrow-button`, `icon-checkmark`, `icon-doodle-arrows`, `icon-x`, `icon-bluesky`, `icon-instagram`) are original work by Nonsuch.
 
 ## License
 
