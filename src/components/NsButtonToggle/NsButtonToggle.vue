@@ -3,7 +3,7 @@
     v-bind="$attrs"
     v-model="model"
     :options="options"
-    :disable="disable"
+    :disable="resolvedDisable"
     class="ns-button-toggle"
   >
     <slot />
@@ -39,7 +39,11 @@ const model = computed({
   set: (val) => emit('update:modelValue', val),
 })
 
+// Accepts the `disabled` spelling too — see useNsDisabled.
+const resolvedDisable = useNsDisabled('NsButtonToggle', () => props.disable)
+
 import { computed } from 'vue'
+import { useNsDisabled } from '../../composables/useNsDisabled'
 </script>
 
 <style lang="sass" scoped>

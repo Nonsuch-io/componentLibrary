@@ -1,5 +1,5 @@
 <template>
-  <q-tab v-bind="qTabAttrs" :disable="disable" class="ns-tab">
+  <q-tab v-bind="qTabAttrs" :disable="resolvedDisable" class="ns-tab">
     <!-- When icon is a slot, render it inside a q-tab__icon wrapper -->
     <div v-if="$slots.icon" class="q-tab__icon">
       <slot name="icon" />
@@ -15,6 +15,7 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue'
 import type { Component } from 'vue'
+import { useNsDisabled } from '../../composables/useNsDisabled'
 
 /**
  * NsTab — A styled wrapper around Quasar's QTab.
@@ -63,6 +64,9 @@ const qTabAttrs = computed(() => {
   // Component or undefined — don't forward icon to q-tab
   return rest
 })
+
+// Accepts the `disabled` spelling too — see useNsDisabled.
+const resolvedDisable = useNsDisabled('NsTab', () => props.disable)
 </script>
 
 <style lang="sass" scoped>

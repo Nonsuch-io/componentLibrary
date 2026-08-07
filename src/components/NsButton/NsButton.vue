@@ -7,6 +7,7 @@
     :loading="loading"
     :padding="buttonPadding"
     :aria-busy="loading"
+    :disable="resolvedDisable"
     :class="['ns-btn', `ns-btn--${variant}`, `ns-btn--${size}`, { 'ns-btn--icon-only': iconOnly }]"
   >
     <slot />
@@ -22,6 +23,7 @@
 import { computed } from 'vue'
 import { QSpinnerDots } from 'quasar'
 import { useNsAttrConflictWarning } from '../../composables/useNsAttrConflictWarning'
+import { useNsDisabled } from '../../composables/useNsDisabled'
 
 export type NsButtonVariant =
   | 'primary'
@@ -42,6 +44,8 @@ export interface NsButtonProps {
   /** Square icon-only layout — use when no label slot is provided */
   iconOnly?: boolean
   loading?: boolean
+  /** Disable the button */
+  disable?: boolean
 }
 
 const props = withDefaults(defineProps<NsButtonProps>(), {
@@ -49,7 +53,14 @@ const props = withDefaults(defineProps<NsButtonProps>(), {
   size: 'md',
   iconOnly: false,
   loading: false,
+  disable: false,
 })
+
+// QBtn renders a real <button>, so the `disabled` spelling natively disables
+// it already — but without this it misses Quasar's `.disabled` class and
+// `aria-disabled`, and doesn't get the loud alias warning the other
+// controls get. See useNsDisabled and componentLibrary-ob8.
+const resolvedDisable = useNsDisabled('NsButton', () => props.disable)
 
 // componentLibrary-nk3: `unelevated` is deliberately NOT in this list. It is hardcoded on the
 // q-btn AFTER v-bind="$attrs", so mergeProps always resolves ours and a consumer-passed value

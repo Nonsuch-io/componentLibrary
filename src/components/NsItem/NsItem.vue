@@ -1,10 +1,11 @@
 <template>
-  <q-item v-bind="$attrs" :disable="disable" class="ns-item">
+  <q-item v-bind="$attrs" :disable="resolvedDisable" class="ns-item">
     <slot />
   </q-item>
 </template>
 
 <script setup lang="ts">
+import { useNsDisabled } from '../../composables/useNsDisabled'
 /**
  * NsItem — A styled wrapper around Quasar's QItem.
  *
@@ -16,9 +17,12 @@ export interface NsItemProps {
   disable?: boolean
 }
 
-withDefaults(defineProps<NsItemProps>(), {
+const props = withDefaults(defineProps<NsItemProps>(), {
   disable: false,
 })
+
+// Accepts the `disabled` spelling too — see useNsDisabled.
+const resolvedDisable = useNsDisabled('NsItem', () => props.disable)
 </script>
 
 <style lang="sass" scoped>

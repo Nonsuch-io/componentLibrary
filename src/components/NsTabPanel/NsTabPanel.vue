@@ -1,10 +1,11 @@
 <template>
-  <q-tab-panel v-bind="$attrs" :name="name" :disable="disable" class="ns-tab-panel">
+  <q-tab-panel v-bind="$attrs" :name="name" :disable="resolvedDisable" class="ns-tab-panel">
     <slot />
   </q-tab-panel>
 </template>
 
 <script setup lang="ts">
+import { useNsDisabled } from '../../composables/useNsDisabled'
 /**
  * NsTabPanel — A styled wrapper around Quasar's QTabPanel.
  *
@@ -18,9 +19,12 @@ export interface NsTabPanelProps {
   disable?: boolean
 }
 
-withDefaults(defineProps<NsTabPanelProps>(), {
+const props = withDefaults(defineProps<NsTabPanelProps>(), {
   disable: false,
 })
+
+// Accepts the `disabled` spelling too — see useNsDisabled.
+const resolvedDisable = useNsDisabled('NsTabPanel', () => props.disable)
 </script>
 
 <style lang="sass" scoped>

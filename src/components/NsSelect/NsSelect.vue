@@ -10,7 +10,7 @@
     :multiple="multiple"
     :emit-value="emitValue"
     :map-options="mapOptions"
-    :disable="disable"
+    :disable="resolvedDisable"
     class="ns-select"
     @update:model-value="$emit('update:modelValue', $event)"
   >
@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import { useNsDisabled } from '../../composables/useNsDisabled'
 /**
  * NsSelect — A styled select/dropdown wrapping Quasar's QSelect.
  *
@@ -55,7 +56,7 @@ export interface NsSelectProps {
   disable?: boolean
 }
 
-withDefaults(defineProps<NsSelectProps>(), {
+const props = withDefaults(defineProps<NsSelectProps>(), {
   label: undefined,
   modelValue: undefined,
   options: () => [],
@@ -71,6 +72,10 @@ withDefaults(defineProps<NsSelectProps>(), {
 defineEmits<{
   'update:modelValue': [value: unknown]
 }>()
+
+// Accepts the `disabled` spelling too — on a QSelect it would otherwise land
+// on the wrapper div and leave the field fully editable. See useNsDisabled.
+const resolvedDisable = useNsDisabled('NsSelect', () => props.disable)
 </script>
 
 <style lang="sass" scoped>

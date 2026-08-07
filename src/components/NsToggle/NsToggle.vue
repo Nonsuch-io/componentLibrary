@@ -5,7 +5,7 @@
     :label="label"
     :color="color"
     :dense="dense"
-    :disable="disable"
+    :disable="resolvedDisable"
     role="switch"
     :aria-checked="modelValue"
     class="ns-toggle"
@@ -14,6 +14,7 @@
 </template>
 
 <script setup lang="ts">
+import { useNsDisabled } from '../../composables/useNsDisabled'
 /**
  * NsToggle — A styled toggle switch wrapping Quasar's QToggle.
  *
@@ -33,7 +34,7 @@ export interface NsToggleProps {
   disable?: boolean
 }
 
-withDefaults(defineProps<NsToggleProps>(), {
+const props = withDefaults(defineProps<NsToggleProps>(), {
   label: undefined,
   modelValue: false,
   color: 'primary',
@@ -44,6 +45,10 @@ withDefaults(defineProps<NsToggleProps>(), {
 defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
+
+// Accepts the `disabled` spelling too — on a QToggle it would otherwise land
+// on the wrapper and leave the control fully live. See useNsDisabled.
+const resolvedDisable = useNsDisabled('NsToggle', () => props.disable)
 </script>
 
 <style lang="sass" scoped>

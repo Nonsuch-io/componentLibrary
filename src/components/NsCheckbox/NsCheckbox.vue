@@ -5,13 +5,14 @@
     :label="label"
     :color="color"
     :dense="dense"
-    :disable="disable"
+    :disable="resolvedDisable"
     class="ns-checkbox"
     @update:model-value="$emit('update:modelValue', $event)"
   />
 </template>
 
 <script setup lang="ts">
+import { useNsDisabled } from '../../composables/useNsDisabled'
 /**
  * NsCheckbox — A styled checkbox wrapping Quasar's QCheckbox.
  *
@@ -31,7 +32,7 @@ export interface NsCheckboxProps {
   disable?: boolean
 }
 
-withDefaults(defineProps<NsCheckboxProps>(), {
+const props = withDefaults(defineProps<NsCheckboxProps>(), {
   label: undefined,
   modelValue: false,
   color: 'primary',
@@ -42,6 +43,10 @@ withDefaults(defineProps<NsCheckboxProps>(), {
 defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
+
+// Accepts the `disabled` spelling too — on a QCheckbox it would otherwise
+// land on the wrapper div and leave the control fully live. See useNsDisabled.
+const resolvedDisable = useNsDisabled('NsCheckbox', () => props.disable)
 </script>
 
 <style lang="sass" scoped>

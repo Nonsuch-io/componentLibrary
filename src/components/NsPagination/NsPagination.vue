@@ -1,5 +1,11 @@
 <template>
-  <q-pagination v-bind="$attrs" v-model="model" :max="max" :disable="disable" class="ns-pagination">
+  <q-pagination
+    v-bind="$attrs"
+    v-model="model"
+    :max="max"
+    :disable="resolvedDisable"
+    class="ns-pagination"
+  >
     <slot />
   </q-pagination>
 </template>
@@ -33,7 +39,11 @@ const model = computed({
   set: (val) => emit('update:modelValue', val),
 })
 
+// Accepts the `disabled` spelling too — see useNsDisabled.
+const resolvedDisable = useNsDisabled('NsPagination', () => props.disable)
+
 import { computed } from 'vue'
+import { useNsDisabled } from '../../composables/useNsDisabled'
 </script>
 
 <style lang="sass" scoped>

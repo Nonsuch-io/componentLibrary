@@ -7,7 +7,7 @@
     :dense="dense"
     :removable="removable"
     :clickable="clickable"
-    :disable="disable"
+    :disable="resolvedDisable"
     class="ns-chip"
     @remove="$emit('remove')"
   >
@@ -16,6 +16,7 @@
 </template>
 
 <script setup lang="ts">
+import { useNsDisabled } from '../../composables/useNsDisabled'
 /**
  * NsChip — A styled chip wrapping Quasar's QChip.
  *
@@ -40,7 +41,7 @@ export interface NsChipProps {
   disable?: boolean
 }
 
-withDefaults(defineProps<NsChipProps>(), {
+const props = withDefaults(defineProps<NsChipProps>(), {
   color: 'primary',
   textColor: 'white',
   outline: false,
@@ -53,6 +54,9 @@ withDefaults(defineProps<NsChipProps>(), {
 defineEmits<{
   remove: []
 }>()
+
+// Accepts the `disabled` spelling too — see useNsDisabled.
+const resolvedDisable = useNsDisabled('NsChip', () => props.disable)
 </script>
 
 <style lang="sass" scoped>
