@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.25.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.6...v0.25.0) (2026-08-07)
+
+
+### Features
+
+* **dialog:** add the design system's named width scale (componentLibrary-0bw) ([ada088d](https://github.com/Nonsuch-io/componentLibrary/commit/ada088d492917d57b73e93cb32dcd5ca21795462))
+
 ## [0.24.6](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.5...v0.24.6) (2026-08-07)
 
 
