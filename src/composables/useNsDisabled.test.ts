@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import NsInput from '../components/NsInput/NsInput.vue'
+import NsButton from '../components/NsButton/NsButton.vue'
 import NsCheckbox from '../components/NsCheckbox/NsCheckbox.vue'
 import NsSelect from '../components/NsSelect/NsSelect.vue'
-import NsButton from '../components/NsButton/NsButton.vue'
 import { __resetNsDisabledWarnings } from './useNsDisabled'
 
 describe('useNsDisabled', () => {
@@ -102,6 +102,43 @@ describe('useNsDisabled', () => {
         .findComponent({ name: 'QBtn' })
         .props('disable')
       expect(disable).toBe(true)
+    })
+  })
+
+  describe('coercion matches Vue, with one deliberate carve-out', () => {
+    // Review measured `:disabled="0"` rendering a DISABLED field, and the warning
+    // then claiming it "has been treated as disable for you" — affirmatively
+    // wrong for a falsy binding. Vue's own rule is `!!value || value === ''`.
+    it.each([
+      ['0 (a falsy count)', 0, false],
+      ['NaN', Number.NaN, false],
+      ['null', null, false],
+      ['false', false, false],
+      ["the string 'false'", 'false', false],
+      ['empty string (bare attribute)', '', true],
+      ['true', true, true],
+      ["the string 'true'", 'true', true],
+    ])('%s -> disable %s', (_label, value, expected) => {
+      expect(disableOf(mount(NsInput, { attrs: { disabled: value } }))).toBe(expected)
+    })
+  })
+
+  describe('the raw attribute does not also reach the DOM', () => {
+    // On NsButton, QBtn renders a real <button>, so a stray disabled="false"
+    // falling through set element.disabled = true while our resolved prop said
+    // false — a button styled fully enabled that ignores clicks. Every earlier
+    // test asserted at the Vue-prop level and could not see it.
+    it('does not leave a stray disabled attribute on the rendered element', () => {
+      const w = mount(NsButton, { attrs: { disabled: 'false' } })
+      expect(w.attributes('disabled'), 'raw attribute leaked through $attrs').toBeUndefined()
+    })
+
+    it('still forwards other attrs untouched', () => {
+      // Asserted against the rendered output, not the ROOT element: QInput places
+      // unknown attrs on its inner <input>, not the outer <label>. Checking the
+      // root failed while the behaviour was correct.
+      const w = mount(NsInput, { attrs: { disabled: true, 'data-test': 'keep-me' } })
+      expect(w.html(), 'unrelated attrs must survive the disabled filtering').toContain('keep-me')
     })
   })
 })

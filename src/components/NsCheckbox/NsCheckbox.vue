@@ -1,6 +1,6 @@
 <template>
   <q-checkbox
-    v-bind="$attrs"
+    v-bind="attrsWithoutDisabled"
     :model-value="modelValue"
     :label="label"
     :color="color"
@@ -46,7 +46,13 @@ defineEmits<{
 
 // Accepts the `disabled` spelling too — on a QCheckbox it would otherwise
 // land on the wrapper div and leave the control fully live. See useNsDisabled.
-const resolvedDisable = useNsDisabled('NsCheckbox', () => props.disable)
+// inheritAttrs: false is REQUIRED, not tidiness. Vue applies $attrs to the root
+// element automatically IN ADDITION to any explicit v-bind, so without this the
+// raw `disabled` attribute lands on the DOM anyway and defeats the filtering
+// below — measured: the attribute was still present on the rendered element.
+defineOptions({ inheritAttrs: false })
+
+const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsCheckbox', () => props.disable)
 </script>
 
 <style lang="sass" scoped>

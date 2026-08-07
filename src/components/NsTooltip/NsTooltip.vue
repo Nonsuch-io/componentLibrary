@@ -192,8 +192,7 @@ onMounted(() => {
   // build verbatim for the consumer's bundler. Same reasoning as
   // useNsAttrConflictWarning, which documents the measurement.
   if (
-    typeof process !== 'undefined' &&
-    process?.env?.NODE_ENV !== 'production' &&
+    (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') &&
     $attrs.target !== undefined
   ) {
     console.warn(

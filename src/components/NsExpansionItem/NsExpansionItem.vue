@@ -1,5 +1,9 @@
 <template>
-  <q-expansion-item v-bind="$attrs" :disable="resolvedDisable" class="ns-expansion-item">
+  <q-expansion-item
+    v-bind="attrsWithoutDisabled"
+    :disable="resolvedDisable"
+    class="ns-expansion-item"
+  >
     <slot />
   </q-expansion-item>
 </template>
@@ -22,7 +26,16 @@ const props = withDefaults(defineProps<NsExpansionItemProps>(), {
 })
 
 // Accepts the `disabled` spelling too — see useNsDisabled.
-const resolvedDisable = useNsDisabled('NsExpansionItem', () => props.disable)
+// inheritAttrs: false is REQUIRED, not tidiness. Vue applies $attrs to the root
+// element automatically IN ADDITION to any explicit v-bind, so without this the
+// raw `disabled` attribute lands on the DOM anyway and defeats the filtering
+// below — measured: the attribute was still present on the rendered element.
+defineOptions({ inheritAttrs: false })
+
+const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled(
+  'NsExpansionItem',
+  () => props.disable,
+)
 </script>
 
 <style lang="sass" scoped>

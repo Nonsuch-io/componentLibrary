@@ -57,7 +57,12 @@ const attrs = useAttrs()
  * to q-tab (which calls `.match()` on the value and would throw at runtime).
  */
 const qTabAttrs = computed(() => {
-  const { icon: _icon, ...rest } = attrs as Record<string, unknown>
+  // `disabled` is dropped here too, not just `icon`: useNsDisabled resolves it
+  // into the `disable` prop, and letting the raw attribute also reach q-tab
+  // puts an inert `disabled` on the DOM that a consumer's `[disabled]` selector
+  // would match on an ENABLED tab. This component filters attrs itself, so it
+  // cannot use attrsWithoutDisabled directly.
+  const { icon: _icon, disabled: _disabled, ...rest } = attrs as Record<string, unknown>
   if (typeof props.icon === 'string') {
     return { ...rest, icon: props.icon }
   }
@@ -66,7 +71,13 @@ const qTabAttrs = computed(() => {
 })
 
 // Accepts the `disabled` spelling too — see useNsDisabled.
-const resolvedDisable = useNsDisabled('NsTab', () => props.disable)
+// inheritAttrs: false is REQUIRED, not tidiness. Vue applies $attrs to the root
+// element automatically IN ADDITION to any explicit v-bind, so without this the
+// raw `disabled` attribute lands on the DOM anyway and defeats the filtering
+// below — measured: the attribute was still present on the rendered element.
+defineOptions({ inheritAttrs: false })
+
+const { resolvedDisable } = useNsDisabled('NsTab', () => props.disable)
 </script>
 
 <style lang="sass" scoped>

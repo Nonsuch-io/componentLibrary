@@ -1,6 +1,6 @@
 <template>
   <q-btn
-    v-bind="$attrs"
+    v-bind="attrsWithoutDisabled"
     unelevated
     no-caps
     :ripple="false"
@@ -60,10 +60,16 @@ const props = withDefaults(defineProps<NsButtonProps>(), {
 // it already — but without this it misses Quasar's `.disabled` class and
 // `aria-disabled`, and doesn't get the loud alias warning the other
 // controls get. See useNsDisabled and componentLibrary-ob8.
-const resolvedDisable = useNsDisabled('NsButton', () => props.disable)
+// inheritAttrs: false is REQUIRED, not tidiness. Vue applies $attrs to the root
+// element automatically IN ADDITION to any explicit v-bind, so without this the
+// raw `disabled` attribute lands on the DOM anyway and defeats the filtering
+// below — measured: the attribute was still present on the rendered element.
+defineOptions({ inheritAttrs: false })
+
+const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsButton', () => props.disable)
 
 // componentLibrary-nk3: `unelevated` is deliberately NOT in this list. It is hardcoded on the
-// q-btn AFTER v-bind="$attrs", so mergeProps always resolves ours and a consumer-passed value
+// q-btn AFTER the attrs spread, so mergeProps always resolves ours and a consumer-passed value
 // is inert — warning about it would be a false positive, and a guard that is wrong once gets
 // ignored for the cases that matter (fable).
 //

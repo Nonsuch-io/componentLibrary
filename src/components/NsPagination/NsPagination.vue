@@ -1,6 +1,6 @@
 <template>
   <q-pagination
-    v-bind="$attrs"
+    v-bind="attrsWithoutDisabled"
     v-model="model"
     :max="max"
     :disable="resolvedDisable"
@@ -40,7 +40,13 @@ const model = computed({
 })
 
 // Accepts the `disabled` spelling too — see useNsDisabled.
-const resolvedDisable = useNsDisabled('NsPagination', () => props.disable)
+// inheritAttrs: false is REQUIRED, not tidiness. Vue applies $attrs to the root
+// element automatically IN ADDITION to any explicit v-bind, so without this the
+// raw `disabled` attribute lands on the DOM anyway and defeats the filtering
+// below — measured: the attribute was still present on the rendered element.
+defineOptions({ inheritAttrs: false })
+
+const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsPagination', () => props.disable)
 
 import { computed } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'

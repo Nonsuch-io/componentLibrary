@@ -1,6 +1,6 @@
 <template>
   <q-select
-    v-bind="$attrs"
+    v-bind="attrsWithoutDisabled"
     :model-value="modelValue"
     :label="label"
     :options="options"
@@ -75,7 +75,13 @@ defineEmits<{
 
 // Accepts the `disabled` spelling too — on a QSelect it would otherwise land
 // on the wrapper div and leave the field fully editable. See useNsDisabled.
-const resolvedDisable = useNsDisabled('NsSelect', () => props.disable)
+// inheritAttrs: false is REQUIRED, not tidiness. Vue applies $attrs to the root
+// element automatically IN ADDITION to any explicit v-bind, so without this the
+// raw `disabled` attribute lands on the DOM anyway and defeats the filtering
+// below — measured: the attribute was still present on the rendered element.
+defineOptions({ inheritAttrs: false })
+
+const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsSelect', () => props.disable)
 </script>
 
 <style lang="sass" scoped>
