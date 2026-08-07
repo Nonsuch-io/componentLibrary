@@ -22,6 +22,24 @@ updates:
       semver-patch-days: 3
       semver-minor-days: 7
       semver-major-days: 14
+    # TypeScript 7 is held back, NOT declined. typescript-eslint does not
+    # support it: v8 (latest, 8.66.x) declares `typescript: >=4.8.4 <6.1.0`, and
+    # there is no v9. Taking the bump reds CI at the Lint step with
+    # "typescript-eslint does not support TS 7.0" — verified on PRs #201 and #219.
+    #
+    # Recorded here rather than via `@dependabot ignore this major version`,
+    # because a comment-command ignore is stored by Dependabot and is INVISIBLE
+    # in this repo — nobody could see the rule or its reason. It is also ambiguous
+    # on a grouped PR: typescript ships in the `build` group below, so a comment
+    # command risks holding back vite and vue-tsc with it.
+    #
+    # REMOVE THIS ENTRY when typescript-eslint ships TS 7 support (watch its
+    # peerDependencies.typescript range). Only 7.x is blocked, so 6.x patches and
+    # minors still flow, and a future 8.x would be offered normally.
+    ignore:
+      - dependency-name: 'typescript'
+        versions: ['7.x']
+
     groups:
       storybook:
         patterns:
