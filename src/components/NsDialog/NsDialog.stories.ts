@@ -1,5 +1,7 @@
+import { ref } from 'vue'
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import NsDialog from './NsDialog.vue'
+import NsButton from '../NsButton/NsButton.vue'
 
 const meta: Meta<typeof NsDialog> = {
   title: 'Components/NsDialog',
@@ -51,6 +53,35 @@ export const Persistent: Story = {
           <button>Keep editing</button>
           <button>Discard</button>
         </template>
+      </NsDialog>
+    `,
+  }),
+}
+
+/**
+ * The design system's named widths — 400 / 650 / 820. Storybook is the only
+ * place the difference is actually visible, since happy-dom computes no layout.
+ */
+export const Sizes: Story = {
+  render: () => ({
+    components: { NsDialog, NsButton },
+    setup() {
+      const open = ref<'small' | 'default' | 'large' | null>(null)
+      return { open }
+    },
+    template: `
+      <div style="display:flex; gap:12px">
+        <NsButton label="Small" @click="open = 'small'" />
+        <NsButton label="Default" @click="open = 'default'" />
+        <NsButton label="Large" @click="open = 'large'" />
+      </div>
+      <NsDialog
+        :model-value="open !== null"
+        :size="open ?? 'default'"
+        :title="(open ?? '') + ' dialog'"
+        @update:model-value="open = null"
+      >
+        This dialog is the "{{ open }}" size from the design system's scale.
       </NsDialog>
     `,
   }),

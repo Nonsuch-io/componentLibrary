@@ -1,4 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { nextTick, defineComponent, h } from 'vue'
 import NsDialog from './NsDialog.vue'
@@ -267,6 +269,70 @@ describe('NsDialog', () => {
         global: { stubs },
       })
       expect(wrapper.find('.stub-hdr').exists()).toBe(true)
+    })
+  })
+
+  describe('size', () => {
+    // Same stubs the template-coverage block uses; the module-level stub
+    // components are shared, only this object literal is local to each block.
+    const stubs = {
+      QDialog: QDialogStub,
+      QCard: QCardStub,
+      QCardSection: QCardSectionStub,
+      QCardActions: QCardActionsStub,
+    }
+
+    // These assert the RESOLVED WIDTH, not just that a modifier class exists.
+    // A class-only assertion passes whether or not the CSS behind it does
+    // anything — and this whole prop exists because five consumers were each
+    // setting their own max-width. Parsing the component's own style block ties
+    // the class to the number the design system names.
+    const sfc = readFileSync(
+      resolve(process.cwd(), 'src/components/NsDialog/NsDialog.vue'),
+      'utf-8',
+    )
+    const styleBlock = sfc.slice(sfc.indexOf('<style'))
+
+    const tokens = readFileSync(resolve(process.cwd(), 'src/tokens/tokens.css'), 'utf-8')
+
+    it.each([
+      ['small', '400px'],
+      ['default', '650px'],
+      ['large', '820px'],
+    ])('size="%s" resolves to a max-width of %s', (size, expected) => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true, size: size as 'small' | 'default' | 'large' },
+        slots: { default: 'Body' },
+        global: { stubs },
+      })
+      expect(wrapper.find(`.ns-dialog__card--${size}`).exists()).toBe(true)
+
+      // the class must set max-width from a token...
+      const rule = new RegExp(
+        `&--${size}\\s*\\n\\s*max-width:\\s*var\\((--ns-dialog-width-[a-z]+)\\)`,
+      )
+      const match = rule.exec(styleBlock)
+      expect(match, `no max-width token under &--${size}`).not.toBeNull()
+
+      // ...and that token must resolve to the value Figma specifies.
+      const tokenValue = new RegExp(`${match![1]}:\\s*([^;]+);`).exec(tokens)
+      expect(tokenValue?.[1].trim(), `${match![1]} in tokens.css`).toBe(expected)
+    })
+
+    it('defaults to the default size', () => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true },
+        slots: { default: 'Body' },
+        global: { stubs },
+      })
+      expect(wrapper.find('.ns-dialog__card--default').exists()).toBe(true)
+    })
+
+    it('shrinks rather than overflowing a narrow viewport', () => {
+      // width:100% with a max-width, never a fixed width — an 820px `large`
+      // dialog on a 400px phone must not push the viewport sideways.
+      expect(styleBlock).toMatch(/width:\s*100%/)
+      expect(styleBlock).not.toMatch(/^\s+width:\s*\d+px/m)
     })
   })
 })
