@@ -31,7 +31,11 @@ declare const process: { env: { NODE_ENV?: string } } | undefined
  */
 const warned = new Set<string>()
 
-/** Test seam: the warning dedupes per component+attr, which leaks across tests. */
+/**
+ * Test seam: the warning dedupes per COMPONENT NAME — the Set is keyed by that
+ * alone, not by component+attr as an earlier comment claimed. Module-level, so
+ * it leaks between tests in a file; reset it in beforeEach.
+ */
 export function __resetNsDisabledWarnings(): void {
   warned.clear()
 }

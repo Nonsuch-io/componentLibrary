@@ -35,21 +35,36 @@ describe.skipIf(!built)('dev warnings survive the build and fail open', () => {
     expect(js).not.toContain('import.meta.env')
   })
 
-  it('has NO fail-closed guard: none returns early merely because process is absent', () => {
-    // MATCH ON THE OPERATOR, NOT THE SURROUNDING SYNTAX. My first version
-    // required `) return` after the condition and could not fail: the minifier
-    // chains the next guard in, producing `...||Qe.has(e))return`. Proved it
-    // green against a deliberately reverted polarity before fixing it.
+  it('every process guard in the bundle matches a known-good, fail-open shape', () => {
+    // ALLOW-LIST, NOT DENY-LIST. The first version denied ONE wrong shape — the
+    // OR-chain early return, which was my own mistake — and review proved it
+    // blind to the OTHER wrong shape, the AND-chain inline guard that actually
+    // shipped twice (NsTooltip #213, NsBreadcrumbs #228). Reverting NsTooltip to
+    // its historical form left this test GREEN. A deny-list of the bugs you
+    // happen to have made cannot cover the ones you have not.
     //
-    // The distinguishing signature is which comparison pairs with
-    // `typeof process > "u"` (i.e. "process is undefined"):
-    //     >"u" || ... === "production"   FAIL-CLOSED — silent in a browser
-    //     >"u" || ... !== "production"   fail-open inline guard   (fine)
-    //     <"u" && ... === "production"   fail-open early return   (fine)
-    const failClosed =
-      /typeof process\s*>\s*"u"\s*\|\|\s*process\.env\.NODE_ENV\s*===\s*"production"/g
-    const hits = js.match(failClosed) ?? []
-    expect(hits, `fail-closed guard(s) found: ${hits.join(' | ')}`).toEqual([])
+    // The two correct shapes, as the minifier writes them:
+    //   early return:  typeof process < "u" && ...NODE_ENV === "production"
+    //                  -> returns ONLY when process exists AND is production
+    //   inline guard:  typeof process > "u" || ...NODE_ENV !== "production"
+    //                  -> proceeds when process is absent
+    // Both warn when `typeof process` is 'undefined', which is what a consumer's
+    // browser gives after their bundler has inlined NODE_ENV.
+    const GOOD = [
+      /^typeof process\s*<\s*"u"\s*&&\s*process\.env\.NODE_ENV\s*===\s*"production"$/,
+      /^typeof process\s*>\s*"u"\s*\|\|\s*process\.env\.NODE_ENV\s*!==\s*"production"$/,
+    ]
+
+    const guards =
+      js.match(
+        /typeof process\s*[<>]\s*"u"\s*(?:&&|\|\|)\s*process\.env\.NODE_ENV\s*[!=]==\s*"production"/g,
+      ) ?? []
+    expect(guards.length, 'no process guards found at all — extraction is broken').toBeGreaterThan(
+      0,
+    )
+
+    const bad = guards.filter((g) => !GOOD.some((re) => re.test(g)))
+    expect(bad, `fail-closed guard shape(s): ${bad.join(' | ')}`).toEqual([])
   })
 })
 
