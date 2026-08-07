@@ -21,17 +21,21 @@ import imgDoodleX from '../../assets/marketing/icon-x.svg?url'
 import imgDoodleCheck from '../../assets/marketing/icon-checkmark.svg?url'
 import imgBluesky from '../../assets/marketing/icon-bluesky.svg?url'
 import imgInstagram from '../../assets/marketing/icon-instagram.svg?url'
-import imgHeaderWordmark from '../../assets/marketing/icon-brand-logo.svg?url'
 import imgCanadaFlag from '../../assets/marketing/icon-flag-canada.svg?url'
-import imgSquareLogo from '../../assets/marketing/icon-logo-badge.svg?url'
 import imgSendingEmail from '../../assets/marketing/icon-incoming-envelope.svg?url'
 import imgLaptopGirl from '../../assets/marketing/icon-woman-technologist.svg?url'
+import {
+  placeholderLogoSrc,
+  placeholderWordmarkSrc,
+  placeholderLogoAlt,
+  placeholderCopy,
+} from '../../stories/placeholderMarketingContent'
 
 const trustItems: NsTrustBarItem[] = [
   { text: 'No credit card', icon: imgDoodleX },
   { text: 'No commitment', icon: imgDoodleX },
   {
-    text: "Just an early look at what butiq is and how it's built better for in-person retail.",
+    text: placeholderCopy.trustBarBullet,
     icon: imgDoodleCheck,
   },
 ]
@@ -70,9 +74,11 @@ export const Default: Story = {
       return {
         email,
         submitted,
-        imgHeaderWordmark,
+        placeholderLogoSrc,
+        placeholderWordmarkSrc,
+        placeholderLogoAlt,
+        placeholderCopy,
         imgCanadaFlag,
-        imgSquareLogo,
         imgButtonArrow,
         imgDoodleArrows,
         imgDoodleCheck,
@@ -88,7 +94,7 @@ export const Default: Story = {
         <template #header>
           <NsSiteHeader>
             <template #logo>
-              <img :src="imgHeaderWordmark" style="height: 27px; width: 72px;" alt="butiq" />
+              <img :src="placeholderWordmarkSrc" style="height: 27px; width: 72px;" :alt="placeholderLogoAlt" />
             </template>
             <template #nav>
               <span style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; color: white;">Home</span>
@@ -135,7 +141,7 @@ export const Default: Story = {
               </div>
             </template>
             <template #media>
-              <img :src="imgSquareLogo" style="width: 145px; height: 156px;" alt="butiq logo" />
+              <img :src="placeholderLogoSrc" style="width: 145px; height: 156px;" :alt="placeholderLogoAlt" />
             </template>
           </NsHero>
         </template>
@@ -154,7 +160,7 @@ export const Default: Story = {
           </template>
           <NsStepList>
             <NsStepRow :number="1">A no-nonsense breakdown of why Shopify works for some shops and not others</NsStepRow>
-            <NsStepRow :number="2">A look at what butiq actually does differently and how it's built to stay that way</NsStepRow>
+            <NsStepRow :number="2">{{ placeholderCopy.stepListItem }}</NsStepRow>
             <NsStepRow :number="3">An early look at the product, and the option to book a demo if you like what you see</NsStepRow>
           </NsStepList>
         </NsExpectSection>
@@ -163,7 +169,7 @@ export const Default: Story = {
           <template #eyebrow>
             <NsSectionEyebrow label-color="primary">
               <template #label>More About</template>
-              <template #heading>butiq</template>
+              <template #heading>{{ placeholderCopy.aboutHeading }}</template>
               <template #icon>
                 <img :src="imgLaptopGirl" alt="" />
               </template>
@@ -171,10 +177,10 @@ export const Default: Story = {
           </template>
           <hr style="width: 100%; margin: 0; border: none; border-top: 1px solid var(--ns-color-text-primary);" />
           <p style="margin: 0;">
-            Owned and operated in Alberta, butiq is launching a way to manage all your in-store processes - from staff management to inventory reordering - while still handling your online sales and order fulfillment without the gaps.
+            {{ placeholderCopy.aboutParagraphOne }}
           </p>
           <p style="margin: 0;">
-            butiq was built by an experienced team of developers, designers, and success managers who have all actually worked in retail, which is why the priorities are different. It is built to handle the back-of-house so you can pay attention to the actual shop and designed to run in the background, not become another thing to manage.
+            {{ placeholderCopy.aboutParagraphTwo }}
           </p>
           <hr style="width: 100%; margin: 0; border: none; border-top: 1px solid var(--ns-color-text-primary);" />
         </NsAboutSection>

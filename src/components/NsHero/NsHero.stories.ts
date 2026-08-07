@@ -11,7 +11,7 @@ import imgButtonArrow from '../../assets/marketing/icon-arrow-button.svg?url'
 import imgDoodleCheck from '../../assets/marketing/icon-checkmark.svg?url'
 
 import imgCanadaFlag from '../../assets/marketing/icon-flag-canada.svg?url'
-import imgSquareLogo from '../../assets/marketing/icon-logo-badge.svg?url'
+import { placeholderLogoSrc, placeholderLogoAlt } from '../../stories/placeholderMarketingContent'
 
 const meta = {
   title: 'Marketing/NsHero',
@@ -31,7 +31,8 @@ export const Default: Story = {
       const submitted = ref(false)
       return {
         imgCanadaFlag,
-        imgSquareLogo,
+        placeholderLogoSrc,
+        placeholderLogoAlt,
         imgButtonArrow,
         imgDoodleArrows,
         imgDoodleCheck,
@@ -78,7 +79,7 @@ export const Default: Story = {
             </div>
           </template>
           <template #media>
-            <img :src="imgSquareLogo" style="width: 145px; height: 156px;" alt="butiq logo" />
+            <img :src="placeholderLogoSrc" style="width: 145px; height: 156px;" :alt="placeholderLogoAlt" />
           </template>
         </NsHero>
       </div>

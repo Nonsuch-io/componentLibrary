@@ -5,7 +5,7 @@ import NsSiteHeader from './NsSiteHeader.vue'
 describe('NsSiteHeader', () => {
   it('should render logo slot content', () => {
     const wrapper = mount(NsSiteHeader, {
-      slots: { logo: '<img class="wordmark" src="logo.svg" alt="butiq" />' },
+      slots: { logo: '<img class="wordmark" src="logo.svg" alt="Acme" />' },
     })
     expect(wrapper.find('.wordmark').exists()).toBe(true)
   })
