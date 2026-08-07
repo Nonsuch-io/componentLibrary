@@ -4,6 +4,15 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.24.6](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.5...v0.24.6) (2026-08-07)
+
+
+### Bug Fixes
+
+* **breadcrumbs:** add nav landmark, list semantics and aria-current (2c7) ([3db6375](https://github.com/Nonsuch-io/componentLibrary/commit/3db6375d7a9a7da0654e36c1606618749a978da2))
+* **breadcrumbs:** add nav landmark, list semantics and aria-current (componentLibrary-2c7) ([bf731f5](https://github.com/Nonsuch-io/componentLibrary/commit/bf731f51cbe8b477d3101eaccdd98c0c70b75cc1))
+* **breadcrumbs:** handle v-for crumbs, and stop claiming CSS content is unreadable ([4840e8c](https://github.com/Nonsuch-io/componentLibrary/commit/4840e8cf00e8f2795f4ca97ce27bc20e7db14d7d))
+
 ## [0.24.5](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.4...v0.24.5) (2026-08-07)
 
 
