@@ -319,18 +319,33 @@ describe('NsDialog', () => {
       expect(tokenValue?.[1].trim(), `${match![1]} in tokens.css`).toBe(expected)
     })
 
-    it('defaults to the default size', () => {
+    it('applies NO width constraint when size is omitted', () => {
+      // THE BLOCKER FROM REVIEW, pinned. `size` first defaulted to 'default'
+      // (650px), which looked like an opt-in prop and was a BREAKING change:
+      // consumers nest their own sized card inside this one, so a max-width on
+      // the parent caps the child by CONTAINMENT — nothing they write can
+      // override it. Review measured butiq's 780px dialogs silently rendering
+      // at 618px with no change on their side. Omitting `size` must leave the
+      // card exactly as it was before this prop existed.
       wrapper = mount(NsDialog, {
         props: { modelValue: true },
         slots: { default: 'Body' },
         global: { stubs },
       })
-      expect(wrapper.find('.ns-dialog__card--default').exists()).toBe(true)
+      const card = wrapper.find('.ns-dialog__card')
+      expect(card.exists()).toBe(true)
+      const classes = card.classes().filter((c) => c.startsWith('ns-dialog__card--'))
+      expect(classes, `unexpected size modifier(s): ${classes.join(', ')}`).toEqual([])
     })
 
-    it('shrinks rather than overflowing a narrow viewport', () => {
-      // width:100% with a max-width, never a fixed width — an 820px `large`
-      // dialog on a 400px phone must not push the viewport sideways.
+    it('sizes with width:100% and a max-width, never a fixed width', () => {
+      // NAMED FOR WHAT IT ASSERTS. This was called "shrinks rather than
+      // overflowing a narrow viewport", which promised behaviour it cannot
+      // reach: happy-dom has no layout engine, so nothing here can observe an
+      // overflow. It checks the CSS SHAPE that makes shrinking possible.
+      // Actual rendered width is asserted in a real browser by the
+      // LargeMeasuresEightTwenty story — and review showed source-text checks
+      // alone stay green against commented-out CSS.
       expect(styleBlock).toMatch(/width:\s*100%/)
       expect(styleBlock).not.toMatch(/^\s+width:\s*\d+px/m)
     })

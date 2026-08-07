@@ -10,7 +10,7 @@
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <q-card
-      :class="['ns-dialog__card', `ns-dialog__card--${size}`]"
+      :class="['ns-dialog__card', size && `ns-dialog__card--${size}`]"
       role="dialog"
       :aria-modal="true"
     >
@@ -73,6 +73,14 @@ export interface NsDialogProps {
    * Before this existed, every consumer set its own `max-width` in a scoped
    * style block — butiq had five dialogs at 780px and 720px, neither of which
    * is a named size. Pass a name, not a number.
+   *
+   * NO DEFAULT, DELIBERATELY. Defaulting to `default` (650px) was a BREAKING
+   * change disguised as an opt-in prop: consumers nest their own sized card
+   * inside this one, so a max-width on the parent caps the child by
+   * CONTAINMENT — nothing a consumer writes can override it. Review measured
+   * butiq's 780px dialogs silently rendering at 618px with no change on their
+   * side. Omitting `size` leaves the card unconstrained, exactly as before,
+   * so upgrading is inert and adoption is a real choice.
    */
   size?: NsDialogSize
 }
@@ -82,7 +90,7 @@ withDefaults(defineProps<NsDialogProps>(), {
   title: undefined,
   persistent: false,
   noBackdropDismiss: false,
-  size: 'default',
+  size: undefined,
 })
 
 defineEmits<{
@@ -98,11 +106,24 @@ const bodyId = `ns-dialog-body-${useId()}`
   border-radius: var(--ns-radius-lg)
   font-family: var(--ns-font-family-text)
   min-width: 320px
+
   // `width: 100%` with a per-size max-width, NOT a fixed width: an 820px
-  // `large` dialog on a 400px phone must shrink rather than overflow the
-  // viewport. Quasar's .q-dialog__inner already caps at the screen edge, but
-  // a fixed width would fight that instead of cooperating.
-  width: 100%
+  // `large` dialog on a narrow viewport must shrink rather than overflow.
+  // Scoped to the size modifiers so that omitting `size` leaves the card
+  // completely unstyled for width — see NsDialogProps.size on why there is
+  // no default.
+  //
+  // MEASURED SHRINK THRESHOLDS, because they are higher than "narrow" suggests:
+  // Quasar's .q-dialog__inner--minimized has fixed 24px padding either side, so
+  // the card resolves against (viewport - 48px). `large` therefore reaches its
+  // full 820px only above ~868px of viewport, and `default` above ~698px. At an
+  // 800px window `large` renders ~751px; at 601px every size collapses to the
+  // same ~553px. That is correct behaviour, not a bug, but a consumer measuring
+  // "large" on a small laptop will not see 820 and should not conclude it broke.
+  &--small,
+  &--default,
+  &--large
+    width: 100%
 
   &--small
     max-width: var(--ns-dialog-width-small)
