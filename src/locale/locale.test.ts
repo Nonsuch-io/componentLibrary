@@ -48,6 +48,10 @@ describe('nsLocaleEnCA', () => {
     expect(nsLocaleEnCA.validation.tooLong).toBe('Too long')
   })
 
+  it('has navigation strings', () => {
+    expect(nsLocaleEnCA.navigation.breadcrumbs).toBe('Breadcrumb')
+  })
+
   it('every top-level key contains only string values (no nesting beyond 1 level)', () => {
     for (const section of Object.values(nsLocaleEnCA)) {
       for (const value of Object.values(section)) {
@@ -85,6 +89,10 @@ describe('nsLocaleFrCA', () => {
   it('has French validation strings', () => {
     expect(nsLocaleFrCA.validation.required).toBe('Ce champ est requis')
     expect(nsLocaleFrCA.validation.invalidEmail).toBe('Veuillez entrer une adresse courriel valide')
+  })
+
+  it('has French navigation strings', () => {
+    expect(nsLocaleFrCA.navigation.breadcrumbs).toBe("Fil d'Ariane")
   })
 
   it('every top-level key contains only string values', () => {
