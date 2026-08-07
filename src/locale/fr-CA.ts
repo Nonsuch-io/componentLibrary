@@ -47,4 +47,8 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     emailAddress: 'Adresse courriel',
     emailPlaceholder: 'votre@courriel.com',
   },
+
+  navigation: {
+    breadcrumbs: "Fil d'Ariane",
+  },
 }

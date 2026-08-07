@@ -64,4 +64,10 @@ export interface NsLocaleMessages {
     emailAddress: string
     emailPlaceholder: string
   }
+
+  /** Navigation-component strings (NsBreadcrumbs, etc.) */
+  navigation: {
+    /** Accessible name for the breadcrumb <nav> landmark. */
+    breadcrumbs: string
+  }
 }

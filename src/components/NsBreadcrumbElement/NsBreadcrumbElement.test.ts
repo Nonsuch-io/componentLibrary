@@ -23,5 +23,21 @@ describe('NsBreadcrumbElement', () => {
       const wrapper = mount(NsBreadcrumbElement, { attrs: { 'aria-label': 'Test label' } })
       expect(wrapper.find('.q-breadcrumbs__el').attributes('aria-label')).toBe('Test label')
     })
+
+    it('forwards an aria-current attribute onto the underlying Quasar element', () => {
+      // NsBreadcrumbElement declares no props of its own -- NsBreadcrumbs
+      // (the parent) is what decides *which* crumb is current and clones
+      // `aria-current="page"` onto its vnode. This test locks in the
+      // child's half of that contract: whatever aria-current it receives
+      // must actually land in the DOM, or the parent's logic is silently
+      // inert. See componentLibrary-2c7.
+      const wrapper = mount(NsBreadcrumbElement, { attrs: { 'aria-current': 'page' } })
+      expect(wrapper.find('.q-breadcrumbs__el').attributes('aria-current')).toBe('page')
+    })
+
+    it('does not add an aria-current attribute when none is passed', () => {
+      const wrapper = mount(NsBreadcrumbElement)
+      expect(wrapper.find('.q-breadcrumbs__el').attributes('aria-current')).toBeUndefined()
+    })
   })
 })

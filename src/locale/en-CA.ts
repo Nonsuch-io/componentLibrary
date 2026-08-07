@@ -50,4 +50,8 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     emailAddress: 'Email address',
     emailPlaceholder: 'your@email.com',
   },
+
+  navigation: {
+    breadcrumbs: 'Breadcrumb',
+  },
 }
