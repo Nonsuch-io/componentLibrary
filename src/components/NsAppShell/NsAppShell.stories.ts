@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { ref } from 'vue'
 import { expect, userEvent, within } from 'storybook/test'
 import NsAppShell from './NsAppShell.vue'
+import NsIcon from '../NsIcon/NsIcon.vue'
 import NsButton from '../NsButton/NsButton.vue'
 import NsCard from '../NsCard/NsCard.vue'
 import type { NsAppShellTab, NsAppShellNavItem, NsAppShellUserMenuItem } from './types'
@@ -96,7 +97,7 @@ const pageContent = `
 
 export const Default: Story = {
   render: (args) => ({
-    components: { NsAppShell, NsButton, NsCard },
+    components: { NsAppShell, NsIcon, NsButton, NsCard },
     setup: () => ({ args }),
     template: `
       <NsAppShell v-bind="args">
@@ -105,7 +106,7 @@ export const Default: Story = {
         </template>
         <template #header-actions>
           <NsButton flat round dense aria-label="Notifications">
-            <q-icon name="notifications" />
+            <NsIcon name="notifications" />
           </NsButton>
         </template>
         ${pageContent}
@@ -127,7 +128,7 @@ export const DrawerSubmenus: Story = {
     fullDrawerBreakpoint: 400,
   },
   render: (args) => ({
-    components: { NsAppShell, NsButton, NsCard },
+    components: { NsAppShell, NsIcon, NsButton, NsCard },
     setup: () => ({ args }),
     template: `
       <NsAppShell v-bind="args">
@@ -175,7 +176,7 @@ export const MiniDrawer: Story = {
     miniDrawer: true,
   },
   render: (args) => ({
-    components: { NsAppShell, NsCard },
+    components: { NsAppShell, NsIcon, NsCard },
     setup: () => ({ args }),
     template: `
       <NsAppShell v-bind="args">
@@ -193,7 +194,7 @@ export const NoSearch: Story = {
     showSearch: false,
   },
   render: (args) => ({
-    components: { NsAppShell, NsCard },
+    components: { NsAppShell, NsIcon, NsCard },
     setup: () => ({ args }),
     template: `
       <NsAppShell v-bind="args">
@@ -211,7 +212,7 @@ export const WithBottomBarAbove: Story = {
     viewport: { defaultViewport: 'mobile1' },
   },
   render: (args) => ({
-    components: { NsAppShell, NsCard },
+    components: { NsAppShell, NsIcon, NsCard },
     setup: () => ({ args }),
     template: `
       <NsAppShell v-bind="args">
@@ -221,7 +222,7 @@ export const WithBottomBarAbove: Story = {
         <template #bottom-bar-above>
           <div class="bg-dark text-white q-pa-sm row items-center justify-between">
             <span class="text-caption">Now Playing: Summer Vibes</span>
-            <q-icon name="play_arrow" />
+            <NsIcon name="play_arrow" />
           </div>
         </template>
         ${pageContent}
@@ -235,7 +236,7 @@ export const Mobile: Story = {
     viewport: { defaultViewport: 'mobile1' },
   },
   render: (args) => ({
-    components: { NsAppShell, NsCard },
+    components: { NsAppShell, NsIcon, NsCard },
     setup: () => ({ args }),
     template: `
       <NsAppShell v-bind="args">
@@ -253,7 +254,7 @@ export const Tablet: Story = {
     viewport: { defaultViewport: 'tablet' },
   },
   render: (args) => ({
-    components: { NsAppShell, NsCard },
+    components: { NsAppShell, NsIcon, NsCard },
     setup: () => ({ args }),
     template: `
       <NsAppShell v-bind="args">
@@ -271,7 +272,7 @@ export const Tablet: Story = {
 // localStorage (SPA), and persist it on change (e.g. watch(collapsed, save)).
 export const PersistedCollapse: Story = {
   render: (args) => ({
-    components: { NsAppShell },
+    components: { NsAppShell, NsIcon },
     setup() {
       const collapsed = ref(false)
       return { args, collapsed }
@@ -317,7 +318,7 @@ export const ScrollingNav: Story = {
     fullDrawerBreakpoint: 400,
   },
   render: (args) => ({
-    components: { NsAppShell },
+    components: { NsAppShell, NsIcon },
     setup: () => ({ args }),
     template: `
       <NsAppShell v-bind="args">
