@@ -4,6 +4,16 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.24.5](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.4...v0.24.5) (2026-08-07)
+
+
+### Bug Fixes
+
+* **ci:** build before test so the dist-artifact guards actually run ([f5a1f33](https://github.com/Nonsuch-io/componentLibrary/commit/f5a1f33235b70e5cbc8a11437a275080b6a59f42))
+* **ci:** build before test so the dist-artifact guards actually run ([d24d1fc](https://github.com/Nonsuch-io/componentLibrary/commit/d24d1fc41784b51cb809d5cec7ccc3f2fd07d35a))
+* **tooltip:** make NsTooltip reachable by keyboard and assistive tech (componentLibrary-sj1) ([899deb3](https://github.com/Nonsuch-io/componentLibrary/commit/899deb32b7abc8b17de462cc7cdb78b05e26bdca))
+* **tooltip:** make NsTooltip reachable by keyboard and assistive tech (sj1) ([36a3002](https://github.com/Nonsuch-io/componentLibrary/commit/36a3002484550c3a6f957c443420e38bc6cb1713))
+
 ## [0.24.4](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.3...v0.24.4) (2026-08-05)
 
 
