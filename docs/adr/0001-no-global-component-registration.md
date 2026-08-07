@@ -54,6 +54,14 @@ what it depends on. Global registration deletes that signal, and deletes it
 **one-way**: once an app registers globally, nothing needs importing, usage drifts
 toward global everywhere, and reverting means re-finding every tag in the codebase.
 
+**It would destroy the guard the consumer is building.** butiq's `butiq-xp9i.2`
+fails their test run on Vue `"Failed to resolve component"` warnings. That warning is
+the **only** runtime signal this class emits — typecheck cannot see an unresolved tag,
+because there is no type to check against. If every `<ns-*>` resolves globally the
+warning never fires, so global registration does not fix the class, **it makes the
+class silent**. butiq-agent's words on declining: they would have spent a week finding
+163 invisible failures and then removed the instrument that found them.
+
 **It would delete the diagnostic that found this bug.** Vue's
 `"Failed to resolve component"` warning is the only reason 163 tags were
 discoverable at all. Registration silences it for forgotten imports — which is the
@@ -75,9 +83,12 @@ gap. Measured against the built package:
 About 13 kB gzipped per app, across three apps, to solve a problem that has a
 cheaper fix.
 
-**Nobody would have used it.** butiq is the library's only consumer. Building an
-opt-in capability the sole consumer intends to decline is dead code in the design
-authority, and it would have to be maintained — 70 static imports and a 70-entry
+**Nobody would have used it, confirmed.** butiq is the library's only consumer, and
+butiq-agent declined explicitly on 2026-08-07: _"NO. Not in admin, not in portal, not
+in dev, and not qualified."_ All 163 tags were imported in their PR #412 and a
+repo-wide scan reports zero unresolved — the demand this was built for no longer
+exists. Building an opt-in capability the sole consumer has refused is dead code in
+the design authority, and it would have to be maintained — 70 static imports and a 70-entry
 type augmentation, both hand-maintained and guarded by drift tests.
 
 ### The actual fix lives in the consumer
