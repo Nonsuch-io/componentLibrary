@@ -1,9 +1,9 @@
 <template>
   <q-btn-toggle
-    v-bind="$attrs"
+    v-bind="attrsWithoutDisabled"
     v-model="model"
     :options="options"
-    :disable="disable"
+    :disable="resolvedDisable"
     class="ns-button-toggle"
   >
     <slot />
@@ -39,7 +39,20 @@ const model = computed({
   set: (val) => emit('update:modelValue', val),
 })
 
+// Accepts the `disabled` spelling too — see useNsDisabled.
+// inheritAttrs: false is REQUIRED, not tidiness. Vue applies $attrs to the root
+// element automatically IN ADDITION to any explicit v-bind, so without this the
+// raw `disabled` attribute lands on the DOM anyway and defeats the filtering
+// below — measured: the attribute was still present on the rendered element.
+defineOptions({ inheritAttrs: false })
+
+const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled(
+  'NsButtonToggle',
+  () => props.disable,
+)
+
 import { computed } from 'vue'
+import { useNsDisabled } from '../../composables/useNsDisabled'
 </script>
 
 <style lang="sass" scoped>

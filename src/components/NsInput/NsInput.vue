@@ -1,12 +1,12 @@
 <template>
   <q-input
-    v-bind="$attrs"
+    v-bind="attrsWithoutDisabled"
     :model-value="modelValue"
     :label="label"
     :outlined="outlined"
     :dense="dense"
     :rules="rules"
-    :disable="disable"
+    :disable="resolvedDisable"
     class="ns-input"
     @update:model-value="$emit('update:modelValue', $event)"
   >
@@ -17,6 +17,7 @@
 </template>
 
 <script setup lang="ts">
+import { useNsDisabled } from '../../composables/useNsDisabled'
 /**
  * NsInput — A styled text input wrapping Quasar's QInput.
  *
@@ -41,7 +42,7 @@ export interface NsInputProps {
   disable?: boolean
 }
 
-withDefaults(defineProps<NsInputProps>(), {
+const props = withDefaults(defineProps<NsInputProps>(), {
   label: undefined,
   modelValue: undefined,
   outlined: true,
@@ -53,6 +54,16 @@ withDefaults(defineProps<NsInputProps>(), {
 defineEmits<{
   'update:modelValue': [value: string | number | null]
 }>()
+
+// Accepts the `disabled` spelling too — on a QInput it would otherwise land on
+// the wrapper div and leave the field fully editable. See useNsDisabled.
+// inheritAttrs: false is REQUIRED, not tidiness. Vue applies $attrs to the root
+// element automatically IN ADDITION to any explicit v-bind, so without this the
+// raw `disabled` attribute lands on the DOM anyway and defeats the filtering
+// below — measured: the attribute was still present on the rendered element.
+defineOptions({ inheritAttrs: false })
+
+const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsInput', () => props.disable)
 </script>
 
 <style lang="sass" scoped>

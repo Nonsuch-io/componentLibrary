@@ -101,8 +101,7 @@ const crumbs = computed<VNode[]>(() => {
   // wrapping NsBreadcrumbElement (or passing any shape we cannot recognise)
   // gets a perfect-looking trail with no current-page marker and no signal.
   if (
-    typeof process !== 'undefined' &&
-    process?.env?.NODE_ENV !== 'production' &&
+    (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') &&
     nodes.length > 0 &&
     lastCrumbIndex === -1 &&
     !hasExplicitAriaCurrent

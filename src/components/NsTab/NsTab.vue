@@ -1,5 +1,5 @@
 <template>
-  <q-tab v-bind="qTabAttrs" :disable="disable" class="ns-tab">
+  <q-tab v-bind="qTabAttrs" :disable="resolvedDisable" class="ns-tab">
     <!-- When icon is a slot, render it inside a q-tab__icon wrapper -->
     <div v-if="$slots.icon" class="q-tab__icon">
       <slot name="icon" />
@@ -15,6 +15,7 @@
 <script setup lang="ts">
 import { computed, useAttrs } from 'vue'
 import type { Component } from 'vue'
+import { useNsDisabled } from '../../composables/useNsDisabled'
 
 /**
  * NsTab — A styled wrapper around Quasar's QTab.
@@ -56,13 +57,27 @@ const attrs = useAttrs()
  * to q-tab (which calls `.match()` on the value and would throw at runtime).
  */
 const qTabAttrs = computed(() => {
-  const { icon: _icon, ...rest } = attrs as Record<string, unknown>
+  // `disabled` is dropped here too, not just `icon`: useNsDisabled resolves it
+  // into the `disable` prop, and letting the raw attribute also reach q-tab
+  // puts an inert `disabled` on the DOM that a consumer's `[disabled]` selector
+  // would match on an ENABLED tab. This component filters attrs itself, so it
+  // cannot use attrsWithoutDisabled directly.
+  const { icon: _icon, disabled: _disabled, ...rest } = attrs as Record<string, unknown>
   if (typeof props.icon === 'string') {
     return { ...rest, icon: props.icon }
   }
   // Component or undefined — don't forward icon to q-tab
   return rest
 })
+
+// Accepts the `disabled` spelling too — see useNsDisabled.
+// inheritAttrs: false is REQUIRED, not tidiness. Vue applies $attrs to the root
+// element automatically IN ADDITION to any explicit v-bind, so without this the
+// raw `disabled` attribute lands on the DOM anyway and defeats the filtering
+// below — measured: the attribute was still present on the rendered element.
+defineOptions({ inheritAttrs: false })
+
+const { resolvedDisable } = useNsDisabled('NsTab', () => props.disable)
 </script>
 
 <style lang="sass" scoped>

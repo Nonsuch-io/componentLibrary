@@ -1,12 +1,13 @@
 <template>
   <q-btn
-    v-bind="$attrs"
+    v-bind="attrsWithoutDisabled"
     unelevated
     no-caps
     :ripple="false"
     :loading="loading"
     :padding="buttonPadding"
     :aria-busy="loading"
+    :disable="resolvedDisable"
     :class="['ns-btn', `ns-btn--${variant}`, `ns-btn--${size}`, { 'ns-btn--icon-only': iconOnly }]"
   >
     <slot />
@@ -22,6 +23,7 @@
 import { computed } from 'vue'
 import { QSpinnerDots } from 'quasar'
 import { useNsAttrConflictWarning } from '../../composables/useNsAttrConflictWarning'
+import { useNsDisabled } from '../../composables/useNsDisabled'
 
 export type NsButtonVariant =
   | 'primary'
@@ -42,6 +44,8 @@ export interface NsButtonProps {
   /** Square icon-only layout — use when no label slot is provided */
   iconOnly?: boolean
   loading?: boolean
+  /** Disable the button */
+  disable?: boolean
 }
 
 const props = withDefaults(defineProps<NsButtonProps>(), {
@@ -49,10 +53,23 @@ const props = withDefaults(defineProps<NsButtonProps>(), {
   size: 'md',
   iconOnly: false,
   loading: false,
+  disable: false,
 })
 
+// QBtn renders a real <button>, so the `disabled` spelling natively disables
+// it already — but without this it misses Quasar's `.disabled` class and
+// `aria-disabled`, and doesn't get the loud alias warning the other
+// controls get. See useNsDisabled and componentLibrary-ob8.
+// inheritAttrs: false is REQUIRED, not tidiness. Vue applies $attrs to the root
+// element automatically IN ADDITION to any explicit v-bind, so without this the
+// raw `disabled` attribute lands on the DOM anyway and defeats the filtering
+// below — measured: the attribute was still present on the rendered element.
+defineOptions({ inheritAttrs: false })
+
+const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsButton', () => props.disable)
+
 // componentLibrary-nk3: `unelevated` is deliberately NOT in this list. It is hardcoded on the
-// q-btn AFTER v-bind="$attrs", so mergeProps always resolves ours and a consumer-passed value
+// q-btn AFTER the attrs spread, so mergeProps always resolves ours and a consumer-passed value
 // is inert — warning about it would be a false positive, and a guard that is wrong once gets
 // ignored for the cases that matter (fable).
 //

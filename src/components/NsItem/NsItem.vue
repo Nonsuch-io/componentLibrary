@@ -1,10 +1,11 @@
 <template>
-  <q-item v-bind="$attrs" :disable="disable" class="ns-item">
+  <q-item v-bind="attrsWithoutDisabled" :disable="resolvedDisable" class="ns-item">
     <slot />
   </q-item>
 </template>
 
 <script setup lang="ts">
+import { useNsDisabled } from '../../composables/useNsDisabled'
 /**
  * NsItem — A styled wrapper around Quasar's QItem.
  *
@@ -16,9 +17,18 @@ export interface NsItemProps {
   disable?: boolean
 }
 
-withDefaults(defineProps<NsItemProps>(), {
+const props = withDefaults(defineProps<NsItemProps>(), {
   disable: false,
 })
+
+// Accepts the `disabled` spelling too — see useNsDisabled.
+// inheritAttrs: false is REQUIRED, not tidiness. Vue applies $attrs to the root
+// element automatically IN ADDITION to any explicit v-bind, so without this the
+// raw `disabled` attribute lands on the DOM anyway and defeats the filtering
+// below — measured: the attribute was still present on the rendered element.
+defineOptions({ inheritAttrs: false })
+
+const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsItem', () => props.disable)
 </script>
 
 <style lang="sass" scoped>
