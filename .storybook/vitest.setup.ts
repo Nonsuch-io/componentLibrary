@@ -15,8 +15,19 @@ setProjectAnnotations([a11yAddonAnnotations, projectAnnotations])
 // shipped green: a broken `:src` binding, 47/47 tests passing). Vue routes
 // every one of those cases through its internal warn(), which in dev builds
 // always calls `console.warn` with a message prefixed "[Vue warn]:". Treat
-// any such warning during a story's render as a failure, so this whole class
-// of bug is caught rather than the one instance that was found by accident.
+// such a warning as a failure of the story that produced it, so this whole
+// class of bug is caught rather than the one instance found by accident.
+//
+// SCOPE, STATED HONESTLY: this catches warnings emitted while the test is
+// still running — initial render (the bug this was built for, which warns
+// synchronously during mount) and anything a play() function awaits. It does
+// NOT catch fire-and-forget work the test never waits on: a stray setTimeout
+// or un-awaited promise that warns after the story's test has finished lands
+// in no bucket and is LOST, not misattributed. Demonstrated in review with a
+// 400ms un-awaited timeout. The afterEach below yields twice first, which
+// recovers same-tick and next-tick stragglers; genuinely delayed ones are a
+// harder problem and deliberately out of scope. Do not read a green run as
+// proof that no story warns asynchronously.
 let vueWarningsDuringStory: string[] = []
 
 const isVueWarning = (args: unknown[]): boolean =>
@@ -34,7 +45,14 @@ beforeEach(() => {
   vueWarningsDuringStory = []
 })
 
-afterEach(() => {
+afterEach(async () => {
+  // Yield twice before reading the bucket: once for pending microtasks
+  // (promise continuations, Vue's scheduler) and once for the macrotask queue.
+  // Without this, a warning emitted from work that settles immediately after
+  // the test body — but before the next story starts — is dropped silently.
+  await Promise.resolve()
+  await new Promise((resolve) => setTimeout(resolve, 0))
+
   if (vueWarningsDuringStory.length === 0) return
   const messages = vueWarningsDuringStory.join('\n\n')
   vueWarningsDuringStory = []
