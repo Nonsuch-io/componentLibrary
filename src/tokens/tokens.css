@@ -194,6 +194,20 @@
   /* — Interaction — */
   --ns-touch-target: 44px; /* WCAG / mobile minimum interactive size */
 
+  /* — Overlay widths —
+     The design system's named dialog scale, from Figma's NsDialog frame
+     (5628:2889). Tokens rather than values in the component so a consumer can
+     see the scale exists, and so the numbers live where every other design
+     constant does. Deliberately :root only: these are not theme-dependent, in
+     the same way --ns-touch-target above is not.
+
+     Figma also has Size=Tablet and Size=Mobile, both 400px, but both carry
+     Style=Secondary and change typography and surface as well as width — a
+     different presentation, not a size — so they are NOT tokens here. */
+  --ns-dialog-width-small: 400px;
+  --ns-dialog-width-default: 650px;
+  --ns-dialog-width-large: 820px;
+
   /* — Border radius — */
   --ns-radius-none: 0;
   --ns-radius-sm: 0.25rem;

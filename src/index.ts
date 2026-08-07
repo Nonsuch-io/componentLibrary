@@ -44,7 +44,7 @@ export { default as NsForm } from './components/NsForm/NsForm.vue'
 export type { NsFormProps } from './components/NsForm/NsForm.vue'
 
 export { default as NsDialog } from './components/NsDialog/NsDialog.vue'
-export type { NsDialogProps } from './components/NsDialog/NsDialog.vue'
+export type { NsDialogProps, NsDialogSize } from './components/NsDialog/NsDialog.vue'
 
 export { default as NsDrawer } from './components/NsDrawer/NsDrawer.vue'
 export type { NsDrawerProps } from './components/NsDrawer/NsDrawer.vue'

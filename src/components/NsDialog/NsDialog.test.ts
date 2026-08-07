@@ -1,4 +1,6 @@
 import { describe, it, expect, afterEach } from 'vitest'
+import { readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { nextTick, defineComponent, h } from 'vue'
 import NsDialog from './NsDialog.vue'
@@ -267,6 +269,85 @@ describe('NsDialog', () => {
         global: { stubs },
       })
       expect(wrapper.find('.stub-hdr').exists()).toBe(true)
+    })
+  })
+
+  describe('size', () => {
+    // Same stubs the template-coverage block uses; the module-level stub
+    // components are shared, only this object literal is local to each block.
+    const stubs = {
+      QDialog: QDialogStub,
+      QCard: QCardStub,
+      QCardSection: QCardSectionStub,
+      QCardActions: QCardActionsStub,
+    }
+
+    // These assert the RESOLVED WIDTH, not just that a modifier class exists.
+    // A class-only assertion passes whether or not the CSS behind it does
+    // anything — and this whole prop exists because five consumers were each
+    // setting their own max-width. Parsing the component's own style block ties
+    // the class to the number the design system names.
+    const sfc = readFileSync(
+      resolve(process.cwd(), 'src/components/NsDialog/NsDialog.vue'),
+      'utf-8',
+    )
+    const styleBlock = sfc.slice(sfc.indexOf('<style'))
+
+    const tokens = readFileSync(resolve(process.cwd(), 'src/tokens/tokens.css'), 'utf-8')
+
+    it.each([
+      ['small', '400px'],
+      ['default', '650px'],
+      ['large', '820px'],
+    ])('size="%s" resolves to a max-width of %s', (size, expected) => {
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true, size: size as 'small' | 'default' | 'large' },
+        slots: { default: 'Body' },
+        global: { stubs },
+      })
+      expect(wrapper.find(`.ns-dialog__card--${size}`).exists()).toBe(true)
+
+      // the class must set max-width from a token...
+      const rule = new RegExp(
+        `&--${size}\\s*\\n\\s*max-width:\\s*var\\((--ns-dialog-width-[a-z]+)\\)`,
+      )
+      const match = rule.exec(styleBlock)
+      expect(match, `no max-width token under &--${size}`).not.toBeNull()
+
+      // ...and that token must resolve to the value Figma specifies.
+      const tokenValue = new RegExp(`${match![1]}:\\s*([^;]+);`).exec(tokens)
+      expect(tokenValue?.[1].trim(), `${match![1]} in tokens.css`).toBe(expected)
+    })
+
+    it('applies NO width constraint when size is omitted', () => {
+      // THE BLOCKER FROM REVIEW, pinned. `size` first defaulted to 'default'
+      // (650px), which looked like an opt-in prop and was a BREAKING change:
+      // consumers nest their own sized card inside this one, so a max-width on
+      // the parent caps the child by CONTAINMENT — nothing they write can
+      // override it. Review measured butiq's 780px dialogs silently rendering
+      // at 618px with no change on their side. Omitting `size` must leave the
+      // card exactly as it was before this prop existed.
+      wrapper = mount(NsDialog, {
+        props: { modelValue: true },
+        slots: { default: 'Body' },
+        global: { stubs },
+      })
+      const card = wrapper.find('.ns-dialog__card')
+      expect(card.exists()).toBe(true)
+      const classes = card.classes().filter((c) => c.startsWith('ns-dialog__card--'))
+      expect(classes, `unexpected size modifier(s): ${classes.join(', ')}`).toEqual([])
+    })
+
+    it('sizes with width:100% and a max-width, never a fixed width', () => {
+      // NAMED FOR WHAT IT ASSERTS. This was called "shrinks rather than
+      // overflowing a narrow viewport", which promised behaviour it cannot
+      // reach: happy-dom has no layout engine, so nothing here can observe an
+      // overflow. It checks the CSS SHAPE that makes shrinking possible.
+      // Actual rendered width is asserted in a real browser by the
+      // LargeMeasuresEightTwenty story — and review showed source-text checks
+      // alone stay green against commented-out CSS.
+      expect(styleBlock).toMatch(/width:\s*100%/)
+      expect(styleBlock).not.toMatch(/^\s+width:\s*\d+px/m)
     })
   })
 })
