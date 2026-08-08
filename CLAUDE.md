@@ -53,9 +53,32 @@ bd close <id>         # Complete work
 
 <!-- END BEADS INTEGRATION -->
 
-## Independent review — before opening a PR
+## Independent review — before opening a PR, and after amending one
 
 **Before opening a PR that touches non-test source, dispatch an `independent-reviewer` against the branch, run as a DIFFERENT model from the author.** A requirement, not a judgement call (background is fine). "Low risk / small / just a prop rename / my tests pass" are **not** skip reasons — they are the author's assessment of the author's own work, which is exactly what the review checks. To skip, get the operator's agreement; never skip silently.
+
+**The requirement covers code added AFTER a review, not just at PR-open.** If you push
+non-test source onto a branch that has already been reviewed — including fixes for the
+reviewer's own findings — that commit needs its own pass. The rule used to say "before
+opening a PR", and the PR was already open, so the gap read as compliance. butiq hit this
+on their PR #414: a filter added after approval shipped unreviewed, and a second reviewer
+found **four real defects** in that one commit, two of them provably untestable — an inert
+dropdown whose v-model could be replaced with a dead local ref while all 235 tests stayed
+green, and a flag whose only assertion was vacuous in the direction that mattered.
+componentLibrary did the same thing on PRs #213, #228, #230 and #232; #232's post-review
+commit changed guard polarity in four files, added `inheritAttrs: false` to 13 components,
+and merged without a second look.
+
+**Rotate the reviewing model; do not merely differ from the author.** Different-from-author
+is the floor, not the ceiling. Sonnet reviewed ten consecutive butiq PRs and found something
+real in every one, so there was no visible blind spot to correct — and yet switching to Fable
+for one commit surfaced two mutations that Sonnet-style review had not produced. Of three
+vacuous tests written that week, two were caught by mutation testing and one by a _different_
+reviewer; none by the same reviewer looking harder. The claim is not that one model is better
+— it is that the **variance between reviewers is doing real work**, and spending it on
+alternation is worth more than concentrating it. Alternate `sonnet` and `fable` across
+consecutive reviews of the same author's work, and prefer the one that did _not_ review the
+previous PR on the same component.
 
 The different-model gate is structural: the same model re-makes the same assumptions, so self-review is blind in a way more care can't fix. In a component library the blind spots have a shape — **accessibility that passes every unit test** (a lost focus trap, a dropped `aria-*`, a keyboard path that no longer reaches a control); **contract drift a consumer feels, not the library** (a renamed prop or changed slot/emit — types compile, the component's tests pass, a consuming app breaks); **wireframe/interaction regressions** with no assertion behind them; and **i18n** (a hardcoded string, a key in only one locale).
 

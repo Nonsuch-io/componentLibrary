@@ -4,6 +4,15 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.25.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.25.0...v0.25.1) (2026-08-07)
+
+
+### Bug Fixes
+
+* **components:** accept the `disabled` spelling, which silently did nothing (componentLibrary-ob8) ([5d3c645](https://github.com/Nonsuch-io/componentLibrary/commit/5d3c645ae220d451c0335ac00fd810b19d3d3747))
+* **components:** accept the `disabled` spelling, which silently did nothing (ob8) ([eb49f4c](https://github.com/Nonsuch-io/componentLibrary/commit/eb49f4cb3a945535771424dff66af4fa4264746d))
+* **components:** make the disabled warning actually reach a browser ([6a2b5a7](https://github.com/Nonsuch-io/componentLibrary/commit/6a2b5a7714446874e6b0d18e133e034b3e8dba1e))
+
 ## [0.25.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.24.6...v0.25.0) (2026-08-07)
 
 
