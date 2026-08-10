@@ -2,6 +2,7 @@ import type { App, Plugin } from 'vue'
 import type { NsLocaleMessages } from './locale/NsLocaleMessages'
 import { nsLocaleEnCA } from './locale/en-CA'
 import { NsLocaleKey } from './composables/useNsLocale'
+import { warnIfNsStylesheetMissing } from './composables/useNsStylesheetWarning'
 
 /**
  * Options accepted by the `createNonsuch()` plugin.
@@ -50,6 +51,10 @@ export function createNonsuch(options: NsPluginOptions = {}): Plugin {
     install(app: App) {
       // Provide locale messages to all Ns components via inject
       app.provide(NsLocaleKey, locale)
+
+      // Dev-only, once-per-app check that the consumer actually loaded
+      // `style.css`. See useNsStylesheetWarning.ts / componentLibrary-07u.
+      warnIfNsStylesheetMissing()
     },
   }
 }

@@ -4,6 +4,31 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.28.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.0...v0.28.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* **button:** stop advising `iconOnly` for `round`, which is not equivalent ([a097395](https://github.com/Nonsuch-io/componentLibrary/commit/a0973952495f5395533e78298e36353b491cfc49))
+
+## [0.28.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.27.0...v0.28.0) (2026-08-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* **banner:** NsBanner's `type` values `success` and `error` are renamed to `positive` and `negative`. Consumers must migrate; the old values now render unstyled and lose their role/aria-live. 30 butiq call sites are affected.
+
+### Bug Fixes
+
+* **banner:** rename type values to the design system's vocabulary (whr) ([9929d2d](https://github.com/Nonsuch-io/componentLibrary/commit/9929d2d969a821d95a62d81cfd2a0af468d95053))
+
+## [0.27.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.26.1...v0.27.0) (2026-08-10)
+
+
+### Features
+
+* **plugin:** warn when a consumer never loaded style.css (componentLibrary-07u) ([54d527f](https://github.com/Nonsuch-io/componentLibrary/commit/54d527f045cd4934912b49eca2a6c4c91c15a321))
+
 ## [0.26.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.26.0...v0.26.1) (2026-08-10)
 
 

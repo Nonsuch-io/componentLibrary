@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
+import NsButton from '../components/NsButton/NsButton.vue'
 import {
   useNsAttrConflictWarning,
   type NsAttrConflict,
@@ -93,5 +94,50 @@ describe('useNsAttrConflictWarning', () => {
     mount(Harness, { attrs: { color: 'primary' } })
 
     expect(warnSpy).not.toHaveBeenCalled()
+  })
+
+  describe('never recommends a non-equivalent prop', () => {
+    // `round` used to advise `iconOnly`. That was WRONG — iconOnly is a SQUARE
+    // icon-only layout and round is a CIRCLE — so the library was actively
+    // recommending a visual regression on 89 butiq call sites, in a warning
+    // people were reading in their console. componentLibrary-nbr had already
+    // rejected that equivalence; the warning was never updated to match.
+    //
+    // A warning that names a replacement is an INSTRUCTION. A wrong instruction
+    // is worse than no warning: it turns "something is off" into "do this",
+    // which people then do.
+    it('says there is no equivalent for `round`, rather than naming one', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      __resetAttrConflictWarnings()
+      mount(NsButton, { attrs: { round: true } })
+      const text = warn.mock.calls.flat().join(' ')
+      warn.mockRestore()
+
+      expect(text, 'no warning fired at all').toContain('round')
+      expect(text, 'still recommends iconOnly, which is square not circular').not.toContain(
+        'Use the "iconOnly" prop',
+      )
+      expect(text).toContain('no equivalent Ns prop')
+    })
+
+    it('says there is no equivalent for `fab` either', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      __resetAttrConflictWarnings()
+      mount(NsButton, { attrs: { fab: true } })
+      const text = warn.mock.calls.flat().join(' ')
+      warn.mockRestore()
+      expect(text).toContain('no equivalent Ns prop')
+      expect(text).not.toContain('Use the "size" prop')
+    })
+
+    it('still names the replacement where one genuinely exists', () => {
+      // The honest fallback must not swallow the useful case.
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      __resetAttrConflictWarnings()
+      mount(NsButton, { attrs: { color: 'primary' } })
+      const text = warn.mock.calls.flat().join(' ')
+      warn.mockRestore()
+      expect(text).toContain('Use the "variant" prop instead of "color"')
+    })
   })
 })

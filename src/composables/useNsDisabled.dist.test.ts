@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
+import { createApp, type Plugin } from 'vue'
 
 /**
  * The library's dev warnings must survive the build AND fire in a consumer's
@@ -130,7 +131,32 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(5)
+    ).toBe(7) // 5->6 componentLibrary-07u (stylesheet), 6->7 componentLibrary-whr (invalid banner type)
+  })
+
+  it('warns from the built bundle when the stylesheet sentinel is missing and `process` is absent', async () => {
+    // Same rationale as the other two tests in this file: the guard's polarity
+    // decides whether this can ever fire in a real browser, and only mounting
+    // from dist with `process` removed can tell. jsdom/happy-dom never load a
+    // real stylesheet, so `--ns-styles-loaded` legitimately resolves empty
+    // here — the same condition a consumer who forgot `style.css` would hit.
+    const mod = (await import('../../dist/nonsuch-components.js')) as {
+      createNonsuch: () => Plugin
+    }
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    const app = createApp({ render: () => null })
+    app.use(mod.createNonsuch())
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the missing-stylesheet warning did not fire with `process` undefined — it is ' +
+        'dead in every consumer browser, whatever the unit tests say',
+    ).toContain('style.css')
   })
 })
 

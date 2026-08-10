@@ -12,7 +12,7 @@ const meta: Meta<typeof NsBanner> = {
   argTypes: {
     type: {
       control: 'select',
-      options: ['info', 'success', 'warning', 'error'],
+      options: ['info', 'positive', 'warning', 'negative'],
     },
     dense: { control: 'boolean' },
     rounded: { control: 'boolean' },
@@ -30,8 +30,8 @@ export const Info: Story = {
   }),
 }
 
-export const Success: Story = {
-  args: { type: 'success' },
+export const Positive: Story = {
+  args: { type: 'positive' },
   render: (args) => ({
     components: { NsBanner },
     setup: () => ({ args }),
@@ -48,8 +48,8 @@ export const Warning: Story = {
   }),
 }
 
-export const Error: Story = {
-  args: { type: 'error' },
+export const Negative: Story = {
+  args: { type: 'negative' },
   render: (args) => ({
     components: { NsBanner },
     setup: () => ({ args }),
