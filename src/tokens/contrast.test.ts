@@ -559,7 +559,7 @@ const KNOWN_EXCEPTIONS: KnownException[] = [
     belowLarge: true,
     ratios: { light: 2.8728, darkRoot: 2.1852, darkMedia: 2.1852 },
     bead: 'componentLibrary-3ul',
-    note: '.ns-banner--success (NsBanner type="success") — #919500 on #f3f4d2, 2.87:1 in light (matches the bead exactly); dark is worse at 2.19:1.',
+    note: '.ns-banner--positive (NsBanner type="positive", renamed from "success" by componentLibrary-whr) — #919500 on #f3f4d2, 2.87:1 in light (matches the bead exactly); dark is worse at 2.19:1.',
   },
 
   // --- NOT covered above: componentLibrary-34n ---
@@ -608,7 +608,7 @@ const NEWLY_DISCOVERED_EXCEPTIONS: KnownException[] = [
     ratios: { darkRoot: 1.0, darkMedia: 1.0 },
     bead: 'componentLibrary-2p1',
     note:
-      '.ns-banner--error (NsBanner type="error"), dark mode only — --ns-color-text-negative and ' +
+      '.ns-banner--negative (NsBanner type="negative", renamed from "error" by componentLibrary-whr), dark mode only — --ns-color-text-negative and ' +
       '--ns-color-bg-negative are BOTH #fd6d73 in dark. Identical colour, 1.00:1, invisible text. ' +
       'Light mode is fine (4.71:1).',
   },
