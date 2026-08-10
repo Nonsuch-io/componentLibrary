@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.28.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.0...v0.28.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* **button:** stop advising `iconOnly` for `round`, which is not equivalent ([a097395](https://github.com/Nonsuch-io/componentLibrary/commit/a0973952495f5395533e78298e36353b491cfc49))
+
 ## [0.28.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.27.0...v0.28.0) (2026-08-10)
 
 
