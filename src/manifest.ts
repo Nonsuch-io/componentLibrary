@@ -18,6 +18,8 @@ export const nsComponentManifest: Record<string, string> = {
   QForm: 'NsForm',
   QInput: 'NsInput',
   QList: 'NsList',
+  QRadio: 'NsRadio',
+  QOptionGroup: 'NsRadioButtons',
   QSelect: 'NsSelect',
   QSkeleton: 'NsSkeleton',
   QToggle: 'NsToggle',
