@@ -286,4 +286,61 @@ describe('NsRadioButtons', () => {
       wrapper.unmount()
     })
   })
+
+  describe('review findings', () => {
+    it('treats a per-option `disabled` as disable, like the group does', async () => {
+      // componentLibrary-ob8 one level down: the GROUP accepted both spellings
+      // while a per-option `{ disabled: true }` silently did nothing — the option
+      // rendered live, keyboard-reachable and selectable. TypeScript cannot catch
+      // it either; excess-property checks only fire on object literals, so
+      // `plans.map(p => ({ ..., disabled: !p.ok }))` passes clean.
+      const wrapper = mount(NsRadioButtons, {
+        props: {
+          modelValue: 'a',
+          label: 'Plans',
+          options: [
+            { label: 'A', value: 'a' },
+            { label: 'B', value: 'b', disabled: true },
+            { label: 'C', value: 'c' },
+          ],
+        },
+      })
+      const radios = wrapper.findAllComponents({ name: 'QRadio' })
+      expect(radios[1]?.props('disable'), 'option with `disabled: true` was left enabled').toBe(
+        true,
+      )
+
+      // and the keyboard must skip it, not just style it
+      await radios[0]!.trigger('keydown', { key: 'ArrowDown' })
+      expect(wrapper.emitted('update:modelValue')?.at(-1)).toEqual(['c'])
+    })
+
+    it('keeps traversing when the parent does NOT apply the emitted value', async () => {
+      // THE KEYBOARD TRAP review measured. Position was derived from modelValue,
+      // so a parent that listens but does not apply (validation rejects it, or
+      // state updates async) froze traversal: three ArrowDown presses emitted
+      // ["b","b","b"] and option C was unreachable, with DOM focus stranded on a
+      // tabindex="-1" element that was not the tab stop.
+      const wrapper = mount(NsRadioButtons, {
+        props: {
+          modelValue: 'a', // deliberately never updated
+          label: 'Stuck',
+          options: [
+            { label: 'A', value: 'a' },
+            { label: 'B', value: 'b' },
+            { label: 'C', value: 'c' },
+          ],
+        },
+      })
+      const radios = wrapper.findAllComponents({ name: 'QRadio' })
+      await radios[0]!.trigger('keydown', { key: 'ArrowDown' })
+      await radios[1]!.trigger('keydown', { key: 'ArrowDown' })
+
+      const emitted = wrapper.emitted('update:modelValue')?.flat()
+      expect(
+        emitted,
+        `emitted ${JSON.stringify(emitted)} — traversal stalls when the parent does not apply`,
+      ).toEqual(['b', 'c'])
+    })
+  })
 })

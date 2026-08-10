@@ -16,7 +16,7 @@
         :val="option.value"
         :label="option.label"
         :name="resolvedName"
-        :disable="resolvedDisable || Boolean(option.disable)"
+        :disable="resolvedDisable || optionDisabled(option)"
         :tabindex="index === rovingIndex ? 0 : -1"
         class="ns-radio-buttons__option"
         @update:model-value="handleSelect"
@@ -76,6 +76,22 @@ export interface NsRadioOption {
   value: unknown
   /** Disable this individual option, independent of the group's `disable` */
   disable?: boolean
+  /**
+   * Accepted as an alias for `disable`, with a dev warning.
+   *
+   * The group already accepts both spellings via useNsDisabled, but a per-option
+   * `{ disabled: true }` was silently ignored — the option rendered fully live,
+   * keyboard-reachable and selectable. That is componentLibrary-ob8 reintroduced
+   * one level down, and it evades TypeScript entirely: excess-property checking
+   * only fires on object literals, so `plans.map(p => ({ ..., disabled: !p.ok }))`
+   * type-checks clean while every unavailable option stays selectable.
+   */
+  disabled?: boolean
+}
+
+/** True when an option is disabled by either spelling. */
+function optionDisabled(option: NsRadioOption): boolean {
+  return Boolean(option.disable ?? option.disabled)
 }
 
 export type NsRadioButtonsOrientation = 'vertical' | 'horizontal'
@@ -152,7 +168,7 @@ const selectedIndex = computed(() =>
 
 /** Index of the first option that is not disabled, individually or by the group. */
 const firstEnabledIndex = computed(() =>
-  props.options.findIndex((option) => !resolvedDisable.value && !option.disable),
+  props.options.findIndex((option) => !resolvedDisable.value && !optionDisabled(option)),
 )
 
 /**
@@ -177,7 +193,7 @@ function enabledIndices(): number[] {
   if (resolvedDisable.value) return []
   const indices: number[] = []
   props.options.forEach((option, index) => {
-    if (!option.disable) indices.push(index)
+    if (!optionDisabled(option)) indices.push(index)
   })
   return indices
 }
@@ -193,7 +209,20 @@ function handleKeydown(event: KeyboardEvent) {
   const indices = enabledIndices()
   if (indices.length === 0) return
 
-  const currentPos = indices.indexOf(rovingIndex.value)
+  // DERIVE POSITION FROM THE FOCUSED ELEMENT, NOT FROM SELECTION.
+  //
+  // rovingIndex is derived from modelValue, so using it here assumes the parent
+  // APPLIES every emit. When it does not — validation rejects the change, or
+  // state updates asynchronously — the two diverge and traversal stalls. Review
+  // measured it: with a non-applying parent, three ArrowDown presses emitted
+  // ["b","b","b"], DOM focus stuck on index 1, and option C was unreachable by
+  // keyboard while focus sat on a tabindex="-1" element that was not the tab
+  // stop. The event target is the only thing that knows where the user is.
+  const focusedIndex = groupRef.value
+    ? Array.prototype.indexOf.call(groupRef.value.children, event.currentTarget as Node)
+    : -1
+  const anchorIndex = focusedIndex !== -1 ? focusedIndex : rovingIndex.value
+  const currentPos = indices.indexOf(anchorIndex)
   const safeCurrentPos = currentPos === -1 ? 0 : currentPos
 
   let targetIndex: number
