@@ -4,6 +4,17 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.28.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.27.0...v0.28.0) (2026-08-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* **banner:** NsBanner's `type` values `success` and `error` are renamed to `positive` and `negative`. Consumers must migrate; the old values now render unstyled and lose their role/aria-live. 30 butiq call sites are affected.
+
+### Bug Fixes
+
+* **banner:** rename type values to the design system's vocabulary (whr) ([9929d2d](https://github.com/Nonsuch-io/componentLibrary/commit/9929d2d969a821d95a62d81cfd2a0af468d95053))
+
 ## [0.27.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.26.1...v0.27.0) (2026-08-10)
 
 
