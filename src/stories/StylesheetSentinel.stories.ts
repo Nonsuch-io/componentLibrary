@@ -59,3 +59,50 @@ export const SentinelResolves: Story = {
     ).toBe('1')
   },
 }
+
+/**
+ * CALLS THE FUNCTION UNDER TEST, in a real browser, with a real cascade.
+ *
+ * Review found the gap this closes: the sibling story reads getComputedStyle
+ * directly and never imports warnIfNsStylesheetMissing, while every "does not
+ * warn" assertion elsewhere is happy-dom with a synthetic INLINE property
+ * (`element.style.setProperty`). So the claim that matters most — that a correct
+ * setup stays silent — was never exercised against a stylesheet-driven value.
+ *
+ * Crying wolf is the worse failure here. A warning that fires on correct setups
+ * teaches people to ignore it, and this repo has repeatedly found that a muted
+ * check is worse than none.
+ *
+ * WHAT THIS DOES NOT COVER, stated rather than implied: the positive direction
+ * in a real browser. Removing a :root rule from a live stylesheet at runtime is
+ * not something a play function can do, so "warns when genuinely missing" is
+ * covered by the behavioural dist test in happy-dom instead.
+ */
+export const DoesNotCryWolf: Story = {
+  render: () => ({ template: '<div />' }),
+  play: async () => {
+    const { warnIfNsStylesheetMissing, __resetNsStylesheetWarning } =
+      await import('../composables/useNsStylesheetWarning')
+    __resetNsStylesheetWarning?.()
+
+    const calls: unknown[][] = []
+    const original = console.warn
+    console.warn = (...args: unknown[]) => {
+      calls.push(args)
+      original(...args)
+    }
+    try {
+      warnIfNsStylesheetMissing()
+    } finally {
+      console.warn = original
+    }
+
+    const text = calls.flat().join(' ')
+    if (text.includes('style.css')) {
+      throw new Error(
+        'warnIfNsStylesheetMissing() warned in a real browser WITH the stylesheet ' +
+          `loaded — it cries wolf on a correct setup. Warning was: ${text}`,
+      )
+    }
+  },
+}
