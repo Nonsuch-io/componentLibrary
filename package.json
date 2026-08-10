@@ -26,6 +26,10 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/nonsuch-components.js"
     },
+    "./quasar-config": {
+      "types": "./dist/quasarConfig.d.ts",
+      "import": "./dist/quasar-config.js"
+    },
     "./style.css": "./dist/nonsuch-components.css",
     "./fonts.css": "./fonts/fonts.css",
     "./fonts/global.css": "./fonts/global.css",

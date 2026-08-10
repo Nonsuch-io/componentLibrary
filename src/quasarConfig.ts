@@ -46,7 +46,15 @@ export interface QuasarConfigOverrides {
  *  `dark` and `dark-page` aren't represented in the Figma semantic layer,
  *  so they use the dark-mode bg-canvas / surface values directly.
  */
-const NS_BRAND: Required<QuasarBrandColors> = {
+/**
+ * The brand palette Quasar is configured with.
+ *
+ * Exported so a consumer that only needs the colours does not have to call the
+ * factory and pick them back out — and, more importantly, so nobody keeps a
+ * hand-copied duplicate. butiq had one in each Nuxt app; both had drifted to
+ * Tailwind defaults under a comment claiming they mirrored this object.
+ */
+export const NS_BRAND: Required<QuasarBrandColors> = {
   primary: '#d56307', // color-bg-brand
   secondary: '#93dbff', // color-status-accent
   accent: '#93dbff', // color-status-accent

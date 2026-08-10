@@ -26,9 +26,19 @@ export default defineConfig({
   },
   build: {
     lib: {
-      entry: resolve(__dirname, 'src/index.ts'),
+      // TWO ENTRIES ON PURPOSE. `quasar-config` is standalone (quasarConfig.ts
+      // imports nothing) and must be importable WITHOUT the barrel: a consumer
+      // resolving it at Nuxt config time cannot pull in `.` , because that drags
+      // in Vue SFCs and throws an SSR globals error. butiq inlined a copy of the
+      // palette for exactly that reason, and both Nuxt apps then drifted to
+      // Tailwind defaults under a comment claiming they mirrored this file —
+      // brand orange never reached them. A copy nobody can diff is the problem;
+      // a subpath removes the reason to keep one.
+      entry: {
+        'nonsuch-components': resolve(__dirname, 'src/index.ts'),
+        'quasar-config': resolve(__dirname, 'src/quasarConfig.ts'),
+      },
       name: 'NonsuchComponents',
-      fileName: 'nonsuch-components',
       formats: ['es'],
     },
     rollupOptions: {
