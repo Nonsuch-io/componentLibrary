@@ -230,7 +230,7 @@ export { createNonsuch } from './plugin'
 export type { NsPluginOptions } from './plugin'
 
 // Quasar config helper
-export { createQuasarConfig } from './quasarConfig'
+export { createQuasarConfig, NS_BRAND } from './quasarConfig'
 export type { QuasarConfigOverrides, QuasarBrandColors } from './quasarConfig'
 
 // Locale
