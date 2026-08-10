@@ -4,6 +4,31 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.28.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.1...v0.28.2) (2026-08-10)
+
+
+### Bug Fixes
+
+* **badge:** make ghost and neutral actually render (mwe) ([6d71ded](https://github.com/Nonsuch-io/componentLibrary/commit/6d71ded4ac1d0c94e36cdf22baaf9afee5dead58))
+
+## [0.28.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.0...v0.28.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* **button:** stop advising `iconOnly` for `round`, which is not equivalent ([a097395](https://github.com/Nonsuch-io/componentLibrary/commit/a0973952495f5395533e78298e36353b491cfc49))
+
+## [0.28.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.27.0...v0.28.0) (2026-08-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* **banner:** NsBanner's `type` values `success` and `error` are renamed to `positive` and `negative`. Consumers must migrate; the old values now render unstyled and lose their role/aria-live. 30 butiq call sites are affected.
+
+### Bug Fixes
+
+* **banner:** rename type values to the design system's vocabulary (whr) ([9929d2d](https://github.com/Nonsuch-io/componentLibrary/commit/9929d2d969a821d95a62d81cfd2a0af468d95053))
+
 ## [0.27.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.26.1...v0.27.0) (2026-08-10)
 
 

@@ -632,6 +632,24 @@ const NEWLY_DISCOVERED_EXCEPTIONS: KnownException[] = [
   },
 ]
 
+NEWLY_DISCOVERED_EXCEPTIONS.push({
+  fg: '--ns-color-text-primary',
+  bg: '--ns-color-status-neutral',
+  blocks: ['darkRoot', 'darkMedia'],
+  belowLarge: true,
+  ratios: { darkRoot: 1.1552, darkMedia: 1.1552 },
+  bead: 'componentLibrary-2p1',
+  note:
+    '.ns-badge--neutral (NsBadge color="neutral") — 14.63:1 in LIGHT and 1.16:1 in DARK. Same root ' +
+    'cause as the banner entries above: --ns-color-status-neutral does NOT flip between themes ' +
+    '(#e5e7eb in all three blocks) while --ns-color-text-primary does (#2d0b00 -> #fef7ee), so ' +
+    'near-black on light grey becomes near-white on light grey. Figma specifies exactly this pair ' +
+    '(Badges page, Color=Neutral), so the design is light-mode-only here rather than the component ' +
+    'being wrong. Caught by this check on the commit that ADDED the variant — it would otherwise ' +
+    'have shipped. Kale has scoped dark mode as WIP and consumers force light, so it ships ' +
+    'documented rather than blocked.',
+})
+
 const ALL_EXCEPTIONS = [...KNOWN_EXCEPTIONS, ...NEWLY_DISCOVERED_EXCEPTIONS]
 
 function findException(
@@ -755,7 +773,15 @@ describe('token contrast (componentLibrary-gbb)', () => {
     // it's small enough not to trip the 75% floor above.
     const unresolved = evaluations.filter((e) => e.ratio === null)
     const isDocumentedGap = (e: Evaluation) =>
-      e.bgIdentity.startsWith('linear-gradient(') || e.bgIdentity === 'transparent'
+      e.bgIdentity.startsWith('linear-gradient(') ||
+      e.bgIdentity === 'transparent' ||
+      // A TOKEN whose resolved value is transparent is the SAME documented gap,
+      // and the identity check alone missed it: NsBadge's ghost variant uses
+      // --ns-color-btn-tertiary-bg, which IS `transparent`, so it was reported
+      // as a new undocumented gap rather than the known one. Match the reason
+      // rather than an exact identity, since the reason is built from whatever
+      // the resolver classified the value as.
+      /\btransparent\b/.test(e.unresolvedReason ?? '')
     const undocumented = unresolved.filter((e) => !isDocumentedGap(e))
     expect(
       undocumented,

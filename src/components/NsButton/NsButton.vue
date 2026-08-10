@@ -92,8 +92,23 @@ useNsAttrConflictWarning('NsButton', [
   // while .q-btn--round's border-radius LOSES to our scoped .ns-btn radius, producing a
   // half-Quasar, half-Ns mongrel. Exactly the class of collision this guard exists for.
   { attrs: ['dense'], useInstead: 'size' },
-  { attrs: ['round'], useInstead: 'iconOnly' },
-  { attrs: ['fab', 'fab-mini', 'fabMini'], useInstead: 'size' },
+  // NO useInstead. iconOnly is a SQUARE icon-only layout; round is a CIRCLE.
+  // Recommending it would silently turn 89 butiq buttons square — the same
+  // reasoning that took `round` off the never-list in componentLibrary-nbr.
+  {
+    attrs: ['round'],
+    because:
+      'There is no equivalent Ns prop yet — "iconOnly" is a square layout, not a circle. ' +
+      'Leave "round" in place for now; see componentLibrary-nbr.',
+  },
+  // Same shape as `round`: a fab is a circular, elevated button. `size` changes
+  // dimensions, not form, so it is not a replacement.
+  {
+    attrs: ['fab', 'fab-mini', 'fabMini'],
+    because:
+      'There is no equivalent Ns prop yet — a fab is a circular elevated button, and "size" ' +
+      'only changes dimensions. Leave it in place for now; see componentLibrary-nbr.',
+  },
 ])
 
 const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = {

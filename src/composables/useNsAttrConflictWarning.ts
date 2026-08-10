@@ -15,17 +15,42 @@ export interface NsAttrConflict {
    * `['text-color', 'textColor']`.
    */
   attrs: readonly string[]
-  /** The Ns prop consumers should use instead of the conflicting attr. */
-  useInstead: string
+  /**
+   * The Ns prop consumers should use instead of the conflicting attr.
+   *
+   * OMIT IT when there is no equivalent. `round` had `useInstead: 'iconOnly'`,
+   * and that advice was WRONG: iconOnly is a SQUARE icon-only layout, round is a
+   * CIRCLE. Following it silently turns a circular button square — a visual
+   * regression the library was actively recommending on 89 butiq call sites.
+   * The same reasoning took `round` off the never-list in componentLibrary-nbr;
+   * the warning was not updated to match, so it kept giving advice the guard
+   * itself had already rejected.
+   */
+  useInstead?: string
+  /**
+   * Why the attr conflicts, when no replacement exists yet. Shown instead of
+   * "use X instead", so the warning stays honest about the absence.
+   */
+  because?: string
 }
 
-function buildConflictWarning(componentName: string, attrKey: string, useInstead: string): string {
-  return (
+function buildConflictWarning(
+  componentName: string,
+  attrKey: string,
+  conflict: NsAttrConflict,
+): string {
+  const head =
     `[${componentName}] "${attrKey}" was passed through to the underlying Quasar component, ` +
-    `but it competes with this component's own "${useInstead}" prop. Both styling systems can ` +
-    `apply at once and silently produce unreadable output (e.g. matching text and background ` +
-    `colours). Use the "${useInstead}" prop instead of "${attrKey}".`
-  )
+    `where it competes with this component's own styling. Both systems can apply at once and ` +
+    `silently produce unreadable output (e.g. matching text and background colours).`
+
+  // NEVER RECOMMEND A PROP THAT IS NOT EQUIVALENT. A warning that names a
+  // replacement is an instruction, and a wrong instruction is worse than no
+  // warning: it converts "something is off here" into "do this specific thing",
+  // which people then do.
+  return conflict.useInstead
+    ? `${head} Use the "${conflict.useInstead}" prop instead of "${attrKey}".`
+    : `${head} ${conflict.because ?? `There is no equivalent Ns prop for "${attrKey}" yet.`}`
 }
 
 /**
@@ -102,6 +127,6 @@ export function useNsAttrConflictWarning(
     const seenKey = `${componentName}:${matchedKey}`
     if (warned.has(seenKey)) continue
     warned.add(seenKey)
-    console.warn(buildConflictWarning(componentName, matchedKey, conflict.useInstead))
+    console.warn(buildConflictWarning(componentName, matchedKey, conflict))
   }
 }
