@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.26.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.26.0...v0.26.1) (2026-08-10)
+
+
+### Bug Fixes
+
+* **test:** unmount components after every test ([0b8c909](https://github.com/Nonsuch-io/componentLibrary/commit/0b8c909c8ab561e1350f4e991cff4f2d7b101641))
+* **test:** unmount components after every test ([595f713](https://github.com/Nonsuch-io/componentLibrary/commit/595f71357ccf3dbe68d0cb343b64f7641639b138))
+
 ## [0.26.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.25.1...v0.26.0) (2026-08-10)
 
 
