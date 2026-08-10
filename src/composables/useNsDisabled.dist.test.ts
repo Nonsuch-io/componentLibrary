@@ -131,7 +131,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(6) // bumped 5 -> 6: componentLibrary-07u added the stylesheet-missing warning
+    ).toBe(7) // 5->6 componentLibrary-07u (stylesheet), 6->7 componentLibrary-whr (invalid banner type)
   })
 
   it('warns from the built bundle when the stylesheet sentinel is missing and `process` is absent', async () => {

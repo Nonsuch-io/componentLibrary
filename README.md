@@ -294,7 +294,7 @@ src/
   components/
     NsAvatar/             # Avatar with size presets
     NsBadge/              # Styled QBadge wrapper
-    NsBanner/             # Info/success/warning/error banners
+    NsBanner/             # Info/positive/warning/negative banners
     NsBreadcrumbs/        # Breadcrumb navigation
     NsBreadcrumbElement/  # Individual breadcrumb item
     NsButton/             # Styled QBtn wrapper
