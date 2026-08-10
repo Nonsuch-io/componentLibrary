@@ -70,6 +70,36 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     ).toContain('is not a Quasar prop and does nothing on its own')
   })
 
+  it("warns for NsRadioButtons' unlabelled group too, from the built bundle", async () => {
+    // EVERY dev warning belongs in this test, not just the first one. The
+    // shape-regex and pinned-count checks above cover the NsRadioButtons guard,
+    // but review defeated a shape check once already — polarity lives in
+    // parentheses a regex cannot see. A refactor into the early-return form
+    // would keep those green while the warning went permanently silent in
+    // browsers. Only mounting from dist with `process` removed can tell.
+    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsRadioButtons as never, {
+      props: {
+        options: [
+          { label: 'A', value: 'a' },
+          { label: 'B', value: 'b' },
+        ],
+      },
+    })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the unlabelled-radiogroup warning did not fire with `process` undefined — ' +
+        'it is dead in every consumer browser, whatever the unit tests say',
+    ).toContain('NsRadioButtons')
+  })
+
   it('accounts for every `typeof process` in the bundle', () => {
     // A tripwire for guards this file does not otherwise exercise. Review showed
     // the extraction regex implicitly ALLOWED any shape it failed to recognise —
@@ -100,7 +130,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(4)
+    ).toBe(5)
   })
 })
 
