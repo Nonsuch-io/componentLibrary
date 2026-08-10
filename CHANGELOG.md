@@ -4,6 +4,21 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.26.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.25.1...v0.26.0) (2026-08-10)
+
+
+### Features
+
+* **config:** export the Quasar config at a standalone subpath ([1c89463](https://github.com/Nonsuch-io/componentLibrary/commit/1c8946356166374e4b6a688fb426148c00b877ad))
+* **config:** export the Quasar config at a standalone subpath ([510c06b](https://github.com/Nonsuch-io/componentLibrary/commit/510c06b1bfea92d29e9478b1ad335a3bc28e0389))
+* **radio:** add NsRadio and NsRadioButtons with a real radiogroup (componentLibrary-zux) ([1795609](https://github.com/Nonsuch-io/componentLibrary/commit/17956096b9d10b3d9403b2f562387084bb971b47))
+* **radio:** add NsRadio and NsRadioButtons with a real radiogroup (zux) ([63ba514](https://github.com/Nonsuch-io/componentLibrary/commit/63ba514dbe6557dc19cb6b59f9b20c3666ca3cdd))
+
+
+### Bug Fixes
+
+* **build:** pin the CSS filename, which the second lib entry silently renamed ([3a4c4bc](https://github.com/Nonsuch-io/componentLibrary/commit/3a4c4bc8da9147c473d12b4231000a99694c9620))
+
 ## [0.25.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.25.0...v0.25.1) (2026-08-07)
 
 
