@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.28.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.1...v0.28.2) (2026-08-10)
+
+
+### Bug Fixes
+
+* **badge:** make ghost and neutral actually render (mwe) ([6d71ded](https://github.com/Nonsuch-io/componentLibrary/commit/6d71ded4ac1d0c94e36cdf22baaf9afee5dead58))
+
 ## [0.28.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.0...v0.28.1) (2026-08-10)
 
 
