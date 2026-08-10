@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.27.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.26.1...v0.27.0) (2026-08-10)
+
+
+### Features
+
+* **plugin:** warn when a consumer never loaded style.css (componentLibrary-07u) ([54d527f](https://github.com/Nonsuch-io/componentLibrary/commit/54d527f045cd4934912b49eca2a6c4c91c15a321))
+
 ## [0.26.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.26.0...v0.26.1) (2026-08-10)
 
 
