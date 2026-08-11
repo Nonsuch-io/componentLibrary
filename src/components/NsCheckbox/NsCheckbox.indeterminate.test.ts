@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { defineComponent, ref } from 'vue'
 import NsCheckbox from './NsCheckbox.vue'
 import { __resetAttrConflictWarnings } from '../../composables/useNsAttrConflictWarning'
 
@@ -110,18 +111,37 @@ describe('NsCheckbox holds its boolean contract on every reachable path', () => 
     expect(typeof value).toBe('boolean')
   })
 
-  it('STAYS USABLE with toggle-indeterminate, rather than sticking at unchecked', () => {
-    // Coercing null -> false kept the type honest and bricked the control: the
-    // model never advanced past false and the checkbox stopped responding
-    // entirely. Stripping the attr keeps it a working two-state toggle, which a
-    // type-only assertion cannot tell apart from the dead version.
-    const wrapper = mount(NsCheckbox, {
-      props: { modelValue: false },
-      attrs: { 'toggle-indeterminate': true },
+  it('STAYS USABLE with toggle-indeterminate — five clicks on ONE live v-model', async () => {
+    // THE METHODOLOGY IS THE TEST. Coercing null -> false kept the declared type
+    // honest and bricked the control: the model never advanced past false and the
+    // checkbox stopped responding. That was found by clicking a LIVE v-model
+    // repeatedly and watching [false, false, false, false] — and it is invisible
+    // to a test that mounts fresh instances and clicks each once, because every
+    // isolated first click looks fine.
+    //
+    // A previous version of this test did exactly that: two mounts, one click
+    // each, under a title promising the repeated-click scenario. It failed when
+    // the fix was reverted, so it was not vacuous — but it did not check what it
+    // said, which is the third claim/body mismatch this file has carried.
+    const harness = defineComponent({
+      components: { NsCheckbox },
+      setup: () => ({ checked: ref(false) }),
+      template: `<NsCheckbox v-model="checked" toggle-indeterminate />`,
     })
-    expect(clickAndRead({ modelValue: false }, { 'toggle-indeterminate': true })).toBe(true)
-    expect(clickAndRead({ modelValue: true }, { 'toggle-indeterminate': true })).toBe(false)
-    expect(wrapper.find('.ns-checkbox').attributes('aria-checked')).toBe('false')
+    const wrapper = mount(harness)
+    const seen: unknown[] = []
+    for (let i = 0; i < 5; i++) {
+      await wrapper.find('.ns-checkbox').trigger('click')
+      seen.push((wrapper.vm as unknown as { checked: boolean }).checked)
+    }
+    expect(seen, 'the model stopped advancing — the control is stuck').toEqual([
+      true,
+      false,
+      true,
+      false,
+      true,
+    ])
+    expect(seen.every((v) => typeof v === 'boolean')).toBe(true)
   })
 
   it('does not let true-value leak a STRING into a boolean emit', () => {

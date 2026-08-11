@@ -196,6 +196,16 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       'the ignored-attr warning did not fire with `process` undefined — it is dead ' +
         'in every consumer browser, whatever the unit tests say',
     ).toContain('toggle-indeterminate')
+
+    // ALSO THE WORDING, not just the attr name. Review noted the attr-name-only
+    // check would pass on a regression that kept the name while dropping
+    // "IGNORED" or reverting to the styling head — and the difference matters:
+    // a consumer told the attr "conflicts" will look for a way to make it work,
+    // where one told it was IGNORED knows to stop.
+    expect(text, 'the warning no longer says the attr was ignored').toContain('IGNORED')
+    expect(text, 'the styling wording came back for a behaviour conflict').not.toContain(
+      'background colours',
+    )
   })
 
   it('warns from the built bundle when the stylesheet sentinel is missing and `process` is absent', async () => {
