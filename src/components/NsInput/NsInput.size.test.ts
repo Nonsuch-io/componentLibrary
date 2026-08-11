@@ -120,3 +120,42 @@ describe('NsInput size (componentLibrary-b5e)', () => {
     })
   })
 })
+
+/**
+ * An invalid `size` from an untyped call site. TypeScript does not reach a .js
+ * consumer, a spread, or a value off an API response — and the first version of
+ * this prop turned one typo into two silent wrong answers (found in review).
+ */
+describe('NsInput size — unrecognised values fail loudly, not quietly', () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  it('warns and names the valid options', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsInput, { props: { size: 'huge' as unknown as 'dense' } })
+    const text = warn.mock.calls.flat().join(' ')
+    expect(text).toContain('size="huge" is not a valid size')
+    expect(text).toContain('dense, default, large')
+  })
+
+  it('emits no size class, rather than a class matching no rule', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const html = mount(NsInput, { props: { size: 'huge' as unknown as 'dense' } }).html()
+    expect(html).not.toContain('ns-input--')
+  })
+
+  it('KEEPS a `dense` the consumer set, instead of silently dropping it', () => {
+    // The second of the two wrong answers, and the one with visible consequence:
+    // a typo'd size used to flip resolvedDense to false and un-dense the field.
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = mount(NsInput, {
+      props: { dense: true, size: 'huge' as unknown as 'dense' },
+    })
+    expect(wrapper.find('.q-field--dense').exists()).toBe(true)
+  })
+
+  it('does not also emit the misleading dense+size conflict warning', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsInput, { props: { dense: true, size: 'huge' as unknown as 'dense' } })
+    expect(warn.mock.calls.flat().join(' ')).not.toContain('were both set')
+  })
+})

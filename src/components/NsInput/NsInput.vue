@@ -94,13 +94,25 @@ const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsInput', () =>
 
 const attrs = useAttrs()
 
+const NS_INPUT_SIZES: readonly NsInputSize[] = ['dense', 'default', 'large']
+
+/**
+ * AN UNRECOGNISED `size` IS TREATED AS ABSENT, not as "some size".
+ *
+ * TypeScript does not reach a `.js` call site, a spread, or a value off an API
+ * response. Before this, `size="huge"` produced `ns-input--huge` — a class
+ * matching no rule, so the field silently lost all size styling — AND flipped
+ * `resolvedDense` to false, silently discarding a `dense` the consumer had set.
+ * Two wrong answers, no signal, from one typo. Falling back to `dense` means the
+ * worst case is today's rendering rather than an unstyled field.
+ */
+const isKnownSize = computed(() => props.size !== undefined && NS_INPUT_SIZES.includes(props.size))
+
 /** `size` wins when both are given; `dense` remains the fallback so every call
  *  site that predates `size` renders exactly as it did. */
-const resolvedDense = computed(() =>
-  props.size === undefined ? props.dense : props.size === 'dense',
-)
+const resolvedDense = computed(() => (isKnownSize.value ? props.size === 'dense' : props.dense))
 
-const sizeClass = computed(() => (props.size ? `ns-input--${props.size}` : undefined))
+const sizeClass = computed(() => (isKnownSize.value ? `ns-input--${props.size}` : undefined))
 
 /**
  * Large is multi-line, because that is what the design's 120px MEANS. Quasar
@@ -129,6 +141,17 @@ const resolvedType = computed<QInputType>(() =>
 
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   watchEffect(() => {
+    if (props.size !== undefined && !isKnownSize.value) {
+      // Reported BEFORE the dense+size warning below, and that ordering matters:
+      // for a typo'd size the conflict message ("`size` wins") would be actively
+      // misleading, since the value that "won" is one this component cannot
+      // render.
+      console.warn(
+        `[NsInput] size="${String(props.size)}" is not a valid size and has been ` +
+          `ignored. Expected one of: ${NS_INPUT_SIZES.join(', ')}.`,
+      )
+      return
+    }
     if (props.size !== undefined && props.dense) {
       console.warn(
         '[NsInput] `dense` and `size` were both set. `size` wins and `dense` is ' +

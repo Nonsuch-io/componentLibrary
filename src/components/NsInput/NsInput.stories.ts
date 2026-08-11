@@ -11,6 +11,11 @@ const meta: Meta<typeof NsInput> = {
     dense: false,
   },
   argTypes: {
+    size: {
+      control: 'select',
+      options: [undefined, 'dense', 'default', 'large'],
+      description: "Figma's three sizes. Undefined is NOT the same as 'default' — see SizeDefault.",
+    },
     label: { control: 'text' },
     outlined: { control: 'boolean' },
     dense: { control: 'boolean' },
@@ -133,26 +138,37 @@ export const HeightsAreReal: Story = {
     `,
   }),
   play: async ({ canvasElement }) => {
-    // Queried by DOCUMENT ORDER rather than by test id. `inheritAttrs: false`
-    // plus the filtered v-bind means an id lands on the root label, and
-    // getByTestId then returned an element the control was not inside — the
-    // query, not the component, was wrong. Order is fixed by the template above.
+    // ASSERTS min-height, NOT offsetHeight, AND THAT DISTINCTION IS THE WHOLE TEST.
+    //
+    // The first version measured offsetHeight against tolerance bands, and review
+    // PROVED it could not catch the incident it was written for. Deleting the
+    // `&--dense` block entirely left the story green, because Quasar's own
+    // `.q-field--dense .q-field__control` is 40px and 40 sat inside the 36-40
+    // band — the fallback passed as though it were the 38px override. Deleting
+    // `&--large` also left it green, because `type="textarea"` is set in JS and
+    // Quasar's default rows=6 already cleared the >=118 floor with no upper
+    // bound. Two of three variants were unfalsifiable in a test whose stated
+    // purpose was falsifying exactly that.
+    //
+    // min-height is the property these rules SET, and Quasar sets none on
+    // .q-field__control, so an exact match cannot be satisfied by a fallback.
     const controls = canvasElement.querySelectorAll<HTMLElement>('.q-field__control')
-    const [dense, def, large, unsized] = Array.from(controls)
-
     await expect(controls.length).toBe(4)
+    const [dense, def, large, unsized] = Array.from(controls)
+    const minHeight = (el: HTMLElement) => getComputedStyle(el).minHeight
 
-    await expect(dense.offsetHeight).toBeGreaterThanOrEqual(36)
-    await expect(dense.offsetHeight).toBeLessThanOrEqual(40)
+    await expect(minHeight(dense)).toBe('38px')
+    await expect(minHeight(def)).toBe('50px')
+    await expect(minHeight(large)).toBe('120px')
 
-    await expect(def.offsetHeight).toBeGreaterThanOrEqual(48)
-    await expect(def.offsetHeight).toBeLessThanOrEqual(52)
-
-    await expect(large.offsetHeight).toBeGreaterThanOrEqual(118)
-
-    // The load-bearing one: an UNSIZED input must keep Quasar's 56px, not pick
-    // up Figma's 50px. If this drifts, every existing form in the consumer
-    // silently changed height and nothing else in the suite would notice.
+    // The load-bearing one: an UNSIZED input must keep Quasar's own metrics and
+    // pick up NONE of the design's. If this ever equals 38 or 50, a `size`
+    // default has silently restyled every form in the consumer.
+    await expect(['38px', '50px', '120px']).not.toContain(minHeight(unsized))
     await expect(unsized.offsetHeight).toBeGreaterThanOrEqual(54)
+
+    // Large is still a real textarea, not merely a tall box (the CSS half and
+    // the JS half fail independently, so they are asserted independently).
+    await expect(canvasElement.querySelectorAll('textarea').length).toBe(1)
   },
 }

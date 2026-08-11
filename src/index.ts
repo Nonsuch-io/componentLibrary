@@ -26,7 +26,7 @@ export { default as NsThemeProvider } from './components/NsThemeProvider/NsTheme
 export type { NsThemeProviderProps } from './components/NsThemeProvider/NsThemeProvider.vue'
 
 export { default as NsInput } from './components/NsInput/NsInput.vue'
-export type { NsInputProps } from './components/NsInput/NsInput.vue'
+export type { NsInputProps, NsInputSize } from './components/NsInput/NsInput.vue'
 
 export { default as NsCard } from './components/NsCard/NsCard.vue'
 export type { NsCardProps } from './components/NsCard/NsCard.vue'
