@@ -39,7 +39,23 @@ const TOKENS_CSS = resolve(ROOT, 'src/tokens/tokens.css')
 function lightBlockTokens(): Map<string, string> {
   const css = readFileSync(TOKENS_CSS, 'utf-8')
   const start = css.indexOf(':root {')
-  const end = css.indexOf('}', start)
+  // BRACE DEPTH, not indexOf('}'). Review pointed out that scanning to the first
+  // closing brace truncates the moment any comment inside the block contains a
+  // literal `}` — and truncation here is SILENT: fewer tokens parsed means fewer
+  // lookups, not a failure. A file written to catch silent drift should not be
+  // one comment away from it. (The size floor below is the backstop.)
+  let depth = 0
+  let end = start
+  for (let i = css.indexOf('{', start); i < css.length; i++) {
+    if (css[i] === '{') depth++
+    else if (css[i] === '}') {
+      depth--
+      if (depth === 0) {
+        end = i
+        break
+      }
+    }
+  }
   const tokens = new Map<string, string>()
   for (const m of css.slice(start, end).matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) {
     tokens.set(m[1], m[2].trim())
@@ -47,12 +63,19 @@ function lightBlockTokens(): Map<string, string> {
   return tokens
 }
 
-function vueFiles(dir: string): string[] {
+/**
+ * .vue AND .ts. Scoping this to .vue was a real hole, found by review: literal
+ * hex fallbacks live in story files too (AnimatedEye.stories.ts had three), and
+ * they were invisible to this scanner while it claimed to cover the repo. A
+ * check that cannot fail for an entire file type is the switchboard-87q shape
+ * this very file was written to prevent — one directory over.
+ */
+function sourceFiles(dir: string): string[] {
   const out: string[] = []
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name)
-    if (entry.isDirectory()) out.push(...vueFiles(full))
-    else if (entry.name.endsWith('.vue')) out.push(full)
+    if (entry.isDirectory()) out.push(...sourceFiles(full))
+    else if (/\.(vue|ts)$/.test(entry.name) && !/\.test\.ts$/.test(entry.name)) out.push(full)
   }
   return out
 }
@@ -75,10 +98,24 @@ describe('var() fallbacks agree with the tokens they stand in for', () => {
   })
 
   const findings: string[] = []
-  const files = vueFiles(resolve(ROOT, 'src/components'))
+  // Both trees: components AND src/stories, which also hardcodes fallbacks.
+  const files = [
+    ...sourceFiles(resolve(ROOT, 'src/components')),
+    ...sourceFiles(resolve(ROOT, 'src/stories')),
+  ]
 
   for (const file of files) {
     const src = readFileSync(file, 'utf-8')
+    // NESTED FALLBACKS ARE REPORTED, NOT SKIPPED. `var(--a, var(--b, #hex))`
+    // does not match the literal-colour pattern below, so it would slip through
+    // silently — an unrecognised shape reading as a pass, which is the deny-list
+    // mistake that defeated the dist-guard check twice (see useNsDisabled.dist.test.ts).
+    for (const m of src.matchAll(/var\(\s*(--ns-[\w-]+)\s*,\s*var\(/g)) {
+      findings.push(
+        `${file.replace(ROOT + '/', '')}: var(${m[1]}, var(...)) — nested fallback, ` +
+          'not checkable by this test. Flatten it or add an explicit exception.',
+      )
+    }
     // var(--token, <fallback>) where the fallback is a literal colour, not a var()
     for (const m of src.matchAll(
       /var\(\s*(--ns-[\w-]+)\s*,\s*(#[0-9a-fA-F]{3,8}|rgba?\([^)]*\))\s*\)/g,
@@ -112,7 +149,10 @@ describe('var() fallbacks agree with the tokens they stand in for', () => {
       (n, f) => n + [...readFileSync(f, 'utf-8').matchAll(/var\(\s*--ns-[\w-]+\s*,/g)].length,
       0,
     )
-    expect(total, 'no var() fallbacks matched anywhere in src/components').toBeGreaterThan(10)
+    expect(
+      total,
+      'no var() fallbacks matched anywhere in src/components or src/stories',
+    ).toBeGreaterThan(10)
   })
 
   it('every literal fallback matches its token in the light block', () => {

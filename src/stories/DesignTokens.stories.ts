@@ -43,6 +43,13 @@ const text: Token[] = [
   { name: '--ns-color-text-on-negative', fallback: '#ffffff' },
   { name: '--ns-color-text-info', fallback: '#0069b4' },
   { name: '--ns-color-text-on-info', fallback: '#ffffff' },
+  // Ink for the SUBTLE bg-* fills, as opposed to text-on-* above which is ink
+  // for the SOLID status-* surfaces. Two surfaces, two families
+  // (componentLibrary-2p1).
+  { name: '--ns-color-text-on-bg-positive', fallback: '#2d0b00' },
+  { name: '--ns-color-text-on-bg-warning', fallback: '#2d0b00' },
+  { name: '--ns-color-text-on-bg-negative', fallback: '#2d0b00' },
+  { name: '--ns-color-text-on-bg-info', fallback: '#2d0b00' },
   { name: '--ns-color-text-accent', fallback: '#64cbff' },
   { name: '--ns-color-text-on-accent', fallback: '#2d0b00' },
   { name: '--ns-color-text-on-dark', fallback: '#fef7ee' },
