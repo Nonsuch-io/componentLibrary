@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.28.4](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.3...v0.28.4) (2026-08-11)
+
+
+### Reverts
+
+* **test:** un-serialise story files — it fixed nothing (5wn) ([bf9c04c](https://github.com/Nonsuch-io/componentLibrary/commit/bf9c04cfdce7238b15e73301055f42fd871b0869))
+* **test:** un-serialise story files — it fixed nothing (5wn) ([c76fa16](https://github.com/Nonsuch-io/componentLibrary/commit/c76fa166bbb29854f2b671cae05328c76fbcbadb))
+
 ## [0.28.3](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.2...v0.28.3) (2026-08-10)
 
 
