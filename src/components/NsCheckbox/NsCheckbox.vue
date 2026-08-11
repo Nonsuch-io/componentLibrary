@@ -1,7 +1,7 @@
 <template>
   <q-checkbox
     v-bind="attrsWithoutDisabled"
-    :model-value="modelValue"
+    :model-value="resolvedModelValue"
     :label="label"
     :color="color"
     :dense="dense"
@@ -12,6 +12,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'
 /**
  * NsCheckbox — A styled checkbox wrapping Quasar's QCheckbox.
@@ -24,6 +25,21 @@ export interface NsCheckboxProps {
   label?: string
   /** v-model value */
   modelValue?: boolean
+  /**
+   * Render the PARTIAL state Figma specifies (Checked = false | true | partial).
+   *
+   * A separate prop rather than widening `modelValue` to `boolean | null`, which
+   * was the obvious move and is the wrong one. Widening it also widens the emit,
+   * and every consumer with a typed handler or a `Ref<boolean>` behind `v-model`
+   * would stop type-checking — 12 call sites in butiq today, all `v-model`. The
+   * partial state is a DISPLAY concern owned by the parent ("some of my children
+   * are selected"), not a third value the checkbox itself can hold, so a boolean
+   * `modelValue` was never the thing that needed to change.
+   *
+   * Clicking a partial checkbox emits `true`, which is the select-all behaviour
+   * this exists for: partial -> click -> all.
+   */
+  indeterminate?: boolean
   /** Quasar colour name */
   color?: string
   /** Use dense (compact) size */
@@ -35,6 +51,7 @@ export interface NsCheckboxProps {
 const props = withDefaults(defineProps<NsCheckboxProps>(), {
   label: undefined,
   modelValue: false,
+  indeterminate: false,
   color: 'primary',
   dense: false,
   disable: false,
@@ -43,6 +60,19 @@ const props = withDefaults(defineProps<NsCheckboxProps>(), {
 defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
+
+/**
+ * Quasar renders the indeterminate state when the model value is neither `true`
+ * nor `false` — `indeterminateValue` defaults to `null` (use-checkbox.js:32), and
+ * `isIndeterminate` is `!isTrue && !isFalse` (:96). It then sets
+ * `aria-checked="mixed"` itself (:142), which is the part that actually matters:
+ * a screen reader announcing "checked" or "unchecked" for a partial selection is
+ * being told something FALSE, and there is no visual cue to contradict it.
+ *
+ * So this maps our boolean-plus-flag API onto Quasar's tri-state model value
+ * rather than reimplementing the state or the ARIA.
+ */
+const resolvedModelValue = computed(() => (props.indeterminate ? null : props.modelValue))
 
 // Accepts the `disabled` spelling too — on a QCheckbox it would otherwise
 // land on the wrapper div and leave the control fully live. See useNsDisabled.

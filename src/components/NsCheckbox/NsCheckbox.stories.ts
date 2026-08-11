@@ -34,3 +34,23 @@ export const Dense: Story = {
 export const Disabled: Story = {
   args: { disable: true, label: 'Cannot change' },
 }
+
+/**
+ * Figma's `Checked = partial`. The state a "select all" needs when only some of
+ * its children are selected.
+ *
+ * THE POINT IS `aria-checked="mixed"`, not the dash icon. A screen reader
+ * announcing "checked" or "unchecked" over a partial selection states something
+ * false, and unlike a wrong icon there is no visual cue to contradict it.
+ *
+ * `indeterminate` is a separate prop rather than a third `modelValue` — the
+ * partial state belongs to the parent ("some of my children are selected"),
+ * and widening the model would widen the emit and break every typed `v-model`.
+ * Clicking a partial checkbox emits `true`: partial, then click, means select all.
+ */
+export const Indeterminate: Story = {
+  args: {
+    label: 'Select all',
+    indeterminate: true,
+  },
+}
