@@ -113,19 +113,33 @@ const ariaLive = computed(() =>
   font-family: var(--ns-font-family-text)
   border-radius: var(--ns-radius-md)
 
+  // INK IS text-on-bg-*, NOT text-*. `--ns-color-text-X` is a coloured text token
+  // for a NEUTRAL surface; putting it on `--ns-color-bg-X` gave 1.36:1 warning
+  // text in light mode and, in dark, the LITERALLY IDENTICAL hex for both
+  // (#eaa500 on #eaa500, #fd6d73 on #fd6d73) -- invisible, not merely low
+  // contrast. `--ns-color-text-on-X` is not the fix either: that one belongs to
+  // the SOLID `--ns-color-status-X` surface, and white on the pale #fedee0 fill
+  // is 1.25:1. Two different surfaces need two different inks. (componentLibrary-2p1,
+  // reported by butiq-agent, who computed it rather than trusting the bead.)
+  //
+  // FALLBACKS ARE THE REAL LIGHT-MODE TOKEN VALUES. The previous ones were
+  // Material palette hexes that resolved to a 1.48:1 pairing, and butiq quoted
+  // them out of a bead AS the component's accessible treatment -- fallbacks read
+  // exactly like fact because they are real hex sitting in our own source.
+
   &--info
-    background-color: var(--ns-color-bg-info, #e3f2fd)
-    color: var(--ns-color-text-info, #0d47a1)
+    background-color: var(--ns-color-bg-info, #e0f1fa)
+    color: var(--ns-color-text-on-bg-info, #2d0b00)
 
   &--positive
-    background-color: var(--ns-color-bg-positive, #e8f5e9)
-    color: var(--ns-color-text-positive, #1b5e20)
+    background-color: var(--ns-color-bg-positive, #f3f4d2)
+    color: var(--ns-color-text-on-bg-positive, #2d0b00)
 
   &--warning
-    background-color: var(--ns-color-bg-warning, #fff3e0)
-    color: var(--ns-color-text-warning, #e65100)
+    background-color: var(--ns-color-bg-warning, #f9e3ad)
+    color: var(--ns-color-text-on-bg-warning, #2d0b00)
 
   &--negative
-    background-color: var(--ns-color-bg-negative, #ffebee)
-    color: var(--ns-color-text-negative, #b71c1c)
+    background-color: var(--ns-color-bg-negative, #fedee0)
+    color: var(--ns-color-text-on-bg-negative, #2d0b00)
 </style>
