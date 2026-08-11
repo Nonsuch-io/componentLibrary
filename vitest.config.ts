@@ -88,30 +88,19 @@ export default defineConfig({
             ],
           },
           setupFiles: ['.storybook/vitest.setup.ts'],
-          // ONE STORY FILE AT A TIME. Not a flake workaround -- the flake WAS
-          // this. Vitest sizes its worker pool from the CPU count, and every
-          // worker wants its own page in a single Chromium instance. On a
-          // 24-core box that is ~24 pages competing, and a story with no `play`
-          // function -- a bare render of NsSpace or NsSeparator -- blows the
-          // 15s timeout while WAITING FOR A SLOT rather than while rendering.
+          // Story files run in PARALLEL, deliberately. componentLibrary-5wn
+          // briefly shipped `fileParallelism: false` here on the theory that
+          // browser-page contention caused the 15s timeouts. It did not, and
+          // serialising fixed NOTHING -- measured on a healthy machine, both
+          // configs are 76/76 green in ~21s.
           //
-          // That is why the failures always looked like nonsense: the victims
-          // were the most trivial stories in the suite, and running any one of
-          // them alone was instantly green, which is what let this be waved
-          // through as "flaky" for weeks (componentLibrary-5wn).
+          // The timeouts were MEMORY. With swap 100% exhausted (4095/4096 MB)
+          // individual story files took 98-112s against a ~21s whole-suite
+          // baseline, so a 15s timeout was never the wrong threshold; Chromium
+          // could not get memory. CI was 14/14 green throughout.
           //
-          // MEASURED ON ONE COMMIT, same machine, same build:
-          //   parallel   17 failed / 76, all `Test timed out in 15000ms`
-          //   serial      0 failed / 76, 50.43s total
-          //
-          // The counterintuitive proof: an IDLER machine failed MORE (9 -> 17),
-          // because more free cores means a bigger pool means more contention.
-          // Load average is not the variable; parallelism is.
-          //
-          // Serial costs nothing worth having -- 50s for the whole suite, and
-          // the parallel run was SLOWER because it spent that time timing out.
-          // Applies to this project only; the unit project stays parallel.
-          fileParallelism: false,
+          // BEFORE BELIEVING A LOCAL STORYBOOK FAILURE: check `free -m` and
+          // `uptime`. Full swap means discard the run, not interpret it.
         },
       },
     ],
