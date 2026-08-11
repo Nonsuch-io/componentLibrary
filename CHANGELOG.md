@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.29.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.29.0...v0.29.1) (2026-08-11)
+
+
+### Bug Fixes
+
+* **button:** my own CSS comments blinded the contrast checker (34n) ([c0f4777](https://github.com/Nonsuch-io/componentLibrary/commit/c0f47772f155f2fd9e5414244666f482e4fbedea))
+* **button:** use the on-colour token that matches each background (34n) ([151d712](https://github.com/Nonsuch-io/componentLibrary/commit/151d71229ab1e1dded73ab672b855f11423bf02d))
+
 ## [0.29.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.5...v0.29.0) (2026-08-11)
 
 
