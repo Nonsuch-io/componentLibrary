@@ -4,6 +4,18 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.29.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.5...v0.29.0) (2026-08-11)
+
+
+### Features
+
+* **input:** add the design's three sizes, opt-in (b5e) ([ec6129e](https://github.com/Nonsuch-io/componentLibrary/commit/ec6129e24a9c04930bd5af26629ed8e49cdcbc34))
+
+
+### Bug Fixes
+
+* **input:** large rendered 152px against a 120px spec (b5e) ([f89f56d](https://github.com/Nonsuch-io/componentLibrary/commit/f89f56ddb0992ac992b7e20946e29930edc46498))
+
 ## [0.28.5](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.4...v0.28.5) (2026-08-11)
 
 
