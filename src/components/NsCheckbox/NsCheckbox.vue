@@ -1,6 +1,6 @@
 <template>
   <q-checkbox
-    v-bind="attrsWithoutDisabled"
+    v-bind="forwardedAttrs"
     :model-value="resolvedModelValue"
     :label="label"
     :color="color"
@@ -86,37 +86,73 @@ defineOptions({ inheritAttrs: false })
 const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsCheckbox', () => props.disable)
 
 /**
- * `toggle-indeterminate` MAKES QUASAR EMIT null, WHICH THIS COMPONENT'S EMIT TYPE
- * SAYS IT NEVER DOES.
+ * ATTRS THAT WOULD MAKE THE MODEL NON-BOOLEAN ARE STRIPPED, NOT COERCED.
  *
- * Found in review of PR #262, and it predates that PR: the attr is undeclared, so
- * it falls through $attrs untouched, and clicking then cycles false -> true ->
- * null. `defineEmits` promises `[value: boolean]`, so a consumer's typed handler
- * receives a value TypeScript told them was impossible — a type lie reachable
- * from a supported Quasar prop.
+ * QCheckbox is tri-state and value-configurable: `toggle-indeterminate` cycles
+ * the model through `null`, and `true-value` / `false-value` /
+ * `indeterminate-value` replace the emitted values outright. All four are
+ * undeclared here, so they used to fall straight through `$attrs` while
+ * `defineEmits` promised `[value: boolean]` — a type TypeScript guaranteed and
+ * the runtime broke.
  *
- * Two halves, because either alone is insufficient:
- *   - the template coerces `$event ?? false`, so the DECLARED TYPE IS TRUE no
- *     matter what reaches it. A promise the code keeps rather than one the docs
- *     assert.
- *   - this warns, because silently coercing would turn their three-state cycle
- *     into a two-state one with no explanation — a quiet wrong answer, which is
- *     the failure class this repo keeps finding.
+ * COERCING WAS MY FIRST FIX AND IT WAS WORSE THAN THE BUG. Emitting
+ * `$event ?? false` kept the declared type true and BRICKED THE CONTROL: with
+ * `toggle-indeterminate`, Quasar computes `null` as the next value from false,
+ * the coercion turns it back into false, the model never changes and the
+ * checkbox stops responding to clicks entirely. Measured over four clicks:
+ * [false, false, false, false]. In production the warning below is compiled out,
+ * so the consumer would have got a silently dead checkbox — strictly worse than
+ * the type lie it replaced, and invisible to every test I had written.
  *
- * NO `useInstead`. `indeterminate` is NOT an equivalent: theirs cycles the value
- * through a third state on CLICK, ours renders a partial state the PARENT owns
- * and never enters by itself. Naming it as a replacement would be the `round` ->
- * `iconOnly` mistake again, where a warning turned "something is off" into a
- * specific wrong instruction that people then followed.
+ * Stripping keeps the control WORKING as the two-state toggle this component
+ * declares itself to be, and the warning says what was ignored. The `?? false`
+ * on the emit stays as belt-and-braces for any path this list has not
+ * anticipated — the list is a deny-list, and this repo has been defeated by
+ * deny-lists twice.
  */
+const TRI_STATE_ATTRS = [
+  'toggle-indeterminate',
+  'toggleIndeterminate',
+  'true-value',
+  'trueValue',
+  'false-value',
+  'falseValue',
+  'indeterminate-value',
+  'indeterminateValue',
+] as const
+
+const forwardedAttrs = computed(() =>
+  Object.fromEntries(
+    Object.entries(attrsWithoutDisabled.value).filter(
+      ([key]) => !TRI_STATE_ATTRS.includes(key as (typeof TRI_STATE_ATTRS)[number]),
+    ),
+  ),
+)
+
 useNsAttrConflictWarning('NsCheckbox', [
   {
     attrs: ['toggle-indeterminate', 'toggleIndeterminate'],
+    kind: 'behaviour',
     because:
-      'This component emits a boolean, and "toggle-indeterminate" makes Quasar emit ' +
-      'null on the third click — which is coerced to false here so the declared ' +
-      'type holds. The partial state is set by the parent via the "indeterminate" ' +
-      'prop, which is a display state rather than a value the checkbox cycles into.',
+      'It has been IGNORED: it makes Quasar cycle the model through null, and this ' +
+      'component emits a boolean. The partial state is set by the parent via the ' +
+      '"indeterminate" prop, which is a display state rather than a value the ' +
+      'checkbox cycles into on click.',
+  },
+  {
+    attrs: ['true-value', 'trueValue', 'false-value', 'falseValue'],
+    kind: 'behaviour',
+    because:
+      'It has been IGNORED: it replaces the emitted values, and this component ' +
+      'declares it emits a boolean. Map the boolean to your own values in the ' +
+      'handler instead.',
+  },
+  {
+    attrs: ['indeterminate-value', 'indeterminateValue'],
+    kind: 'behaviour',
+    because:
+      'It has been IGNORED: this component reaches the partial state through the ' +
+      '"indeterminate" prop and never emits an indeterminate value.',
   },
 ])
 </script>

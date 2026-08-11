@@ -69,23 +69,25 @@ describe('NsCheckbox indeterminate (componentLibrary-eom)', () => {
 })
 
 /**
- * `toggle-indeterminate` is Quasar's own tri-state cycling, and it reaches this
- * component through $attrs because it is undeclared. Found in review of PR #262
- * and PRE-DATING it: clicking then cycled false -> true -> null while
- * `defineEmits` promised `[value: boolean]`, so a typed handler received a value
- * TypeScript had told the consumer was impossible.
+ * QCheckbox is tri-state and value-configurable, and all four relevant props are
+ * undeclared here, so they used to reach Quasar through $attrs while
+ * `defineEmits` promised `[value: boolean]`.
  *
- * The previous test titled "emits a BOOLEAN" only exercised the `indeterminate`
- * prop path, so its NAME asserted more than it checked — the exact shape of
- * unfalsifiable check this repo keeps finding. These cover the path that could
- * actually break it.
+ * TWO EARLIER VERSIONS OF THIS SUITE WERE WRONG, BOTH IN THE SAME DIRECTION:
+ *   1. A test titled "emits a BOOLEAN" that only exercised the `indeterminate`
+ *      prop — its NAME asserted the contract, its BODY checked one path.
+ *   2. Its replacement clicked from `true` with `toggle-indeterminate`, on the
+ *      belief that Quasar cycles false -> true -> null. IT DOES NOT: a click
+ *      from true returns falseValue (use-checkbox.js:178-181), and null is
+ *      reached from FALSE (:182-190). So it asserted `not.toBeNull()` on a value
+ *      that was always false, and review proved the whole suite stayed green
+ *      with the fix deleted.
+ *
+ * These click from FALSE, which is the state that actually produced null.
  */
-describe('NsCheckbox emit type holds on every reachable path', () => {
-  // The conflict warning dedupes per (component, attr) at MODULE level, so an
-  // earlier test in this file that mounts with `toggle-indeterminate` silently
-  // suppresses the one asserting it — the exact order-dependence the composable's
-  // own docstring warns about, walked into anyway.
+describe('NsCheckbox holds its boolean contract on every reachable path', () => {
   beforeEach(() => __resetAttrConflictWarnings())
+
   const clickAndRead = (props: Record<string, unknown>, attrs: Record<string, unknown> = {}) => {
     const wrapper = mount(NsCheckbox, { props, attrs })
     wrapper.find('.ns-checkbox').trigger('click')
@@ -100,20 +102,64 @@ describe('NsCheckbox emit type holds on every reachable path', () => {
     expect(typeof clickAndRead(props)).toBe('boolean')
   })
 
-  it('emits a boolean even with toggle-indeterminate, where Quasar would emit null', () => {
-    // Reaches the third state directly: Quasar cycles false -> true -> null, so
-    // starting from true puts the next click on the null step.
-    const value = clickAndRead({ modelValue: true }, { 'toggle-indeterminate': true })
+  it('emits a boolean from FALSE with toggle-indeterminate — the path that produced null', () => {
+    // The one that matters. Quasar reaches its indeterminate value from false,
+    // not from true, so this is the click the contract used to break on.
+    const value = clickAndRead({ modelValue: false }, { 'toggle-indeterminate': true })
     expect(value, 'null reached a consumer whose handler is typed boolean').not.toBeNull()
     expect(typeof value).toBe('boolean')
   })
 
-  it('warns that toggle-indeterminate is not supported, rather than silently coercing', () => {
-    // Coercion alone would turn their three-state cycle into a two-state one with
-    // no explanation — correct types, quietly wrong behaviour.
+  it('STAYS USABLE with toggle-indeterminate, rather than sticking at unchecked', () => {
+    // Coercing null -> false kept the type honest and bricked the control: the
+    // model never advanced past false and the checkbox stopped responding
+    // entirely. Stripping the attr keeps it a working two-state toggle, which a
+    // type-only assertion cannot tell apart from the dead version.
+    const wrapper = mount(NsCheckbox, {
+      props: { modelValue: false },
+      attrs: { 'toggle-indeterminate': true },
+    })
+    expect(clickAndRead({ modelValue: false }, { 'toggle-indeterminate': true })).toBe(true)
+    expect(clickAndRead({ modelValue: true }, { 'toggle-indeterminate': true })).toBe(false)
+    expect(wrapper.find('.ns-checkbox').attributes('aria-checked')).toBe('false')
+  })
+
+  it('does not let true-value leak a STRING into a boolean emit', () => {
+    // A second route to the same broken contract, and the reason the fix strips
+    // rather than coerces: `?? false` only intercepts null/undefined, so
+    // true-value="yes" sailed through it.
+    const value = clickAndRead({ modelValue: false }, { 'true-value': 'yes' })
+    expect(typeof value, `emitted ${JSON.stringify(value)} for a boolean-typed emit`).toBe(
+      'boolean',
+    )
+  })
+
+  it.each([
+    ['toggle-indeterminate', { 'toggle-indeterminate': true }],
+    ['toggleIndeterminate', { toggleIndeterminate: true }],
+    ['true-value', { 'true-value': 'yes' }],
+    ['indeterminate-value', { 'indeterminate-value': 'maybe' }],
+  ])('warns that %s was ignored', (name, attrs) => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsCheckbox, { attrs })
+    const text = warn.mock.calls.flat().join(' ')
+    expect(text).toContain(name)
+    expect(text, 'the warning must say it was IGNORED, not merely that it conflicts').toContain(
+      'IGNORED',
+    )
+    warn.mockRestore()
+  })
+
+  it('describes a BEHAVIOUR conflict, not a colour-contrast one', () => {
+    // The composable was written for NsButton, where every conflict is two
+    // styling systems fighting. Its stock sentence about "unreadable output
+    // (e.g. matching text and background colours)" would send someone hunting a
+    // contrast bug they do not have.
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     mount(NsCheckbox, { attrs: { 'toggle-indeterminate': true } })
-    expect(warn.mock.calls.flat().join(' ')).toContain('toggle-indeterminate')
+    const text = warn.mock.calls.flat().join(' ')
+    expect(text).not.toContain('background colours')
+    expect(text).toContain('changes behaviour')
     warn.mockRestore()
   })
 })
