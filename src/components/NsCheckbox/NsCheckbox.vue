@@ -7,13 +7,14 @@
     :dense="dense"
     :disable="resolvedDisable"
     class="ns-checkbox"
-    @update:model-value="$emit('update:modelValue', $event)"
+    @update:model-value="$emit('update:modelValue', $event ?? false)"
   />
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'
+import { useNsAttrConflictWarning } from '../../composables/useNsAttrConflictWarning'
 /**
  * NsCheckbox — A styled checkbox wrapping Quasar's QCheckbox.
  *
@@ -83,6 +84,41 @@ const resolvedModelValue = computed(() => (props.indeterminate ? null : props.mo
 defineOptions({ inheritAttrs: false })
 
 const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsCheckbox', () => props.disable)
+
+/**
+ * `toggle-indeterminate` MAKES QUASAR EMIT null, WHICH THIS COMPONENT'S EMIT TYPE
+ * SAYS IT NEVER DOES.
+ *
+ * Found in review of PR #262, and it predates that PR: the attr is undeclared, so
+ * it falls through $attrs untouched, and clicking then cycles false -> true ->
+ * null. `defineEmits` promises `[value: boolean]`, so a consumer's typed handler
+ * receives a value TypeScript told them was impossible — a type lie reachable
+ * from a supported Quasar prop.
+ *
+ * Two halves, because either alone is insufficient:
+ *   - the template coerces `$event ?? false`, so the DECLARED TYPE IS TRUE no
+ *     matter what reaches it. A promise the code keeps rather than one the docs
+ *     assert.
+ *   - this warns, because silently coercing would turn their three-state cycle
+ *     into a two-state one with no explanation — a quiet wrong answer, which is
+ *     the failure class this repo keeps finding.
+ *
+ * NO `useInstead`. `indeterminate` is NOT an equivalent: theirs cycles the value
+ * through a third state on CLICK, ours renders a partial state the PARENT owns
+ * and never enters by itself. Naming it as a replacement would be the `round` ->
+ * `iconOnly` mistake again, where a warning turned "something is off" into a
+ * specific wrong instruction that people then followed.
+ */
+useNsAttrConflictWarning('NsCheckbox', [
+  {
+    attrs: ['toggle-indeterminate', 'toggleIndeterminate'],
+    because:
+      'This component emits a boolean, and "toggle-indeterminate" makes Quasar emit ' +
+      'null on the third click — which is coerced to false here so the declared ' +
+      'type holds. The partial state is set by the parent via the "indeterminate" ' +
+      'prop, which is a display state rather than a value the checkbox cycles into.',
+  },
+])
 </script>
 
 <style lang="sass" scoped>
