@@ -176,6 +176,38 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     ).toContain('is not a valid size')
   })
 
+  it("warns for NsCheckbox's stripped tri-state attrs from the built bundle", async () => {
+    // The pinned count cannot protect this one — it shares useNsAttrConflictWarning's
+    // single guard, so the count stays 8 whether this call exists or not. Review
+    // flagged the gap against this file's own stated policy that EVERY dev warning
+    // gets a from-dist test, and this warning is load-bearing: the attr is SILENTLY
+    // IGNORED, so without it a consumer sees a prop do nothing and no explanation.
+    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsCheckbox as never, { attrs: { 'toggle-indeterminate': true } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the ignored-attr warning did not fire with `process` undefined — it is dead ' +
+        'in every consumer browser, whatever the unit tests say',
+    ).toContain('toggle-indeterminate')
+
+    // ALSO THE WORDING, not just the attr name. Review noted the attr-name-only
+    // check would pass on a regression that kept the name while dropping
+    // "IGNORED" or reverting to the styling head — and the difference matters:
+    // a consumer told the attr "conflicts" will look for a way to make it work,
+    // where one told it was IGNORED knows to stop.
+    expect(text, 'the warning no longer says the attr was ignored').toContain('IGNORED')
+    expect(text, 'the styling wording came back for a behaviour conflict').not.toContain(
+      'background colours',
+    )
+  })
+
   it('warns from the built bundle when the stylesheet sentinel is missing and `process` is absent', async () => {
     // Same rationale as the other two tests in this file: the guard's polarity
     // decides whether this can ever fire in a real browser, and only mounting

@@ -32,6 +32,15 @@ export interface NsAttrConflict {
    * "use X instead", so the warning stays honest about the absence.
    */
   because?: string
+  /**
+   * What KIND of conflict this is, which decides how the warning opens.
+   * Defaults to styling, because that is what every conflict was when this
+   * composable was written. Set 'behaviour' for attrs that change what the
+   * component DOES rather than how it looks — a consumer told they have a
+   * contrast problem when they have an emit-type problem will look in the wrong
+   * place, and stop trusting the next warning.
+   */
+  kind?: 'styling' | 'behaviour'
 }
 
 function buildConflictWarning(
@@ -39,10 +48,21 @@ function buildConflictWarning(
   attrKey: string,
   conflict: NsAttrConflict,
 ): string {
+  // THE HEAD IS ABOUT STYLING ONLY WHEN THE CONFLICT IS. This composable was
+  // written for NsButton, where every conflict really is two styling systems
+  // fighting — so the sentence about "unreadable output (e.g. matching text and
+  // background colours)" was hardcoded. Its first NON-styling use (NsCheckbox's
+  // tri-state attrs, a BEHAVIOUR and emit-type conflict) then told the consumer
+  // they had a colour-contrast problem they do not have. A warning that
+  // misdescribes the fault is the round -> iconOnly mistake in a different place:
+  // it converts "something is off" into a confident wrong diagnosis.
   const head =
-    `[${componentName}] "${attrKey}" was passed through to the underlying Quasar component, ` +
-    `where it competes with this component's own styling. Both systems can apply at once and ` +
-    `silently produce unreadable output (e.g. matching text and background colours).`
+    conflict.kind === 'behaviour'
+      ? `[${componentName}] "${attrKey}" was passed through to the underlying Quasar ` +
+        `component, where it changes behaviour this component has its own contract for.`
+      : `[${componentName}] "${attrKey}" was passed through to the underlying Quasar component, ` +
+        `where it competes with this component's own styling. Both systems can apply at once and ` +
+        `silently produce unreadable output (e.g. matching text and background colours).`
 
   // NEVER RECOMMEND A PROP THAT IS NOT EQUIVALENT. A warning that names a
   // replacement is an instruction, and a wrong instruction is worse than no
