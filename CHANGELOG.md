@@ -4,6 +4,20 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.30.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.29.1...v0.30.0) (2026-08-11)
+
+
+### Features
+
+* **checkbox:** add the partial state Figma specifies (eom) ([4e0e528](https://github.com/Nonsuch-io/componentLibrary/commit/4e0e5285bf53262c1910949e0aa9123dbfc06192))
+* **checkbox:** add the partial state Figma specifies (eom) ([fc5733d](https://github.com/Nonsuch-io/componentLibrary/commit/fc5733db38c2ddea87e7889e4fdda4e64369f587))
+
+
+### Bug Fixes
+
+* **checkbox:** make the boolean emit true on every path, not just the documented one ([117bb21](https://github.com/Nonsuch-io/componentLibrary/commit/117bb216a39be3bd731d2c9df1bf296ef09a14c6))
+* **checkbox:** strip the tri-state attrs — coercing them bricked the control ([cd17bed](https://github.com/Nonsuch-io/componentLibrary/commit/cd17bed302ac66d3802df7022d7ad72dcfe0563c))
+
 ## [0.29.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.29.0...v0.29.1) (2026-08-11)
 
 
