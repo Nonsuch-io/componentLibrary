@@ -49,7 +49,7 @@ import * as sass from 'sass-embedded'
  * Two gaps live in `resolveToRgb` rather than in extraction: the PAIR is
  * found correctly, but its VALUES cannot be turned into an RGB triple, so the
  * evaluation resolves to `ratio: null` and is silently skipped by the AA
- * assertions below. As of this writing that is 18 of 84 evaluations (21%):
+ * assertions below. As of this writing that is 21 of 90 evaluations (23%), MEASURED not estimated:
  *
  *   1. `--ns-color-text-primary` on a `linear-gradient(...)` background — 12
  *      evaluations (4 occurrences x 3 theme blocks): NsBottomNav's
@@ -68,8 +68,8 @@ import * as sass from 'sass-embedded'
  * CONSEQUENCE: both of the above are entire pairs, not just some of their
  * blocks — they resolve to null in EVERY theme block. So 2 of this file's 19
  * "unique pairs" produce NO real AA assertion anywhere, which quietly
- * inflates what "19 unique pairs" / "84 evaluations" imply as coverage:
- * effectively only 17 of 19 pairs are ever checked against AA.
+ * inflates what "21 unique pairs" / "90 evaluations" imply as coverage:
+ * effectively only 19 of 21 pairs are ever checked against AA.
  *
  * SHARP INSTANCE: `--ns-color-text-brand` on `transparent` (gap 2) shares its
  * FOREGROUND token with an ALREADY-DOCUMENTED failing pair —
@@ -360,6 +360,14 @@ interface CssRule {
  * Regular selectors do not nest in compiled CSS output, so declarations
  * collected here are the rule's OWN declarations — never a parent's. */
 function parseCssRules(css: string): CssRule[] {
+  // STRIP /* */ COMMENTS FIRST. Sass preserves block comments into the compiled
+  // CSS, and the declaration regex below reads `2.76:1` inside one as a property
+  // named `76` whose `[^;]+` value then SWALLOWS the next real declaration. A
+  // comment documenting a contrast ratio therefore removed that rule's colour
+  // from this checker — measured at 90 evaluations down to 84, silently, and the
+  // pair it hid was the one the comment was explaining (found in review of #260).
+  css = css.replace(/\/\*[\s\S]*?\*\//g, '')
+
   const rules: CssRule[] = []
   let i = 0
   while (i < css.length) {
@@ -523,15 +531,15 @@ const KNOWN_EXCEPTIONS: KnownException[] = [
     bead: 'componentLibrary-7jc',
     note: '.ns-btn--secondary base — #d56307 on #fefbf5, 3.62:1.',
   },
-  {
-    fg: '--ns-color-text-on-brand',
-    bg: '--ns-color-status-negative',
-    blocks: ['darkRoot', 'darkMedia'],
-    belowLarge: true,
-    ratios: { darkRoot: 2.759, darkMedia: 2.759 },
-    bead: 'componentLibrary-7jc',
-    note: '.ns-btn--negative (dark) — white on #fd6d73, 2.76:1.',
-  },
+  // --- RESOLVED 2026-08-11: .ns-btn--negative (dark), was 2.76:1 ---
+  // Filed under 7jc as a colour-choice problem; it was actually a WRONG-TOKEN
+  // problem. The button asked for --ns-color-text-on-brand (#ffffff) on
+  // --ns-color-status-negative, which in dark is a light salmon. Repointing it
+  // at --ns-color-text-on-negative — the token matching its own background —
+  // gives 6.56:1 (componentLibrary-34n). No colour was chosen or changed here.
+  //
+  // Deleted rather than re-pinned: the pair no longer exists in any stylesheet,
+  // and this file fails loudly on an exception that "no longer resolves".
   {
     fg: '--ns-color-text-on-accent',
     bg: '--ns-color-status-accent',
@@ -561,7 +569,24 @@ const KNOWN_EXCEPTIONS: KnownException[] = [
   // 3ul's remaining scope (the positive status tokens SWAPPING ROLES between
   // themes) is untouched by that fix and stays open on the bead.
 
-  // --- NOT covered above: componentLibrary-34n ---
+  // --- componentLibrary-34n: FIXED 2026-08-11, and the reasoning below was
+  //     half wrong, so it is kept rather than deleted ---
+  //
+  // The claim "a numeric contrast check has nothing to catch here by definition"
+  // was true only while every mispaired token coincided with its correct one.
+  // That stopped being true: componentLibrary-2p1 moved
+  // --ns-color-text-on-negative to #2d0b00 in the dark blocks, and the negative
+  // button — still asking for on-brand — kept white at 2.76:1. So the identity
+  // bug BECAME a contrast bug, and this file did catch that half of it (the
+  // deleted exception above), while remaining blind to the other three variants
+  // whose tokens still coincide.
+  //
+  // Both halves now have an owner: ratios here, identity in
+  // NsButton.tokens.test.ts, which asserts each variant's colour token matches
+  // its own background token. That test found a FOURTH instance
+  // (.ns-btn--marketing-pushed) this bead never listed.
+
+  // --- NOT covered above ---
   // .ns-btn--positive/.ns-btn--warning/.ns-btn--negative pair a background
   // with the WRONG on-colour token (e.g. text-on-accent instead of
   // text-on-positive). This is a token-IDENTITY bug, not a contrast one:
@@ -714,7 +739,7 @@ describe('token contrast (componentLibrary-gbb)', () => {
   })
 
   it('at least 75% of theme-block evaluations resolve to a measurable ratio (extraction sanity floor)', () => {
-    // NOT "every pair" — KNOWN GAPS above documents 18/84 evaluations
+    // NOT "every pair" — KNOWN GAPS above documents 21/90 evaluations
     // (gradient and `transparent` backgrounds) that this extractor cannot
     // turn into an RGB triple, by design, not by bug. A per-pair "every pair
     // resolves somewhere" assertion, as an earlier version of this test's
