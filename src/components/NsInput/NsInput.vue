@@ -6,6 +6,7 @@
     :outlined="outlined"
     :dense="resolvedDense"
     :type="resolvedType"
+    :autogrow="resolvedAutogrow"
     :rules="rules"
     :disable="resolvedDisable"
     :class="['ns-input', sizeClass]"
@@ -106,7 +107,10 @@ const NS_INPUT_SIZES: readonly NsInputSize[] = ['dense', 'default', 'large']
  * Two wrong answers, no signal, from one typo. Falling back to `dense` means the
  * worst case is today's rendering rather than an unstyled field.
  */
-const isKnownSize = computed(() => props.size !== undefined && NS_INPUT_SIZES.includes(props.size))
+// `!= null` catches null AS WELL AS undefined, on purpose: a JS consumer
+// passing null to mean "no size" was getting size="null" is not a valid size
+// on every mount. Absent is absent however it is spelled.
+const isKnownSize = computed(() => props.size != null && NS_INPUT_SIZES.includes(props.size))
 
 /** `size` wins when both are given; `dense` remains the fallback so every call
  *  site that predates `size` renders exactly as it did. */
@@ -139,9 +143,37 @@ const resolvedType = computed<QInputType>(() =>
       : undefined,
 )
 
+/**
+ * LARGE AUTOGROWS, AND WITHOUT THIS IT RENDERED 152px AGAINST A 120px SPEC.
+ *
+ * Quasar's textarea defaults to rows=6, whose intrinsic height (~124px, 152px of
+ * control) EXCEEDS min-height: 120px — so the min-height never governed and the
+ * field shipped 32px too tall. Worse, the story asserting min-height was green
+ * throughout, because the CSS property genuinely applied; it just did not decide
+ * the rendered height. A property assertion that is true and irrelevant.
+ *
+ * `autogrow` starts the textarea at one row, which puts min-height back in
+ * charge of the empty state and makes 120px the floor Figma specifies rather
+ * than a number the browser ignores. It also makes the documented "120px is a
+ * starting height, not a ceiling" true — measured false before this: a
+ * rows=6 textarea scrolls at 30 lines instead of growing.
+ *
+ * A consumer's own `autogrow` or `rows` wins, same rule as `type`.
+ */
+// GATED ON resolvedType, NOT ON `size`. Quasar treats autogrow as IMPLYING a
+// textarea (isTextarea = type === 'textarea' || autogrow === true), so keying
+// this off `size === 'large'` alone re-forced a textarea for
+// `size="large" type="number"` — undoing the consumer's explicit type through a
+// second, unrelated prop. Caught by the existing override test.
+const resolvedAutogrow = computed(() =>
+  attrs.autogrow !== undefined || attrs.rows !== undefined
+    ? undefined
+    : resolvedType.value === 'textarea' || undefined,
+)
+
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   watchEffect(() => {
-    if (props.size !== undefined && !isKnownSize.value) {
+    if (props.size != null && !isKnownSize.value) {
       // Reported BEFORE the dense+size warning below, and that ordering matters:
       // for a typo'd size the conflict message ("`size` wins") would be actively
       // misleading, since the value that "won" is one this component cannot
@@ -215,10 +247,14 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
       min-height: 120px
 
     :deep(.q-field__native)
+      // NO min-height HERE. It was 120px, and it STACKED with the control's own
+      // 120px plus padding to render 148px — the design's number applied twice
+      // and satisfied neither time. The control owns the height; the native only
+      // owns where the text sits inside it.
+      //
       // Text starts at the top of a prose field. Quasar vertically centres a
       // single-line native, which in a 120px box parks the caret in the middle
       // of empty space and reads as a broken layout rather than a writing area.
       align-items: flex-start
-      min-height: 120px
       padding-top: var(--ns-space-2, 8px)
 </style>

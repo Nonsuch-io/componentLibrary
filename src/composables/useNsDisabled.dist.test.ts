@@ -155,6 +155,27 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     ).toContain('were both set')
   })
 
+  it("warns for NsInput's INVALID size from the built bundle too", async () => {
+    // The pinned count cannot protect this one: it shares the conflict warning's
+    // `typeof process` guard, so the count stays 8 whether this branch exists,
+    // is deleted, or is moved behind a fail-closed guard. Review flagged the gap
+    // against this file's own stated policy that EVERY dev warning belongs here.
+    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsInput as never, { props: { size: 'huge' } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the invalid-size warning did not fire with `process` undefined — it is dead ' +
+        'in every consumer browser, whatever the unit tests say',
+    ).toContain('is not a valid size')
+  })
+
   it('warns from the built bundle when the stylesheet sentinel is missing and `process` is absent', async () => {
     // Same rationale as the other two tests in this file: the guard's polarity
     // decides whether this can ever fire in a real browser, and only mounting
