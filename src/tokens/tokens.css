@@ -61,6 +61,15 @@
   --ns-color-bg-warning: #f9e3ad;
   --ns-color-bg-negative: #fedee0;
   --ns-color-bg-info: #e0f1fa;
+  /* Ink for the SUBTLE bg-* fills, distinct from text-on-* (which is ink for the
+     SOLID status-* surfaces). componentLibrary-2p1: NsBanner paired bg-X with
+     text-X and rendered 1.36:1 warning text in light and IDENTICAL hex in dark.
+     text-on-X is not the fix either -- it is correct for status-X and wrong here
+     (white on the pale #fedee0 fill is 1.25:1). Two surfaces, two inks. */
+  --ns-color-text-on-bg-positive: #2d0b00;
+  --ns-color-text-on-bg-warning: #2d0b00;
+  --ns-color-text-on-bg-negative: #2d0b00;
+  --ns-color-text-on-bg-info: #2d0b00;
   --ns-color-bg-accent: #b8e4fa;
   --ns-color-bg-dark: #2d0b00;
   --ns-color-bg-dialog: #fef7ee;
@@ -265,7 +274,10 @@
   --ns-color-text-warning: #eaa500;
   --ns-color-text-on-warning: #2d0b00;
   --ns-color-text-negative: #fd6d73;
-  --ns-color-text-on-negative: #ffffff;
+  /* NOT #ffffff: dark --ns-color-negative is a LIGHT salmon (#fd6d73), so white
+     on it is 2.76:1 -- this pair failed on its own intended solid surface.
+     Nothing renders it yet, so it would have shipped invisible. (2p1) */
+  --ns-color-text-on-negative: #2d0b00;
   --ns-color-text-info: #15acf8;
   --ns-color-text-on-info: #ffffff;
   --ns-color-text-accent: #15acf8;
@@ -289,6 +301,13 @@
   --ns-color-bg-warning: #eaa500;
   --ns-color-bg-negative: #fd6d73;
   --ns-color-bg-info: #004a7f;
+  /* See the light block. Only bg-info is genuinely dark here (#004a7f), so it is
+     the single fill wanting white; the other three are saturated mid-tones that
+     need the same near-black as light. Chosen by BACKGROUND LIGHTNESS, not theme. */
+  --ns-color-text-on-bg-positive: #2d0b00;
+  --ns-color-text-on-bg-warning: #2d0b00;
+  --ns-color-text-on-bg-negative: #2d0b00;
+  --ns-color-text-on-bg-info: #ffffff;
   --ns-color-bg-accent: #0069b4;
   --ns-color-bg-dark: #2d0b00;
   --ns-color-bg-dialog: #351d16;
@@ -411,7 +430,10 @@
     --ns-color-text-warning: #eaa500;
     --ns-color-text-on-warning: #2d0b00;
     --ns-color-text-negative: #fd6d73;
-    --ns-color-text-on-negative: #ffffff;
+    /* NOT #ffffff: dark --ns-color-negative is a LIGHT salmon (#fd6d73), so white
+     on it is 2.76:1 -- this pair failed on its own intended solid surface.
+     Nothing renders it yet, so it would have shipped invisible. (2p1) */
+    --ns-color-text-on-negative: #2d0b00;
     --ns-color-text-info: #15acf8;
     --ns-color-text-on-info: #ffffff;
     --ns-color-text-accent: #15acf8;
@@ -435,6 +457,13 @@
     --ns-color-bg-warning: #eaa500;
     --ns-color-bg-negative: #fd6d73;
     --ns-color-bg-info: #004a7f;
+    /* See the light block. Only bg-info is genuinely dark here (#004a7f), so it is
+       the single fill wanting white; the other three are saturated mid-tones that
+       need the same near-black as light. Chosen by BACKGROUND LIGHTNESS, not theme. */
+    --ns-color-text-on-bg-positive: #2d0b00;
+    --ns-color-text-on-bg-warning: #2d0b00;
+    --ns-color-text-on-bg-negative: #2d0b00;
+    --ns-color-text-on-bg-info: #ffffff;
     --ns-color-bg-accent: #0069b4;
     --ns-color-bg-dark: #2d0b00;
     --ns-color-bg-dialog: #351d16;

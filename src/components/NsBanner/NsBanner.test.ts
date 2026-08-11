@@ -223,11 +223,17 @@ describe('NsBanner', () => {
       return propMatch[1]
     }
 
+    // INK IS text-on-bg-*, AND THAT IS THE POINT OF THIS TEST NOW.
+    // It previously pinned --ns-color-text-X, which is a coloured text token for
+    // a NEUTRAL surface: on the bg-X fill it measured 1.36:1 in light and, in
+    // dark, the identical hex for both (componentLibrary-2p1). The pairing this
+    // test locked was the bug. It is not --ns-color-text-on-X either — that ink
+    // belongs to the SOLID status-X surface and is 1.25:1 on the pale fill.
     it.each([
-      ['info', '--ns-color-bg-info', '--ns-color-text-info'],
-      ['positive', '--ns-color-bg-positive', '--ns-color-text-positive'],
-      ['warning', '--ns-color-bg-warning', '--ns-color-text-warning'],
-      ['negative', '--ns-color-bg-negative', '--ns-color-text-negative'],
+      ['info', '--ns-color-bg-info', '--ns-color-text-on-bg-info'],
+      ['positive', '--ns-color-bg-positive', '--ns-color-text-on-bg-positive'],
+      ['warning', '--ns-color-bg-warning', '--ns-color-text-on-bg-warning'],
+      ['negative', '--ns-color-bg-negative', '--ns-color-text-on-bg-negative'],
     ])('%s class resolves to %s / %s — not a renamed pair', (className, bgToken, textToken) => {
       expect(extractDeclaration(className, 'background-color')).toBe(bgToken)
       expect(extractDeclaration(className, 'color')).toBe(textToken)

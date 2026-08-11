@@ -551,16 +551,15 @@ const KNOWN_EXCEPTIONS: KnownException[] = [
     note: '.ns-btn--secondary:active — 4.27:1, just under the 4.5:1 AA-normal line.',
   },
 
-  // --- componentLibrary-3ul: positive status tokens fail AA and swap roles ---
-  {
-    fg: '--ns-color-text-positive',
-    bg: '--ns-color-bg-positive',
-    blocks: ['light', 'darkRoot', 'darkMedia'],
-    belowLarge: true,
-    ratios: { light: 2.8728, darkRoot: 2.1852, darkMedia: 2.1852 },
-    bead: 'componentLibrary-3ul',
-    note: '.ns-banner--positive (NsBanner type="positive", renamed from "success" by componentLibrary-whr) — #919500 on #f3f4d2, 2.87:1 in light (matches the bead exactly); dark is worse at 2.19:1.',
-  },
+  // --- componentLibrary-3ul: RESOLVED for the banner, 2026-08-11 ---
+  // The text-positive-on-bg-positive pair (2.87:1 light, 2.19:1 dark) is gone:
+  // NsBanner now uses --ns-color-text-on-bg-positive, 16.11:1 light / 5.61:1
+  // dark. The exception is DELETED rather than re-pinned because the pair no
+  // longer exists in any stylesheet — and this file fails loudly on an
+  // exception that "no longer resolves", which is what caught it.
+  //
+  // 3ul's remaining scope (the positive status tokens SWAPPING ROLES between
+  // themes) is untouched by that fix and stays open on the bead.
 
   // --- NOT covered above: componentLibrary-34n ---
   // .ns-btn--positive/.ns-btn--warning/.ns-btn--negative pair a background
@@ -587,40 +586,18 @@ const KNOWN_EXCEPTIONS: KnownException[] = [
 // ---------------------------------------------------------------------------
 
 const NEWLY_DISCOVERED_EXCEPTIONS: KnownException[] = [
-  {
-    fg: '--ns-color-text-warning',
-    bg: '--ns-color-bg-warning',
-    blocks: ['light', 'darkRoot', 'darkMedia'],
-    belowLarge: true,
-    ratios: { light: 1.3641, darkRoot: 1.0, darkMedia: 1.0 },
-    bead: 'componentLibrary-2p1',
-    note:
-      '.ns-banner--warning (NsBanner type="warning") — #f7bc2b on #f9e3ad, 1.36:1 in light. In DARK ' +
-      'MODE, --ns-color-text-warning and --ns-color-bg-warning are the SAME hex (#eaa500 on #eaa500) ' +
-      '— literally invisible text, 1.00:1. Same shape as PR #211 (a token reused across two roles that ' +
-      'happen to collide). Ships today in NsBanner.',
-  },
-  {
-    fg: '--ns-color-text-negative',
-    bg: '--ns-color-bg-negative',
-    blocks: ['darkRoot', 'darkMedia'],
-    belowLarge: true,
-    ratios: { darkRoot: 1.0, darkMedia: 1.0 },
-    bead: 'componentLibrary-2p1',
-    note:
-      '.ns-banner--negative (NsBanner type="negative", renamed from "error" by componentLibrary-whr), dark mode only — --ns-color-text-negative and ' +
-      '--ns-color-bg-negative are BOTH #fd6d73 in dark. Identical colour, 1.00:1, invisible text. ' +
-      'Light mode is fine (4.71:1).',
-  },
-  {
-    fg: '--ns-color-text-info',
-    bg: '--ns-color-bg-info',
-    blocks: ['darkRoot', 'darkMedia'],
-    belowLarge: false,
-    ratios: { darkRoot: 3.6257, darkMedia: 3.6257 },
-    bead: 'componentLibrary-2p1',
-    note: '.ns-banner--info (NsBanner type="info"), dark mode — 3.63:1. Passes AA Large, fails AA normal.',
-  },
+  // --- componentLibrary-2p1: the three banner entries are RESOLVED, 2026-08-11 ---
+  // warning (1.36 light / 1.00 dark), negative (1.00 dark) and info (3.63 dark)
+  // all came from NsBanner pairing --ns-color-bg-X with --ns-color-text-X. The
+  // component now uses --ns-color-text-on-bg-X and every block passes AA:
+  //
+  //     positive  16.11 light / 5.61 dark      negative  14.44 / 6.56
+  //     warning   14.33 / 8.52                 info      15.64 / 9.19
+  //
+  // Deleted rather than re-pinned, for the same reason as the 3ul entry above:
+  // the pairs no longer exist. Reported by butiq-agent, who computed the ratios
+  // from the shipped tokens instead of trusting a bead that quoted var()
+  // FALLBACK hexes as though they were live values.
   {
     fg: '--ns-color-text-primary',
     bg: '--ns-color-bg-highlight',
