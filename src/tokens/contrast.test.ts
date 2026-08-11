@@ -49,7 +49,7 @@ import * as sass from 'sass-embedded'
  * Two gaps live in `resolveToRgb` rather than in extraction: the PAIR is
  * found correctly, but its VALUES cannot be turned into an RGB triple, so the
  * evaluation resolves to `ratio: null` and is silently skipped by the AA
- * assertions below. As of this writing that is 18 of 84 evaluations (21%):
+ * assertions below. As of this writing that is 21 of 90 evaluations (23%), MEASURED not estimated:
  *
  *   1. `--ns-color-text-primary` on a `linear-gradient(...)` background — 12
  *      evaluations (4 occurrences x 3 theme blocks): NsBottomNav's
@@ -68,8 +68,8 @@ import * as sass from 'sass-embedded'
  * CONSEQUENCE: both of the above are entire pairs, not just some of their
  * blocks — they resolve to null in EVERY theme block. So 2 of this file's 19
  * "unique pairs" produce NO real AA assertion anywhere, which quietly
- * inflates what "19 unique pairs" / "84 evaluations" imply as coverage:
- * effectively only 17 of 19 pairs are ever checked against AA.
+ * inflates what "21 unique pairs" / "90 evaluations" imply as coverage:
+ * effectively only 19 of 21 pairs are ever checked against AA.
  *
  * SHARP INSTANCE: `--ns-color-text-brand` on `transparent` (gap 2) shares its
  * FOREGROUND token with an ALREADY-DOCUMENTED failing pair —
@@ -360,6 +360,14 @@ interface CssRule {
  * Regular selectors do not nest in compiled CSS output, so declarations
  * collected here are the rule's OWN declarations — never a parent's. */
 function parseCssRules(css: string): CssRule[] {
+  // STRIP /* */ COMMENTS FIRST. Sass preserves block comments into the compiled
+  // CSS, and the declaration regex below reads `2.76:1` inside one as a property
+  // named `76` whose `[^;]+` value then SWALLOWS the next real declaration. A
+  // comment documenting a contrast ratio therefore removed that rule's colour
+  // from this checker — measured at 90 evaluations down to 84, silently, and the
+  // pair it hid was the one the comment was explaining (found in review of #260).
+  css = css.replace(/\/\*[\s\S]*?\*\//g, '')
+
   const rules: CssRule[] = []
   let i = 0
   while (i < css.length) {
@@ -731,7 +739,7 @@ describe('token contrast (componentLibrary-gbb)', () => {
   })
 
   it('at least 75% of theme-block evaluations resolve to a measurable ratio (extraction sanity floor)', () => {
-    // NOT "every pair" — KNOWN GAPS above documents 18/84 evaluations
+    // NOT "every pair" — KNOWN GAPS above documents 21/90 evaluations
     // (gradient and `transparent` backgrounds) that this extractor cannot
     // turn into an RGB triple, by design, not by bug. A per-pair "every pair
     // resolves somewhere" assertion, as an earlier version of this test's

@@ -31,6 +31,17 @@ import { resolve } from 'node:path'
  * The fourth instance (marketing-pushed) was NOT in the bead. It was found by
  * checking every pair mechanically, which is the argument for this test rather
  * than a one-time fix.
+ *
+ * SCOPE, STATED HONESTLY: THIS COVERS BASE VARIANT BLOCKS ONLY, NOT STATES.
+ * Nested `&:hover` / `&:active` / `&:focus-visible` blocks never match the
+ * selector regex, and a state background like `status-accent-active` does not
+ * equal the surface name `accent`, so states are unreachable here even in
+ * principle. Review found a FIFTH instance that proves the point:
+ * `.ns-btn--accent:active` pairs `--ns-color-bg-accent-active` with
+ * `--ns-color-text-on-brand`. It is deliberately left alone — unlike the four
+ * above, repointing it would CHANGE A COLOUR (1.82:1 -> 9.97:1), which is a
+ * designer's call, and its ratio is already pinned under componentLibrary-7jc.
+ * So "every solid background" is the invariant; base blocks are what is enforced.
  */
 const SFC = readFileSync(resolve(__dirname, 'NsButton.vue'), 'utf-8')
 
@@ -59,36 +70,53 @@ function pairs(): Pair[] {
 describe('NsButton on-colour tokens match their backgrounds (componentLibrary-34n)', () => {
   const found = pairs()
 
-  it('extracted pairs at all, so a regex that matches nothing cannot pass', () => {
-    // Without this the assertion below is vacuously green the moment the CSS is
-    // reformatted, the selectors are renamed, or the file moves to sass — the
-    // same empty-reads-as-valid failure this repo keeps finding.
+  /**
+   * THE EXACT SET, NOT A COUNT. A count floor plus a `.some()` check was the
+   * first version, and review DEFEATED it: re-introducing the original 34n bug
+   * while inserting an innocuous `&:focus-visible { }` block between
+   * `background:` and `color:` made the body regex truncate at the nested brace,
+   * dropped `.ns-btn--negative` out of the pair list entirely (6 -> 5, still
+   * above the floor of 4), and left all 17 tests green with the exact
+   * accessibility bug shipped. The guard's own comment named that failure mode
+   * and then did not close it.
+   *
+   * An exact set makes a dropout loud, and makes adding a variant a conscious
+   * edit here rather than a silent exemption.
+   */
+  const EXPECTED = [
+    '.ns-btn--primary',
+    '.ns-btn--accent',
+    '.ns-btn--positive',
+    '.ns-btn--negative',
+    '.ns-btn--warning',
+    '.ns-btn--marketing-pushed',
+  ]
+
+  it('extracts exactly the variants we know about — a dropout fails here', () => {
     expect(
-      found.length,
-      'no background/on-colour pairs extracted from NsButton.vue',
-    ).toBeGreaterThan(4)
+      [...new Set(found.map((p) => p.selector))].sort(),
+      'The set of extracted background/on-colour pairs changed. If you ADDED a ' +
+        'variant, add it here. If you did not, one has silently stopped being ' +
+        'recognised — most likely a nested block between `background:` and ' +
+        '`color:`, which truncates the body match — and is no longer checked.',
+    ).toEqual([...EXPECTED].sort())
   })
 
-  it('covers every on-colour surface the component actually uses', () => {
-    // A second anti-vacuity guard, aimed one level up: the assertion below only
-    // proves something about pairs the regex RECOGNISED. If a variant stopped
-    // being recognised it would silently drop out of the check rather than fail.
-    const surfaces = new Set(found.map((p) => p.background))
-    expect([...surfaces].some((s) => ON_COLOUR_SURFACES.includes(s as never))).toBe(true)
-  })
-
-  it.each(ON_COLOUR_SURFACES)('every %s background uses text-on-%s', (surface) => {
-    const mismatched = found
-      .filter((p) => p.background === surface && p.colour !== surface)
-      .map((p) => `${p.selector}: background ${p.background} but colour text-on-${p.colour}`)
-    expect(
-      mismatched,
-      `A button variant pairs a ${surface} background with a different on-colour token. ` +
-        'While the two tokens happen to resolve to the same hex this renders correctly ' +
-        'and no contrast check can see it — then breaks the day a designer moves one, ' +
-        'which has already happened once (componentLibrary-2p1, the dark negative button ' +
-        'at 2.76:1).\n' +
-        mismatched.join('\n'),
-    ).toEqual([])
-  })
+  it.each(ON_COLOUR_SURFACES)(
+    'every %s background uses its matching on-colour token',
+    (surface) => {
+      const mismatched = found
+        .filter((p) => p.background === surface && p.colour !== surface)
+        .map((p) => `${p.selector}: background ${p.background} but colour text-on-${p.colour}`)
+      expect(
+        mismatched,
+        `A button variant pairs a ${surface} background with a different on-colour token. ` +
+          'While the two tokens happen to resolve to the same hex this renders correctly ' +
+          'and no contrast check can see it — then breaks the day a designer moves one, ' +
+          'which has already happened once (componentLibrary-2p1, the dark negative button ' +
+          'at 2.76:1).\n' +
+          mismatched.join('\n'),
+      ).toEqual([])
+    },
+  )
 })
