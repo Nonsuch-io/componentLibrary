@@ -4,10 +4,12 @@
     :model-value="modelValue"
     :label="label"
     :outlined="outlined"
-    :dense="dense"
+    :dense="resolvedDense"
+    :type="resolvedType"
+    :autogrow="resolvedAutogrow"
     :rules="rules"
     :disable="resolvedDisable"
-    class="ns-input"
+    :class="['ns-input', sizeClass]"
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <template v-for="(_, name) in $slots" #[name]="slotData">
@@ -17,7 +19,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed, useAttrs, watchEffect } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'
+
+declare const process: { env: { NODE_ENV?: string } } | undefined
 /**
  * NsInput — A styled text input wrapping Quasar's QInput.
  *
@@ -25,7 +30,17 @@ import { useNsDisabled } from '../../composables/useNsDisabled'
  * and Fixel font via design tokens.
  */
 
-import type { ValidationRule } from 'quasar'
+import type { QInput, ValidationRule } from 'quasar'
+
+/**
+ * The design's three sizes. Figma (Inputs page, frame 5513:9121, 505 symbols)
+ * specifies Dense 38px / Default 50px / Large 120px, and the variable defs for a
+ * Large symbol and a Default one are IDENTICAL — same font, padding, radius and
+ * colours. Only the height moves, which is what makes Large a PROSE FIELD rather
+ * than a bigger input: a 120px single-line box would be absurd, a 120px box with
+ * body-14 text and unchanged padding is a description field.
+ */
+export type NsInputSize = 'dense' | 'default' | 'large'
 
 export interface NsInputProps {
   /** Input label text */
@@ -34,8 +49,20 @@ export interface NsInputProps {
   modelValue?: string
   /** Use outlined style */
   outlined?: boolean
-  /** Use dense (compact) size */
+  /**
+   * Use dense (compact) size.
+   * @deprecated Use `size="dense"`. A boolean cannot carry the design's three
+   * sizes. Still honoured, and still the fallback when `size` is absent, so no
+   * existing call site changes; it will be removed in the batched breaking
+   * release (componentLibrary-b5e).
+   */
   dense?: boolean
+  /**
+   * Field size. DELIBERATELY UNDEFAULTED — see the note in the style block.
+   * Omitting it renders exactly what this component rendered before `size`
+   * existed. Setting it opts into the design's measurements.
+   */
+  size?: NsInputSize
   /** Validation rules — array of Quasar validation rules */
   rules?: ValidationRule[]
   /** Disable the input */
@@ -47,6 +74,7 @@ const props = withDefaults(defineProps<NsInputProps>(), {
   modelValue: undefined,
   outlined: true,
   dense: false,
+  size: undefined,
   rules: undefined,
   disable: false,
 })
@@ -64,6 +92,107 @@ defineEmits<{
 defineOptions({ inheritAttrs: false })
 
 const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsInput', () => props.disable)
+
+const attrs = useAttrs()
+
+const NS_INPUT_SIZES: readonly NsInputSize[] = ['dense', 'default', 'large']
+
+/**
+ * AN UNRECOGNISED `size` IS TREATED AS ABSENT, not as "some size".
+ *
+ * TypeScript does not reach a `.js` call site, a spread, or a value off an API
+ * response. Before this, `size="huge"` produced `ns-input--huge` — a class
+ * matching no rule, so the field silently lost all size styling — AND flipped
+ * `resolvedDense` to false, silently discarding a `dense` the consumer had set.
+ * Two wrong answers, no signal, from one typo. Falling back to `dense` means the
+ * worst case is today's rendering rather than an unstyled field.
+ */
+// `!= null` catches null AS WELL AS undefined, on purpose: a JS consumer
+// passing null to mean "no size" was getting size="null" is not a valid size
+// on every mount. Absent is absent however it is spelled.
+const isKnownSize = computed(() => props.size != null && NS_INPUT_SIZES.includes(props.size))
+
+/** `size` wins when both are given; `dense` remains the fallback so every call
+ *  site that predates `size` renders exactly as it did. */
+const resolvedDense = computed(() => (isKnownSize.value ? props.size === 'dense' : props.dense))
+
+const sizeClass = computed(() => (isKnownSize.value ? `ns-input--${props.size}` : undefined))
+
+/**
+ * Large is multi-line, because that is what the design's 120px MEANS. Quasar
+ * renders a textarea only for `type="textarea"`, so without this the component
+ * would honour the height and still give a single-line field the user cannot
+ * type a second line into — the measurement satisfied and the intent missed.
+ *
+ * A consumer's explicit `type` always wins: `size="large" type="number"` is
+ * their call to make, not ours to override.
+ */
+// PASSES THE CONSUMER'S `type` BACK THROUGH rather than returning undefined.
+// An explicit `:type` binding sits AFTER `v-bind="attrsWithoutDisabled"` in the
+// template, so it wins even when its value is undefined — returning undefined
+// here did not "leave attrs alone", it deleted the consumer's type. Caught by
+// the test for `size="large" type="number"`, which is the one combination where
+// the two rules disagree.
+type QInputType = InstanceType<typeof QInput>['$props']['type']
+
+const resolvedType = computed<QInputType>(() =>
+  attrs.type !== undefined
+    ? (attrs.type as QInputType)
+    : props.size === 'large'
+      ? 'textarea'
+      : undefined,
+)
+
+/**
+ * LARGE AUTOGROWS, AND WITHOUT THIS IT RENDERED 152px AGAINST A 120px SPEC.
+ *
+ * Quasar's textarea defaults to rows=6, whose intrinsic height (~124px, 152px of
+ * control) EXCEEDS min-height: 120px — so the min-height never governed and the
+ * field shipped 32px too tall. Worse, the story asserting min-height was green
+ * throughout, because the CSS property genuinely applied; it just did not decide
+ * the rendered height. A property assertion that is true and irrelevant.
+ *
+ * `autogrow` starts the textarea at one row, which puts min-height back in
+ * charge of the empty state and makes 120px the floor Figma specifies rather
+ * than a number the browser ignores. It also makes the documented "120px is a
+ * starting height, not a ceiling" true — measured false before this: a
+ * rows=6 textarea scrolls at 30 lines instead of growing.
+ *
+ * A consumer's own `autogrow` or `rows` wins, same rule as `type`.
+ */
+// GATED ON resolvedType, NOT ON `size`. Quasar treats autogrow as IMPLYING a
+// textarea (isTextarea = type === 'textarea' || autogrow === true), so keying
+// this off `size === 'large'` alone re-forced a textarea for
+// `size="large" type="number"` — undoing the consumer's explicit type through a
+// second, unrelated prop. Caught by the existing override test.
+const resolvedAutogrow = computed(() =>
+  attrs.autogrow !== undefined || attrs.rows !== undefined
+    ? undefined
+    : resolvedType.value === 'textarea' || undefined,
+)
+
+if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
+  watchEffect(() => {
+    if (props.size != null && !isKnownSize.value) {
+      // Reported BEFORE the dense+size warning below, and that ordering matters:
+      // for a typo'd size the conflict message ("`size` wins") would be actively
+      // misleading, since the value that "won" is one this component cannot
+      // render.
+      console.warn(
+        `[NsInput] size="${String(props.size)}" is not a valid size and has been ` +
+          `ignored. Expected one of: ${NS_INPUT_SIZES.join(', ')}.`,
+      )
+      return
+    }
+    if (props.size !== undefined && props.dense) {
+      console.warn(
+        '[NsInput] `dense` and `size` were both set. `size` wins and `dense` is ' +
+          'ignored. Use `size="dense"` instead — `dense` is deprecated because a ' +
+          'boolean cannot express the three sizes the design specifies.',
+      )
+    }
+  })
+}
 </script>
 
 <style lang="sass" scoped>
@@ -75,4 +204,57 @@ const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsInput', () =>
 
   :deep(.q-field__control)
     border-radius: var(--ns-radius-md)
+
+  // SIZES ARE OPT-IN, AND `default` IS NOT WHAT AN UNSIZED INPUT RENDERS.
+  //
+  // That reads like a bug, so: Quasar's outlined control is 56px and its dense
+  // native is 40px, while Figma specifies 50px and 38px (Inputs page, 505
+  // symbols). Those disagree by 6px and 2px. Making `size` default to 'default'
+  // would have restyled all 369 <ns-input> sites in the only consumer — a silent
+  // visual change to every form in the product, shipped as "added a prop". So
+  // `size` starts undefined and an unsized input renders exactly what it did.
+  //
+  // The reconciliation (make 50px the true default and drop `dense`) belongs in
+  // the batched breaking release this bead already calls for, NOT here.
+  // Scheduled decision, not a thing someone rediscovers: componentLibrary-b5e.
+  //
+  // Heights land on .q-field__control, which is what Quasar sizes; setting them
+  // on .ns-input is overridden by Quasar's own rule at higher specificity.
+  //
+  // KEEP THIS COMMENT INDENTED. In indented sass a comment at column 0 CLOSES
+  // the enclosing block: an earlier version had this flush left and all three
+  // size rules silently vanished — zero `.ns-input--*` rules in the compiled
+  // CSS, with the build, the typecheck and every unit test still green. Only
+  // the real-browser height story caught it, measuring 56px where the design
+  // says 50px. That is precisely the gap the story was added to cover.
+
+  &--dense
+    :deep(.q-field__control)
+      height: 38px
+      min-height: 38px
+
+  &--default
+    :deep(.q-field__control)
+      height: 50px
+      min-height: 50px
+
+  // Large is the PROSE field: a textarea (see resolvedType), so height must be
+  // min-height only — a fixed height would cap autogrow and clip the text the
+  // field exists to hold. Figma's 120px is the STARTING height, not a ceiling.
+  &--large
+    :deep(.q-field__control)
+      height: auto
+      min-height: 120px
+
+    :deep(.q-field__native)
+      // NO min-height HERE. It was 120px, and it STACKED with the control's own
+      // 120px plus padding to render 148px — the design's number applied twice
+      // and satisfied neither time. The control owns the height; the native only
+      // owns where the text sits inside it.
+      //
+      // Text starts at the top of a prose field. Quasar vertically centres a
+      // single-line native, which in a 120px box parks the caret in the middle
+      // of empty space and reads as a broken layout rather than a writing area.
+      align-items: flex-start
+      padding-top: var(--ns-space-2, 8px)
 </style>

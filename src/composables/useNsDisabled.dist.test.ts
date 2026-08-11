@@ -131,7 +131,49 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(7) // 5->6 componentLibrary-07u (stylesheet), 6->7 componentLibrary-whr (invalid banner type)
+    ).toBe(8) // 5->6 componentLibrary-07u (stylesheet), 6->7 componentLibrary-whr (invalid banner type), 7->8 componentLibrary-b5e (dense+size conflict)
+  })
+
+  it("warns for NsInput's dense+size conflict too, from the built bundle", async () => {
+    // Added with the warning itself (componentLibrary-b5e) rather than after the
+    // fact. The pinned count above would have caught a guard VANISHING, but not a
+    // guard that ships fail-CLOSED — and this file exists because two already
+    // merged PRs did exactly that, silently, while every unit test passed.
+    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsInput as never, { props: { dense: true, size: 'large' } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the dense+size conflict warning did not fire with `process` undefined — it is ' +
+        'dead in every consumer browser, whatever the unit tests say',
+    ).toContain('were both set')
+  })
+
+  it("warns for NsInput's INVALID size from the built bundle too", async () => {
+    // The pinned count cannot protect this one: it shares the conflict warning's
+    // `typeof process` guard, so the count stays 8 whether this branch exists,
+    // is deleted, or is moved behind a fail-closed guard. Review flagged the gap
+    // against this file's own stated policy that EVERY dev warning belongs here.
+    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsInput as never, { props: { size: 'huge' } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the invalid-size warning did not fire with `process` undefined — it is dead ' +
+        'in every consumer browser, whatever the unit tests say',
+    ).toContain('is not a valid size')
   })
 
   it('warns from the built bundle when the stylesheet sentinel is missing and `process` is absent', async () => {

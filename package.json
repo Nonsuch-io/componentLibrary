@@ -83,10 +83,10 @@
       ]
     },
     {
-      "name": "app shell (heaviest import)",
+      "name": "app shell (heaviest import; contains NsInput, so NsInput changes land here)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsAppShell }",
-      "limit": "10 kB",
+      "limit": "10.5 kB",
       "gzip": true,
       "ignore": [
         "vue",
