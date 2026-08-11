@@ -37,13 +37,18 @@ const TOKENS_CSS = resolve(ROOT, 'src/tokens/tokens.css')
 /** Light-block token values. The light block is the first `:root {`; the dark
  *  overrides live in `:root.dark` / `[data-theme='dark']` / an @media block. */
 function lightBlockTokens(): Map<string, string> {
-  const css = readFileSync(TOKENS_CSS, 'utf-8')
+  // COMMENTS ARE STRIPPED FIRST, and that is the load-bearing half. A previous
+  // version of this function replaced indexOf('}') with the brace walk below and
+  // claimed to be comment-proof; review REPRODUCED the exact stated scenario — a
+  // lone `}` inside a comment — and the walk still truncated, 174 tokens down to
+  // 67. The walk only survives BALANCED braces in comments, and prose references
+  // a closing brace far more often than an opening one. Worse, 67 cleared the
+  // size floor, so the backstop did not fire either.
+  const css = readFileSync(TOKENS_CSS, 'utf-8').replace(/\/\*[\s\S]*?\*\//g, '')
   const start = css.indexOf(':root {')
-  // BRACE DEPTH, not indexOf('}'). Review pointed out that scanning to the first
-  // closing brace truncates the moment any comment inside the block contains a
-  // literal `}` — and truncation here is SILENT: fewer tokens parsed means fewer
-  // lookups, not a failure. A file written to catch silent drift should not be
-  // one comment away from it. (The size floor below is the backstop.)
+  // Brace depth rather than the first '}', so a nested rule cannot end the block
+  // early either. If no closing brace is found, `end` stays at `start` and the
+  // size floor below fails loudly — verified, not assumed.
   let depth = 0
   let end = start
   for (let i = css.indexOf('{', start); i < css.length; i++) {
@@ -75,6 +80,11 @@ function sourceFiles(dir: string): string[] {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name)
     if (entry.isDirectory()) out.push(...sourceFiles(full))
+    // *.test.ts is excluded because a test asserting on a style STRING would
+    // report its own fixture as a finding. Verified empty today (no test file
+    // under either tree contains a `var(--ns-…,` fallback), so this excludes
+    // nothing real — stated so nobody 'fixes' it in either direction by guess.
+    // Note *.stories.ts and *.d.ts ARE scanned; only .test.ts is skipped.
     else if (/\.(vue|ts)$/.test(entry.name) && !/\.test\.ts$/.test(entry.name)) out.push(full)
   }
   return out
@@ -94,7 +104,12 @@ describe('var() fallbacks agree with the tokens they stand in for', () => {
     // Without this, a broken path or a changed `:root {` shape would yield zero
     // tokens, every lookup would be skipped, and the suite would report success
     // — the same empty-is-valid failure this file exists to catch.
-    expect(tokens.size, 'no tokens parsed from the light block of tokens.css').toBeGreaterThan(50)
+    expect(
+      tokens.size,
+      'too few tokens parsed from the light block of tokens.css — the block is being ' +
+        'truncated. Baseline is ~174; review found a truncation to 67 that cleared a ' +
+        'floor of 50, which is why this is not a token-ish-looking number.',
+    ).toBeGreaterThan(150)
   })
 
   const findings: string[] = []
@@ -112,8 +127,9 @@ describe('var() fallbacks agree with the tokens they stand in for', () => {
     // mistake that defeated the dist-guard check twice (see useNsDisabled.dist.test.ts).
     for (const m of src.matchAll(/var\(\s*(--ns-[\w-]+)\s*,\s*var\(/g)) {
       findings.push(
-        `${file.replace(ROOT + '/', '')}: var(${m[1]}, var(...)) — nested fallback, ` +
-          'not checkable by this test. Flatten it or add an explicit exception.',
+        `${file.replace(ROOT + '/', '')}: var(${m[1]}, var(...)) — the OUTER pair is not ` +
+          'checkable by this test (an inner `var(--b, #hex)` still is). Flatten it, or ' +
+          'extend this test — there is deliberately no exception list to add it to.',
       )
     }
     // var(--token, <fallback>) where the fallback is a literal colour, not a var()
@@ -163,6 +179,56 @@ describe('var() fallbacks agree with the tokens they stand in for', () => {
         'butiq-iko6 came to describe an inaccessible banner as accessible. Fix the ' +
         'fallback to match the light-block value, or drop it.\n' +
         findings.join('\n'),
+    ).toEqual([])
+  })
+})
+
+/**
+ * THE SHOWCASE'S OWN `fallback:` FIELDS, which the scanner above structurally
+ * cannot see: DesignTokens.stories.ts stores reference values as
+ * `{ name, fallback }` object literals, not `var()` syntax, so the regex misses
+ * them entirely.
+ *
+ * That gap had content. Review found --ns-shadow-md/lg/xl each quoting only the
+ * FIRST layer of a two-layer shadow, in the page whose entire purpose is to be
+ * the reference for what the design system's values are. Exactly the
+ * read-by-humans-and-quoted-as-fact failure the file above was written for,
+ * hiding in a shape it could not parse — and it was found by review, not by the
+ * check I had just widened, which is the point.
+ */
+describe('the DesignTokens showcase quotes real token values', () => {
+  const tokens = lightBlockTokens()
+  const src = readFileSync(resolve(ROOT, 'src/stories/DesignTokens.stories.ts'), 'utf-8')
+  const entries = [
+    ...src.matchAll(/\{\s*name:\s*'(--ns-[\w-]+)',\s*fallback:\s*'([^']+)'\s*,?\s*\}/g),
+  ]
+
+  it('found entries to check, so a parse that matches nothing cannot pass', () => {
+    expect(
+      entries.length,
+      'no { name, fallback } entries parsed from the showcase',
+    ).toBeGreaterThan(100)
+  })
+
+  it('every showcase fallback matches the light-block token', () => {
+    const norm = (v: string) => v.replace(/\s+/g, ' ').trim().toLowerCase()
+    const bad: string[] = []
+    for (const [, name, fallback] of entries) {
+      const declared = tokens.get(name)
+      if (declared === undefined) {
+        bad.push(`${name} — not declared in tokens.css`)
+        continue
+      }
+      const resolved = resolveAlias(declared, tokens)
+      if (norm(fallback) !== norm(declared) && norm(fallback) !== norm(resolved)) {
+        bad.push(`${name} — showcase says "${fallback}", token is "${declared}"`)
+      }
+    }
+    expect(
+      bad,
+      'The Design Tokens page quotes a value the token does not have. This page is ' +
+        'the reference consumers read, so a wrong entry here propagates as fact.\n' +
+        bad.join('\n'),
     ).toEqual([])
   })
 })
