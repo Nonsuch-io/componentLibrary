@@ -4,6 +4,15 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.28.5](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.4...v0.28.5) (2026-08-11)
+
+
+### Bug Fixes
+
+* **banner:** give the subtle fills their own ink — three of four failed AA (2p1) ([a4eb5c9](https://github.com/Nonsuch-io/componentLibrary/commit/a4eb5c9a2b903b924067c82f775de982d259124f))
+* **tokens:** make the comment-proof claim true, and check the showcase too ([6e6669a](https://github.com/Nonsuch-io/componentLibrary/commit/6e6669a651093dd785f662bb0caf0522f680b492))
+* **tokens:** widen the fallback check — its .vue-only scope had six real misses ([a5c946a](https://github.com/Nonsuch-io/componentLibrary/commit/a5c946aacfc46d5ab274ab7c933eb28fb92686ce))
+
 ## [0.28.4](https://github.com/Nonsuch-io/componentLibrary/compare/v0.28.3...v0.28.4) (2026-08-11)
 
 
