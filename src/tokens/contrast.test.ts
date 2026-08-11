@@ -523,15 +523,15 @@ const KNOWN_EXCEPTIONS: KnownException[] = [
     bead: 'componentLibrary-7jc',
     note: '.ns-btn--secondary base — #d56307 on #fefbf5, 3.62:1.',
   },
-  {
-    fg: '--ns-color-text-on-brand',
-    bg: '--ns-color-status-negative',
-    blocks: ['darkRoot', 'darkMedia'],
-    belowLarge: true,
-    ratios: { darkRoot: 2.759, darkMedia: 2.759 },
-    bead: 'componentLibrary-7jc',
-    note: '.ns-btn--negative (dark) — white on #fd6d73, 2.76:1.',
-  },
+  // --- RESOLVED 2026-08-11: .ns-btn--negative (dark), was 2.76:1 ---
+  // Filed under 7jc as a colour-choice problem; it was actually a WRONG-TOKEN
+  // problem. The button asked for --ns-color-text-on-brand (#ffffff) on
+  // --ns-color-status-negative, which in dark is a light salmon. Repointing it
+  // at --ns-color-text-on-negative — the token matching its own background —
+  // gives 6.56:1 (componentLibrary-34n). No colour was chosen or changed here.
+  //
+  // Deleted rather than re-pinned: the pair no longer exists in any stylesheet,
+  // and this file fails loudly on an exception that "no longer resolves".
   {
     fg: '--ns-color-text-on-accent',
     bg: '--ns-color-status-accent',
@@ -561,7 +561,24 @@ const KNOWN_EXCEPTIONS: KnownException[] = [
   // 3ul's remaining scope (the positive status tokens SWAPPING ROLES between
   // themes) is untouched by that fix and stays open on the bead.
 
-  // --- NOT covered above: componentLibrary-34n ---
+  // --- componentLibrary-34n: FIXED 2026-08-11, and the reasoning below was
+  //     half wrong, so it is kept rather than deleted ---
+  //
+  // The claim "a numeric contrast check has nothing to catch here by definition"
+  // was true only while every mispaired token coincided with its correct one.
+  // That stopped being true: componentLibrary-2p1 moved
+  // --ns-color-text-on-negative to #2d0b00 in the dark blocks, and the negative
+  // button — still asking for on-brand — kept white at 2.76:1. So the identity
+  // bug BECAME a contrast bug, and this file did catch that half of it (the
+  // deleted exception above), while remaining blind to the other three variants
+  // whose tokens still coincide.
+  //
+  // Both halves now have an owner: ratios here, identity in
+  // NsButton.tokens.test.ts, which asserts each variant's colour token matches
+  // its own background token. That test found a FOURTH instance
+  // (.ns-btn--marketing-pushed) this bead never listed.
+
+  // --- NOT covered above ---
   // .ns-btn--positive/.ns-btn--warning/.ns-btn--negative pair a background
   // with the WRONG on-colour token (e.g. text-on-accent instead of
   // text-on-positive). This is a token-IDENTITY bug, not a contrast one:

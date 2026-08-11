@@ -264,7 +264,9 @@ const buttonPadding = computed(() => {
 // ---- Positive ----
 .ns-btn--positive {
   background: var(--ns-color-status-positive);
-  color: var(--ns-color-text-on-accent);
+  /* on-POSITIVE, matching the background token. Was on-accent, which happens to
+     resolve to the same #2d0b00 — see the note above .ns-btn--negative. */
+  color: var(--ns-color-text-on-positive);
 
   &:hover:not(.disabled) {
     background: var(--ns-color-status-positive-hover);
@@ -283,7 +285,20 @@ const buttonPadding = computed(() => {
 // ---- Negative ----
 .ns-btn--negative {
   background: var(--ns-color-status-negative);
-  color: var(--ns-color-text-on-brand);
+  /* ON-NEGATIVE, AND THIS ONE IS NOT COSMETIC (componentLibrary-34n).
+     Three variants paired a background with an unrelated on-colour token, and it
+     rendered correctly because the pairs coincidentally resolved to the same hex
+     — on-accent and on-positive were both #2d0b00, on-brand and on-negative both
+     #ffffff. The whole point of separate on-colour tokens is that a designer can
+     move one; the day that happened, three variants would break and each
+     declaration would still read perfectly sensibly on its own.
+
+     The day arrived. componentLibrary-2p1 changed --ns-color-text-on-negative to
+     #2d0b00 in the DARK blocks, because white on dark's light-salmon #fd6d73 is
+     2.76:1 and failed on its own intended surface. This button still asked for
+     on-BRAND, so it kept the white and kept the 2.76:1. Using the token that
+     matches its background takes it to 6.56:1. */
+  color: var(--ns-color-text-on-negative);
 
   &:hover:not(.disabled) {
     background: var(--ns-color-status-negative-hover);
@@ -302,7 +317,8 @@ const buttonPadding = computed(() => {
 // ---- Warning ----
 .ns-btn--warning {
   background: var(--ns-color-status-warning);
-  color: var(--ns-color-text-on-accent);
+  /* on-WARNING, matching the background token. Was on-accent. */
+  color: var(--ns-color-text-on-warning);
 
   &:hover:not(.disabled) {
     background: var(--ns-color-status-warning-hover);
@@ -364,7 +380,11 @@ const buttonPadding = computed(() => {
 // ---- Marketing pushed ----
 .ns-btn--marketing-pushed {
   background: var(--ns-color-status-positive);
-  color: var(--ns-color-text-on-accent);
+  /* A FOURTH instance, not listed in componentLibrary-34n's three. Found by
+     auditing every background/on-colour pair mechanically rather than fixing the
+     three the bead named — which is the argument for the test below existing at
+     all. Same coincidence: on-accent and on-positive are both #2d0b00 today. */
+  color: var(--ns-color-text-on-positive);
 
   :deep(img) {
     filter: none;
