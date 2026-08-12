@@ -52,6 +52,19 @@ describe('NsNavSidebar accessible names (componentLibrary-mxa)', () => {
       undefined,
       undefined,
     ])
+
+    // SELF-SUFFICIENT ON PURPOSE. Review showed this test passes if the binding
+    // is DELETED OUTRIGHT — absent and absent-when-expanded look identical from
+    // here, so on its own it proves nothing. Asserting the visible labels in the
+    // SAME mount pins the actual invariant: the name comes from text here, and
+    // from aria-label when that text is gone. Without this, deleting the
+    // collapsed test during a refactor would leave a nameless sidebar with two
+    // green tests.
+    expect(wrapper.findAll('.ns-nav-sidebar__label').map((s) => s.text())).toEqual([
+      'Dashboard',
+      'Orders',
+      'Settings',
+    ])
   })
 
   it('keeps the visible label as the name source when expanded', () => {
