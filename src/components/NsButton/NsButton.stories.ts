@@ -89,16 +89,26 @@ export const WithIcon: Story = {
   }),
 }
 
+/**
+ * EVERY ONE OF THESE CARRIES aria-label, and that is the demonstration.
+ *
+ * This story previously rendered five icon-only buttons with no accessible name.
+ * axe reported button-name on all five, and it was the last name-level violation
+ * blocking componentLibrary-057. A docs page showing a control used wrongly is
+ * worse than no page: it is the version people copy.
+ *
+ * The label names the ACTION, not the icon — "Send message", not "send".
+ */
 export const IconOnly: Story = {
   render: () => ({
     components: { NsButton },
     template: `
       <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-        <NsButton size="xs" icon="send" icon-only />
-        <NsButton size="sm" icon="send" icon-only />
-        <NsButton size="md" icon="send" icon-only />
-        <NsButton size="lg" icon="send" icon-only />
-        <NsButton size="xl" icon="send" icon-only />
+        <NsButton size="xs" icon="send" icon-only aria-label="Send message" />
+        <NsButton size="sm" icon="send" icon-only aria-label="Send message" />
+        <NsButton size="md" icon="send" icon-only aria-label="Send message" />
+        <NsButton size="lg" icon="send" icon-only aria-label="Send message" />
+        <NsButton size="xl" icon="send" icon-only aria-label="Send message" />
       </div>
     `,
   }),

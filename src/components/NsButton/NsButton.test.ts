@@ -128,3 +128,42 @@ describe('NsButton', () => {
     })
   })
 })
+
+/**
+ * componentLibrary-057 prerequisite. An `iconOnly` button with no accessible
+ * name announces as "button" and nothing else — axe reports button-name, and
+ * nothing else in this repo can see it.
+ */
+describe('NsButton icon-only accessible name', () => {
+  beforeEach(() => __resetAttrConflictWarnings())
+
+  it('warns when iconOnly has no name, because the library cannot invent one', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsButton, { props: { iconOnly: true } })
+    expect(warn.mock.calls.flat().join(' ')).toContain('no accessible name')
+    warn.mockRestore()
+  })
+
+  it.each(['aria-label', 'aria-labelledby', 'title'])('accepts %s as the name', (attr) => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsButton, { props: { iconOnly: true }, attrs: { [attr]: 'Send message' } })
+    expect(warn.mock.calls.flat().join(' ')).not.toContain('no accessible name')
+    warn.mockRestore()
+  })
+
+  it('says nothing for a normal labelled button', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsButton, { slots: { default: 'Send' } })
+    expect(warn.mock.calls.flat().join(' ')).not.toContain('no accessible name')
+    warn.mockRestore()
+  })
+
+  it('names the ACTION in its advice, not the icon', () => {
+    // A warning that says "add a label" and stops produces labels like "trash".
+    // The useful half is what to put in it.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsButton, { props: { iconOnly: true } })
+    expect(warn.mock.calls.flat().join(' ')).toContain('Delete item')
+    warn.mockRestore()
+  })
+})
