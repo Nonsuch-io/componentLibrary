@@ -14,8 +14,25 @@
     <!-- Main nav items -->
     <ul class="ns-nav-sidebar__list">
       <template v-for="item in items" :key="item.id">
-        <li v-if="item.separator" class="ns-nav-sidebar__separator" role="separator" />
+        <li
+          v-if="item.separator"
+          class="ns-nav-sidebar__separator"
+          role="presentation"
+          aria-hidden="true"
+        />
         <li class="ns-nav-sidebar__item">
+          <!--
+            aria-label IS SET ONLY WHEN COLLAPSED, and the condition is the point.
+            The label span below is `v-if="isExpanded"`, so in the collapsed state
+            each pill held an icon and nothing else — axe reported link-name /
+            button-name on EVERY item, and a screen-reader user heard "link" with
+            no name for the entire primary navigation. Sighted users decode the
+            icons, so nothing on screen contradicted it (componentLibrary-mxa).
+
+            NOT unconditional: an aria-label set while the visible label renders
+            OVERRIDES that text, so what a screen reader announces could silently
+            drift from what everyone else reads.
+          -->
           <component
             :is="item.to && !item.disable ? 'a' : 'button'"
             :href="item.to && !item.disable ? item.to : undefined"
@@ -31,6 +48,7 @@
               hasSub(item) && !item.disable && openSub === item.id ? flyoutId : undefined
             "
             :aria-haspopup="hasSub(item) && !item.disable ? 'true' : undefined"
+            :aria-label="isExpanded ? undefined : item.label"
             :aria-disabled="item.disable ? 'true' : undefined"
             :tabindex="item.disable ? -1 : undefined"
             @click="onItemClick(item, $event)"
@@ -124,6 +142,7 @@
             : undefined
         "
         :aria-haspopup="hasSub(bottomItem) && !bottomItem.disable ? 'true' : undefined"
+        :aria-label="isExpanded ? undefined : bottomItem.label"
         :aria-disabled="bottomItem.disable ? 'true' : undefined"
         :tabindex="bottomItem.disable ? -1 : undefined"
         @click="onItemClick(bottomItem, $event)"

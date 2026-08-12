@@ -128,7 +128,17 @@ describe('NsNavSidebar', () => {
       expect(pills[1].attributes('tabindex')).toBe('-1')
     })
 
-    it('renders a separator with role="separator"', () => {
+    it('renders the separator as PRESENTATIONAL, not role="separator"', () => {
+      // CHANGED DELIBERATELY (componentLibrary-mxa). This asserted
+      // role="separator", which reads sensible and is invalid here: WAI-ARIA
+      // requires the `list` role to own only `listitem`, so an <li> whose role
+      // becomes `separator` makes the <ul> structurally wrong — axe reports it
+      // under the `list` rule. The original assertion carried no rationale, and
+      // nothing in the repo could see the problem because the a11y addon ran at
+      // test:'todo' and never failed CI.
+      //
+      // A nav separator is decorative, so it is hidden from the tree entirely
+      // rather than given a role the container cannot own.
       const wrapper = mount$({
         items: [
           { id: 'home', label: 'Home', icon: MockIcon },
@@ -137,7 +147,8 @@ describe('NsNavSidebar', () => {
       })
       const sep = wrapper.find('.ns-nav-sidebar__separator')
       expect(sep.exists()).toBe(true)
-      expect(sep.attributes('role')).toBe('separator')
+      expect(sep.attributes('role')).toBe('presentation')
+      expect(sep.attributes('aria-hidden')).toBe('true')
     })
   })
 
