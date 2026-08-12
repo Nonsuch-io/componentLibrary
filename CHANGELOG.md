@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.30.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.0...v0.30.1) (2026-08-12)
+
+
+### Bug Fixes
+
+* **nav-sidebar:** collapsed nav links had no accessible name at all (mxa) ([73caa8a](https://github.com/Nonsuch-io/componentLibrary/commit/73caa8a515c8bba601a1ce07d5ea5905d32c9354))
+* **nav-sidebar:** collapsed nav links had no accessible name at all (mxa) ([1ada7a3](https://github.com/Nonsuch-io/componentLibrary/commit/1ada7a3d932ed23a2c82217ca0b635c10e459404))
+
 ## [0.30.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.29.1...v0.30.0) (2026-08-11)
 
 
