@@ -20,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useAttrs, watchEffect } from 'vue'
+import { computed, useAttrs, useSlots, watchEffect } from 'vue'
 import { QSpinnerDots } from 'quasar'
 import { useNsAttrConflictWarning } from '../../composables/useNsAttrConflictWarning'
 import { useNsDisabled } from '../../composables/useNsDisabled'
@@ -83,40 +83,68 @@ const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsButton', () =
 // dev-only warning, not a reconciliation: it does NOT make the combination
 // render correctly, it only makes the collision loud instead of silent.
 const attrs = useAttrs()
+const slots = useSlots()
 
 /**
  * AN ICON-ONLY BUTTON WITH NO ACCESSIBLE NAME IS A BUTTON A SCREEN READER CANNOT
  * DESCRIBE. `iconOnly` means "there is no text here" — so unless the consumer
- * supplies aria-label, aria-labelledby or title, the control announces as
- * "button" and nothing else. axe reports it as button-name; nothing else can.
+ * supplies a name, the control announces as "button" and nothing else. axe
+ * reports it as button-name; nothing else in this repo can, and axe runs at
+ * test:'todo' (componentLibrary-057).
  *
  * THE LIBRARY CANNOT SUPPLY THE NAME. Only the call site knows what the icon
- * means, and inventing one ("Button", or the icon's name) would be worse than
- * silence: it produces a confident, wrong announcement instead of an obviously
- * missing one. So this warns and does not guess — the same reasoning as the
- * NsRadioButtons unlabelled-group guard.
+ * means, and inventing one ("Button", or the icon's own name) would be worse
+ * than silence: a confident wrong announcement instead of an obviously missing
+ * one. So this warns and does not guess.
+ *
+ * THREE THINGS REVIEW CAUGHT, all of which made it cry wolf or stay silent
+ * when it should not have:
+ *
+ *   1. EMPTY IS NOT NAMED. `aria-label=""` passed the original `!== undefined`
+ *      check while providing no accessible name at all — the exact defect this
+ *      exists to catch, and a realistic one: `:aria-label="t('send')"` resolves
+ *      to '' before translations load. Values are trimmed now.
+ *
+ *   2. SLOT TEXT NAMES A BUTTON. `<NsButton icon-only>Save</NsButton>` was
+ *      warned about despite having a perfectly good name from its content, and
+ *      the visually-hidden-span pattern (<span class="sr-only">) is a
+ *      legitimate — arguably better — alternative to aria-label. A guard that
+ *      cries wolf gets ignored for the cases that matter, which
+ *      useNsAttrConflictWarning says in this same directory.
+ *
+ *      The check is "was a default slot PROVIDED", not "does it render text":
+ *      inspecting rendered vnodes at setup time is fragile, and the conservative
+ *      direction is to stay quiet. A slot containing only another icon is
+ *      therefore missed — a deliberate under-report, stated rather than hidden.
+ *
+ *   3. WARN ONCE PER INSTANCE. watchEffect re-ran on every unrelated attrs
+ *      change: four warnings for one unfixed button across three re-renders. A
+ *      v-for over reactive data would bury the signal in copies of itself. Same
+ *      reasoning, and the same fix, as the sibling composable's dedupe.
  *
  * SCOPE, MEASURED RATHER THAN ASSUMED: all six `icon-only` call sites in the
  * only consumer are already named, so this fires zero times there today. It is
- * here to stop the seventh. The real population of unnamed icon buttons in that
- * codebase — 35 of them — uses Quasar's `round` attr instead, which this
- * component already warns about for a different reason and which
- * componentLibrary-nbr plans to make a type error. That gap is tracked
- * separately; it is their markup, not a defect this component can fix.
+ * here to stop the seventh. The 35 genuinely unnamed icon buttons in that
+ * codebase use Quasar's `round` attr instead — their markup, tracked separately.
  */
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
+  let warnedUnnamed = false
   watchEffect(() => {
-    if (!props.iconOnly) return
-    const named =
-      attrs['aria-label'] !== undefined ||
-      attrs['aria-labelledby'] !== undefined ||
-      attrs['title'] !== undefined
-    if (named) return
+    if (warnedUnnamed || !props.iconOnly) return
+    const hasText = (v: unknown) => typeof v === 'string' && v.trim() !== ''
+    if (
+      hasText(attrs['aria-label']) ||
+      hasText(attrs['aria-labelledby']) ||
+      hasText(attrs['title']) ||
+      slots.default !== undefined
+    )
+      return
+    warnedUnnamed = true
     console.warn(
       '[NsButton] `iconOnly` is set but the button has no accessible name, so it ' +
         'announces as "button" with no description. Add aria-label (or ' +
-        'aria-labelledby / title) describing the ACTION, not the icon — ' +
-        '"Delete item", not "trash".',
+        'aria-labelledby / title), or put visually-hidden text in the default ' +
+        'slot. Name the ACTION, not the icon — "Delete item", not "trash".',
     )
   })
 }

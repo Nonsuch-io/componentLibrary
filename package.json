@@ -74,7 +74,7 @@
       "name": "single component: NsButton (tree-shaking guard)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsButton }",
-      "limit": "3 kB",
+      "limit": "3.25 kB",
       "gzip": true,
       "ignore": [
         "vue",
