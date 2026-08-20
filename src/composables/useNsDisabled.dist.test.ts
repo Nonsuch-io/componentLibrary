@@ -131,7 +131,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(9) // 5->6 07u (stylesheet), 6->7 whr (banner type), 7->8 b5e (dense+size), 8->9 057 (icon-only unnamed)
+    ).toBe(10) // 5->6 07u (stylesheet), 6->7 whr (banner type), 7->8 b5e (dense+size), 8->9 057 (icon-only unnamed), 9->10 057 (unnamed dialog)
   })
 
   it("warns for NsInput's dense+size conflict too, from the built bundle", async () => {
@@ -226,6 +226,26 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     expect(
       text,
       'the unnamed icon-only warning did not fire with `process` undefined — it is ' +
+        'dead in every consumer browser, whatever the unit tests say',
+    ).toContain('no accessible name')
+  })
+
+  it('warns for an unnamed NsDialog from the built bundle', async () => {
+    // A modal with no name announces as "dialog" while trapping focus. Nothing
+    // else reports it: axe runs at test:'todo' (componentLibrary-057), so if this
+    // guard ships fail-closed the defect is invisible everywhere.
+    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsDialog as never, { props: { modelValue: true } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the unnamed-dialog warning did not fire with `process` undefined — it is ' +
         'dead in every consumer browser, whatever the unit tests say',
     ).toContain('no accessible name')
   })

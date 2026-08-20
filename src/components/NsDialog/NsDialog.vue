@@ -4,16 +4,19 @@
     :model-value="modelValue"
     :persistent="persistent"
     :no-backdrop-dismiss="noBackdropDismiss"
-    :aria-labelledby="title || $slots.header ? titleId : undefined"
+    :aria-labelledby="hasTitle ? titleId : undefined"
+    :aria-label="hasTitle ? undefined : ariaLabel"
     :aria-describedby="bodyId"
     class="ns-dialog"
     @update:model-value="$emit('update:modelValue', $event)"
   >
-    <q-card
-      :class="['ns-dialog__card', size && `ns-dialog__card--${size}`]"
-      role="dialog"
-      :aria-modal="true"
-    >
+    <!--
+      NO role/aria-modal HERE. QDialog already sets both on its portal node
+      (QDialog.js:432) and spreads ...attrs onto that SAME node, so naming
+      attributes belong on <q-dialog> above. Declaring role="dialog" here created a
+      NESTED second dialog, and the one axe flagged as unnamed was Quasar's.
+    -->
+    <q-card :class="['ns-dialog__card', size && `ns-dialog__card--${size}`]">
       <q-card-section v-if="title || $slots.header" :id="titleId" class="ns-dialog__header">
         <slot name="header">
           <div class="text-h6">{{ title }}</div>
@@ -32,7 +35,9 @@
 </template>
 
 <script setup lang="ts">
-import { useId } from 'vue'
+import { computed, useId, useSlots, watchEffect } from 'vue'
+
+declare const process: { env: { NODE_ENV?: string } } | undefined
 /**
  * NsDialog — A styled dialog wrapping Quasar's QDialog.
  *
@@ -63,6 +68,12 @@ export interface NsDialogProps {
   modelValue?: boolean
   /** Dialog title shown in the header */
   title?: string
+  /**
+   * Accessible name for a dialog with no visible title. Ignored when `title` or
+   * the header slot is present — the visible heading names it, and an aria-label
+   * would override that text.
+   */
+  ariaLabel?: string
   /** Prevent closing by pressing Escape */
   persistent?: boolean
   /** Prevent closing by clicking backdrop */
@@ -85,9 +96,10 @@ export interface NsDialogProps {
   size?: NsDialogSize
 }
 
-withDefaults(defineProps<NsDialogProps>(), {
+const props = withDefaults(defineProps<NsDialogProps>(), {
   modelValue: false,
   title: undefined,
+  ariaLabel: undefined,
   persistent: false,
   noBackdropDismiss: false,
   size: undefined,
@@ -97,8 +109,27 @@ defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
 
+const slots = useSlots()
 const titleId = `ns-dialog-title-${useId()}`
 const bodyId = `ns-dialog-body-${useId()}`
+
+const hasTitle = computed(() => Boolean(props.title) || slots.header !== undefined)
+
+// A modal with no accessible name announces as "dialog" and nothing else, and the
+// user is trapped inside it until they find a way out. The library cannot invent
+// the name. Story: componentLibrary-057.
+if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
+  let warned = false
+  watchEffect(() => {
+    if (warned || hasTitle.value || (props.ariaLabel ?? '').trim() !== '') return
+    warned = true
+    console.warn(
+      '[NsDialog] has no accessible name — it announces as "dialog" with no ' +
+        'description while trapping focus. Pass `title`, use the header slot, or ' +
+        'pass `aria-label` for a dialog with no visible heading.',
+    )
+  })
+}
 </script>
 
 <style lang="sass" scoped>
