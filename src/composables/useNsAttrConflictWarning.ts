@@ -74,34 +74,14 @@ function buildConflictWarning(
 }
 
 /**
- * Dev-only guard: warns when a consumer passes a Quasar attribute that
- * conflicts with one of this component's own curated props (e.g. `flat` /
- * `color` on `NsButton`, which competes with `variant`). Costs nothing in
- * production builds — gated on `process.env.NODE_ENV`.
+ * Dev-only, warn-once-per-(component, attr): a Quasar attr fell through $attrs and
+ * competes with one of this component's own props.
  *
- * THE GUARD IS `process.env.NODE_ENV`, NOT `import.meta.env.DEV`, AND THAT IS LOAD-BEARING.
- * Vite inlines `import.meta.env.DEV` to `false` when it builds THIS LIBRARY, so the whole
- * branch — and every warning in it — is tree-shaken out of `dist/` before a consumer's
- * bundler ever sees it. Measured on the first attempt at this: zero `console.warn` and zero
- * occurrences of the warning text in the published bundle. The guard was dead for every
- * consumer while passing its own tests, because vitest runs from SOURCE where DEV is true.
+ * Makes the collision LOUD; deliberately does not reconcile it.
  *
- * `process.env.NODE_ENV` survives the library build verbatim and is resolved by the
- * CONSUMER's bundler, which is how Vue ships its own dev warnings. A test asserts the
- * warning string is actually present in `dist/` so this cannot silently regress again.
- *
- * Deliberately does NOT reconcile the two styling systems or make the
- * combination "work" — the goal is to make the collision loud, not
- * convenient, so wrong call sites don't spread silently.
- *
- * Call once, synchronously, from a component's `<script setup>`:
- *
- * ```ts
- * useNsAttrConflictWarning('NsButton', [
- *   { attrs: ['color'], useInstead: 'variant' },
- *   { attrs: ['text-color', 'textColor'], useInstead: 'variant' },
- * ])
- * ```
+ * GUARD MUST BE `process.env.NODE_ENV`, never `import.meta.env` — vite inlines the
+ * latter at THIS library's build, tree-shaking every warning out of dist/ while
+ * tests still pass from source. Story: componentLibrary-nk3, PR #211.
  */
 // Declared locally rather than pulling in @types/node: this is a BROWSER library, and the
 // only thing it needs from `process` is the one string every bundler defines. Vue ships its
