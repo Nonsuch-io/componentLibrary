@@ -61,16 +61,31 @@ describe.skipIf(!built)('manifest is build tooling, not runtime (componentLibrar
     }
   })
 
-  it('does not re-export from a sibling chunk, which is how runtime sneaks in', () => {
-    // The shape review produced: `export { x } from "./src-abc123.js"`. Anything
-    // the manifest entry imports from a sibling is code rollup could not prove
-    // belonged only here — which is precisely the runtime this entry exists to
-    // exclude.
-    const siblings = [...manifest.matchAll(/from\s*["'](\.[^"']*)["']/g)].map((m) => m[1])
+  it('reaches NO sibling chunk — static OR dynamic', () => {
+    // BOTH FORMS, because the first version only caught the static one and review
+    // walked straight through the gap: adding a dynamic
+    // `await import('./components/NsButton/NsButton.vue')` made rollup emit
+    // `import("./NsButton-xxx.js")` — 5.6 kB of real component runtime reachable
+    // from this entry — and ALL SIX TESTS PASSED. The markers cannot see it (the
+    // runtime lives in the sibling), the `from` regex cannot see it (no `from`
+    // keyword), and the Node import cannot see it (the dynamic import is never
+    // evaluated, because nothing calls the export that holds it).
+    //
+    // Same false-green this file was rewritten to close, reached by a different
+    // syntax. So the question is now "does this chunk reference a sibling AT
+    // ALL", not "does it use a particular import form".
+    const patterns: Array<[string, RegExp]> = [
+      ['static', /from\s*["'](\.[^"']*)["']/g],
+      ['bare', /(?:^|[;\s])import\s*["'](\.[^"']*)["']/g],
+      ['dynamic', /\bimport\s*\(\s*["'](\.[^"']*)["']/g],
+    ]
+    const found = patterns.flatMap(([kind, re]) =>
+      [...manifest.matchAll(re)].map((m) => `${kind}: ${m[1]}`),
+    )
     expect(
-      siblings,
-      'dist/manifest.js imports from sibling chunks — it is no longer standalone, ' +
-        'and the markers above cannot see what those chunks contain',
+      found,
+      'dist/manifest.js reaches a sibling chunk — it is no longer standalone, and ' +
+        'nothing else in this file can see what that chunk contains',
     ).toEqual([])
   })
 
