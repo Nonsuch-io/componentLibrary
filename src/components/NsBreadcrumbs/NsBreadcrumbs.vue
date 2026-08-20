@@ -12,37 +12,23 @@
 /**
  * NsBreadcrumbs — accessible breadcrumb navigation.
  *
- * Renders a `<nav>` landmark around a real `<ol>/<li>` list, so screen readers announce
- * the trail as a sequence ("2 of 3") instead of an anonymous run of links.
+ * Renders a real `<nav>` + `<ol>/<li>`, so screen readers announce the trail as a
+ * sequence ("2 of 3") rather than an anonymous run of links.
  *
- * The landmark's accessible name resolves as `ariaLabel` prop -> the injected
- * locale's `navigation.breadcrumbs`. There is NO further fallback: `useNsLocale`
- * defaults to en-CA only when nothing is injected at all, so injecting a locale
- * object without a `navigation` key throws rather than degrading. That is
- * deliberate under ADR 0002 rule 4 — a landmark with a missing or empty name is
- * worse than a loud failure — but the earlier comment here claimed a three-step
- * chain the code never implemented, which is why it now says what it does.
+ * NOT a QBreadcrumbs wrapper: that renders a plain `<div>` with no landmark and no
+ * `aria-current`, and its separator logic keys off `vnode.type.name ===
+ * 'QBreadcrumbsEl'` — which our children never match, so separators silently never
+ * rendered. This component inspects its own slot and owns list, separator and
+ * `aria-current` semantics. Story: componentLibrary-2c7.
  *
- * Quasar's QBreadcrumbs can't be used directly for this: it renders a plain
- * `<div>` with no landmark and no `aria-current` (verified against
- * node_modules/quasar/src/components/breadcrumbs/QBreadcrumbs.js, not its
- * docs — componentLibrary-2c7), and its internal separator / "last item"
- * logic keys off `vnode.type.name === 'QBreadcrumbsEl'`. Our
- * NsBreadcrumbElement children never match that check (they're
- * `NsBreadcrumbElement` vnodes, not `QBreadcrumbsEl` ones), so separators
- * silently never render for real NsBreadcrumbs usage today — confirmed by
- * mounting three NsBreadcrumbElement crumbs and inspecting the DOM before
- * this fix. This component inspects its own default slot directly instead
- * and owns list, separator, and `aria-current` semantics itself.
+ * The landmark name is `ariaLabel` -> the injected locale's
+ * `navigation.breadcrumbs`, with NO further fallback: a locale missing that key
+ * throws rather than degrading, because an unnamed landmark is worse than a loud
+ * failure (ADR 0002 rule 4).
  *
- * Separators are pure CSS (`::before` in the scoped styles below), so
- * there's no separator DOM node to ever forget to mark `aria-hidden` — it
- * simply cannot enter the accessibility tree.
- *
- * The last NsBreadcrumbElement found in the slot is marked
- * `aria-current="page"` automatically, unless a crumb already declares its
- * own `aria-current` explicitly — that author-supplied value is always
- * left untouched instead of being duplicated onto the last crumb too.
+ * Separators are CSS `::before`, so no separator node can ever enter the
+ * accessibility tree. The last crumb gets `aria-current="page"` unless it declares
+ * its own.
  */
 import { computed, useSlots, cloneVNode, Comment, Fragment, type VNode } from 'vue'
 import { useNsLocale } from '../../composables/useNsLocale'

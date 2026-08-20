@@ -4,91 +4,41 @@ import { resolve, join, relative } from 'path'
 import * as sass from 'sass-embedded'
 
 /**
- * componentLibrary-gbb — automated WCAG contrast check over design tokens.
+ * componentLibrary-gbb — WCAG contrast over pairs extracted from the COMPILED
+ * `<style>` of every component (real Dart Sass), not from a cross-product of
+ * token names.
  *
- * FIVE separate AA failures were found in a Figma audit this sweep, every one
- * of them BY HAND: someone resolved tokens through tokens.css's three theme
- * blocks and computed ratios in a throwaway script (componentLibrary-7jc,
- * componentLibrary-34n, componentLibrary-3ul, plus two already fixed). There
- * was no automated check anywhere in the repo. This file is that check.
+ * The hard part is knowing which pairs are INTENDED: `text-positive` on
+ * `bg-positive` is, on `bg-brand` is not. A cross-product would be a wall of
+ * false positives, which is a check that cannot fail wearing a green tick.
  *
- * WHY PAIRS ARE EXTRACTED FROM COMPONENTS, NOT FROM TOKEN NAMES:
- * The hard part isn't the maths, it's knowing which foreground/background
- * PAIRS are actually intended. `text-positive` on `bg-positive` is intended;
- * `text-positive` on `bg-brand` is not. A cartesian product over ~118
- * semantic colour tokens would produce a wall of false positives, and a
- * muted check is worse than no check — it is a check that cannot fail
- * wearing a green tick.
+ * Pairs only when `color` AND `background` are OWN properties of the same
+ * compiled rule — a deliberate under-report, since resolving an inherited
+ * backdrop means guessing at cascade order. See KNOWN GAPS.
  *
- * So this test compiles the actual `<style>` block of every component
- * (`sass-embedded`, real Dart Sass — handles both `lang="scss"` and
- * `lang="sass"`, resolves nesting, `&`-selectors, and local SCSS variables
- * exactly as the build does) down to flat CSS rules, and only pairs a
- * `color` with a `background`/`background-color` when BOTH are declared as
- * OWN properties of the exact same compiled rule. A rule that only overrides
- * `color` in a `:hover` block while inheriting `background` from its parent
- * selector is a real pair too, but working out what it inherits requires
- * guessing at cascade order across the whole stylesheet — which is exactly
- * the kind of guess this file avoids. That is a deliberate under-report: it
- * means some real pairs (notably the `:hover`-only background overrides
- * behind some of componentLibrary-7jc's "~25 combinations") are not counted
- * here. See "KNOWN GAPS" below.
- *
- * THREE THEME BLOCKS, ASSERTED INDEPENDENTLY:
- * tokens.css's own header comment says "update both blocks" when there are
- * THREE (`:root`, `:root.dark, [data-theme='dark']`, and
- * `@media (prefers-color-scheme: dark)`). A pair fixed in two of three
- * blocks looks fixed. Every pair below is resolved and asserted separately
- * against all three, so a value corrected only in `:root` fails loudly for
- * the media-query block instead of passing by accident.
+ * ALL THREE THEME BLOCKS are asserted independently (`:root`, `:root.dark`, and
+ * the `prefers-color-scheme` media block). A pair fixed in two of three looks
+ * fixed.
  */
 
 /**
- * KNOWN GAPS
+ * KNOWN GAPS — what this file CANNOT see, so its green is read correctly.
  *
- * Two gaps live in `resolveToRgb` rather than in extraction: the PAIR is
- * found correctly, but its VALUES cannot be turned into an RGB triple, so the
- * evaluation resolves to `ratio: null` and is silently skipped by the AA
- * assertions below. As of this writing that is 21 of 90 evaluations (23%), MEASURED not estimated:
+ * 21 of 90 evaluations (23%) resolve to `ratio: null` and are skipped: a
+ * `linear-gradient(...)` background has no single colour to sample, and
+ * `transparent` composites with whatever renders behind it. Both are refusals to
+ * guess, not oversights.
  *
- *   1. `--ns-color-text-primary` on a `linear-gradient(...)` background — 12
- *      evaluations (4 occurrences x 3 theme blocks): NsBottomNav's
- *      `.ns-bottom-nav__pill` / `.ns-bottom-nav__sub-pill` and NsNavSidebar's
- *      active-pill equivalents. A multi-layer gradient has no single "the
- *      background colour" to sample without picking an arbitrary point on
- *      it, which this file declines to guess at.
+ * CONSEQUENCE: 2 of 21 unique pairs produce NO AA assertion in ANY theme block,
+ * so "21 pairs" overstates coverage — 19 are actually checked.
  *
- *   2. `--ns-color-text-brand` on `background: transparent` — 6 evaluations
- *      (2 occurrences x 3 theme blocks): `.ns-btn--tertiary` and
- *      NsNavSidebar's `.ns-nav-sidebar__toggle-btn`. `transparent` has no RGB
- *      value of its own; the real backdrop is whatever renders behind the
- *      element, which is exactly the cascade-order guess the OWN-properties
- *      restriction above exists to avoid.
+ * SHARP INSTANCE: `--ns-color-text-brand` on `transparent` (`.ns-btn--tertiary`,
+ * `.ns-nav-sidebar__toggle-btn`) very often composites over `--ns-color-bg-canvas`
+ * — the same pair that already fails at 3.62:1 under componentLibrary-7jc. Check
+ * those two by hand against their real backdrop.
  *
- * CONSEQUENCE: both of the above are entire pairs, not just some of their
- * blocks — they resolve to null in EVERY theme block. So 2 of this file's 19
- * "unique pairs" produce NO real AA assertion anywhere, which quietly
- * inflates what "21 unique pairs" / "90 evaluations" imply as coverage:
- * effectively only 19 of 21 pairs are ever checked against AA.
- *
- * SHARP INSTANCE: `--ns-color-text-brand` on `transparent` (gap 2) shares its
- * FOREGROUND token with an ALREADY-DOCUMENTED failing pair —
- * `--ns-color-text-brand` on `--ns-color-bg-canvas`, 3.62:1 in light,
- * componentLibrary-7jc (see KNOWN_EXCEPTIONS below). In practice a
- * `transparent` background composites with whatever renders behind it, and
- * for `.ns-btn--tertiary` / `.ns-nav-sidebar__toggle-btn` that backdrop is
- * very often `--ns-color-bg-canvas` — the same already-failing 3.62:1 colour
- * likely renders in both places, but this file structurally cannot see that:
- * it only pairs declarations that are both own properties of the same
- * compiled rule, never a composited/inherited backdrop. Those two selectors
- * should be checked by hand against their real rendered backdrop.
- *
- * The extraction-sanity floor and the unresolved-fraction ceiling below
- * (search "resolve to a measurable ratio" / "bounded to the documented KNOWN
- * GAPS") exist so a FUTURE silent expansion of this skipped set — a third
- * unresolvable pattern, or either of these two gaps spreading to more
- * components — fails loudly instead of being absorbed quietly into "some
- * evaluations don't resolve, as expected."
+ * The extraction floor and unresolved-fraction ceiling below exist so a FUTURE
+ * expansion of this skipped set fails loudly instead of being absorbed.
  */
 
 const ROOT = resolve(__dirname, '../..')

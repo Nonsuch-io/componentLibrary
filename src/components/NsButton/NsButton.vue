@@ -70,62 +70,21 @@ defineOptions({ inheritAttrs: false })
 
 const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsButton', () => props.disable)
 
-// componentLibrary-nk3: `unelevated` is deliberately NOT in this list. It is hardcoded on the
-// q-btn AFTER the attrs spread, so mergeProps always resolves ours and a consumer-passed value
-// is inert — warning about it would be a false positive, and a guard that is wrong once gets
-// ignored for the cases that matter (fable).
-//
-// NsButton declares neither `color` nor `flat` (and
-// friends), so they fall through $attrs to QBtn and can silently collide
-// with the `.ns-btn--*` variant CSS below (e.g. flat + color="primary"
-// renders orange text on an orange background — both systems agree on the
-// same brand colour, which is exactly what makes it invisible). This is a
-// dev-only warning, not a reconciliation: it does NOT make the combination
-// render correctly, it only makes the collision loud instead of silent.
+// Quasar styling attrs fall through $attrs and collide with the .ns-btn--* CSS
+// (flat + color="primary" renders orange on orange — invisible because both
+// systems agree). Warns only; does not reconcile. `unelevated` is excluded on
+// purpose: it is hardcoded after the spread, so a consumer value is inert and
+// warning would cry wolf. Story: componentLibrary-nk3.
 const attrs = useAttrs()
 const slots = useSlots()
 
 /**
- * AN ICON-ONLY BUTTON WITH NO ACCESSIBLE NAME IS A BUTTON A SCREEN READER CANNOT
- * DESCRIBE. `iconOnly` means "there is no text here" — so unless the consumer
- * supplies a name, the control announces as "button" and nothing else. axe
- * reports it as button-name; nothing else in this repo can, and axe runs at
- * test:'todo' (componentLibrary-057).
+ * An `iconOnly` button with no accessible name announces as "button" and nothing
+ * else. The library cannot invent the name — only the call site knows what the
+ * icon means — so it warns and names the ACTION in its advice, not the icon.
  *
- * THE LIBRARY CANNOT SUPPLY THE NAME. Only the call site knows what the icon
- * means, and inventing one ("Button", or the icon's own name) would be worse
- * than silence: a confident wrong announcement instead of an obviously missing
- * one. So this warns and does not guess.
- *
- * THREE THINGS REVIEW CAUGHT, all of which made it cry wolf or stay silent
- * when it should not have:
- *
- *   1. EMPTY IS NOT NAMED. `aria-label=""` passed the original `!== undefined`
- *      check while providing no accessible name at all — the exact defect this
- *      exists to catch, and a realistic one: `:aria-label="t('send')"` resolves
- *      to '' before translations load. Values are trimmed now.
- *
- *   2. SLOT TEXT NAMES A BUTTON. `<NsButton icon-only>Save</NsButton>` was
- *      warned about despite having a perfectly good name from its content, and
- *      the visually-hidden-span pattern (<span class="sr-only">) is a
- *      legitimate — arguably better — alternative to aria-label. A guard that
- *      cries wolf gets ignored for the cases that matter, which
- *      useNsAttrConflictWarning says in this same directory.
- *
- *      The check is "was a default slot PROVIDED", not "does it render text":
- *      inspecting rendered vnodes at setup time is fragile, and the conservative
- *      direction is to stay quiet. A slot containing only another icon is
- *      therefore missed — a deliberate under-report, stated rather than hidden.
- *
- *   3. WARN ONCE PER INSTANCE. watchEffect re-ran on every unrelated attrs
- *      change: four warnings for one unfixed button across three re-renders. A
- *      v-for over reactive data would bury the signal in copies of itself. Same
- *      reasoning, and the same fix, as the sibling composable's dedupe.
- *
- * SCOPE, MEASURED RATHER THAN ASSUMED: all six `icon-only` call sites in the
- * only consumer are already named, so this fires zero times there today. It is
- * here to stop the seventh. The 35 genuinely unnamed icon buttons in that
- * codebase use Quasar's `round` attr instead — their markup, tracked separately.
+ * Empty strings do not count, slot text does, and it warns once per instance:
+ * all three were review findings. Story: componentLibrary-057.
  */
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   let warnedUnnamed = false

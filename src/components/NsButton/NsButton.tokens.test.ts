@@ -3,45 +3,21 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 /**
- * EVERY SOLID BACKGROUND MUST USE THE on-COLOUR TOKEN THAT MATCHES IT.
+ * Every solid background must use the on-colour token that MATCHES it.
  *
- * componentLibrary-34n. Four button variants paired a background with an
- * unrelated on-colour token:
+ * Four variants paired e.g. `status-positive` with `text-on-ACCENT` and rendered
+ * correctly, because the two tokens coincidentally resolved to the same hex. A
+ * contrast check cannot see that — while they agree there is no number to fail —
+ * so this asserts token IDENTITY instead.
  *
- *     positive          status-positive   +  text-on-ACCENT
- *     warning           status-warning    +  text-on-ACCENT
- *     negative          status-negative   +  text-on-BRAND
- *     marketing-pushed  status-positive   +  text-on-ACCENT
+ * The coincidence has already broken once: componentLibrary-2p1 moved dark
+ * `text-on-negative`, and the negative button kept white at 2.76:1.
  *
- * ALL FOUR RENDERED CORRECTLY, which is the entire problem. on-accent and
- * on-positive both resolved to #2d0b00; on-brand and on-negative both to
- * #ffffff. The pairs agreed by coincidence, so every declaration read sensibly
- * on its own and nothing looked wrong on any screen.
- *
- * A CONTRAST CHECK CANNOT CATCH THIS, by construction: while the tokens agree
- * the ratios are identical, so there is no number to fail. That is why this file
- * asserts token IDENTITY rather than measuring anything.
- *
- * THE COINCIDENCE HAS ALREADY BROKEN ONCE. componentLibrary-2p1 moved
- * --ns-color-text-on-negative to #2d0b00 in the dark blocks (white failed at
- * 2.76:1 on dark's light-salmon #fd6d73). The negative button still asked for
- * on-brand, so it kept the white and kept the 2.76:1 — a real dark-mode failure
- * produced by exactly the divergence this pairing was always vulnerable to.
- *
- * The fourth instance (marketing-pushed) was NOT in the bead. It was found by
- * checking every pair mechanically, which is the argument for this test rather
- * than a one-time fix.
- *
- * SCOPE, STATED HONESTLY: THIS COVERS BASE VARIANT BLOCKS ONLY, NOT STATES.
- * Nested `&:hover` / `&:active` / `&:focus-visible` blocks never match the
- * selector regex, and a state background like `status-accent-active` does not
- * equal the surface name `accent`, so states are unreachable here even in
- * principle. Review found a FIFTH instance that proves the point:
- * `.ns-btn--accent:active` pairs `--ns-color-bg-accent-active` with
- * `--ns-color-text-on-brand`. It is deliberately left alone — unlike the four
- * above, repointing it would CHANGE A COLOUR (1.82:1 -> 9.97:1), which is a
- * designer's call, and its ratio is already pinned under componentLibrary-7jc.
- * So "every solid background" is the invariant; base blocks are what is enforced.
+ * SCOPE: base variant blocks only. Nested `&:hover` / `&:active` never match the
+ * selector regex, and a state background like `accent-active` is not the surface
+ * `accent` — `.ns-btn--accent:active` is a known instance left to
+ * componentLibrary-7jc, because fixing it changes a colour. Story:
+ * componentLibrary-34n.
  */
 const SFC = readFileSync(resolve(__dirname, 'NsButton.vue'), 'utf-8')
 
@@ -70,19 +46,9 @@ function pairs(): Pair[] {
 describe('NsButton on-colour tokens match their backgrounds (componentLibrary-34n)', () => {
   const found = pairs()
 
-  /**
-   * THE EXACT SET, NOT A COUNT. A count floor plus a `.some()` check was the
-   * first version, and review DEFEATED it: re-introducing the original 34n bug
-   * while inserting an innocuous `&:focus-visible { }` block between
-   * `background:` and `color:` made the body regex truncate at the nested brace,
-   * dropped `.ns-btn--negative` out of the pair list entirely (6 -> 5, still
-   * above the floor of 4), and left all 17 tests green with the exact
-   * accessibility bug shipped. The guard's own comment named that failure mode
-   * and then did not close it.
-   *
-   * An exact set makes a dropout loud, and makes adding a variant a conscious
-   * edit here rather than a silent exemption.
-   */
+  // THE EXACT SET, NOT A COUNT. A count floor let review drop .ns-btn--negative
+  // out of the list (6 -> 5, still above the floor) by inserting a nested block
+  // between `background:` and `color:` — 17 tests green, bug shipped.
   const EXPECTED = [
     '.ns-btn--primary',
     '.ns-btn--accent',
