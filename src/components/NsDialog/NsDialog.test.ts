@@ -416,6 +416,21 @@ describe('NsDialog accessible name', () => {
     wrapper.unmount()
   })
 
+  it('RENDERS aria-label when that is the only name — the positive case', async () => {
+    // Review mutation-killed the previous suite here: deleting the
+    // `:aria-label` binding left all 30 tests AND the 1000-test suite green.
+    // Every other test checked the warning being suppressed or the attribute
+    // being ABSENT; none checked it actually reaching the DOM, which is the whole
+    // point of the prop.
+    const wrapper = mount(NsDialog, {
+      props: { modelValue: true, ariaLabel: 'Filter panel' },
+      global: { stubs },
+    })
+    await nextTick()
+    expect(wrapper.find('.ns-dialog').attributes('aria-label')).toBe('Filter panel')
+    wrapper.unmount()
+  })
+
   it('ignores aria-label when a visible title exists, so it cannot override it', async () => {
     // An aria-label alongside visible text WINS, so what a screen reader announces
     // would silently drift from what is on screen.

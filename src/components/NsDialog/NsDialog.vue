@@ -113,6 +113,9 @@ const slots = useSlots()
 const titleId = `ns-dialog-title-${useId()}`
 const bodyId = `ns-dialog-body-${useId()}`
 
+// SLOT PRESENCE, not slot content — a header slot that renders nothing still
+// counts as named. A deliberate under-report (inspecting rendered vnodes at
+// setup is fragile), stated here rather than hidden, same as NsButton.
 const hasTitle = computed(() => Boolean(props.title) || slots.header !== undefined)
 
 // A modal with no accessible name announces as "dialog" and nothing else, and the
