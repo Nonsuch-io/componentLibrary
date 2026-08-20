@@ -29,8 +29,12 @@ import * as sass from 'sass-embedded'
  * `transparent` composites with whatever renders behind it. Both are refusals to
  * guess, not oversights.
  *
- * CONSEQUENCE: 2 of 21 unique pairs produce NO AA assertion in ANY theme block,
- * so "21 pairs" overstates coverage — 19 are actually checked.
+ * CONSEQUENCE: 3 of 21 unique pairs produce NO AA assertion in ANY theme block,
+ * so "21 pairs" overstates coverage — 18 are actually checked. MEASURED, not
+ * estimated: the third is `text-primary` on `btn-tertiary-bg` (NsBadge ghost), a
+ * TOKEN that resolves to transparent — which counts as the transparent gap even
+ * though its identity is a token name. An earlier version of this note said 2,
+ * and the block was exempted from shortening BECAUSE its numbers are load-bearing.
  *
  * SHARP INSTANCE: `--ns-color-text-brand` on `transparent` (`.ns-btn--tertiary`,
  * `.ns-nav-sidebar__toggle-btn`) very often composites over `--ns-color-bg-canvas`
@@ -698,7 +702,10 @@ describe('token contrast (componentLibrary-gbb)', () => {
     // acceptable reason — dishonest to keep as a name and pointless as a
     // check.
     //
-    // 75% is chosen as a floor comfortably below today's actual (66/84 =
+    // MEASURED TODAY: 69 resolved of 90 (76.7%). The floor requires 69, so there
+    // is ZERO headroom — the next unresolvable pair trips it, which is the point,
+    // but "comfortably below" was never true and is now provably not.
+    // (historical note, stale: 66/84 =
     // 78.6%), leaving room for the two documented gaps above to grow a
     // little without failing every unrelated PR, while still being high
     // enough to catch a REAL regression — e.g. a change that broke var()
@@ -749,7 +756,7 @@ describe('token contrast (componentLibrary-gbb)', () => {
     ).toEqual([])
 
     // Bounds how far the DOCUMENTED gap itself may silently grow. Today it is
-    // 18/84 (21.4%). The ceiling gives room for a handful of new occurrences
+    // 21/90 (23.3%) today. The ceiling gives room for a handful of new occurrences
     // of the SAME two categories without failing on every unrelated PR, while
     // still catching a gap that balloons unnoticed — if this trips, KNOWN
     // GAPS above needs updating (and re-justifying), not just a bigger number.

@@ -44,7 +44,12 @@ declare const process: { env: { NODE_ENV?: string } } | undefined
  *  1. an accessible name — the rendered label via aria-labelledby, or aria-label
  *  2. a shared `name`, auto-generated per instance so groups never collide
  *  3. roving tabindex + arrow keys, wrapping, where moving also SELECTS (unlike
- *     tabs). Disabled options skipped; Home/End jump to first/last.
+ *     tabs). Exactly one option is tabindex=0 — the selected one, or the first
+ *     enabled when none is. Disabled options skipped; Home/End jump to first/last.
+ *
+ * Setting `name` on QOptionGroup does NOT fix the tab stops — the focusables are
+ * Quasar's outer divs, not the native inputs. That is the obvious simpler fix and
+ * it does not work.
  *
  * Figma's "Associated Fields" variant is deliberately absent — it needs a design
  * decision first (does the radio or the GROUP own the revealed content?) and

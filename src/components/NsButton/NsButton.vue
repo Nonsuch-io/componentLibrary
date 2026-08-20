@@ -83,8 +83,10 @@ const slots = useSlots()
  * else. The library cannot invent the name — only the call site knows what the
  * icon means — so it warns and names the ACTION in its advice, not the icon.
  *
- * Empty strings do not count, slot text does, and it warns once per instance:
- * all three were review findings. Story: componentLibrary-057.
+ * Empty strings do not count. A PROVIDED default slot does — even one with no
+ * text, a deliberate under-report, because inspecting rendered vnodes at setup
+ * is fragile. Warns once per instance. All three were review findings.
+ * Story: componentLibrary-057.
  */
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   let warnedUnnamed = false

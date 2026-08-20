@@ -15,8 +15,9 @@ import { computed, useAttrs } from 'vue'
  * anywhere — they rendered unstyled with no error, warning or type complaint.
  * Those two are handled here; everything else passes through untouched.
  *
- * NOT a strict union, despite ADR 0002 rule 2: 62 of the consumer's 104 call
- * sites pass a BOUND `:color`, so a union would break most of them.
+ * NOT a strict union, despite ADR 0002 rule 2: of the consumer's 104 call sites,
+ * 11 use Quasar palette names Figma has no opinion about (grey-4, orange) and
+ * would break UNCONDITIONALLY; 62 more pass a bound `:color`.
  * `inheritAttrs: false` is required — Vue applies $attrs to the root IN ADDITION
  * to an explicit v-bind, which would re-emit the class we just withheld.
  * Story: componentLibrary-mwe.
