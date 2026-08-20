@@ -68,7 +68,20 @@ export const nsComponentManifest: Record<string, string> = {
  * Quasar kebab-case tag → Ns kebab-case tag.
  * Useful for template-level ESLint rules (vue/no-restricted-html-elements).
  */
-export const nsTemplateTagManifest: Record<string, string> = Object.fromEntries(
+/*
+ * `/* #__PURE__ *\/` IS LOAD-BEARING, NOT DECORATION.
+ *
+ * This derivation is a FUNCTION CALL at module scope. `sideEffects: false` lets a
+ * bundler drop an unused MODULE, but once this module is reachable it cannot
+ * drop a statement whose call it is unable to prove pure — so the call was kept,
+ * and keeping it kept `nsComponentManifest` alive with it.
+ *
+ * MEASURED CONSEQUENCE: a consumer importing only NsButton shipped the entire
+ * Quasar->Ns lookup table. 365 B gzipped, 12.3% of that bundle, for a migration
+ * and codemod aid nothing uses at runtime. Every consumer of every component paid
+ * it (componentLibrary-19x).
+ */
+export const nsTemplateTagManifest: Record<string, string> = /* @__PURE__ */ Object.fromEntries(
   Object.entries(nsComponentManifest).map(([q, ns]) => [
     q
       .replace(/([A-Z])/g, '-$1')

@@ -35,7 +35,11 @@
     "./fonts/global.css": "./fonts/global.css",
     "./fonts/quasar-overrides": "./fonts/_quasar-overrides.sass",
     "./tokens.css": "./src/tokens/tokens.css",
-    "./typography.css": "./src/tokens/typography.css"
+    "./typography.css": "./src/tokens/typography.css",
+    "./manifest": {
+      "types": "./dist/manifest.d.ts",
+      "import": "./dist/manifest.js"
+    }
   },
   "scripts": {
     "dev": "storybook dev -p 6006",
@@ -62,7 +66,7 @@
       "name": "full library (gzip)",
       "path": "dist/nonsuch-components.js",
       "import": "*",
-      "limit": "24 kB",
+      "limit": "22.5 kB",
       "gzip": true,
       "ignore": [
         "vue",
@@ -74,7 +78,7 @@
       "name": "single component: NsButton (tree-shaking guard)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsButton }",
-      "limit": "3.25 kB",
+      "limit": "2.75 kB",
       "gzip": true,
       "ignore": [
         "vue",
@@ -86,13 +90,19 @@
       "name": "app shell (heaviest import; contains NsInput, so NsInput changes land here)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsAppShell }",
-      "limit": "10.5 kB",
+      "limit": "10.25 kB",
       "gzip": true,
       "ignore": [
         "vue",
         "quasar",
         "@phosphor-icons/vue"
       ]
+    },
+    {
+      "name": "manifest subpath (build tooling; must never pull runtime code)",
+      "path": "dist/manifest.js",
+      "limit": "0.75 kB",
+      "gzip": true
     },
     {
       "name": "styles",

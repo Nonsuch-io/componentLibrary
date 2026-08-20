@@ -37,6 +37,15 @@ export default defineConfig({
       entry: {
         'nonsuch-components': resolve(__dirname, 'src/index.ts'),
         'quasar-config': resolve(__dirname, 'src/quasarConfig.ts'),
+        // THIRD ENTRY, same reasoning as quasar-config. The manifest is
+        // BUILD-TOOLING DATA — ESLint rules, CI drift checks, codemods — and
+        // nothing renders it. Bundled into the barrel it could not be shaken
+        // out: a consumer importing only NsButton shipped the whole Quasar->Ns
+        // lookup table, 365 B gzipped and 12.3% of that bundle. A /*#__PURE__*/
+        // on the derived map did NOT fix it (measured: byte-identical output),
+        // because the dead derivation survived minification anyway. A separate
+        // entry does not depend on a bundler heuristic holding.
+        manifest: resolve(__dirname, 'src/manifest.ts'),
       },
       // PIN THE CSS FILENAME. With a SINGLE lib entry vite derives it from
       // `fileName`; the moment `entry` became an object it fell back to the
