@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.30.4](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.3...v0.30.4) (2026-08-20)
+
+
+### Bug Fixes
+
+* **dialog:** remove a duplicate role that left the modal unnamed (057) ([6423652](https://github.com/Nonsuch-io/componentLibrary/commit/64236522f62429210554a3ea3138b54aab485fa5))
+* **dialog:** remove a duplicate role that left the modal unnamed (057) ([43b9882](https://github.com/Nonsuch-io/componentLibrary/commit/43b98829b1650c8c650937d011210322524ae32f))
+
 ## [0.30.3](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.2...v0.30.3) (2026-08-20)
 
 
