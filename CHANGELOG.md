@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.30.3](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.2...v0.30.3) (2026-08-20)
+
+
+### Performance Improvements
+
+* **build:** split the manifest out of the runtime bundle, and lower the budgets (19x) ([9fe3644](https://github.com/Nonsuch-io/componentLibrary/commit/9fe36444c221135ab0de1d0ac01a05b727408249))
+
 ## [0.30.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.1...v0.30.2) (2026-08-20)
 
 
