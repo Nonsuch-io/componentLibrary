@@ -14,6 +14,6 @@ export const Default: Story = {
   render: (args) => ({
     components: { NsImage },
     setup: () => ({ args }),
-    template: '<NsImage v-bind="args">Default content</NsImage>',
+    template: '<NsImage v-bind="args" alt="A calm harbour at sunrise">Default content</NsImage>',
   }),
 }

@@ -14,6 +14,9 @@ export const Default: Story = {
   render: (args) => ({
     components: { NsLinearProgress },
     setup: () => ({ args }),
-    template: '<NsLinearProgress v-bind="args">Default content</NsLinearProgress>',
+    // NAMED. QLinearProgress renders role="progressbar" (QLinearProgress.js:135),
+    // which announces as an unnamed progress bar without one — the same class as
+    // the icon-only button and the unnamed dialog (componentLibrary-057).
+    template: '<NsLinearProgress v-bind="args" aria-label="Upload progress" />',
   }),
 }

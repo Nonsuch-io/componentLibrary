@@ -1,5 +1,11 @@
 <template>
-  <q-item v-bind="attrsWithoutDisabled" :disable="resolvedDisable" class="ns-item">
+  <!--
+    role="listitem" because NsList declares role="list", and a list role REQUIRES
+    listitem children — axe reports aria-required-children otherwise. q-item
+    renders a plain div, so the library's own list/item pair was invalid on both
+    sides. A consumer's own role wins via attrs (componentLibrary-057).
+  -->
+  <q-item role="listitem" v-bind="attrsWithoutDisabled" :disable="resolvedDisable" class="ns-item">
     <slot />
   </q-item>
 </template>
