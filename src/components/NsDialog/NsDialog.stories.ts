@@ -146,3 +146,19 @@ export const Sizes: Story = {
     `,
   }),
 }
+
+/**
+ * A dialog with no visible heading, named by `aria-label`.
+ *
+ * Without one it announces as "dialog" and nothing else while trapping focus.
+ * This story exists so the axe gate covers the prop's real DOM output once
+ * componentLibrary-057 flips `a11y.test` to `'error'` — a unit assertion alone
+ * would not.
+ */
+export const NamedByAriaLabel: Story = {
+  args: {
+    modelValue: true,
+    title: undefined,
+    ariaLabel: 'Filter panel',
+  },
+}
