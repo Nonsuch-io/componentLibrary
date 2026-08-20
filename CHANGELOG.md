@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.30.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.1...v0.30.2) (2026-08-20)
+
+
+### Bug Fixes
+
+* **button:** warn when an icon-only button has no accessible name (057) ([2976543](https://github.com/Nonsuch-io/componentLibrary/commit/2976543ee15eb17f488873fc3e26565094183cfa))
+
 ## [0.30.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.0...v0.30.1) (2026-08-12)
 
 
