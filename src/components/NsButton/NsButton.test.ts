@@ -38,7 +38,16 @@ describe('NsButton', () => {
   })
 
   it('applies icon-only class', () => {
-    const wrapper = mountButton({ iconOnly: true })
+    // Named on purpose. Without it this emits the real unnamed-icon warning into
+    // the suite's stderr — noise from a test about a CSS class, in a PR whose
+    // whole point is that warnings should be readable when they matter. The
+    // warning has its own tests below.
+    // mountButton's second argument is SLOTS, not attrs — so this mounts
+    // directly rather than quietly passing a bogus slot named "aria-label".
+    const wrapper = mount(NsButton, {
+      props: { iconOnly: true },
+      attrs: { 'aria-label': 'Send' },
+    })
     expect(wrapper.find('.ns-btn--icon-only').exists()).toBe(true)
   })
 
@@ -126,5 +135,76 @@ describe('NsButton', () => {
       expect(warnSpy).not.toHaveBeenCalled()
       vi.unstubAllEnvs()
     })
+  })
+})
+
+/**
+ * componentLibrary-057 prerequisite. An `iconOnly` button with no accessible
+ * name announces as "button" and nothing else — axe reports button-name, and
+ * nothing else in this repo can see it.
+ */
+describe('NsButton icon-only accessible name', () => {
+  beforeEach(() => __resetAttrConflictWarnings())
+
+  it('warns when iconOnly has no name, because the library cannot invent one', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsButton, { props: { iconOnly: true } })
+    expect(warn.mock.calls.flat().join(' ')).toContain('no accessible name')
+    warn.mockRestore()
+  })
+
+  it.each(['aria-label', 'aria-labelledby', 'title'])('accepts %s as the name', (attr) => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsButton, { props: { iconOnly: true }, attrs: { [attr]: 'Send message' } })
+    expect(warn.mock.calls.flat().join(' ')).not.toContain('no accessible name')
+    warn.mockRestore()
+  })
+
+  it('says nothing for a normal labelled button', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsButton, { slots: { default: 'Send' } })
+    expect(warn.mock.calls.flat().join(' ')).not.toContain('no accessible name')
+    warn.mockRestore()
+  })
+
+  it.each(['', '   '])('treats aria-label=%p as UNNAMED, because it is', (empty) => {
+    // `!== undefined` passed an empty label while providing no accessible name —
+    // the exact defect this guard exists for. Realistic: :aria-label="t('send')"
+    // resolves to '' before translations load.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsButton, { props: { iconOnly: true }, attrs: { 'aria-label': empty } })
+    expect(warn.mock.calls.flat().join(' ')).toContain('no accessible name')
+    warn.mockRestore()
+  })
+
+  it('does NOT warn when the default slot supplies the name', () => {
+    // <NsButton icon-only>Save</NsButton> has a name from its content, and the
+    // visually-hidden-span pattern is a legitimate alternative to aria-label.
+    // A guard that cries wolf gets ignored for the cases that matter.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsButton, { props: { iconOnly: true }, slots: { default: 'Save' } })
+    expect(warn.mock.calls.flat().join(' ')).not.toContain('no accessible name')
+    warn.mockRestore()
+  })
+
+  it('warns ONCE per instance, not once per re-render', async () => {
+    // watchEffect re-ran on every unrelated attrs change: four warnings for one
+    // unfixed button across three re-renders. A v-for over reactive data would
+    // bury the signal in copies of itself.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const wrapper = mount(NsButton, { props: { iconOnly: true }, attrs: { 'data-n': '0' } })
+    for (let i = 1; i <= 3; i++) await wrapper.setProps({ 'data-n': String(i) } as never)
+    const hits = warn.mock.calls.flat().filter((c) => String(c).includes('no accessible name'))
+    expect(hits, 'the same unfixed button warned on every re-render').toHaveLength(1)
+    warn.mockRestore()
+  })
+
+  it('names the ACTION in its advice, not the icon', () => {
+    // A warning that says "add a label" and stops produces labels like "trash".
+    // The useful half is what to put in it.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    mount(NsButton, { props: { iconOnly: true } })
+    expect(warn.mock.calls.flat().join(' ')).toContain('Delete item')
+    warn.mockRestore()
   })
 })

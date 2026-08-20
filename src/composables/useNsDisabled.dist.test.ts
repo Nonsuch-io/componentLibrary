@@ -131,7 +131,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(8) // 5->6 componentLibrary-07u (stylesheet), 6->7 componentLibrary-whr (invalid banner type), 7->8 componentLibrary-b5e (dense+size conflict)
+    ).toBe(9) // 5->6 07u (stylesheet), 6->7 whr (banner type), 7->8 b5e (dense+size), 8->9 057 (icon-only unnamed)
   })
 
   it("warns for NsInput's dense+size conflict too, from the built bundle", async () => {
@@ -206,6 +206,28 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     expect(text, 'the styling wording came back for a behaviour conflict').not.toContain(
       'background colours',
     )
+  })
+
+  it("warns for NsButton's unnamed icon-only button from the built bundle", async () => {
+    // Added with the warning rather than after it. This one is load-bearing in a
+    // way the pinned count cannot express: an icon-only button with no name is
+    // INVISIBLE to everything except axe, and axe runs at test:'todo'
+    // (componentLibrary-057). If this guard ships fail-closed, nothing anywhere
+    // reports the defect.
+    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsButton as never, { props: { iconOnly: true } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the unnamed icon-only warning did not fire with `process` undefined — it is ' +
+        'dead in every consumer browser, whatever the unit tests say',
+    ).toContain('no accessible name')
   })
 
   it('warns from the built bundle when the stylesheet sentinel is missing and `process` is absent', async () => {
