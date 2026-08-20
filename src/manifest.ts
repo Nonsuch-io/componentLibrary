@@ -69,19 +69,21 @@ export const nsComponentManifest: Record<string, string> = {
  * Useful for template-level ESLint rules (vue/no-restricted-html-elements).
  */
 /*
- * `/* #__PURE__ *\/` IS LOAD-BEARING, NOT DECORATION.
+ * NO /*#__PURE__*\/ HERE, DELIBERATELY.
  *
- * This derivation is a FUNCTION CALL at module scope. `sideEffects: false` lets a
- * bundler drop an unused MODULE, but once this module is reachable it cannot
- * drop a statement whose call it is unable to prove pure — so the call was kept,
- * and keeping it kept `nsComponentManifest` alive with it.
+ * I added one and wrote that it was "load-bearing, not decoration". It is not:
+ * output was BYTE-IDENTICAL with and without it, measured twice — once by me and
+ * again independently in review. The dead derivation survives minification
+ * regardless, so the annotation bought nothing while claiming to be the fix.
  *
- * MEASURED CONSEQUENCE: a consumer importing only NsButton shipped the entire
- * Quasar->Ns lookup table. 365 B gzipped, 12.3% of that bundle, for a migration
- * and codemod aid nothing uses at runtime. Every consumer of every component paid
- * it (componentLibrary-19x).
+ * What actually keeps this out of consumers' runtime bundles is the separate
+ * vite entry (see vite.config.ts). That does not depend on a bundler heuristic
+ * holding, which is the whole reason to prefer it (componentLibrary-19x).
+ *
+ * The comment is kept rather than deleted because the wrong version was more
+ * persuasive than the right one, and someone will reach for the annotation again.
  */
-export const nsTemplateTagManifest: Record<string, string> = /* @__PURE__ */ Object.fromEntries(
+export const nsTemplateTagManifest: Record<string, string> = Object.fromEntries(
   Object.entries(nsComponentManifest).map(([q, ns]) => [
     q
       .replace(/([A-Z])/g, '-$1')
