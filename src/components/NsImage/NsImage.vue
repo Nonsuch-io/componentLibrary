@@ -30,7 +30,15 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   watchEffect(() => {
     if (warned) return
     const named = typeof attrs.alt === 'string' && attrs.alt.trim() !== ''
-    if (named || attrs['aria-hidden'] !== undefined || attrs['aria-label'] !== undefined) return
+    if (
+      named ||
+      attrs['aria-label'] !== undefined ||
+      // aria-labelledby also satisfies axe's role-img-alt; omitting it made the
+      // guard cry wolf at a correctly-named image (caught in review).
+      attrs['aria-labelledby'] !== undefined ||
+      attrs['aria-hidden'] !== undefined
+    )
+      return
     warned = true
     console.warn(
       '[NsImage] has no `alt`, so it announces as "image" with no description. ' +

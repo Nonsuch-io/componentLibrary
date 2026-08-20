@@ -15,9 +15,9 @@ export const Default: Story = {
   render: (args) => ({
     components: { NsItem, NsList },
     setup: () => ({ args }),
-    // WRAPPED IN NsList, because NsItem now declares role="listitem" and a
-    // listitem outside a list is invalid (aria-required-parent). It was already
-    // showing invalid markup — the role just made it visible.
+    // WRAPPED IN NsList, because QItem renders role="listitem" for a plain item and a
+    // listitem outside a list is invalid (aria-required-parent). The story was
+    // always showing invalid markup; measuring it is what surfaced it.
     template: '<NsList><NsItem v-bind="args">Default content</NsItem></NsList>',
   }),
 }

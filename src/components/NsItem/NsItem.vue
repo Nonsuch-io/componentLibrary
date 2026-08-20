@@ -1,11 +1,13 @@
 <template>
   <!--
-    role="listitem" because NsList declares role="list", and a list role REQUIRES
-    listitem children — axe reports aria-required-children otherwise. q-item
-    renders a plain div, so the library's own list/item pair was invalid on both
-    sides. A consumer's own role wins via attrs (componentLibrary-057).
+    NO role HERE. QItem sets it correctly and CONDITIONALLY (QItem.js:146-150):
+    plain -> listitem, clickable -> button, link -> none so the native <a> role
+    stands. Hardcoding listitem demoted every clickable item to a static one —
+    focusable, Enter-activatable, announced as "list item" — and axe does NOT
+    flag a focusable listitem, so the gate could not see it. Caught in review of
+    componentLibrary-057; the axe win came entirely from the story fixes.
   -->
-  <q-item role="listitem" v-bind="attrsWithoutDisabled" :disable="resolvedDisable" class="ns-item">
+  <q-item v-bind="attrsWithoutDisabled" :disable="resolvedDisable" class="ns-item">
     <slot />
   </q-item>
 </template>
