@@ -68,6 +68,28 @@ export const nsComponentManifest: Record<string, string> = {
  * Quasar kebab-case tag → Ns kebab-case tag.
  * Useful for template-level ESLint rules (vue/no-restricted-html-elements).
  */
+/*
+ * NO /*#__PURE__*\/ HERE, DELIBERATELY.
+ *
+ * I added one and wrote that it was "load-bearing, not decoration". It is not:
+ * every size-limit budget is IDENTICAL with and without it (623 B for this entry
+ * either way), measured three times — by me, and twice independently in review.
+ * The dead derivation survives minification regardless, so the annotation bought
+ * nothing while claiming to be the fix.
+ *
+ * PRECISELY: the raw emitted dist/manifest.js does differ, by the length of the
+ * comment itself. What is unchanged is everything that matters — what survives
+ * tree-shaking, and every measured budget. An earlier version of this note said
+ * "byte-identical" flatly, which was the same unqualified overclaim it exists to
+ * correct.
+ *
+ * What actually keeps this out of consumers' runtime bundles is the separate
+ * vite entry (see vite.config.ts). That does not depend on a bundler heuristic
+ * holding, which is the whole reason to prefer it (componentLibrary-19x).
+ *
+ * The comment is kept rather than deleted because the wrong version was more
+ * persuasive than the right one, and someone will reach for the annotation again.
+ */
 export const nsTemplateTagManifest: Record<string, string> = Object.fromEntries(
   Object.entries(nsComponentManifest).map(([q, ns]) => [
     q

@@ -260,4 +260,10 @@ export {
 } from './breakpoints'
 
 // Component manifest (Quasar → Ns mapping for sync enforcement)
+// ALSO available as the `./manifest` subpath, which is the one build tooling
+// wants: the root bundle throws `__QUASAR_SSR_SERVER__ is not defined` outside a
+// browser build, so an ESLint config cannot import it from here
+// (componentLibrary-19x). Kept re-exported because it costs nothing — the
+// separate vite entry is what removed it from consumers' runtime bundles, so
+// this line is now a convenience rather than a 365 B tax.
 export { nsComponentManifest, nsTemplateTagManifest, generateQuasarBanRules } from './manifest'
