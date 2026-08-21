@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest'
+import { describe, it, expect, vi, afterEach, beforeAll } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
@@ -44,6 +44,19 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
 
   const js = built && existsSync(BUNDLE) ? readFileSync(BUNDLE, 'utf-8') : ''
 
+  // IMPORTED ONCE, not per test. Nine tests each did their own
+  // `await import(dist/...)`, and while the module is cached, each still paid the
+  // resolve plus a full component mount inside the default 5s timeout. Measured
+  // 5-12s per test under load; it has failed for two different machines on
+  // unrelated branches, so it is fragility rather than one bad environment. This
+  // was componentLibrary-5wn's original recommendation, dropped when the cause
+  // looked like memory.
+  let mod: Record<string, unknown> = {}
+  beforeAll(async () => {
+    if (!built || !existsSync(BUNDLE)) return
+    mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
+  }, 30_000)
+
   it('uses no import.meta.env, which would have been inlined away', () => {
     // Weak by construction — it only fails if the string SURVIVES, whereas the
     // bug is that it gets inlined out. Kept as a cheap tripwire; the behavioural
@@ -55,7 +68,6 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     // Import FIRST, while process still exists: Vue captures process.nextTick at
     // module init. The guards read `typeof process` at WARN time, so removing it
     // afterwards reproduces a browser faithfully without breaking the runtime.
-    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
@@ -78,7 +90,6 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     // parentheses a regex cannot see. A refactor into the early-return form
     // would keep those green while the warning went permanently silent in
     // browsers. Only mounting from dist with `process` removed can tell.
-    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
@@ -139,7 +150,6 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     // fact. The pinned count above would have caught a guard VANISHING, but not a
     // guard that ships fail-CLOSED — and this file exists because two already
     // merged PRs did exactly that, silently, while every unit test passed.
-    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
@@ -160,7 +170,6 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     // `typeof process` guard, so the count stays 8 whether this branch exists,
     // is deleted, or is moved behind a fail-closed guard. Review flagged the gap
     // against this file's own stated policy that EVERY dev warning belongs here.
-    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
@@ -182,7 +191,6 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     // flagged the gap against this file's own stated policy that EVERY dev warning
     // gets a from-dist test, and this warning is load-bearing: the attr is SILENTLY
     // IGNORED, so without it a consumer sees a prop do nothing and no explanation.
-    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
@@ -214,7 +222,6 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     // INVISIBLE to everything except axe, and axe runs at test:'todo'
     // (componentLibrary-057). If this guard ships fail-closed, nothing anywhere
     // reports the defect.
-    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
@@ -234,7 +241,6 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     // A modal with no name announces as "dialog" while trapping focus. Nothing
     // else reports it: axe runs at test:'todo' (componentLibrary-057), so if this
     // guard ships fail-closed the defect is invisible everywhere.
-    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
@@ -254,7 +260,6 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     // QImg renders role="img" with aria-label={alt}; without alt that is an
     // unnamed image role. axe runs at test:'todo', so a fail-closed guard here
     // means nothing reports it (componentLibrary-057).
-    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
@@ -276,14 +281,11 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     // from dist with `process` removed can tell. jsdom/happy-dom never load a
     // real stylesheet, so `--ns-styles-loaded` legitimately resolves empty
     // here — the same condition a consumer who forgot `style.css` would hit.
-    const mod = (await import('../../dist/nonsuch-components.js')) as {
-      createNonsuch: () => Plugin
-    }
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
     const app = createApp({ render: () => null })
-    app.use(mod.createNonsuch())
+    app.use((mod.createNonsuch as () => Plugin)())
     vi.unstubAllGlobals()
     const text = warn.mock.calls.flat().join(' ')
     warn.mockRestore()
