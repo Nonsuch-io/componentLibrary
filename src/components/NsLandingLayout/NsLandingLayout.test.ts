@@ -63,7 +63,12 @@ describe('NsLandingLayout', () => {
     expect(mainIdx).toBeLessThan(footerIdx)
   })
 
-  it('uses semantic landmark elements', () => {
+  it('owns <main> only — the slot content owns banner and contentinfo', () => {
+    // CHANGED DELIBERATELY. This asserted <header> and <footer> here, which is
+    // what produced nested duplicate landmarks: this layout is documented to hold
+    // NsSiteHeader / NsSiteFooter, and those render their own. axe reported five
+    // rules at once (componentLibrary-057). <main> stays because nothing else
+    // provides it.
     const wrapper = mount(NsLandingLayout, {
       slots: {
         header: 'h',
@@ -72,8 +77,8 @@ describe('NsLandingLayout', () => {
         footer: 'f',
       },
     })
-    expect(wrapper.find('header').exists()).toBe(true)
+    expect(wrapper.find('header').exists()).toBe(false)
     expect(wrapper.find('main').exists()).toBe(true)
-    expect(wrapper.find('footer').exists()).toBe(true)
+    expect(wrapper.find('footer').exists()).toBe(false)
   })
 })

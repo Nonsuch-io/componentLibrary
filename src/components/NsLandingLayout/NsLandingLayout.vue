@@ -1,17 +1,25 @@
 <template>
   <div class="ns-landing-layout">
-    <header v-if="$slots.header" class="ns-landing-layout__header">
+    <!--
+      PLAIN DIVS, NOT <header>/<footer>. This layout is documented to hold
+      NsSiteHeader / NsSiteFooter, and those render their OWN landmarks — so
+      wrapping them produced nested duplicates: landmark-no-duplicate-banner,
+      landmark-banner-is-top-level, landmark-unique and the contentinfo pair.
+      The slot content owns the landmark; this owns layout. <main> stays, because
+      nothing else provides it (componentLibrary-057).
+    -->
+    <div v-if="$slots.header" class="ns-landing-layout__header">
       <slot name="header" />
-    </header>
+    </div>
     <section v-if="$slots.hero" class="ns-landing-layout__hero">
       <slot name="hero" />
     </section>
     <main v-if="$slots.default" class="ns-landing-layout__main">
       <slot />
     </main>
-    <footer v-if="$slots.footer" class="ns-landing-layout__footer">
+    <div v-if="$slots.footer" class="ns-landing-layout__footer">
       <slot name="footer" />
-    </footer>
+    </div>
   </div>
 </template>
 

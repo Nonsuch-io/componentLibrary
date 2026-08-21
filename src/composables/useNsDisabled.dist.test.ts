@@ -131,7 +131,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(10) // 5->6 07u (stylesheet), 6->7 whr (banner type), 7->8 b5e (dense+size), 8->9 057 (icon-only unnamed), 9->10 057 (unnamed dialog)
+    ).toBe(11) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt)
   })
 
   it("warns for NsInput's dense+size conflict too, from the built bundle", async () => {
@@ -248,6 +248,26 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       'the unnamed-dialog warning did not fire with `process` undefined — it is ' +
         'dead in every consumer browser, whatever the unit tests say',
     ).toContain('no accessible name')
+  })
+
+  it('warns for an NsImage with no alt from the built bundle', async () => {
+    // QImg renders role="img" with aria-label={alt}; without alt that is an
+    // unnamed image role. axe runs at test:'todo', so a fail-closed guard here
+    // means nothing reports it (componentLibrary-057).
+    const mod = (await import('../../dist/nonsuch-components.js')) as Record<string, unknown>
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsImage as never, {})
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the missing-alt warning did not fire with `process` undefined — it is dead ' +
+        'in every consumer browser, whatever the unit tests say',
+    ).toContain('no `alt`')
   })
 
   it('warns from the built bundle when the stylesheet sentinel is missing and `process` is absent', async () => {

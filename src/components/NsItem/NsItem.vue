@@ -1,4 +1,12 @@
 <template>
+  <!--
+    NO role HERE. QItem sets it correctly and CONDITIONALLY (QItem.js:146-150):
+    plain -> listitem, clickable -> button, link -> none so the native <a> role
+    stands. Hardcoding listitem demoted every clickable item to a static one —
+    focusable, Enter-activatable, announced as "list item" — and axe does NOT
+    flag a focusable listitem, so the gate could not see it. Caught in review of
+    componentLibrary-057; the axe win came entirely from the story fixes.
+  -->
   <q-item v-bind="attrsWithoutDisabled" :disable="resolvedDisable" class="ns-item">
     <slot />
   </q-item>

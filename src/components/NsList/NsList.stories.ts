@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import NsList from './NsList.vue'
+import NsItem from '../NsItem/NsItem.vue'
 
 const meta: Meta<typeof NsList> = {
   title: 'Components/NsList',
@@ -21,13 +22,13 @@ type Story = StoryObj<typeof NsList>
 
 export const Default: Story = {
   render: (args) => ({
-    components: { NsList },
+    components: { NsList, NsItem },
     setup: () => ({ args }),
     template: `
       <NsList v-bind="args">
-        <div class="q-item">Item 1</div>
-        <div class="q-item">Item 2</div>
-        <div class="q-item">Item 3</div>
+        <NsItem>Item 1</NsItem>
+        <NsItem>Item 2</NsItem>
+        <NsItem>Item 3</NsItem>
       </NsList>
     `,
   }),
@@ -36,12 +37,12 @@ export const Default: Story = {
 export const Bordered: Story = {
   args: { bordered: true },
   render: (args) => ({
-    components: { NsList },
+    components: { NsList, NsItem },
     setup: () => ({ args }),
     template: `
       <NsList v-bind="args">
-        <div class="q-item">Bordered item 1</div>
-        <div class="q-item">Bordered item 2</div>
+        <NsItem>Bordered item 1</NsItem>
+        <NsItem>Bordered item 2</NsItem>
       </NsList>
     `,
   }),
@@ -50,13 +51,13 @@ export const Bordered: Story = {
 export const Dense: Story = {
   args: { dense: true },
   render: (args) => ({
-    components: { NsList },
+    components: { NsList, NsItem },
     setup: () => ({ args }),
     template: `
       <NsList v-bind="args">
-        <div class="q-item">Dense item 1</div>
-        <div class="q-item">Dense item 2</div>
-        <div class="q-item">Dense item 3</div>
+        <NsItem>Dense item 1</NsItem>
+        <NsItem>Dense item 2</NsItem>
+        <NsItem>Dense item 3</NsItem>
       </NsList>
     `,
   }),
