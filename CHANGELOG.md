@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.31.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.5...v0.31.0) (2026-08-21)
+
+
+### Features
+
+* **a11y:** turn the axe gate on (057) ([b9ca73c](https://github.com/Nonsuch-io/componentLibrary/commit/b9ca73c239d6649f56399f61fb3b4dad6e1cb2c8))
+
 ## [0.30.5](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.4...v0.30.5) (2026-08-21)
 
 
