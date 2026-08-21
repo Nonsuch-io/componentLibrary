@@ -4,6 +4,15 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.30.5](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.4...v0.30.5) (2026-08-21)
+
+
+### Bug Fixes
+
+* **a11y:** clear the remaining structural violations (057) ([a161dfb](https://github.com/Nonsuch-io/componentLibrary/commit/a161dfb752f831db26275c894db573a5dfcb6ad5))
+* **a11y:** drop a role that demoted every clickable item (057) ([61b4a8a](https://github.com/Nonsuch-io/componentLibrary/commit/61b4a8a85742d317e791e2124180242b87e93838))
+* **test:** stop Quasar's resize debounce outliving jsdom teardown ([60deafa](https://github.com/Nonsuch-io/componentLibrary/commit/60deafaa5c8ce29d3e2e43f405bc48e26937ff24))
+
 ## [0.30.4](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.3...v0.30.4) (2026-08-20)
 
 
