@@ -22,5 +22,9 @@
   // interaction assertions. Adding them surfaces 11 errors, almost all
   // Storybook's `args`-required typing rather than real defects, which is a
   // different piece of work: componentLibrary-vtj.
-  "exclude": ["src/**/*.stories.ts", "test/fixtures/**"]
+  // `exclude` REPLACES the base's, it does not merge — so "dist" and
+  // "node_modules" are repeated here deliberately. Harmless today because the
+  // include globs cannot reach either, but broaden `include` later and dist
+  // floods the program with nothing pointing at why. Found in review.
+  "exclude": ["dist", "node_modules", "src/**/*.stories.ts", "test/fixtures/**"]
 }

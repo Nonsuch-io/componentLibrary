@@ -142,19 +142,44 @@ describe('NsTable', () => {
   })
 
   describe('types', () => {
-    // WAS: expectTypeOf<NsTableProps>().toEqualTypeOf<QTableProps>() — FALSE
-    // since the day it was written. types.ts makes `rows` optional on purpose so
-    // consumers passing no rows still compile, so the two types are designed NOT
-    // to be equal. It never failed because nothing read it: vitest erases
-    // expectTypeOf at runtime unless `typecheck` is on (it is not), and tsconfig
-    // excluded *.test.ts from vue-tsc. Checked by neither. componentLibrary-9ka.
-    it('passes every QTable prop through unchanged, except rows', () => {
-      expectTypeOf<Omit<NsTableProps, 'rows'>>().toEqualTypeOf<Omit<QTableProps, 'rows'>>()
+    // NsTableProps CANNOT DETECT QUASAR DRIFT, and no assertion routed through it
+    // can. types.ts defines it AS `Omit<QTableProps,'rows'> & { rows?: ... }`, so
+    // `Omit<NsTableProps,'rows'>` and `Omit<QTableProps,'rows'>` are the same type
+    // by construction — comparing them is algebra, not a test.
+    //
+    // This file has now shipped two bad versions of that idea. The original
+    // asserted NsTableProps EQUALS QTableProps, which was false from the day it
+    // was written (`rows` is optional here on purpose) and never failed because
+    // nothing typechecked tests. Its replacement was tautological instead: review
+    // renamed a Quasar prop and vue-tsc still exited 0. Both looked like coverage.
+    //
+    // So the drift check below does NOT go through NsTableProps. It is a literal
+    // list of the props this component actually relies on, checked against
+    // Quasar's own keys — independent of our derivation, and it fails if Quasar
+    // renames or removes any of them. componentLibrary-9ka.
+    it('still has the QTable props NsTable is built on', () => {
+      type ReliedUpon =
+        | 'rows'
+        | 'columns'
+        | 'rowKey'
+        | 'loading'
+        | 'flat'
+        | 'bordered'
+        | 'hidePagination'
+        | 'pagination'
+        | 'selection'
+        | 'selected'
+        | 'filter'
+        | 'title'
+      // never (not false) when a name is gone, so the failure names the type.
+      type Survives = ReliedUpon extends keyof QTableProps ? true : never
+      expectTypeOf<Survives>().toEqualTypeOf<true>()
     })
 
-    // The deliberate difference, asserted in BOTH directions. Stating only
-    // "optional here" would still pass if Quasar made it optional too, and the
-    // divergence we are documenting would have quietly stopped existing.
+    // The one intended divergence, asserted in BOTH directions. Only the
+    // QTableProps half is real drift detection — the NsTableProps half restates
+    // types.ts — but it is kept because it fails if Quasar ever makes `rows`
+    // optional too and the divergence we document stops existing.
     it('makes rows optional — the one intended divergence from QTable', () => {
       type IsOptional<T, K extends keyof T> =
         Record<string, never> extends Pick<T, K> ? true : false

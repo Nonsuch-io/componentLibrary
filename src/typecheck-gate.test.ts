@@ -31,6 +31,16 @@ describe('the typecheck gate can fail (componentLibrary-9ka)', () => {
     )
     const output = `${result.stdout ?? ''}${result.stderr ?? ''}`
 
+    // Checked FIRST, because the two below cannot tell these apart. On timeout
+    // or ENOENT `status` is null, so `not.toBe(0)` passes vacuously and the
+    // failure message would claim vue-tsc "reported something else" when it
+    // never ran at all. The gate still fails — the TS2322 check catches it — but
+    // it fails pointing at the wrong thing. Review finding.
+    expect(
+      result.error,
+      `vue-tsc never ran or never finished; this is not a type-error result.\n${result.error}`,
+    ).toBeUndefined()
+
     // Both halves matter. A non-zero exit alone would also be satisfied by
     // vue-tsc failing to start, a bad path, or a missing binary — all of which
     // look like a working gate while checking nothing.
@@ -48,8 +58,25 @@ describe('the typecheck gate can fail (componentLibrary-9ka)', () => {
     )
   })
 
-  it('excludes the canary from the real typecheck, or CI could never be green', () => {
-    const config = readFileSync(resolve(ROOT, 'tsconfig.test.json'), 'utf-8')
-    expect(config).toContain('test/fixtures/**')
-  })
+  it('keeps the canary out of the real typecheck program', () => {
+    // WAS a string check for "test/fixtures/**" in tsconfig.test.json — which
+    // passes if the glob sits in a comment, and says nothing about whether the
+    // compiler actually excluded anything. That is the pattern this file's own
+    // header criticises, so it was replaced with the resolved FILE LIST.
+    const result = spawnSync(
+      'npx',
+      ['tsc', '-p', resolve(ROOT, 'tsconfig.test.json'), '--listFilesOnly'],
+      { cwd: ROOT, encoding: 'utf-8', timeout: 120_000 },
+    )
+    const files = (result.stdout ?? '').split('\n')
+    expect(result.error, 'tsc never ran, so the file list proves nothing').toBeUndefined()
+    expect(
+      files.some((f) => f.includes('.test.ts')),
+      'no test files in the program at all',
+    ).toBe(true)
+    expect(
+      files.filter((f) => f.includes('typecheck-canary')),
+      'the deliberately broken fixture is inside the real typecheck — CI can never be green',
+    ).toEqual([])
+  }, 120_000)
 })

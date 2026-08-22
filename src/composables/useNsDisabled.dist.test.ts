@@ -6,13 +6,22 @@ import { createApp, type Component, type Plugin } from 'vue'
 
 /**
  * `mod` members are `unknown` because the dist bundle is deliberately untyped
- * (see src/types/dist-bundle.d.ts), so each mount needs a cast. It must be
- * `as Component`, NOT `as never`: `never` collapses the props object to
- * `undefined`, and TypeScript then accepts literally any props — a misspelled
- * prop name included. That is a cast which disables the checking it looks like
- * it is doing. Story: componentLibrary-9ka.
+ * (see src/types/dist-bundle.d.ts), so every mount needs a cast.
+ *
+ * WHAT THE CAST DOES NOT DO: check prop names. `as Component` resolves its props
+ * generic to `any`, so `{ dense_TYPO: true }` typechecks clean — MEASURED, after
+ * an earlier version of this comment claimed the opposite. `as never` was no
+ * better: it forces the props object to `undefined`, which rejects every
+ * non-empty props object, correct spelling or not. That is why this file did not
+ * compile once tests were finally typechecked, and it is the only reason the
+ * cast changed.
+ *
+ * So prop typos here are caught by the RUNTIME assertion below, not by the
+ * compiler — a mistyped prop simply does not reach the component and the warning
+ * these tests look for never fires. Acceptable, because typing these mounts from
+ * source would defeat the file: it exists to observe the SHIPPED artefact, not
+ * what we meant to ship. Story: componentLibrary-9ka.
  */
-
 /**
  * The library's dev warnings must survive the build AND fire in a consumer's
  * browser. Those are different failures and this repo has shipped both.
