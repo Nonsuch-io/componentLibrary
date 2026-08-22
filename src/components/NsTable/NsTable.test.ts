@@ -142,8 +142,25 @@ describe('NsTable', () => {
   })
 
   describe('types', () => {
-    it('NsTableProps is equivalent to QTableProps', () => {
-      expectTypeOf<NsTableProps>().toEqualTypeOf<QTableProps>()
+    // WAS: expectTypeOf<NsTableProps>().toEqualTypeOf<QTableProps>() — FALSE
+    // since the day it was written. types.ts makes `rows` optional on purpose so
+    // consumers passing no rows still compile, so the two types are designed NOT
+    // to be equal. It never failed because nothing read it: vitest erases
+    // expectTypeOf at runtime unless `typecheck` is on (it is not), and tsconfig
+    // excluded *.test.ts from vue-tsc. Checked by neither. componentLibrary-9ka.
+    it('passes every QTable prop through unchanged, except rows', () => {
+      expectTypeOf<Omit<NsTableProps, 'rows'>>().toEqualTypeOf<Omit<QTableProps, 'rows'>>()
+    })
+
+    // The deliberate difference, asserted in BOTH directions. Stating only
+    // "optional here" would still pass if Quasar made it optional too, and the
+    // divergence we are documenting would have quietly stopped existing.
+    it('makes rows optional — the one intended divergence from QTable', () => {
+      type IsOptional<T, K extends keyof T> =
+        Record<string, never> extends Pick<T, K> ? true : false
+      expectTypeOf<IsOptional<NsTableProps, 'rows'>>().toEqualTypeOf<true>()
+      expectTypeOf<IsOptional<QTableProps, 'rows'>>().toEqualTypeOf<false>()
+      expectTypeOf<NsTableProps['rows']>().toEqualTypeOf<QTableProps['rows'] | undefined>()
     })
 
     it('NsTableColumn is equivalent to QTableColumn', () => {

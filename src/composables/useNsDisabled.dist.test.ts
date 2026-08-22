@@ -2,7 +2,16 @@ import { describe, it, expect, vi, afterEach, beforeAll } from 'vitest'
 import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { mount } from '@vue/test-utils'
-import { createApp, type Plugin } from 'vue'
+import { createApp, type Component, type Plugin } from 'vue'
+
+/**
+ * `mod` members are `unknown` because the dist bundle is deliberately untyped
+ * (see src/types/dist-bundle.d.ts), so each mount needs a cast. It must be
+ * `as Component`, NOT `as never`: `never` collapses the props object to
+ * `undefined`, and TypeScript then accepts literally any props — a misspelled
+ * prop name included. That is a cast which disables the checking it looks like
+ * it is doing. Story: componentLibrary-9ka.
+ */
 
 /**
  * The library's dev warnings must survive the build AND fire in a consumer's
@@ -71,7 +80,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
-    mount(mod.NsInput as never, { attrs: { disabled: true } })
+    mount(mod.NsInput as Component, { attrs: { disabled: true } })
     vi.unstubAllGlobals()
     const text = warn.mock.calls.flat().join(' ')
     warn.mockRestore()
@@ -93,7 +102,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
-    mount(mod.NsRadioButtons as never, {
+    mount(mod.NsRadioButtons as Component, {
       props: {
         options: [
           { label: 'A', value: 'a' },
@@ -153,7 +162,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
-    mount(mod.NsInput as never, { props: { dense: true, size: 'large' } })
+    mount(mod.NsInput as Component, { props: { dense: true, size: 'large' } })
     vi.unstubAllGlobals()
     const text = warn.mock.calls.flat().join(' ')
     warn.mockRestore()
@@ -173,7 +182,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
-    mount(mod.NsInput as never, { props: { size: 'huge' } })
+    mount(mod.NsInput as Component, { props: { size: 'huge' } })
     vi.unstubAllGlobals()
     const text = warn.mock.calls.flat().join(' ')
     warn.mockRestore()
@@ -194,7 +203,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
-    mount(mod.NsCheckbox as never, { attrs: { 'toggle-indeterminate': true } })
+    mount(mod.NsCheckbox as Component, { attrs: { 'toggle-indeterminate': true } })
     vi.unstubAllGlobals()
     const text = warn.mock.calls.flat().join(' ')
     warn.mockRestore()
@@ -225,7 +234,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
-    mount(mod.NsButton as never, { props: { iconOnly: true } })
+    mount(mod.NsButton as Component, { props: { iconOnly: true } })
     vi.unstubAllGlobals()
     const text = warn.mock.calls.flat().join(' ')
     warn.mockRestore()
@@ -244,7 +253,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
-    mount(mod.NsDialog as never, { props: { modelValue: true } })
+    mount(mod.NsDialog as Component, { props: { modelValue: true } })
     vi.unstubAllGlobals()
     const text = warn.mock.calls.flat().join(' ')
     warn.mockRestore()
@@ -263,7 +272,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
 
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     vi.stubGlobal('process', undefined)
-    mount(mod.NsImage as never, {})
+    mount(mod.NsImage as Component, {})
     vi.unstubAllGlobals()
     const text = warn.mock.calls.flat().join(' ')
     warn.mockRestore()

@@ -1,0 +1,26 @@
+{
+  // Test files are typechecked HERE, not in tsconfig.app.json, so the app/build
+  // projects keep emitting declarations from source alone.
+  //
+  // Before this existed, both tsconfigs excluded `src/**/*.test.ts`, so vue-tsc
+  // never opened a test file. `const x: number = "nope"` in a test passed
+  // `pnpm typecheck` clean — measured. That made every `@ts-expect-error` in a
+  // test inert, and hid a type assertion that had been false since it was
+  // written. Story: componentLibrary-9ka.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["vitest/globals"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src/**/*.test.ts", "src/**/*.d.ts", "test/**/*.ts", ".storybook/**/*.ts"],
+
+  // `src/**/*.stories.ts` is NOT here yet, and that is a known remaining hole
+  // rather than a decision that stories do not matter — they carry the a11y and
+  // interaction assertions. Adding them surfaces 11 errors, almost all
+  // Storybook's `args`-required typing rather than real defects, which is a
+  // different piece of work: componentLibrary-vtj.
+  "exclude": ["src/**/*.stories.ts", "test/fixtures/**"]
+}
