@@ -6,28 +6,10 @@ declare const process: { env: { NODE_ENV?: string } } | undefined
  * Resolves a control's disabled state, accepting Quasar's `disable` AND the
  * `disabled` spelling everyone actually reaches for.
  *
- * WHY THIS EXISTS. Quasar uses `disable` and never `disabled` — verified in its
- * types: 40 occurrences of `disable?:`, zero of `disabled?:`. Our wrappers spread
- * `$attrs`, so `disabled` falls through as a plain HTML attribute. Measured in a
- * real browser (componentLibrary-ob8):
- *
- *   <NsInput disabled />     input.disabled FALSE, no .disabled class, no aria-disabled
- *   <NsInput disable  />     input.disabled TRUE,  .disabled class,    aria-disabled="true"
- *
- * QInput/QCheckbox/QSelect render a wrapper div with the control nested inside,
- * so `disabled` lands on the wrapper where it means nothing and the inner control
- * stays LIVE. A form silently accepts input it was meant to refuse, with no
- * error, no warning and no type complaint. `disabled` is also what the Figma
- * variant is called, so the design system actively leads people to the spelling
- * that does nothing.
- *
- * NsButton is the mild case — QBtn renders a real `<button>`, so `disabled`
- * natively disables it and only Quasar's styling class is missed.
- *
- * WHY ALIAS RATHER THAN ONLY WARN. Silently doing nothing is the worst outcome;
- * a warning alone still leaves the control live for anyone not watching a
- * console. Aliasing makes the natural spelling correct, and the warning stops it
- * from spreading. That is ADR 0002 rule 2 — one system wins, loudly.
+ * `disabled` on QInput/QCheckbox/QSelect lands on the WRAPPER div and leaves the
+ * inner control live — a form silently accepts input it meant to refuse, with no
+ * error, warning or type complaint. Aliasing (not warning alone) is the fix,
+ * because a warning still leaves the control live. Story: componentLibrary-ob8.
  */
 const warned = new Set<string>()
 

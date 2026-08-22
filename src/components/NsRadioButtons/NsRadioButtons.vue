@@ -33,40 +33,27 @@ import { useNsDisabled } from '../../composables/useNsDisabled'
 declare const process: { env: { NODE_ENV?: string } } | undefined
 
 /**
- * NsRadioButtons — An accessible radio GROUP, wrapping individual Quasar
- * QRadio controls (see componentLibrary-zux for the browser-measured
- * evidence this is built from).
+ * NsRadioButtons — an accessible radio GROUP, rendering QRadio directly rather
+ * than QOptionGroup.
  *
- * Quasar's QOptionGroup (type="radio") renders role="radiogroup",
- * role="radio" per option and aria-checked, but measured in Chromium it does
- * NOT give the group an accessible name, does NOT give it one tab stop
- * (three options measured as three tab stops), and does NOT wire arrow-key
- * navigation at all. Setting `name` restores native grouping and checked
- * state but the focusable elements are Quasar's outer divs, not the native
- * inputs, so it never fixes the tab stops. This wrapper renders QRadio
- * directly (rather than QOptionGroup) so it can own tabindex on each option
- * and add the three things WAI-ARIA's radiogroup pattern requires and Quasar
- * does not provide:
+ * Measured in Chromium, QOptionGroup gives the group NO accessible name, NO
+ * single tab stop (three options measured as three stops) and NO arrow-key
+ * handling. This wrapper owns tabindex so it can add what WAI-ARIA's radiogroup
+ * pattern requires:
  *
- *  1. an accessible name — the rendered `label`, linked via aria-labelledby,
- *     or `aria-label` when the design calls for an unlabelled-but-named
- *     group.
- *  2. a shared `name` on the native inputs, auto-generated per instance when
- *     the consumer does not supply one, so groups on the same page never
- *     collide.
- *  3. roving tabindex + arrow keys: exactly one option is tabindex=0 (the
- *     selected option, or the first enabled option when none is selected);
- *     ArrowDown/ArrowRight move to the next option, ArrowUp/ArrowLeft to the
- *     previous, BOTH WRAPPING, and moving also SELECTS — the radiogroup
- *     pattern, unlike tabs. Disabled options are skipped. Home/End jump to
- *     the first/last enabled option as a bonus.
+ *  1. an accessible name — the rendered label via aria-labelledby, or aria-label
+ *  2. a shared `name`, auto-generated per instance so groups never collide
+ *  3. roving tabindex + arrow keys, wrapping, where moving also SELECTS (unlike
+ *     tabs). Exactly one option is tabindex=0 — the selected one, or the first
+ *     enabled when none is. Disabled options skipped; Home/End jump to first/last.
  *
- * NOT IMPLEMENTED, DELIBERATELY: Figma's "Associated Fields" variant (a
- * selected radio revealing dependent fields). That is progressive-disclosure
- * behaviour with no slot on QRadio/QOptionGroup to hang it from, and it
- * needs a design decision first — does the RADIO or the GROUP own the
- * revealed content? See componentLibrary-zux. Nothing here reserves an API
- * for it; add one once that question has an answer.
+ * Setting `name` on QOptionGroup does NOT fix the tab stops — the focusables are
+ * Quasar's outer divs, not the native inputs. That is the obvious simpler fix and
+ * it does not work.
+ *
+ * Figma's "Associated Fields" variant is deliberately absent — it needs a design
+ * decision first (does the radio or the GROUP own the revealed content?) and
+ * nothing here reserves an API for it. Story: componentLibrary-zux.
  */
 
 export interface NsRadioOption {
