@@ -67,7 +67,12 @@ The failure is SILENT and looks like success: the PR merges, CI is green, and th
 just stays open — where the author closes it by hand at session-close and erases the
 evidence. Measured 2026-08-22: of five merged PRs only one auto-closed, and only via a
 `Closes componentLibrary-057` body trailer. If a merged PR left its bead open, the title
-was wrong. Full rules in [AGENTS.md](AGENTS.md#git-conventions).
+was wrong — and the same extractor backs `pr_link`, so the bead also loses its PR link
+and branch metadata on the dev-portal board.
+
+Two traps worth knowing: a short id matches nothing, and the extractor has no markdown
+awareness, so a backtick-quoted close-trailer in a PR body is treated as a real
+directive. Full rules in [AGENTS.md](AGENTS.md#git-conventions).
 
 ## Independent review — before opening a PR, and after amending one
 

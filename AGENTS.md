@@ -387,6 +387,26 @@ The other four were closed manually and nobody noticed the webhook had never fir
 A body trailer (`Closes componentLibrary-057`) is a second, independent path and is
 worth adding — it also takes a full id, and it also rejects brackets.
 
+IT IS NOT ONLY THE CLOSE THAT BREAKS. `pr_link` imports the SAME extractor, so a title
+the regex cannot read also loses the PR/bead association and the `branch` metadata that
+the dev-portal board renders. `componentLibrary-yka` sat on the board with no PR on its
+card at all, while `switchboard-5gb3` showed `#160` and its branch — same board, same
+day, different title format. The bead was closed and looked fine; its provenance was
+simply gone, and nothing on the card said so.
+
+### Do not quote a close-trailer verbatim in a PR body
+
+The extractor has no markdown awareness — no code-span handling, no fence handling. A
+backtick-quoted example in prose is matched exactly like a real directive.
+
+This bit THIS VERY SECTION. PR #286 documented the convention, quoted a trailer as an
+example, and the extractor linked that bead to the docs PR — overwriting the link to the
+PR that actually did the work. The PR most likely to quote a trailer is the one
+documenting trailers, so the hazard is self-selecting.
+
+When writing about the convention, break the keyword-then-id adjacency: say "a
+close-trailer naming `componentLibrary-057`", never the two tokens in sequence.
+
 **Do not "fix" this by closing the bead yourself before checking.** If a merged PR left
 its bead open, the title was wrong; correct the habit rather than the symptom.
 
