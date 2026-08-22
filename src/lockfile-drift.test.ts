@@ -90,9 +90,17 @@ describe('installed packages match the lockfile (componentLibrary-yka)', () => {
       if (installed !== expected)
         drift.push(`${name}: installed ${installed}, lockfile ${expected}`)
     }
-    // EVERY locked dep, not "more than ten". A floor BOUNDS a blind spot; this
-    // closes it, because there is no exempt set for a package to quietly join.
-    expect(compared, 'not every locked dependency was compared').toBe(locked.size)
+    // A TRIPWIRE FOR A FUTURE EDIT, not active protection — and the previous
+    // comment here claimed otherwise. `compared` is incremented on both paths of
+    // the loop, so this equality is guaranteed by control flow and cannot fail
+    // today. What actually closes the blind spot is `drift.push` in the catch
+    // above: a package that cannot be read is REPORTED rather than skipped.
+    //
+    // Kept because it does catch one thing: someone reintroducing a bare
+    // `continue` without the increment, which is exactly how the exempt set got
+    // there the first time. Named honestly after review of PR #283 pointed out
+    // that this commit deleted one unfalsifiable assertion while adding another.
+    expect(compared, 'a loop path skipped the counter — see the note above').toBe(locked.size)
     expect(
       drift,
       'node_modules has drifted from pnpm-lock.yaml. CI installs --frozen-lockfile, ' +
