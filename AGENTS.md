@@ -356,8 +356,39 @@ Collect all findings from Steps 1–5 into this table:
 
 - **Branch naming:** `feat/<bead-id>-short-description`, `fix/<bead-id>-short-description`
 - **Commit messages:** Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`)
-- **Reference bead IDs** in commit messages: `feat: add NsFoo component (cl-8)`
 - **PR titles** should match the bead title
+
+### PR title: the bead id must be FULL and in PARENTHESES
+
+```
+feat(a11y): turn the axe gate on (componentLibrary-057)
+```
+
+Not `(057)`, not `[componentLibrary-057]`, not `cl-057`.
+
+**The merge webhook auto-closes the bead by regex-matching the title**, and the pattern
+is `\(({ID}...)\)` where `ID = [a-z][a-z0-9]*-[a-z0-9]+`. Each rejected form fails for
+its own reason, which is why this is worth spelling out:
+
+| form                     | outcome                                                         |
+| ------------------------ | --------------------------------------------------------------- |
+| `(componentLibrary-057)` | closes                                                          |
+| `(057)`                  | **no match** — no prefix, no hyphen, and it starts with a digit |
+| `[componentLibrary-057]` | **no match** — the pattern requires literal parens              |
+| `(cl-057)`               | matches the regex, then the known-prefix filter **discards it** |
+
+WHY THIS WENT UNNOTICED FOR FIVE PRs: the failure is silent and looks exactly like
+success. The PR merges, CI is green, and the only symptom is a bead that stays open —
+which the author then closes by hand as part of the normal session-close checklist,
+erasing the evidence. Measured 2026-08-22: of PRs #276/#277/#279/#281/#283, only #281
+auto-closed, and only because its BODY carried a `Closes componentLibrary-057` trailer.
+The other four were closed manually and nobody noticed the webhook had never fired.
+
+A body trailer (`Closes componentLibrary-057`) is a second, independent path and is
+worth adding — it also takes a full id, and it also rejects brackets.
+
+**Do not "fix" this by closing the bead yourself before checking.** If a merged PR left
+its bead open, the title was wrong; correct the habit rather than the symptom.
 
 <!-- BEGIN BEADS INTEGRATION v:1 profile:minimal hash:7510c1e2 -->
 
