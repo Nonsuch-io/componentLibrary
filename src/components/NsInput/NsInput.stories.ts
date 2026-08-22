@@ -45,10 +45,16 @@ export const WithValidation: Story = {
   },
 }
 
+/**
+ * No VISIBLE label — but still a named control. An input with neither announces
+ * as "edit text" and nothing else, which is a different thing from having no
+ * visible label (componentLibrary-057).
+ */
 export const NoLabel: Story = {
   args: {
     label: undefined,
-  },
+    'aria-label': 'Search',
+  } as Story['args'],
 }
 
 /**

@@ -1,6 +1,6 @@
 import { describe, it, expect, expectTypeOf } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { h } from 'vue'
+import { defineComponent, h } from 'vue'
 import type { QTableColumn, QTableProps } from 'quasar'
 import NsTable from './NsTable.vue'
 import NsTableCell from '../NsTableCell/NsTableCell.vue'
@@ -212,5 +212,66 @@ describe('NsTable', () => {
       })
       expect(wrapper.find('.q-table__container').attributes('aria-label')).toBe('Test label')
     })
+  })
+})
+
+/**
+ * componentLibrary-057. NsTable always declares a `#loading` slot, which
+ * PERMANENTLY suppresses QTable's native indicator (QTable.js:704). Review showed
+ * that replacing the default with an empty slot kept 18 unit tests and all 5
+ * story axe checks green — axe passes on nothing rendered. So a regression here
+ * would leave consumers with no loading indicator at all, silently.
+ */
+describe('NsTable loading indicator', () => {
+  const columns = [{ name: 'a', label: 'A', field: 'a' }]
+
+  it('RENDERS a named indicator while loading — not nothing', () => {
+    const wrapper = mount(NsTable, { props: { rows: [], columns, loading: true } })
+    const bar = wrapper.find('.ns-table__loading')
+    expect(bar.exists(), 'no loading indicator rendered — QTable’s native one is suppressed').toBe(
+      true,
+    )
+    expect(bar.attributes('role')).toBe('progressbar')
+    expect(bar.attributes('aria-label')).toBe('Loading')
+  })
+
+  it('renders nothing when not loading', () => {
+    const wrapper = mount(NsTable, { props: { rows: [], columns, loading: false } })
+    expect(wrapper.find('.ns-table__loading').exists()).toBe(false)
+  })
+
+  it('uses loadingLabel when given, so the name is not a hardcoded literal', () => {
+    const wrapper = mount(NsTable, {
+      props: { rows: [], columns, loading: true, loadingLabel: 'Fetching sessions' },
+    })
+    expect(wrapper.find('.ns-table__loading').attributes('aria-label')).toBe('Fetching sessions')
+  })
+
+  it("a consumer's own loading slot still wins", () => {
+    const wrapper = mount(NsTable, {
+      props: { rows: [], columns, loading: true },
+      slots: { loading: '<div class="mine">Custom</div>' },
+    })
+    expect(wrapper.find('.mine').exists()).toBe(true)
+    expect(wrapper.find('.ns-table__loading').exists()).toBe(false)
+  })
+
+  it('forwards a slot added AFTER mount — the forwarder must re-read $slots', async () => {
+    // A computed over useSlots() caches forever, so a `v-if`-guarded slot never
+    // appeared. Measured in review against a consumer template.
+    const harness = defineComponent({
+      components: { NsTable },
+      props: { show: { type: Boolean, default: false } },
+      setup: () => ({ cols: columns }),
+      template: `
+        <NsTable :rows="[]" :columns="cols">
+          <template v-if="show" #top><div class="late">Late</div></template>
+        </NsTable>
+      `,
+    })
+    const wrapper = mount(harness, { props: { show: false } })
+    expect(wrapper.find('.late').exists()).toBe(false)
+    await wrapper.setProps({ show: true })
+    expect(wrapper.find('.late').exists(), 'a slot added after mount never rendered').toBe(true)
   })
 })
