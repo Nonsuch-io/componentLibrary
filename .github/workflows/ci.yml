@@ -5,10 +5,23 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+    # `ready_for_review` is NOT in the default type list
+    # ([opened, synchronize, reopened]). Without it, the draft guard below would
+    # skip CI while the PR is a draft AND still skip it when the PR is marked
+    # ready, because leaving draft would fire no event this workflow listens for
+    # — a ready PR with no checks at all, which reads as a working config.
+    # Both halves are load-bearing. componentLibrary-x3w.
+    types: [opened, synchronize, reopened, ready_for_review]
 
 jobs:
   ci:
     name: Lint, Type-check, Test, Build
+    # Drafts are work in progress; a full lint/typecheck/test/build/storybook/
+    # coverage/size run on every push to one is wasted. `push` events carry no
+    # pull_request context, so the event_name check comes first — without it,
+    # `github.event.pull_request.draft` is null on pushes to main and the whole
+    # expression is false, which would silently disable CI on the default branch.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     runs-on: ubuntu-latest
 
     steps:
