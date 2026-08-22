@@ -8,30 +8,19 @@
 import { computed, useAttrs } from 'vue'
 
 /**
- * NsBadge — A styled wrapper around Quasar's QBadge.
+ * NsBadge — styled wrapper around QBadge.
  *
- * Figma specifies NINE colours (Badges page, node 4451:1602): Primary,
- * Secondary, Accent, Positive, Negative, Info, Warning, Ghost and Neutral.
- * Quasar's palette has seven of them — it has no `ghost` and no `neutral`.
+ * Figma specifies NINE colours; Quasar's palette has seven. `ghost` and `neutral`
+ * fell through and emitted `.bg-ghost` / `.bg-neutral`, which match no CSS
+ * anywhere — they rendered unstyled with no error, warning or type complaint.
+ * Those two are handled here; everything else passes through untouched.
  *
- * SO TWO OF THE NINE FAILED SILENTLY (componentLibrary-mwe). `color` fell
- * through to Quasar, which emits a `.bg-<name>` class; `.bg-ghost` and
- * `.bg-neutral` match no CSS anywhere, so those badges rendered UNSTYLED with no
- * error, no warning and no type complaint. `--ns-color-status-neutral` existed
- * in all three theme blocks the whole time and the component could not reach it.
- *
- * WHY THIS IS NOT A STRICT UNION, which ADR 0002 rule 2 would otherwise suggest.
- * Measured against the only consumer before choosing: 104 `<ns-badge>` sites, of
- * which 62 pass a BOUND `:color` and 11 use Quasar palette names Figma has no
- * opinion about (`grey`, `grey-4`, `grey-7`, `orange`, `green`, `blue`). A union
- * of the nine Figma names would break roughly 73 of 104 — the same mistake as
- * the first draft of componentLibrary-nbr, where a `never` guard would have
- * turned 89 circular buttons square.
- *
- * The defect is narrow, so the fix is narrow: handle the two values Quasar
- * cannot, pass everything else through exactly as before. Nothing breaks, and
- * `ghost`/`neutral` start working. Whether the vocabulary should eventually be
- * locked down belongs with nbr, not here.
+ * NOT a strict union, despite ADR 0002 rule 2: of the consumer's 104 call sites,
+ * 11 use Quasar palette names Figma has no opinion about (grey-4, orange) and
+ * would break UNCONDITIONALLY; 62 more pass a bound `:color`.
+ * `inheritAttrs: false` is required — Vue applies $attrs to the root IN ADDITION
+ * to an explicit v-bind, which would re-emit the class we just withheld.
+ * Story: componentLibrary-mwe.
  */
 
 /** The two Figma colours Quasar has no equivalent for. */

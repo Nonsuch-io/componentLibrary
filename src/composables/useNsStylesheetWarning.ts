@@ -1,31 +1,12 @@
 declare const process: { env: { NODE_ENV?: string } } | undefined
 
 /**
- * Dev-only, warn-once check that the library's own stylesheet was actually
- * loaded by the consumer.
+ * Dev-only, warn-once: the consumer never imported our `style.css`.
  *
- * WHY THIS EXISTS (componentLibrary-07u). butiq's storefront and homepage
- * NEVER imported `@nonsuch/component-library/style.css`. Every Ns component
- * in those apps rendered without its own CSS for months and nothing warned,
- * nothing failed — jsdom has no cascade, so no test could see it either.
- *
- * It stayed invisible because most components WRAP a Quasar one and borrow
- * `quasar.css`, which the consumer DID load — so 33 of 34 components used
- * still had most of their rules. `NsBreadcrumbs` was such a wrapper until it
- * was rewritten as custom nav/ol markup; the moment it stopped borrowing, it
- * had nothing, and a breadcrumb rendered as a bare numbered list on a live
- * page. See ADR 0002.
- *
- * THE SENTINEL. `:root { --ns-styles-loaded: 1 }` ships from a component's
- * (unscoped — see NsThemeProvider.vue) style block, so it lands in the built
- * `dist/nonsuch-components.css`. If a consumer's page resolves that custom
- * property, the stylesheet is loaded. If it does not, it isn't — regardless
- * of which components happen to look "almost right" because they borrow
- * Quasar's styling.
- *
- * WHERE THIS IS CALLED FROM matters: `createNonsuch()`, not per-component.
- * That is the one place every consumer already calls, once, on install — so
- * this fires (at most) once per app rather than once per mounted component.
+ * Detected via the `--ns-styles-loaded` sentinel, NOT by eyeballing components —
+ * most wrap a Quasar one and borrow `quasar.css`, so "looks almost right" is not
+ * evidence. MUST be called from `createNonsuch()`, not per-component, so it
+ * fires once per app. Story: componentLibrary-07u.
  */
 const SENTINEL_PROPERTY = '--ns-styles-loaded'
 

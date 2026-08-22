@@ -25,6 +25,38 @@ pnpm dev
 
 Storybook will open at [http://localhost:6006](http://localhost:6006). This is where you'll see your components rendered live as you work.
 
+## When a local result is not evidence
+
+Two things make a green (or red) local run say nothing about CI. Both have cost
+real time here, so check them before drawing a conclusion.
+
+**Your `node_modules` can drift from the lockfile.** CI installs with
+`--frozen-lockfile`; your tree is whatever you last installed. In August a local
+tree held quasar 2.23.1 while the lockfile pinned 2.24.0 — a full day of local
+runs tested a different Quasar than CI, including four design decisions settled by
+reading `node_modules` source and quoting line numbers as evidence. A test now
+fails on this (`src/lockfile-drift.test.ts`), but the habit matters more:
+
+```bash
+pnpm install --frozen-lockfile   # after every pull, and before trusting a result
+```
+
+Never quote `node_modules` source as evidence without checking the installed
+version first.
+
+**Storybook results are unreliable under memory pressure.** The browser project
+runs real Chromium. With swap exhausted, individual story files have taken 98-112
+seconds against a ~21s whole-suite baseline, producing timeouts that look exactly
+like real failures. Before believing a local storybook failure:
+
+```bash
+free -m     # swap full? discard the run rather than interpret it
+uptime
+```
+
+CI is the authority for the storybook project. A local failure there means
+"check CI", not "something is broken".
+
 ## How This Library Works
 
 We build on top of [Quasar](https://quasar.dev) — a popular Vue component framework. Our library **wraps** Quasar components with Nonsuch-specific defaults and styles. We prefix ours with `Ns` (so Quasar's `QBtn` becomes our `NsButton`).
