@@ -171,9 +171,25 @@ describe('NsTable', () => {
         | 'selected'
         | 'filter'
         | 'title'
-      // never (not false) when a name is gone, so the failure names the type.
-      type Survives = ReliedUpon extends keyof QTableProps ? true : never
-      expectTypeOf<Survives>().toEqualTypeOf<true>()
+      // `Exclude` rather than the more obvious
+      // `ReliedUpon extends keyof QTableProps ? true : never`, because that
+      // conditional only stays strict while `ReliedUpon` is a type ALIAS. Lift it
+      // into a generic helper (`type Has<K> = K extends ... ? ...`) and it
+      // distributes over the union: partial failures collapse to `true | never`
+      // = `true` and the check goes silently vacuous. This assertion is on its
+      // THIRD attempt — one false, one tautological — so it is worth using the
+      // form with no distribution hazard to reintroduce.
+      type Missing = Exclude<ReliedUpon, keyof QTableProps>
+
+      // BOTH LINES, for one reason: diagnostics. expectTypeOf fails with
+      // "Expected 1 arguments, but got 0", which names nothing — review expected
+      // it to report the missing key and it does not, measured. The assignment
+      // below fails with `Type '"hidePagination"' is not assignable to type
+      // 'never'`, naming the prop Quasar took. Keep the first for consistency
+      // with this file, the second so the failure is readable.
+      expectTypeOf<Missing>().toEqualTypeOf<never>()
+      const _namesTheMissingProp: never = null as unknown as Missing
+      void _namesTheMissingProp
     })
 
     // The one intended divergence, asserted in BOTH directions. Only the
