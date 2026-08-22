@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.31.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.0...v0.31.1) (2026-08-22)
+
+
+### Bug Fixes
+
+* **deps:** the drift guard was blind to the only runtime dependency (yka) ([fbbae0d](https://github.com/Nonsuch-io/componentLibrary/commit/fbbae0d2d09bf86fd213c7c0a5b3eec6ab30fb75))
+
 ## [0.31.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.30.5...v0.31.0) (2026-08-21)
 
 
