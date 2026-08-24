@@ -8,11 +8,19 @@ pnpm-lock.yaml
 .beads
 CHANGELOG.md
 
-# Isolated reviewer worktrees — full copies of this repo inside it. Not a
-# theoretical exposure: `prettier --check .` walks them, and it passes today
-# only because those copies happen to be conformant. A reviewer mid-edit would
-# fail format:check on the MAIN checkout, with no cause visible in the diff.
+# Isolated reviewer worktrees — full copies of this repo inside it.
 #
-# NOT the whole of `.claude/`: settings.json, the agent briefs and the skills
-# are tracked and were being checked. Ignoring the parent hid them.
+# BELT AND BRACES, NOT LOAD-BEARING, and the distinction is the point. Prettier 3
+# already honours .gitignore, which has carried `.claude/worktrees/` since
+# 2026-08-05, so prettier was NEVER walking these — only eslint was, because
+# eslint does not read .gitignore. An earlier version of this comment claimed
+# prettier "passes today only because those copies happen to be conformant".
+# That was an inference stated as a measurement; removing this line and planting
+# a malformed file in a live worktree leaves format:check clean.
+#
+# Kept anyway: it decouples prettier from future .gitignore edits, and someone
+# pruning that file would be thinking about git, not about formatting.
+#
+# NOT the whole of `.claude/`: settings.json, the agent briefs and the skills are
+# tracked and were being checked. Ignoring the parent hid them. componentLibrary-o0n.
 .claude/worktrees/
