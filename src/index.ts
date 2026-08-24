@@ -107,6 +107,9 @@ export type { NsIconProps } from './components/NsIcon/NsIcon.vue'
 export { default as NsImage } from './components/NsImage/NsImage.vue'
 export type { NsImageProps } from './components/NsImage/NsImage.vue'
 
+export { default as NsBrandLogo } from './components/NsBrandLogo/NsBrandLogo.vue'
+export type { NsBrandLogoProps } from './components/NsBrandLogo/NsBrandLogo.vue'
+
 export { default as NsInnerLoading } from './components/NsInnerLoading/NsInnerLoading.vue'
 export type { NsInnerLoadingProps } from './components/NsInnerLoading/NsInnerLoading.vue'
 

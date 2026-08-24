@@ -160,7 +160,45 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(11) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt)
+    ).toBe(13) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name)
+  })
+
+  it("warns for NsBrandLogo's missing box from the built bundle", async () => {
+    // Without `ratio` or `height`, QImg reserves a 16:9 box no brand lockup has,
+    // and the logo renders in dead space until the asset loads. Silent in a
+    // browser is exactly the failure this file exists for.
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsBrandLogo as Component, { props: { src: 'logo.svg', alt: 'Acme', width: 72 } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the NsBrandLogo sizing warning did not fire with `process` undefined — it is ' +
+        'dead in every consumer browser, whatever the unit tests say',
+    ).toContain('has neither `ratio` nor `height`')
+  })
+
+  it("warns for NsBrandLogo's unnamed link from the built bundle", async () => {
+    // A separate guard from the sizing one, so the pinned count above moved by
+    // two. Both need their own mount: the count cannot tell a fail-closed guard
+    // from a working one.
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsBrandLogo as Component, { props: { src: 'logo.svg', ratio: 2.6, href: '/' } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the NsBrandLogo link-name warning did not fire with `process` undefined — it ' +
+        'is dead in every consumer browser, whatever the unit tests say',
+    ).toContain('has `href` but no `alt`')
   })
 
   it("warns for NsInput's dense+size conflict too, from the built bundle", async () => {

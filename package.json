@@ -66,7 +66,7 @@
       "name": "full library (gzip)",
       "path": "dist/nonsuch-components.js",
       "import": "*",
-      "limit": "22.5 kB",
+      "limit": "22.75 kB",
       "gzip": true,
       "ignore": [
         "vue",
@@ -79,6 +79,18 @@
       "path": "dist/nonsuch-components.js",
       "import": "{ NsButton }",
       "limit": "2.75 kB",
+      "gzip": true,
+      "ignore": [
+        "vue",
+        "quasar",
+        "@phosphor-icons/vue"
+      ]
+    },
+    {
+      "name": "single component: NsBrandLogo (must not pull more than NsImage)",
+      "path": "dist/nonsuch-components.js",
+      "import": "{ NsBrandLogo }",
+      "limit": "2 kB",
       "gzip": true,
       "ignore": [
         "vue",
