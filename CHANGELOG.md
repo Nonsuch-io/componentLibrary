@@ -4,6 +4,15 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.31.3](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.2...v0.31.3) (2026-08-24)
+
+
+### Bug Fixes
+
+* **lint:** narrow the ignore to worktrees/ (componentLibrary-o0n) ([085bbce](https://github.com/Nonsuch-io/componentLibrary/commit/085bbcecabc3b880dd58cc47623958b3c86d853f))
+* **lint:** stop linting agent worktrees inside the repo (componentLibrary-o0n) ([91bbe91](https://github.com/Nonsuch-io/componentLibrary/commit/91bbe91b0fe9464d9d2af5dd5d9cee53bb370b48))
+* **lint:** stop linting agent worktrees inside the repo (componentLibrary-o0n) ([6bcabe8](https://github.com/Nonsuch-io/componentLibrary/commit/6bcabe806d7387ce1fa13ca5809962853310d45c))
+
 ## [0.31.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.1...v0.31.2) (2026-08-24)
 
 
