@@ -110,14 +110,26 @@ describe('NsBrandLogo', () => {
       expect(wrapper.find('img').attributes('style')).toContain('object-fit: cover')
     })
 
-    it('should keep passthrough attributes off the anchor', () => {
-      // The anchor is navigation; the attrs belong to the image it wraps.
+    it('should route layout and selector attrs to the anchor when linked', () => {
+      // The anchor is the element that participates in the CONSUMER'S layout —
+      // it is what sits in NsSiteHeader's logo slot. A utility class aimed at
+      // positioning the link is inert one level down on the image.
       const wrapper = mount(NsBrandLogo, {
         props: { ...sized, href: '/' },
-        attrs: { 'data-testid': 'brand' },
+        attrs: { 'data-testid': 'brand', id: 'logo-link', class: 'ml-auto' },
       })
-      expect(wrapper.attributes('data-testid')).toBeUndefined()
-      expect(wrapper.find('a [data-testid="brand"]').exists()).toBe(true)
+      expect(wrapper.attributes('data-testid')).toBe('brand')
+      expect(wrapper.attributes('id')).toBe('logo-link')
+      expect(wrapper.classes()).toContain('ml-auto')
+    })
+
+    it('should keep QImg attrs on the image, not the anchor', () => {
+      const wrapper = mount(NsBrandLogo, {
+        props: { ...sized, href: '/' },
+        attrs: { fit: 'cover' },
+      })
+      expect(wrapper.attributes('fit')).toBeUndefined()
+      expect(wrapper.find('a img').attributes('style')).toContain('object-fit: cover')
     })
   })
 
@@ -147,6 +159,33 @@ describe('NsBrandLogo', () => {
         attrs: { 'aria-hidden': 'true' },
       })
       expect(wrapper.attributes('aria-label')).toBe('Acme')
+      // ASSERTS THE INNER IMAGE TOO. Checking only the anchor's own binding was
+      // trivially true: it is bound from `alt` and cannot be affected by attrs
+      // forwarding at all, so the test could not fail in the direction it named.
+      expect(wrapper.find('[role="img"]').attributes('aria-hidden')).toBe('true')
+    })
+
+    it('should hide the inner image from assistive tech when linked', () => {
+      // The anchor already carries the name. Leaving the nested role="img" named
+      // too announces the brand TWICE as two separate accessible objects — and it
+      // does so for the exact call pattern the stories recommend.
+      const wrapper = mount(NsBrandLogo, { props: { ...sized, href: '/' } })
+      expect(wrapper.find('[role="img"]').attributes('aria-hidden')).toBe('true')
+    })
+
+    it('should not hide the image when it is not a link', () => {
+      // Unlinked, the image IS the accessible object — hiding it would erase the
+      // logo from the accessibility tree entirely.
+      const wrapper = mount(NsBrandLogo, { props: sized })
+      expect(wrapper.find('[role="img"]').attributes('aria-hidden')).toBeUndefined()
+    })
+
+    it('should let a consumer un-hide the inner image when linked', () => {
+      const wrapper = mount(NsBrandLogo, {
+        props: { ...sized, href: '/' },
+        attrs: { 'aria-hidden': 'false' },
+      })
+      expect(wrapper.find('[role="img"]').attributes('aria-hidden')).toBe('false')
     })
 
     it('should warn when a linked logo has no accessible name', () => {

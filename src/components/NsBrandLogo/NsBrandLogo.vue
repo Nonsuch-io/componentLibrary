@@ -1,5 +1,11 @@
 <template>
-  <a v-if="href" :href="href" :aria-label="alt" class="ns-brand-logo ns-brand-logo--link">
+  <a
+    v-if="href"
+    :href="href"
+    :aria-label="alt"
+    v-bind="anchorAttrs"
+    class="ns-brand-logo ns-brand-logo--link"
+  >
     <ns-image v-bind="imageBindings" class="ns-brand-logo__image" />
   </a>
   <ns-image v-else v-bind="imageBindings" class="ns-brand-logo ns-brand-logo__image" />
@@ -58,14 +64,41 @@ const props = withDefaults(defineProps<NsBrandLogoProps>(), {
   href: undefined,
 })
 
-// Attrs belong to the IMAGE, not to the anchor. `ratio`, `fit` and `aria-hidden`
-// are all QImg concerns, and an anchor is the one element here that must not
-// collect them. inheritAttrs must therefore be off in BOTH branches, not just the
-// linked one: Vue applies $attrs to the root automatically in addition to any
-// explicit v-bind, so leaving it on would double-apply them to the unlinked root.
+// inheritAttrs is off in BOTH branches, not just the linked one: Vue applies
+// $attrs to the root automatically IN ADDITION to any explicit v-bind, so leaving
+// it on would double-apply them to the unlinked root — the same duplicate-class
+// bug NsImage still has (it v-binds $attrs AND lets Vue inherit them), filed as
+// componentLibrary-bnw.
 defineOptions({ inheritAttrs: false })
 
 const attrs = useAttrs()
+
+/**
+ * WHICH ELEMENT AN ATTR BELONGS TO, WHEN THERE ARE TWO.
+ *
+ * Unlinked, the image is the root and everything lands on it. Linked, there are
+ * two candidates and the split is not cosmetic:
+ *
+ *   anchor  `class`, `style`, `id`, `data-*` — the anchor is the element that sits
+ *           in the consumer's layout (NsSiteHeader's `logo` slot, say) and the one
+ *           an e2e selector means. A utility class aimed at positioning the link is
+ *           simply inert one level down on the image.
+ *   image   everything else — `ratio`, `fit`, `loading`, `aria-*` are QImg's
+ *           concerns. `aria-hidden` especially: on the anchor it would hide the
+ *           whole link, which is never what a decorative-logo consumer means.
+ */
+const isAnchorAttr = (key: string) =>
+  key === 'class' || key === 'style' || key === 'id' || key.startsWith('data-')
+
+const anchorAttrs = computed(() =>
+  Object.fromEntries(Object.entries(attrs).filter(([key]) => isAnchorAttr(key))),
+)
+
+const imageAttrs = computed(() =>
+  props.href === undefined
+    ? attrs
+    : Object.fromEntries(Object.entries(attrs).filter(([key]) => !isAnchorAttr(key))),
+)
 
 /** QImg types `width`/`height` as String, so a number would trip a Vue prop-type
  *  warning and be dropped. Accepting a number and converting is the ergonomic
@@ -94,9 +127,21 @@ const imageBindings = computed(() => ({
   noSpinner: true,
   noTransition: true,
 
-  // LAST, so a consumer's attrs win over the defaults above — `fit="cover"` on a
-  // call site that genuinely wants a cropped mark still works.
-  ...attrs,
+  /**
+   * LINKED, THE IMAGE IS HIDDEN FROM ASSISTIVE TECH — the anchor already carries
+   * the name. QImg renders `<div role="img" aria-label={alt}>`, so without this the
+   * anchor and its own descendant both announce the brand: two accessible objects,
+   * one logo, in exactly the call pattern the stories recommend.
+   *
+   * This cannot make a link anonymous. If `alt` is absent the anchor had no name to
+   * lose — the image's was equally absent — and that case warns separately below.
+   */
+  'aria-hidden': props.href !== undefined ? 'true' : undefined,
+
+  // LAST, so a consumer's attrs win over every default above — `fit="cover"` on a
+  // call site that genuinely wants a cropped mark still works, as does
+  // `aria-hidden="false"` to put the image back in the tree.
+  ...imageAttrs.value,
 }))
 
 /**
@@ -139,8 +184,12 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   let warned = false
   watchEffect(() => {
     if (warned) return
-    // Reads the resolved bindings, not the props, so a `ratio` or `height` arriving
-    // through $attrs counts. Checking props alone cried wolf at a correct call site.
+    // Reads the RESOLVED bindings rather than the props. Today that is the same
+    // check — `ratio` and `height` are declared props, so Vue routes them there and
+    // they can never arrive through $attrs — but it stays correct if either is ever
+    // moved off the prop surface. (An earlier comment here claimed attrs could
+    // already carry them and that props alone cried wolf; review measured that and
+    // it was wrong.)
     const bindings = imageBindings.value
     if (bindings.ratio !== undefined || bindings.height !== undefined) return
     warned = true
@@ -163,10 +212,19 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   &--link
     display: inline-flex
     align-items: center
+    justify-content: center
     // An anchor is inline by default, which adds descender space under the logo
     // and misaligns it against sibling header actions.
     text-decoration: none
     color: inherit
+
+    // AGENTS.md: interactive elements must be at least 44x44 on mobile. The logo
+    // link is the one interactive element here, and it is sized by its image —
+    // the header lockup this component exists for is 72x27, which is 17px short.
+    // The flex centring above keeps the smaller image centred in the larger hit
+    // box, so the target grows without the logo appearing to move.
+    min-width: var(--ns-touch-target)
+    min-height: var(--ns-touch-target)
 
     &:focus-visible
       outline: 2px solid var(--ns-color-border-focus, currentColor)
