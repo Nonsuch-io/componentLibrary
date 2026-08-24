@@ -53,6 +53,27 @@ bd close <id>         # Complete work
 
 <!-- END BEADS INTEGRATION -->
 
+## PR titles: the bead id must be FULL and in PARENTHESES
+
+```
+feat(a11y): turn the axe gate on (componentLibrary-057)
+```
+
+Not `(057)`, not `[componentLibrary-057]`. The merge webhook auto-closes the bead by
+matching `\(({ID})\)` in the title, where `ID = [a-z][a-z0-9]*-[a-z0-9]+` — so a short
+id has no prefix and no hyphen and matches nothing, and brackets are not parens.
+
+The failure is SILENT and looks like success: the PR merges, CI is green, and the bead
+just stays open — where the author closes it by hand at session-close and erases the
+evidence. Measured 2026-08-22: of five merged PRs only one auto-closed, and only via a
+`Closes componentLibrary-057` body trailer. If a merged PR left its bead open, the title
+was wrong — and the same extractor backs `pr_link`, so the bead also loses its PR link
+and branch metadata on the dev-portal board.
+
+Two traps worth knowing: a short id matches nothing, and the extractor has no markdown
+awareness, so a backtick-quoted close-trailer in a PR body is treated as a real
+directive. Full rules in [AGENTS.md](AGENTS.md#git-conventions).
+
 ## Independent review — before opening a PR, and after amending one
 
 **Before opening a PR that touches non-test source, dispatch an `independent-reviewer` against the branch, run as a DIFFERENT model from the author.** A requirement, not a judgement call (background is fine). "Low risk / small / just a prop rename / my tests pass" are **not** skip reasons — they are the author's assessment of the author's own work, which is exactly what the review checks. To skip, get the operator's agreement; never skip silently.
