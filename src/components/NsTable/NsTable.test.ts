@@ -142,8 +142,66 @@ describe('NsTable', () => {
   })
 
   describe('types', () => {
-    it('NsTableProps is equivalent to QTableProps', () => {
-      expectTypeOf<NsTableProps>().toEqualTypeOf<QTableProps>()
+    // NsTableProps CANNOT DETECT QUASAR DRIFT, and no assertion routed through it
+    // can. types.ts defines it AS `Omit<QTableProps,'rows'> & { rows?: ... }`, so
+    // `Omit<NsTableProps,'rows'>` and `Omit<QTableProps,'rows'>` are the same type
+    // by construction — comparing them is algebra, not a test.
+    //
+    // This file has now shipped two bad versions of that idea. The original
+    // asserted NsTableProps EQUALS QTableProps, which was false from the day it
+    // was written (`rows` is optional here on purpose) and never failed because
+    // nothing typechecked tests. Its replacement was tautological instead: review
+    // renamed a Quasar prop and vue-tsc still exited 0. Both looked like coverage.
+    //
+    // So the drift check below does NOT go through NsTableProps. It is a literal
+    // list of the props this component actually relies on, checked against
+    // Quasar's own keys — independent of our derivation, and it fails if Quasar
+    // renames or removes any of them. componentLibrary-9ka.
+    it('still has the QTable props NsTable is built on', () => {
+      type ReliedUpon =
+        | 'rows'
+        | 'columns'
+        | 'rowKey'
+        | 'loading'
+        | 'flat'
+        | 'bordered'
+        | 'hidePagination'
+        | 'pagination'
+        | 'selection'
+        | 'selected'
+        | 'filter'
+        | 'title'
+      // `Exclude` rather than the more obvious
+      // `ReliedUpon extends keyof QTableProps ? true : never`, because that
+      // conditional only stays strict while `ReliedUpon` is a type ALIAS. Lift it
+      // into a generic helper (`type Has<K> = K extends ... ? ...`) and it
+      // distributes over the union: partial failures collapse to `true | never`
+      // = `true` and the check goes silently vacuous. This assertion is on its
+      // THIRD attempt — one false, one tautological — so it is worth using the
+      // form with no distribution hazard to reintroduce.
+      type Missing = Exclude<ReliedUpon, keyof QTableProps>
+
+      // BOTH LINES, for one reason: diagnostics. expectTypeOf fails with
+      // "Expected 1 arguments, but got 0", which names nothing — review expected
+      // it to report the missing key and it does not, measured. The assignment
+      // below fails with `Type '"hidePagination"' is not assignable to type
+      // 'never'`, naming the prop Quasar took. Keep the first for consistency
+      // with this file, the second so the failure is readable.
+      expectTypeOf<Missing>().toEqualTypeOf<never>()
+      const _namesTheMissingProp: never = null as unknown as Missing
+      void _namesTheMissingProp
+    })
+
+    // The one intended divergence, asserted in BOTH directions. Only the
+    // QTableProps half is real drift detection — the NsTableProps half restates
+    // types.ts — but it is kept because it fails if Quasar ever makes `rows`
+    // optional too and the divergence we document stops existing.
+    it('makes rows optional — the one intended divergence from QTable', () => {
+      type IsOptional<T, K extends keyof T> =
+        Record<string, never> extends Pick<T, K> ? true : false
+      expectTypeOf<IsOptional<NsTableProps, 'rows'>>().toEqualTypeOf<true>()
+      expectTypeOf<IsOptional<QTableProps, 'rows'>>().toEqualTypeOf<false>()
+      expectTypeOf<NsTableProps['rows']>().toEqualTypeOf<QTableProps['rows'] | undefined>()
     })
 
     it('NsTableColumn is equivalent to QTableColumn', () => {

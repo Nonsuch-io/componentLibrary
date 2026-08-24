@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { nextTick, defineComponent, h } from 'vue'
-import NsDialog from './NsDialog.vue'
+import NsDialog, { type NsDialogProps } from './NsDialog.vue'
 
 // Stubs for template branch coverage
 const QDialogStub = defineComponent({
@@ -405,7 +405,12 @@ describe('NsDialog accessible name', () => {
     wrapper.unmount()
   })
 
-  it.each([
+  // Annotated, not inferred. TypeScript widens the two literals to a UNION, and
+  // a union is not assignable to `props` — so this only compiled while test
+  // files were excluded from typecheck (componentLibrary-9ka). The annotation
+  // also means a prop renamed on the component fails HERE, which is the whole
+  // point of naming NsDialogProps rather than casting the array.
+  it.each<[string, NsDialogProps]>([
     ['title', { modelValue: true, title: 'Named' }],
     ['aria-label', { modelValue: true, ariaLabel: 'Named' }],
   ])('does not warn when named by %s', async (_l, props) => {
