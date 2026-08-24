@@ -7,3 +7,9 @@ pnpm-lock.yaml
 *.tsbuildinfo
 .beads
 CHANGELOG.md
+
+# Isolated reviewer worktrees — full copies of this repo inside it. Not a
+# theoretical exposure: `prettier --check .` walks them, and it passes today
+# only because those copies happen to be conformant. A reviewer mid-edit would
+# fail format:check on the MAIN checkout, with no cause visible in the diff.
+.claude/

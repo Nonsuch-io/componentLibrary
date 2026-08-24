@@ -14,6 +14,11 @@ export default ts.config(
       'node_modules/',
       '*.config.ts',
       '*.config.js',
+      // Isolated reviewer worktrees are full copies of this repo living INSIDE
+      // it. Gitignored, but eslint does not read .gitignore — so without this
+      // every file is linted once per live worktree. Measured: 45 problems with
+      // three present, 15 after pruning. componentLibrary-o0n.
+      '.claude/',
     ],
   },
 
