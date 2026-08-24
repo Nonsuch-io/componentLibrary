@@ -54,6 +54,16 @@ export interface NsBrandLogoProps {
    * strip the only name the link had.
    */
   href?: string
+  /**
+   * Passed straight to the underlying image, for QImg options this component does
+   * not surface — `fetchpriority`, `placeholderSrc`, `imgClass`, and so on. Also the
+   * way to override a logo default (`{ fit: 'cover' }`) or to put a linked logo's
+   * image back in the accessibility tree (`{ 'aria-hidden': false }`).
+   *
+   * Exists because a linked logo has TWO elements and an attribute cannot say which
+   * one it meant. Everything else you pass lands on the root, as usual.
+   */
+  imgProps?: Record<string, unknown>
 }
 
 const props = withDefaults(defineProps<NsBrandLogoProps>(), {
@@ -62,6 +72,7 @@ const props = withDefaults(defineProps<NsBrandLogoProps>(), {
   height: undefined,
   ratio: undefined,
   href: undefined,
+  imgProps: undefined,
 })
 
 // inheritAttrs is off in BOTH branches, not just the linked one: Vue applies
@@ -76,29 +87,31 @@ const attrs = useAttrs()
 /**
  * WHICH ELEMENT AN ATTR BELONGS TO, WHEN THERE ARE TWO.
  *
- * Unlinked, the image is the root and everything lands on it. Linked, there are
- * two candidates and the split is not cosmetic:
+ * `$attrs` go to the ROOT — the anchor when linked, the image when not. That is
+ * Vue's own semantic, and it is the one a call site already expects: `@click`,
+ * `target`, `aria-current`, `data-testid` and a utility class all mean the element
+ * you are looking at. Image-specific overrides go through `imgProps`, explicitly.
  *
- *   anchor  `class`, `style`, `id`, `data-*` — the anchor is the element that sits
- *           in the consumer's layout (NsSiteHeader's `logo` slot, say) and the one
- *           an e2e selector means. A utility class aimed at positioning the link is
- *           simply inert one level down on the image.
- *   image   everything else — `ratio`, `fit`, `loading`, `aria-*` are QImg's
- *           concerns. `aria-hidden` especially: on the anchor it would hide the
- *           whole link, which is never what a decorative-logo consumer means.
+ * TWO EARLIER ATTEMPTS GUESSED, AND BOTH GUESSED WRONG.
+ *
+ * Sending everything to the image meant `onClick` bound to the inner div, so
+ * clicking the link never fired it, and `target="_blank"` landed on a `<div>` and
+ * silently opened in the same tab — measured, and covered by no test.
+ *
+ * Replacing that with a name table of QImg's props fixed those cases and bought a
+ * maintenance trap: the table has to track a dependency's prop list, and the day
+ * QImg adds one, that attr silently lands on the wrong element again. It also cost
+ * ~100B of string data against a deliberately tight budget.
+ *
+ * So this component no longer infers intent from an attribute's name. Naming the
+ * target is the consumer's job, and it is one short prop.
  */
-const isAnchorAttr = (key: string) =>
-  key === 'class' || key === 'style' || key === 'id' || key.startsWith('data-')
+const imageOverrides = computed(() => ({
+  ...(props.href === undefined ? attrs : {}),
+  ...props.imgProps,
+}))
 
-const anchorAttrs = computed(() =>
-  Object.fromEntries(Object.entries(attrs).filter(([key]) => isAnchorAttr(key))),
-)
-
-const imageAttrs = computed(() =>
-  props.href === undefined
-    ? attrs
-    : Object.fromEntries(Object.entries(attrs).filter(([key]) => !isAnchorAttr(key))),
-)
+const anchorAttrs = computed(() => (props.href === undefined ? {} : attrs))
 
 /** QImg types `width`/`height` as String, so a number would trip a Vue prop-type
  *  warning and be dropped. Accepting a number and converting is the ergonomic
@@ -138,10 +151,8 @@ const imageBindings = computed(() => ({
    */
   'aria-hidden': props.href !== undefined ? 'true' : undefined,
 
-  // LAST, so a consumer's attrs win over every default above — `fit="cover"` on a
-  // call site that genuinely wants a cropped mark still works, as does
-  // `aria-hidden="false"` to put the image back in the tree.
-  ...imageAttrs.value,
+  // LAST, so a consumer's overrides win over every default above.
+  ...imageOverrides.value,
 }))
 
 /**
@@ -219,12 +230,32 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
     color: inherit
 
     // AGENTS.md: interactive elements must be at least 44x44 on mobile. The logo
-    // link is the one interactive element here, and it is sized by its image —
-    // the header lockup this component exists for is 72x27, which is 17px short.
-    // The flex centring above keeps the smaller image centred in the larger hit
-    // box, so the target grows without the logo appearing to move.
-    min-width: var(--ns-touch-target)
-    min-height: var(--ns-touch-target)
+    // link is the one interactive element here and it is sized by its image — the
+    // header lockup this component exists for is 72x27, which is 17px short.
+    //
+    // GROWS THE HIT AREA, NOT THE BOX. Putting min-height on the anchor itself was
+    // measured overflowing its only real consumer: NsSiteHeader is 66px with 16px
+    // padding, so its content box is 34px, and a 44px anchor plus the logo slot's
+    // own 8px ate 18px of the header's declared padding. Any sticky header that
+    // clips overflow would then have clipped the touch target — defeating the fix
+    // while the isolated test still read a clean 44px.
+    //
+    // The overlay is centred and absolutely positioned, so it never participates in
+    // flex sizing. It only ever grows VERTICALLY in practice (the 72px wordmark is
+    // already wider than 44px), so it cannot reach a sibling header action and steal
+    // its clicks.
+    position: relative
+
+    &::after
+      content: ''
+      position: absolute
+      top: 50%
+      left: 50%
+      transform: translate(-50%, -50%)
+      width: 100%
+      height: 100%
+      min-width: var(--ns-touch-target)
+      min-height: var(--ns-touch-target)
 
     &:focus-visible
       outline: 2px solid var(--ns-color-border-focus, currentColor)

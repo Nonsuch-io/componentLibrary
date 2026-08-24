@@ -105,9 +105,16 @@ describe('NsBrandLogo', () => {
       expect(wrapper.find('[data-testid="brand"]').exists()).toBe(true)
     })
 
-    it('should let a consumer override a logo default', () => {
-      const wrapper = mount(NsBrandLogo, { props: sized, attrs: { fit: 'cover' } })
+    it('should let a consumer override a logo default through imgProps', () => {
+      const wrapper = mount(NsBrandLogo, { props: { ...sized, imgProps: { fit: 'cover' } } })
       expect(wrapper.find('img').attributes('style')).toContain('object-fit: cover')
+    })
+
+    it('should apply imgProps to the image in the linked variant too', () => {
+      const wrapper = mount(NsBrandLogo, {
+        props: { ...sized, href: '/', imgProps: { fit: 'cover' } },
+      })
+      expect(wrapper.find('a img').attributes('style')).toContain('object-fit: cover')
     })
 
     it('should route layout and selector attrs to the anchor when linked', () => {
@@ -123,13 +130,41 @@ describe('NsBrandLogo', () => {
       expect(wrapper.classes()).toContain('ml-auto')
     })
 
-    it('should keep QImg attrs on the image, not the anchor', () => {
+    it('should fire a click handler bound to the anchor', async () => {
+      // The regression that shipped in the first attrs fix: `onClick` landed on the
+      // inner image div, so clicking the LINK never called it.
+      const onClick = vi.fn()
+      const wrapper = mount(NsBrandLogo, { props: { ...sized, href: '/' }, attrs: { onClick } })
+      await wrapper.find('a').trigger('click')
+      expect(onClick).toHaveBeenCalledTimes(1)
+    })
+
+    it('should route link-behaviour attrs to the anchor', () => {
+      // On a <div> these are inert: target="_blank" silently opened in the same tab.
       const wrapper = mount(NsBrandLogo, {
         props: { ...sized, href: '/' },
-        attrs: { fit: 'cover' },
+        attrs: { target: '_blank', rel: 'noopener', title: 'Home' },
+      })
+      expect(wrapper.attributes('target')).toBe('_blank')
+      expect(wrapper.attributes('rel')).toBe('noopener')
+      expect(wrapper.attributes('title')).toBe('Home')
+    })
+
+    it('should route link-level aria to the anchor, not the hidden image', () => {
+      // aria-current on the image would land on an aria-hidden element and be
+      // discarded by every assistive technology.
+      const wrapper = mount(NsBrandLogo, {
+        props: { ...sized, href: '/' },
+        attrs: { 'aria-current': 'page' },
+      })
+      expect(wrapper.attributes('aria-current')).toBe('page')
+    })
+
+    it('should not leak imgProps onto the anchor', () => {
+      const wrapper = mount(NsBrandLogo, {
+        props: { ...sized, href: '/', imgProps: { fit: 'cover' } },
       })
       expect(wrapper.attributes('fit')).toBeUndefined()
-      expect(wrapper.find('a img').attributes('style')).toContain('object-fit: cover')
     })
   })
 
@@ -155,8 +190,7 @@ describe('NsBrandLogo', () => {
 
     it('should keep the link named when the image is marked decorative', () => {
       const wrapper = mount(NsBrandLogo, {
-        props: { ...sized, href: '/' },
-        attrs: { 'aria-hidden': 'true' },
+        props: { ...sized, href: '/', imgProps: { 'aria-hidden': 'true' } },
       })
       expect(wrapper.attributes('aria-label')).toBe('Acme')
       // ASSERTS THE INNER IMAGE TOO. Checking only the anchor's own binding was
@@ -182,8 +216,7 @@ describe('NsBrandLogo', () => {
 
     it('should let a consumer un-hide the inner image when linked', () => {
       const wrapper = mount(NsBrandLogo, {
-        props: { ...sized, href: '/' },
-        attrs: { 'aria-hidden': 'false' },
+        props: { ...sized, href: '/', imgProps: { 'aria-hidden': 'false' } },
       })
       expect(wrapper.find('[role="img"]').attributes('aria-hidden')).toBe('false')
     })
