@@ -4,6 +4,16 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.31.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.1...v0.31.2) (2026-08-24)
+
+
+### Bug Fixes
+
+* **tests:** make the drift assertion name what Quasar took (componentLibrary-9ka) ([e4cd02b](https://github.com/Nonsuch-io/componentLibrary/commit/e4cd02b577f65178d787308165f7526aec7210a7))
+* **tests:** the replacement assertion was tautological too (componentLibrary-9ka) ([296d42a](https://github.com/Nonsuch-io/componentLibrary/commit/296d42af90d9d4fc907a2cbf51abdc101a6b0cb0))
+* **types:** typecheck test files, which nothing was doing (componentLibrary-9ka) ([c50a466](https://github.com/Nonsuch-io/componentLibrary/commit/c50a4663ba7f7ca129cdabe433ff58f6956a6285))
+* **types:** typecheck test files, which nothing was doing (componentLibrary-9ka) ([66ac226](https://github.com/Nonsuch-io/componentLibrary/commit/66ac226ecaea25f2b3eb5356e12a4e9d69036438))
+
 ## [0.31.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.0...v0.31.1) (2026-08-22)
 
 
