@@ -139,8 +139,10 @@ export const TouchTarget: Story = {
     await expect(link).not.toBeNull()
 
     const overlay = getComputedStyle(link!, '::after')
-    await expect(overlay.minWidth).toBe('44px')
     await expect(overlay.minHeight).toBe('44px')
+    // NOT min-width — see the style block. Growing horizontally was measured
+    // swallowing a sibling's click, so the overlay is vertical-only by design.
+    await expect(overlay.minWidth).not.toBe('44px')
 
     // The wordmark is 72x27 — deliberately SHORTER than the minimum, so these two
     // probes sit outside the anchor's own box and only land if the overlay works.
@@ -191,5 +193,55 @@ export const InSiteHeaderFits: Story = {
     // header — overflowing into the declared padding is the regression.
     await expect(linkBox.top).toBeGreaterThanOrEqual(headerBox.top + padTop - 0.5)
     await expect(linkBox.bottom).toBeLessThanOrEqual(headerBox.bottom - padBottom + 0.5)
+  },
+}
+
+/**
+ * A LINKED LOGO NARROWER THAN THE TOUCH TARGET MUST NOT REACH ITS NEIGHBOUR.
+ *
+ * The third review measured the previous overlay — which set min-width as well —
+ * extending 6px past a 32x32 mark on each side and swallowing a click aimed at a
+ * button 4px away. This pins the fix: the overlay grows vertically and stops at the
+ * anchor's own edges horizontally, so the sibling still receives its own clicks.
+ */
+export const NarrowLinkedMarkKeepsOffItsNeighbour: Story = {
+  args: {
+    src: placeholderLogoSrc,
+    alt: placeholderLogoAlt,
+    width: 32,
+    ratio: 1,
+    href: '/',
+  },
+  decorators: [
+    () => ({
+      template: `
+        <div style="padding: 40px; display: flex; align-items: center; gap: 4px">
+          <story />
+          <button data-testid="sibling" style="width: 40px; height: 40px">x</button>
+        </div>
+      `,
+    }),
+  ],
+  play: async ({ canvasElement }) => {
+    const link = canvasElement.querySelector<HTMLElement>('a.ns-brand-logo--link')
+    const sibling = canvasElement.querySelector<HTMLElement>('[data-testid="sibling"]')
+    await expect(link).not.toBeNull()
+    await expect(sibling).not.toBeNull()
+
+    // Vertically it still reaches the minimum — the fix must not have thrown that away.
+    const linkBox = link!.getBoundingClientRect()
+    const cx = linkBox.left + linkBox.width / 2
+    const cy = linkBox.top + linkBox.height / 2
+    await expect(link!.contains(document.elementFromPoint(cx, cy + 21))).toBe(true)
+
+    // Every point inside the sibling belongs to the sibling, including its leading
+    // edge — the exact pixel the old overlay stole.
+    const sibBox = sibling!.getBoundingClientRect()
+    const sibY = sibBox.top + sibBox.height / 2
+    for (const x of [sibBox.left + 1, sibBox.left + sibBox.width / 2]) {
+      const hit = document.elementFromPoint(x, sibY)
+      await expect(sibling!.contains(hit)).toBe(true)
+      await expect(link!.contains(hit)).toBe(false)
+    }
   },
 }

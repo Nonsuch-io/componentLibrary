@@ -14,6 +14,10 @@
 <script setup lang="ts">
 import { computed, useAttrs, watchEffect } from 'vue'
 import NsImage from '../NsImage/NsImage.vue'
+// Type-only: erased at compile time, so typing this surface costs zero bundle
+// bytes. The size argument that killed the earlier denylist was about a RUNTIME
+// array of prop names; it does not apply here.
+import type { QImgProps } from 'quasar'
 
 declare const process: { env: { NODE_ENV?: string } } | undefined
 
@@ -63,7 +67,14 @@ export interface NsBrandLogoProps {
    * Exists because a linked logo has TWO elements and an attribute cannot say which
    * one it meant. Everything else you pass lands on the root, as usual.
    */
-  imgProps?: Record<string, unknown>
+  imgProps?: Partial<QImgProps> & {
+    // QImg's own props are typed, so `{ fi: 'cover' }` and `{ fit: 123 }` are
+    // compile errors rather than attributes that silently do nothing. aria-/data-
+    // stay open because they are legitimate on the image and QImg does not
+    // declare them.
+    [key: `aria-${string}`]: unknown
+    [key: `data-${string}`]: unknown
+  }
 }
 
 const props = withDefaults(defineProps<NsBrandLogoProps>(), {
@@ -233,17 +244,28 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
     // link is the one interactive element here and it is sized by its image — the
     // header lockup this component exists for is 72x27, which is 17px short.
     //
-    // GROWS THE HIT AREA, NOT THE BOX. Putting min-height on the anchor itself was
-    // measured overflowing its only real consumer: NsSiteHeader is 66px with 16px
-    // padding, so its content box is 34px, and a 44px anchor plus the logo slot's
-    // own 8px ate 18px of the header's declared padding. Any sticky header that
-    // clips overflow would then have clipped the touch target — defeating the fix
-    // while the isolated test still read a clean 44px.
+    // GROWS THE HIT AREA, NOT THE BOX. min-height on the anchor itself was measured
+    // overflowing its only real consumer: NsSiteHeader is 66px with 16px padding, so
+    // its content box is 34px, and a 44px anchor plus the logo slot's own 8px ate
+    // 18px of the header's declared padding. Any sticky header clipping overflow
+    // would then have clipped the touch target. The overlay is absolutely positioned
+    // and never participates in flex sizing.
     //
-    // The overlay is centred and absolutely positioned, so it never participates in
-    // flex sizing. It only ever grows VERTICALLY in practice (the 72px wordmark is
-    // already wider than 44px), so it cannot reach a sibling header action and steal
-    // its clicks.
+    // VERTICAL ONLY, AND THAT ASYMMETRY IS DELIBERATE.
+    //
+    // An earlier version set min-width too, with a comment claiming it "only ever
+    // grows vertically in practice" because the wordmark is already wider than 44px.
+    // That was true of the one shape the stories test and false of a shape this
+    // component documents: review measured a 32x32 linked mark whose overlay reached
+    // 6px past its own box on each side and swallowed a click aimed at a sibling
+    // button 4px away. A stolen click is a functional bug; a target that is short on
+    // one axis is a degradation. So the axis that cannot harm a neighbour grows, and
+    // the one that can does not.
+    //
+    // A logo link narrower than 44px therefore does NOT reach the minimum
+    // horizontally. That is the consumer's to solve with size or spacing — which is
+    // also how WCAG 2.5.8 resolves it, via the spacing exception rather than by
+    // growing targets into each other.
     position: relative
 
     &::after
@@ -254,7 +276,6 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
       transform: translate(-50%, -50%)
       width: 100%
       height: 100%
-      min-width: var(--ns-touch-target)
       min-height: var(--ns-touch-target)
 
     &:focus-visible
