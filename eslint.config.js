@@ -14,6 +14,18 @@ export default ts.config(
       'node_modules/',
       '*.config.ts',
       '*.config.js',
+      // Isolated reviewer worktrees are full copies of this repo living INSIDE
+      // it. Gitignored, but eslint does not read .gitignore — so without this
+      // every file is linted once per live worktree. Measured: 45 problems with
+      // three present, 15 after pruning.
+      //
+      // NARROW ON PURPOSE. The first version of this ignored all of `.claude/`,
+      // which also silently dropped five tracked files (settings.json, the agent
+      // briefs, the skills) that prettier had genuinely been checking — a
+      // quality gate quietly narrowed, which is the failure this repo names
+      // switchboard-87q. `worktrees/` suppresses the duplication just as
+      // completely. componentLibrary-o0n.
+      '.claude/worktrees/',
     ],
   },
 
