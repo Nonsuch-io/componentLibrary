@@ -257,4 +257,124 @@ describe('NsBrandLogo', () => {
       expect(warn).not.toHaveBeenCalled()
     })
   })
+
+  describe('blank href is not a link', () => {
+    // Review found the template deciding with `v-if="href"` (truthy) while the
+    // script decided three more times with `href === undefined`. `href=""` split
+    // them, and the disagreement was silent in every direction that mattered.
+
+    it('should not render an anchor for an empty href', () => {
+      const wrapper = mount(NsBrandLogo, { props: { ...sized, href: '' } })
+      expect(wrapper.find('a').exists()).toBe(false)
+    })
+
+    it('should not render an anchor for a whitespace-only href', () => {
+      const wrapper = mount(NsBrandLogo, { props: { ...sized, href: '   ' } })
+      expect(wrapper.find('a').exists()).toBe(false)
+    })
+
+    it('should forward attrs to the image when href is blank', () => {
+      // The bug: attrs were routed to an anchor the template never rendered, so a
+      // class, a data-testid or a @click passed alongside a blank href vanished.
+      const wrapper = mount(NsBrandLogo, {
+        props: { ...sized, href: '' },
+        attrs: { 'data-testid': 'brand' },
+      })
+      expect(wrapper.attributes('data-testid')).toBe('brand')
+    })
+
+    it('should keep the image in the accessibility tree when href is blank', () => {
+      // The worse half of the same bug: aria-hidden="true" was applied because the
+      // script thought this was a link, but the anchor that would have carried the
+      // name did not exist. The logo left the accessibility tree holding a good alt.
+      const wrapper = mount(NsBrandLogo, { props: { ...sized, href: '' } })
+      expect(wrapper.find('[role="img"]').attributes('aria-hidden')).toBeUndefined()
+      expect(wrapper.find('[role="img"]').attributes('aria-label')).toBe('Acme')
+    })
+  })
+
+  describe('blank alt on a linked logo', () => {
+    it('should warn, because an empty alt names the link no better than a missing one', () => {
+      // alt="" is the standard HTML idiom for a DECORATIVE image, so it arrives
+      // here from consumers doing the normally-correct thing. The guard checked
+      // presence, so it stayed quiet for exactly this case.
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      mount(NsBrandLogo, { props: { src: SRC, ratio: 2.62, href: '/', alt: '' } })
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('no `alt`'))
+    })
+
+    it('should omit aria-label rather than emit an empty one', () => {
+      // aria-label="" is its own axe failure on top of the unnamed link.
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const wrapper = mount(NsBrandLogo, { props: { src: SRC, ratio: 2.62, href: '/', alt: '' } })
+      expect(wrapper.attributes('aria-label')).toBeUndefined()
+    })
+  })
+
+  describe('missing src', () => {
+    it('should warn when src is blank, because no img element is created at all', () => {
+      // QImg builds a source only when src || srcset || sizes, so a blank src means
+      // no <img>, which means no error event either — a consumer's own onError
+      // cannot catch this. The box and the labelled role="img" still render.
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      mount(NsBrandLogo, { props: { src: '', alt: 'Acme', ratio: 2.62 } })
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('no `src`'))
+    })
+
+    it('should render no img element for a blank src', () => {
+      // Pins the reason the warning exists, so the warning cannot be "fixed" by
+      // deleting it while the component still renders an empty labelled box.
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const wrapper = mount(NsBrandLogo, { props: { src: '', alt: 'Acme', ratio: 2.62 } })
+      expect(wrapper.find('img').exists()).toBe(false)
+    })
+
+    it('should not warn when srcset alone sources the image', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      mount(NsBrandLogo, {
+        props: { src: '', alt: 'Acme', ratio: 2.62, imgProps: { srcset: `${SRC} 1x` } },
+      })
+      expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('no `src`'))
+    })
+
+    it('should not warn when src is given', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      mount(NsBrandLogo, { props: sized })
+      expect(warn).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('invalid ratio', () => {
+    // QImg computes `props.ratio || naturalRatio`, so every falsy ratio lands on
+    // the same 16:9 fallback the sizing warning exists for — with byte-identical
+    // output to passing nothing. A presence check was silent for all three.
+    it.each([
+      ['zero', 0],
+      ['NaN', Number.NaN],
+      ['an empty string', ''],
+    ])('should warn for %s, which falls back to the 16:9 box', (_label, ratio) => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      mount(NsBrandLogo, { props: { src: SRC, alt: 'Acme', ratio } })
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('neither `ratio` nor `height`'))
+    })
+
+    it('should reserve the 16:9 box for a zero ratio, which is what makes it worth warning about', () => {
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const wrapper = mount(NsBrandLogo, { props: { src: SRC, alt: 'Acme', ratio: 0 } })
+      const filler = wrapper.find('[role="img"] > div:first-child')
+      expect(filler.attributes('style')).toContain('padding-bottom: 56.2')
+    })
+
+    it('should accept a valid ratio passed as a string', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      mount(NsBrandLogo, { props: { src: SRC, alt: 'Acme', ratio: '2.62' } })
+      expect(warn).not.toHaveBeenCalled()
+    })
+
+    it('should still accept height as the alternative to a ratio', () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      mount(NsBrandLogo, { props: { src: SRC, alt: 'Acme', ratio: 0, height: 27 } })
+      expect(warn).not.toHaveBeenCalled()
+    })
+  })
 })

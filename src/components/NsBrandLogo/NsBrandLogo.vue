@@ -1,8 +1,8 @@
 <template>
   <a
-    v-if="href"
+    v-if="isLinked"
     :href="href"
-    :aria-label="alt"
+    :aria-label="anchorLabel"
     v-bind="anchorAttrs"
     class="ns-brand-logo ns-brand-logo--link"
   >
@@ -56,13 +56,19 @@ export interface NsBrandLogoProps {
    * anchor is named from `alt`, EXPLICITLY rather than by name-from-content:
    * a consumer passing `aria-hidden="true"` for a decorative logo would otherwise
    * strip the only name the link had.
+   *
+   * BLANK MEANS NOT A LINK, deliberately: `:href="isHome ? '' : '/'"` is how a call
+   * site says "don't link the logo on the page it points at", and an unresolved
+   * `:href="config.homeUrl"` arrives the same way.
    */
   href?: string
   /**
    * Passed straight to the underlying image, for QImg options this component does
    * not surface — `fetchpriority`, `placeholderSrc`, `imgClass`, and so on. Also the
-   * way to override a logo default (`{ fit: 'cover' }`) or to put a linked logo's
-   * image back in the accessibility tree (`{ 'aria-hidden': false }`).
+   * way to override a logo default (`{ fit: 'cover' }`), to put a linked logo's
+   * image back in the accessibility tree (`{ 'aria-hidden': false }`), or to hear
+   * about a broken asset (`{ onError }`, `{ errorSrc }`) — on a LINKED logo `@error`
+   * and `@load` land on the anchor, where they can never fire.
    *
    * Exists because a linked logo has TWO elements and an attribute cannot say which
    * one it meant. Everything else you pass lands on the root, as usual.
@@ -88,12 +94,41 @@ const props = withDefaults(defineProps<NsBrandLogoProps>(), {
 
 // inheritAttrs is off in BOTH branches, not just the linked one: Vue applies
 // $attrs to the root automatically IN ADDITION to any explicit v-bind, so leaving
-// it on would double-apply them to the unlinked root — the same duplicate-class
-// bug NsImage still has (it v-binds $attrs AND lets Vue inherit them), filed as
-// componentLibrary-bnw.
+// it on would double-apply them to the unlinked root.
+//
+// It does NOT fix NsImage's own double-application — NsImage v-binds $attrs AND
+// lets Vue inherit them, so a consumer class still renders twice through this
+// component. That is pre-existing and filed as componentLibrary-bnw.
 defineOptions({ inheritAttrs: false })
 
 const attrs = useAttrs()
+
+/**
+ * PRESENT IS NOT THE SAME AS SET.
+ *
+ * `href=""`, `alt=""`, `src=" "` and `ratio=""` all pass a `!== undefined` check
+ * and all mean nothing to a user. They arrive the same way too: an expression that
+ * has not resolved yet (`:src="theme.logoUrl"`), a CMS field that came back empty
+ * (`:ratio="asset.width / asset.height"`), or a deliberate blank. So every check in
+ * this component asks for a VALUE, and every one of them asks the same way.
+ */
+const hasValue = (value: unknown) => String(value ?? '').trim() !== ''
+
+/**
+ * ONE DEFINITION OF "IS THIS A LINK", READ BY EVERY PLACE THAT ASKS.
+ *
+ * The template used to decide with `v-if="href"` (truthy) while the script decided
+ * three more times with `href === undefined` (strict). `href=""` split them: the
+ * template rendered the unlinked branch, so `$attrs` were routed to an anchor that
+ * did not exist and were dropped, and the image was still marked `aria-hidden` —
+ * a logo removed from the accessibility tree while carrying a perfectly good `alt`.
+ */
+const isLinked = computed(() => hasValue(props.href))
+
+/** An empty `aria-label` names nothing and is its own axe failure, so a blank
+ *  `alt` omits the attribute rather than emitting one. The unnamed-link warning
+ *  below covers the case; this just avoids adding a second defect to it. */
+const anchorLabel = computed(() => (hasValue(props.alt) ? props.alt : undefined))
 
 /**
  * WHICH ELEMENT AN ATTR BELONGS TO, WHEN THERE ARE TWO.
@@ -118,11 +153,11 @@ const attrs = useAttrs()
  * target is the consumer's job, and it is one short prop.
  */
 const imageOverrides = computed(() => ({
-  ...(props.href === undefined ? attrs : {}),
+  ...(isLinked.value ? {} : attrs),
   ...props.imgProps,
 }))
 
-const anchorAttrs = computed(() => (props.href === undefined ? {} : attrs))
+const anchorAttrs = computed(() => (isLinked.value ? attrs : {}))
 
 /** QImg types `width`/`height` as String, so a number would trip a Vue prop-type
  *  warning and be dropped. Accepting a number and converting is the ergonomic
@@ -160,11 +195,59 @@ const imageBindings = computed(() => ({
    * This cannot make a link anonymous. If `alt` is absent the anchor had no name to
    * lose — the image's was equally absent — and that case warns separately below.
    */
-  'aria-hidden': props.href !== undefined ? 'true' : undefined,
+  'aria-hidden': isLinked.value ? 'true' : undefined,
 
   // LAST, so a consumer's overrides win over every default above.
   ...imageOverrides.value,
 }))
+
+/**
+ * A LINKED LOGO WITH NO `alt` IS AN ANONYMOUS LINK.
+ *
+ * Screen-reader users navigating by link list hear "link" with no destination —
+ * and it is the site's primary navigation control. The `aria-label` on the anchor
+ * covers the normal case, but it is only as good as the `alt` feeding it.
+ *
+ * `alt=""` counts as no name here even though it is the standard HTML idiom for a
+ * DECORATIVE image, and that is the point: decorative is a coherent thing to be
+ * inside a link's content, but a link needs a name whatever its content is.
+ *
+ * Separate from the sizing warning below because the two are independent: a call
+ * site can get sizing right and naming wrong.
+ */
+if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
+  let warnedName = false
+  watchEffect(() => {
+    if (warnedName) return
+    if (!isLinked.value || hasValue(props.alt)) return
+    warnedName = true
+    console.warn(
+      '[NsBrandLogo] has `href` but no `alt`, so the link has no accessible name. ' +
+        'Pass `alt` with the brand name.',
+    )
+  })
+}
+
+/**
+ * NO `src` MEANS NO IMAGE AT ALL, AND NOTHING ELSE REPORTS IT.
+ *
+ * QImg only builds a source when `src || srcset || sizes` is truthy, so a blank
+ * `src` creates no `<img>` element — and therefore no `error` event, so a
+ * consumer's own `onError` cannot catch this either. What renders is the reserved
+ * box plus an empty content div, still wrapped in `role="img"` with the brand's
+ * name on it: a screen reader announces a logo that is visibly not there.
+ *
+ * `srcset` alone is a legitimate way to source the image, so it satisfies this.
+ */
+if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
+  let warnedSrc = false
+  watchEffect(() => {
+    if (warnedSrc) return
+    if (hasValue(props.src) || hasValue(props.imgProps?.srcset)) return
+    warnedSrc = true
+    console.warn('[NsBrandLogo] has no `src`, so no logo renders at all.')
+  })
+}
 
 /**
  * QImg RESERVES A 16:9 BOX WHEN IT KNOWS NOTHING ELSE, AND NO LOCKUP IS 16:9.
@@ -178,30 +261,13 @@ const imageBindings = computed(() => ({
  * Either `ratio` or an explicit `height` removes the guess. This warns rather than
  * picking a default because the right number is a property of the ASSET, which only
  * the consumer has — a library-side guess would be wrong for every brand but one.
- */
-/**
- * A LINKED LOGO WITH NO `alt` IS AN ANONYMOUS LINK.
  *
- * Screen-reader users navigating by link list hear "link" with no destination —
- * and it is the site's primary navigation control. The `aria-label` on the anchor
- * covers the normal case, but it is only as good as the `alt` feeding it.
- *
- * Separate from the sizing warning below because the two are independent: a call
- * site can get sizing right and naming wrong.
+ * A ratio has to be a POSITIVE FINITE NUMBER to count. QImg computes
+ * `props.ratio || naturalRatio`, so `0`, `NaN` and `''` are falsy and land on the
+ * same 16:9 fallback this warns about — measured, byte-identical output. Checking
+ * presence would have stayed silent for exactly the inputs that cause the bug, and
+ * `:ratio="asset.width / asset.height"` over a CMS record produces all three.
  */
-if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
-  let warnedName = false
-  watchEffect(() => {
-    if (warnedName) return
-    if (props.href === undefined || props.alt !== undefined) return
-    warnedName = true
-    console.warn(
-      '[NsBrandLogo] has `href` but no `alt`, so the link has no accessible name. ' +
-        'Pass `alt` with the brand name.',
-    )
-  })
-}
-
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   let warned = false
   watchEffect(() => {
@@ -213,7 +279,8 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
     // already carry them and that props alone cried wolf; review measured that and
     // it was wrong.)
     const bindings = imageBindings.value
-    if (bindings.ratio !== undefined || bindings.height !== undefined) return
+    const ratio = Number(bindings.ratio)
+    if ((Number.isFinite(ratio) && ratio > 0) || hasValue(bindings.height)) return
     warned = true
     // Kept terse ON PURPOSE. The guard is deliberately fail-open so it fires in a
     // browser, which means no consumer bundler can tree-shake this string out —

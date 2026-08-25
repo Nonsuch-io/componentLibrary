@@ -160,7 +160,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(13) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name)
+    ).toBe(14) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name), 13->14 NsBrandLogo (missing src)
   })
 
   it("warns for NsBrandLogo's missing box from the built bundle", async () => {
@@ -199,6 +199,26 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       'the NsBrandLogo link-name warning did not fire with `process` undefined — it ' +
         'is dead in every consumer browser, whatever the unit tests say',
     ).toContain('has `href` but no `alt`')
+  })
+
+  it("warns for NsBrandLogo's missing src from the built bundle", async () => {
+    // The one NsBrandLogo failure a consumer cannot detect for themselves: QImg
+    // creates no <img> for a blank src, so there is no `error` event and their own
+    // onError never fires. If this guard ships fail-closed, nothing reports that
+    // the logo is simply absent.
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsBrandLogo as Component, { props: { src: '', alt: 'Acme', ratio: 2.6 } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the NsBrandLogo missing-src warning did not fire with `process` undefined — ' +
+        'it is dead in every consumer browser, whatever the unit tests say',
+    ).toContain('has no `src`')
   })
 
   it("warns for NsInput's dense+size conflict too, from the built bundle", async () => {
