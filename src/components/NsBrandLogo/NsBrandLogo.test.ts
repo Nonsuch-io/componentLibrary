@@ -228,11 +228,31 @@ describe('NsBrandLogo', () => {
     })
 
     it('should allow a decorative logo to be hidden from assistive tech', () => {
+      // ASSERTS ON THE ROOT, NOT THROUGH [role="img"]. This mount has no `alt`,
+      // and from Quasar 2.25.0 QImg claims the img role only when it has a name:
+      //
+      //   // the img role requires an accessible name, so it is only claimed
+      //   ...(props.alt ? { role: 'img', 'aria-label': props.alt } : {})
+      //
+      // So the selector matched nothing and the test failed on the merge with
+      // main, which carries that bump. The root IS the image in the unlinked
+      // variant, so ask it directly — which is also what the test meant.
       const wrapper = mount(NsBrandLogo, {
         props: { src: SRC, ratio: 2.62 },
         attrs: { 'aria-hidden': 'true' },
       })
-      expect(wrapper.find('[role="img"]').attributes('aria-hidden')).toBe('true')
+      expect(wrapper.attributes('aria-hidden')).toBe('true')
+    })
+
+    it('should claim no img role at all when it has no name to put on it', () => {
+      // Pins the Quasar 2.25.0 behaviour the test above now depends on. An image
+      // role with no accessible name is an axe failure (role-img-alt); upstream
+      // now omits the role rather than emitting an unnamed one, so an unnamed
+      // decorative logo is out of the accessibility tree without any help from us.
+      vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const wrapper = mount(NsBrandLogo, { props: { src: SRC, ratio: 2.62 } })
+      expect(wrapper.find('[role="img"]').exists()).toBe(false)
+      expect(wrapper.attributes('role')).toBeUndefined()
     })
   })
 

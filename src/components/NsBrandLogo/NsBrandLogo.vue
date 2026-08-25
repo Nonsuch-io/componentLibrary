@@ -38,8 +38,12 @@ export interface NsBrandLogoProps {
   src: string
   /**
    * Accessible name for the logo, e.g. the brand name. Omit it ONLY when the
-   * brand name is already in adjacent text, and pass `aria-hidden="true"` in that
-   * case so the logo does not announce as an unnamed image.
+   * brand name is already in adjacent text.
+   *
+   * An unnamed logo is already out of the accessibility tree: from Quasar 2.25.0
+   * QImg claims `role="img"` only when it has a name to put on it, and the inner
+   * `<img>` it renders is `aria-hidden` regardless. Passing `aria-hidden="true"`
+   * as well is belt-and-braces, not a requirement.
    */
   alt?: string
   /** Rendered width. A number is treated as pixels. */
@@ -188,9 +192,12 @@ const imageBindings = computed(() => ({
 
   /**
    * LINKED, THE IMAGE IS HIDDEN FROM ASSISTIVE TECH — the anchor already carries
-   * the name. QImg renders `<div role="img" aria-label={alt}>`, so without this the
-   * anchor and its own descendant both announce the brand: two accessible objects,
-   * one logo, in exactly the call pattern the stories recommend.
+   * the name. A named QImg renders `<div role="img" aria-label={alt}>`, so without
+   * this the anchor and its own descendant both announce the brand: two accessible
+   * objects, one logo, in exactly the call pattern the stories recommend.
+   *
+   * Quasar 2.25.0 made that role conditional on `alt` — which is precisely the case
+   * this guards, so it stays load-bearing rather than becoming redundant.
    *
    * This cannot make a link anonymous. If `alt` is absent the anchor had no name to
    * lose — the image's was equally absent — and that case warns separately below.
