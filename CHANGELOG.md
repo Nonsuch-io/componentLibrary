@@ -4,6 +4,15 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.31.4](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.3...v0.31.4) (2026-09-02)
+
+
+### Bug Fixes
+
+* **NsMenu:** assert the deliberately roleless popup (componentLibrary-nb7) ([1be88ec](https://github.com/Nonsuch-io/componentLibrary/commit/1be88ecfab13543f32fe32462bbb48a08d872521))
+* **NsMenu:** assert the deliberately roleless popup (componentLibrary-nb7) ([be5a12a](https://github.com/Nonsuch-io/componentLibrary/commit/be5a12afeeeaf47242c6198029fd6d09dea5dc05))
+* **NsMenu:** the escape hatch I documented was the wrong layer (componentLibrary-nb7) ([23fdb01](https://github.com/Nonsuch-io/componentLibrary/commit/23fdb0193ce650af8ee2d6f5bd6b23f5e451e431))
+
 ## [0.31.3](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.2...v0.31.3) (2026-08-24)
 
 
