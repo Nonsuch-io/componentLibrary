@@ -379,3 +379,104 @@ export const ScrollingNav: Story = {
     expect(r.top).toBeGreaterThanOrEqual(0)
   },
 }
+
+// Deliberately one very long label among short ones — the truncation
+// assertion below needs a label that actually overflows its 20%-of-viewport
+// tab slot, not merely a property that would truncate IF it were ever long
+// enough (the "true and irrelevant" trap HeightsAreReal's `large` variant
+// hit — see the comment on LayoutIsReal).
+const tabsWithLongLabel: NsAppShellTab[] = [
+  { name: 'home', label: 'Home', icon: 'home' },
+  { name: 'browse', label: 'This Label Is Deliberately Far Too Long To Fit', icon: 'explore' },
+  { name: 'cart', label: 'Cart', icon: 'shopping_cart' },
+  { name: 'account', label: 'Account', icon: 'person' },
+]
+
+/**
+ * THE BOTTOM TAB BAR'S QUASAR-INTERNAL OVERRIDES, MEASURED IN A REAL BROWSER.
+ *
+ * Same rationale as NsInput's HeightsAreReal and NsButton's LayoutIsReal:
+ * happy-dom has no layout engine and loads no stylesheet, so a unit test
+ * reading getComputedStyle() on `.q-tabs__content` / `.q-tab__label` would
+ * pass identically whether the `:deep()` rules in NsAppShell.vue exist, are
+ * misspelled, or were deleted. Only Chromium proves the cascade.
+ *
+ * REACHABILITY: the bottom tab bar only renders when `!isDesktop &&
+ * tabs.length > 0` (mobile-only). `drawerBreakpoint`/`fullDrawerBreakpoint`
+ * are set absurdly high so `isDesktop` is false regardless of the headless
+ * browser's actual viewport width — the same technique already used by
+ * DrawerSubmenus/ScrollingNav in this file, just inverted.
+ *
+ * TWO DIFFERENT FALSIFIABILITY SHAPES, verified by reading Quasar 2.25.0's
+ * QTabs.sass/QTabs.js/use-tab.js source (node_modules/quasar/src/components/tabs):
+ *
+ * 1. `.q-tabs__content` justify-content — Quasar DOES set this property on
+ *    the SAME element, via its own `align` prop (default 'center'), which
+ *    QTabs renders as a `q-tabs__content--align-center` class carrying
+ *    `justify-content: center`. NsAppShell's `justify-content: space-around`
+ *    rule OVERRIDES that default rather than filling an empty gap — per the
+ *    bead instructions, an exact-value assertion is still valid here, but it
+ *    is distinguishing two real values (ours vs Quasar's 'center'), not
+ *    presence vs. absence. Falsifiability proof (componentLibrary-7lp): with
+ *    the override commented out, the assertion below failed with
+ *    `expected 'center' to be 'space-around'` — i.e. it falls back to
+ *    Quasar's own value, not to nothing.
+ *
+ * 2. `.q-tab__label` overflow/text-overflow/white-space/max-width — Quasar's
+ *    QTab.sass sets font-size/line-height/font-weight on `.q-tab__label` but
+ *    NONE of these four properties, on any element, at any size or variant.
+ *    No fallback can satisfy the exact match. And because a property that
+ *    APPLIES is not the same as a truncation that RENDERS (the lesson
+ *    HeightsAreReal's `large` variant already paid for), this story also
+ *    renders one deliberately long label and asserts its `scrollWidth` is
+ *    actually being clipped, not merely eligible to be.
+ */
+export const LayoutIsReal: Story = {
+  args: {
+    tabs: tabsWithLongLabel,
+    drawerItems: [],
+    showSearch: false,
+    userMenuItems: [],
+    // Absurdly high so isDesktop is false regardless of the real viewport —
+    // forces the mobile bottom tab bar to render deterministically.
+    drawerBreakpoint: 99999,
+    fullDrawerBreakpoint: 99999,
+  },
+  render: (args) => ({
+    components: { NsAppShell },
+    setup: () => ({ args }),
+    template: `<NsAppShell v-bind="args">Content</NsAppShell>`,
+  }),
+  play: async ({ canvasElement }) => {
+    const content = canvasElement.querySelector('.q-tabs__content') as HTMLElement
+    await expect(
+      content,
+      '.q-tabs__content not found — bottom tab bar did not render',
+    ).not.toBeNull()
+
+    // Distinguishes our value from Quasar's own default (both apply the
+    // property; see the falsifiability note above).
+    await expect(getComputedStyle(content).justifyContent).toBe('space-around')
+
+    const labels = canvasElement.querySelectorAll<HTMLElement>('.q-tab__label')
+    await expect(labels.length).toBe(4)
+    const longLabel = Array.from(labels).find((el) =>
+      el.textContent?.includes('Deliberately Far Too Long'),
+    ) as HTMLElement
+    await expect(longLabel, 'the long-label tab was not found').toBeTruthy()
+
+    const cs = getComputedStyle(longLabel)
+    await expect(cs.overflow).toBe('hidden')
+    await expect(cs.textOverflow).toBe('ellipsis')
+    await expect(cs.whiteSpace).toBe('nowrap')
+    await expect(cs.maxWidth).toBe('100%')
+
+    // THE RENDERED EFFECT, not merely the property: the label's content must
+    // actually be wider than its box, i.e. genuinely clipped, not just
+    // eligible to clip on a label that happens to fit anyway.
+    await expect(
+      longLabel.scrollWidth,
+      'label did not actually overflow its box — this assertion would be true and irrelevant',
+    ).toBeGreaterThan(longLabel.clientWidth)
+  },
+}
