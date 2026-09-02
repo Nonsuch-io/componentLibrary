@@ -51,7 +51,10 @@ describe('NsMenu', () => {
         expect(popup?.hasAttribute('role')).toBe(false)
       })
 
-      it('lets a consumer declare a role through fall-through attrs', async () => {
+      // A pass-through contract, NOT the recommended way to build a menu — for
+      // that the role goes on NsList so QItems derive menuitem. See the component
+      // comment; review measured that role-on-NsMenu yields menu > list > button.
+      it('forwards a consumer-declared role to the popup element', async () => {
         openWrapper = mount(NsMenu, {
           attrs: { modelValue: true, 'no-parent-event': true, role: 'menu' },
           slots: { default: 'Menu content' },
@@ -61,6 +64,9 @@ describe('NsMenu', () => {
         await nextTick()
 
         const popup = document.querySelector('.q-menu')
+        // Guarded like the test above, so a popup that never renders fails
+        // saying so rather than looking like a role-forwarding bug.
+        expect(popup).not.toBeNull()
         expect(popup?.getAttribute('role')).toBe('menu')
       })
     })
