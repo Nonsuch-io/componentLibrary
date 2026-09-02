@@ -9,12 +9,18 @@ A Vue 3 component library built on top of [Quasar](https://quasar.dev), providin
 ```bash
 # Install the library and its peer dependencies
 pnpm add @nonsuch/component-library
-pnpm add quasar @quasar/extras @quasar/vite-plugin
+pnpm add quasar @quasar/extras
 ```
 
 ### Quick Start (Recommended)
 
 #### Vite Configuration
+
+This library ships pre-built, tree-shaken JS — it does not require
+`@quasar/vite-plugin` to consume. If your own app also authors raw Quasar
+components directly (e.g. `<q-btn>` in your own templates, per the "used
+directly" note above), you'll want the plugin for that unrelated reason; add
+it as your own dependency and wire it in alongside this config:
 
 ```ts
 import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
@@ -365,7 +371,7 @@ Each custom component lives in its own directory with co-located story and test 
 
 ## Architecture
 
-- **Quasar is a peer dependency** — consumers install it normally and get full tree-shaking via `@quasar/vite-plugin`
+- **Quasar is a peer dependency** — consumers install it normally; this library's `dist/` is pre-built and does not need `@quasar/vite-plugin` to consume (only your own app's raw Quasar usage would)
 - **Custom components compose Quasar** — they wrap or extend Quasar components with opinionated defaults
 - **Vite library mode** — builds to ES modules with externalized `vue` and `quasar`
 - **TypeScript** — strict mode with emitted `.d.ts` declarations
