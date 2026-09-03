@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.31.5](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.4...v0.31.5) (2026-09-02)
+
+
+### Bug Fixes
+
+* **locale:** make NsLocaleKey survive two copies of the library (componentLibrary-b5h.4) ([4a49c1d](https://github.com/Nonsuch-io/componentLibrary/commit/4a49c1d9c75f7ac1a5b338afc85dd2f3851fbebb))
+* **locale:** make NsLocaleKey survive two copies of the library (componentLibrary-b5h.4) ([b740b1f](https://github.com/Nonsuch-io/componentLibrary/commit/b740b1fc523e1e3a7bc20007461665252a9a53b8))
+
 ## [0.31.4](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.3...v0.31.4) (2026-09-02)
 
 
