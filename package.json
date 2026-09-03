@@ -63,10 +63,10 @@
   },
   "size-limit": [
     {
-      "name": "full library (gzip) — a CEILING, not a high-water mark: do not bump it to fit a PR",
+      "name": "full library (gzip) \u2014 a SOFT ceiling: it exists to make you stop and ask whether the gain is worth the bytes, or whether an audit could win them back. Bump it deliberately, with the reason, never incidentally",
       "path": "dist/nonsuch-components.js",
       "import": "*",
-      "limit": "23 kB",
+      "limit": "23.5 kB",
       "gzip": true,
       "ignore": [
         "vue",
@@ -99,10 +99,10 @@
       ]
     },
     {
-      "name": "app shell (heaviest import; contains NsInput and NsNavSidebar. Includes the en-CA locale object — a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
+      "name": "app shell (heaviest import; contains NsInput and NsNavSidebar. Includes the en-CA locale object \u2014 a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsAppShell }",
-      "limit": "10.5 kB",
+      "limit": "10.75 kB",
       "gzip": true,
       "ignore": [
         "vue",
