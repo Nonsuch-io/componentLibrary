@@ -125,40 +125,20 @@ describe('NsTooltip accessibility', () => {
     expect(after, `anchor aria-describedby after unmount was "${after}"`).toBe('consumer-hint')
   })
 
-  it("declares pointer-events on .ns-tooltip, overriding Quasar's no-pointer-events", () => {
-    // THE HOVERABLE HALF OF WCAG 2.1 SC 1.4.13. Quasar stamps its
-    // `no-pointer-events` class (pointer-events: none !important) on tooltip
-    // content, removing it from hit-testing: a real pointer moving onto the
-    // bubble generates no mouseenter and the tooltip closes while being read.
-    //
-    // THIS ASSERTS THE STYLE BLOCK, NOT COMPUTED STYLE, AND THAT IS DELIBERATE.
-    // jsdom loads no external stylesheet, so Quasar's rule never applies there
-    // and getComputedStyle() reports the same value with or without our
-    // override — I wrote that test first and proved it could not fail. The
-    // sibling dispatchEvent-based hover test is blind here for a different
-    // reason: dispatchEvent bypasses hit-testing in jsdom AND in a browser.
-    // Asserting the artifact is the only check available in this environment
-    // that goes red when the declaration is removed.
-    // Resolved from the project root: under Vite's transform `import.meta.url`
-    // is not a file:// URL, so fileURLToPath() throws.
-    const sfc = readFileSync(
-      resolve(process.cwd(), 'src/components/NsTooltip/NsTooltip.vue'),
-      'utf-8',
-    )
-    // Strip `//` comments FIRST. The block documents Quasar's
-    // `pointer-events: none !important` in prose, and a non-greedy match finds
-    // that sentence before the real declaration — it reported "none" and failed
-    // against correct source until I stripped comments. Same shape as the
-    // truncating scans that have bitten this project twice already.
-    const style = sfc
-      .slice(sfc.indexOf('<style'))
-      .split('\n')
-      .filter((line) => !line.trim().startsWith('//'))
-      .join('\n')
-    const rule = /\.ns-tooltip\b[\s\S]*?pointer-events:\s*([a-z]+)\s*!important/.exec(style)
-    expect(rule, 'no `pointer-events: <value> !important` under .ns-tooltip').not.toBeNull()
-    expect(rule?.[1], `pointer-events was "${rule?.[1]}"`).not.toBe('none')
-  })
+  // REMOVED: a test that read the SFC source and asserted the
+  // `pointer-events: auto !important` DECLARATION existed.
+  //
+  // It was honest about being an artifact check — its own comment said jsdom
+  // loads no stylesheet, so computed style could not tell the difference. What
+  // neither it nor its author could see is that the declaration was inert
+  // anyway: the rule was SCOPED, and Quasar teleports the tooltip out of the
+  // scope, so `.ns-tooltip[data-v-xxxx]` matched nothing at all. The test was
+  // green, the source was correct, and the style never reached the element.
+  //
+  // A check that asserts a declaration exists cannot see whether it APPLIES.
+  // The real assertion now lives in NsTooltip.stories.ts (HoverableIsReal),
+  // which reads computed pointer-events in Chromium where a cascade exists.
+  // componentLibrary-3sy.
 
   it('dismisses on Escape when shown by hover, with focus outside the anchor', async () => {
     // SC 1.4.13 dismissibility applies to HOVER-triggered content. A keydown
@@ -169,6 +149,12 @@ describe('NsTooltip accessibility', () => {
     await nextTick()
     const anchor = wrapper.find('.anchor-btn').element as HTMLElement
 
+    // BOTH, exactly as a real browser does for a mouse — and as the component
+    // itself now dispatches. Quasar binds mouseenter on <=2.25 and pointerenter
+    // on >=2.26, and our peer range spans that change, so a test that picks one
+    // passes on one half of the range and fails on the other.
+    // componentLibrary-b6j.
+    anchor.dispatchEvent(new PointerEvent('pointerenter'))
     anchor.dispatchEvent(new MouseEvent('mouseenter'))
     await new Promise((r) => setTimeout(r, 400))
     await nextTick()
@@ -310,6 +296,7 @@ describe('NsTooltip accessibility', () => {
       const describedBy = anchorEl.getAttribute('aria-describedby') as string
 
       // Show via a real mouse hover on the anchor.
+      await anchorWrapper.trigger('pointerenter')
       await anchorWrapper.trigger('mouseenter')
       await vi.advanceTimersByTimeAsync(0)
       await nextTick()
@@ -319,6 +306,7 @@ describe('NsTooltip accessibility', () => {
 
       // Leave the anchor (schedules Quasar's own delayed hide) but move the
       // pointer onto the tooltip itself before that hide fires.
+      await anchorWrapper.trigger('pointerleave')
       await anchorWrapper.trigger('mouseleave')
       await tooltipEl!.dispatchEvent(new MouseEvent('mouseenter'))
       await vi.advanceTimersByTimeAsync(0)
