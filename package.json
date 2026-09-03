@@ -1,6 +1,6 @@
 {
   "name": "@nonsuch/component-library",
-  "version": "0.31.7",
+  "version": "0.32.0",
   "description": "A Vue 3 component library built on Quasar with opinionated defaults and custom components.",
   "type": "module",
   "sideEffects": false,
@@ -63,7 +63,7 @@
   },
   "size-limit": [
     {
-      "name": "full library (gzip) \u2014 a CEILING, not a high-water mark: do not bump it to fit a PR",
+      "name": "full library (gzip) — a CEILING, not a high-water mark: do not bump it to fit a PR",
       "path": "dist/nonsuch-components.js",
       "import": "*",
       "limit": "23 kB",
