@@ -50,5 +50,7 @@ export const nsLocaleFrCA: NsLocaleMessages = {
 
   navigation: {
     breadcrumbs: "Fil d'Ariane",
+    collapseMenu: 'Masquer le menu',
+    expandMenu: 'Afficher le menu',
   },
 }
