@@ -1,6 +1,4 @@
 import { describe, it, expect, afterEach, vi } from 'vitest'
-import { readFileSync } from 'node:fs'
-import { resolve } from 'node:path'
 import { mount, VueWrapper } from '@vue/test-utils'
 import { defineComponent, h, nextTick } from 'vue'
 import NsTooltip from './NsTooltip.vue'

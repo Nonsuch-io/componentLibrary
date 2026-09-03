@@ -119,6 +119,75 @@ export const HoverableIsReal: Story = {
     // A second, independent property from the same block. If the block stops
     // applying, pointerEvents alone could in principle be satisfied by some
     // other rule; the token font-size could not.
-    await expect(style.fontSize, 'token font-size did not apply').toBe('14px')
+    //
+    // Derived from the token, NOT hardcoded to '14px'. This guards a
+    // POINTER-EVENTS defect, and it should not go red because a designer retuned
+    // --ns-font-size-sm for unrelated reasons — a test that cries wolf about
+    // something it does not guard gets muted, and then it guards nothing.
+    const rootFontPx = parseFloat(getComputedStyle(document.documentElement).fontSize)
+    const tokenRem = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--ns-font-size-sm') || '0.875',
+    )
+    await expect(style.fontSize, 'token font-size did not apply').toBe(`${tokenRem * rootFontPx}px`)
+  },
+}
+
+/**
+ * THE HOVER-ONTO-THE-TOOLTIP PATH, IN A REAL BROWSER.
+ *
+ * HoverableIsReal proves our stylesheet reaches the teleported element. It does
+ * NOT exercise handleTooltipMouseEnter/Leave — it hovers the anchor and stops.
+ * That code (the dual PointerEvent + MouseEvent re-dispatch of
+ * componentLibrary-b6j) was covered only by dispatchEvent in happy-dom, and this
+ * component's own history says why that is weak: dispatchEvent bypasses
+ * hit-testing, in jsdom AND in a browser. Review caught the gap.
+ *
+ * Here the pointer genuinely moves anchor -> tooltip, native events fire
+ * alongside our synthetic ones, and the tooltip must survive past the hide
+ * delay. That is the hoverable half of WCAG 2.1 SC 1.4.13 end to end.
+ */
+export const HoverOntoTooltipKeepsItOpen: Story = {
+  args: { delay: 0, hideDelay: 300 },
+  render: (args) => ({
+    components: { NsTooltip },
+    setup: () => ({ args }),
+    template: `
+      <button data-testid="anchor" style="padding: 8px 16px; margin: 60px">
+        Hover me
+        <NsTooltip v-bind="args">Read me slowly</NsTooltip>
+      </button>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const anchor = canvasElement.querySelector('[data-testid="anchor"]') as HTMLElement
+    await userEvent.hover(anchor)
+
+    const tip = await new Promise<HTMLElement>((resolve, reject) => {
+      const started = Date.now()
+      const poll = setInterval(() => {
+        const el = document.querySelector('.ns-tooltip') as HTMLElement | null
+        if (el) {
+          clearInterval(poll)
+          resolve(el)
+        } else if (Date.now() - started > 3000) {
+          clearInterval(poll)
+          reject(new Error('tooltip never opened on hover'))
+        }
+      }, 50)
+    })
+
+    // Leave the anchor — this schedules Quasar's hide — then move onto the
+    // bubble before it fires. A real pointer move, so the browser's own
+    // pointerenter fires too, on top of our re-dispatch.
+    await userEvent.unhover(anchor)
+    await userEvent.hover(tip)
+
+    // Past the hideDelay window. Still open means the pending hide was
+    // cancelled, which is the whole point of the re-dispatch.
+    await new Promise((r) => setTimeout(r, 600))
+    await expect(
+      document.querySelector('.ns-tooltip'),
+      'tooltip closed while the pointer was on it — the hoverable half of SC 1.4.13',
+    ).not.toBeNull()
   },
 }
