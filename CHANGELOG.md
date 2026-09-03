@@ -4,6 +4,22 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.33.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.32.0...v0.33.0) (2026-09-03)
+
+
+### Features
+
+* **input:** render the label above the field, associated by for/id (componentLibrary-eag) ([2ebaa8d](https://github.com/Nonsuch-io/componentLibrary/commit/2ebaa8d189a98d62105707bd971c771d3108d2d1))
+* **input:** render the label above the field, associated by for/id (componentLibrary-eag) ([42b6ba9](https://github.com/Nonsuch-io/componentLibrary/commit/42b6ba90841070517e9009bbb26334bc02310a95))
+
+
+### Bug Fixes
+
+* **a11y:** an empty label prop left the toggle nameless (componentLibrary-knw) ([06986f3](https://github.com/Nonsuch-io/componentLibrary/commit/06986f3a4e0cdee96d44eb1a0dba3f5d4d8f9849))
+* **a11y:** stop claiming a menu, and let consumers name the toggles (componentLibrary-cfo) ([163dcc5](https://github.com/Nonsuch-io/componentLibrary/commit/163dcc58a71c0e95dfc531a5df667baad4cf88f2))
+* **a11y:** stop claiming a menu, and let consumers name the toggles (componentLibrary-cfo) ([5f4d442](https://github.com/Nonsuch-io/componentLibrary/commit/5f4d44217cffe546fe9a42ab51a665f6217bf46c))
+* **input:** single root, for passthrough, and a non-empty id (componentLibrary-eag) ([14e652d](https://github.com/Nonsuch-io/componentLibrary/commit/14e652d9accbe5c4c7324a36d6005526124d9d87))
+
 ## [0.32.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.7...v0.32.0) (2026-09-03)
 
 

@@ -1,6 +1,6 @@
 {
   "name": "@nonsuch/component-library",
-  "version": "0.32.0",
+  "version": "0.33.0",
   "description": "A Vue 3 component library built on Quasar with opinionated defaults and custom components.",
   "type": "module",
   "sideEffects": false,
@@ -63,7 +63,7 @@
   },
   "size-limit": [
     {
-      "name": "full library (gzip) \u2014 a SOFT ceiling: it exists to make you stop and ask whether the gain is worth the bytes, or whether an audit could win them back. Bump it deliberately, with the reason, never incidentally",
+      "name": "full library (gzip) — a SOFT ceiling: it exists to make you stop and ask whether the gain is worth the bytes, or whether an audit could win them back. Bump it deliberately, with the reason, never incidentally",
       "path": "dist/nonsuch-components.js",
       "import": "*",
       "limit": "23.5 kB",
@@ -99,7 +99,7 @@
       ]
     },
     {
-      "name": "app shell (heaviest import; contains NsInput and NsNavSidebar. Includes the en-CA locale object \u2014 a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
+      "name": "app shell (heaviest import; contains NsInput and NsNavSidebar. Includes the en-CA locale object — a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsAppShell }",
       "limit": "10.75 kB",
