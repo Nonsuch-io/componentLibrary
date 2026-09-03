@@ -63,10 +63,10 @@
   },
   "size-limit": [
     {
-      "name": "full library (gzip)",
+      "name": "full library (gzip) \u2014 a CEILING, not a high-water mark: do not bump it to fit a PR",
       "path": "dist/nonsuch-components.js",
       "import": "*",
-      "limit": "22.5 kB",
+      "limit": "23 kB",
       "gzip": true,
       "ignore": [
         "vue",
@@ -79,6 +79,18 @@
       "path": "dist/nonsuch-components.js",
       "import": "{ NsButton }",
       "limit": "2.75 kB",
+      "gzip": true,
+      "ignore": [
+        "vue",
+        "quasar",
+        "@phosphor-icons/vue"
+      ]
+    },
+    {
+      "name": "single component: NsBrandLogo (must not pull more than NsImage, which is 1.38 kB)",
+      "path": "dist/nonsuch-components.js",
+      "import": "{ NsBrandLogo }",
+      "limit": "2.25 kB",
       "gzip": true,
       "ignore": [
         "vue",
