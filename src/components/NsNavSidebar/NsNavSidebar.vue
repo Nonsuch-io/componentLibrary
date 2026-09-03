@@ -17,13 +17,11 @@
     <button
       v-if="showToggle"
       class="ns-nav-sidebar__toggle-btn"
-      :aria-label="isExpanded ? undefined : locale.navigation.expandMenu"
+      :aria-label="isExpanded ? undefined : expandText"
       @click="isExpanded = !isExpanded"
     >
       <AnimatedEye :open="isExpanded" />
-      <span v-if="isExpanded" class="ns-nav-sidebar__toggle-label">{{
-        locale.navigation.collapseMenu
-      }}</span>
+      <span v-if="isExpanded" class="ns-nav-sidebar__toggle-label">{{ collapseText }}</span>
     </button>
 
     <!-- Main nav items -->
@@ -62,7 +60,6 @@
             :aria-controls="
               hasSub(item) && !item.disable && openSub === item.id ? flyoutId : undefined
             "
-            :aria-haspopup="hasSub(item) && !item.disable ? 'true' : undefined"
             :aria-label="isExpanded ? undefined : item.label"
             :aria-disabled="item.disable ? 'true' : undefined"
             :tabindex="item.disable ? -1 : undefined"
@@ -101,6 +98,22 @@
       </template>
     </ul>
 
+    <!--
+      NO aria-haspopup ON THE PILLS, deliberately. It used to be "true", which
+      maps to the value "menu" per ARIA — announcing a menu, while what opens is
+      this plain <div> of links and buttons with no role="menu" and no
+      role="menuitem" children. Announced structure that does not match reality.
+
+      The alternative was building a real menu, which obliges the full WAI-ARIA
+      keyboard contract: arrow keys, Home/End, type-ahead. Announcing a menu we
+      have not built is worse than announcing nothing — the same reasoning that
+      made NsMenu deliberately roleless in componentLibrary-nb7, and the same
+      reasoning Quasar used when 2.25.0 stopped writing aria-haspopup unless the
+      popup's role is one of dialog/grid/listbox/menu/tree.
+
+      aria-expanded and aria-controls STAY. Those are accurate: the pill does
+      toggle a region, and that region does have this id. Story: componentLibrary-cfo.
+    -->
     <!-- Sub-menu flyout — teleported to <body> so it escapes the drawer's
          overflow clipping (q-drawer__content .scroll = overflow:auto, and
          ns-app-shell__drawer = overflow:hidden). Only one flyout is open at a
@@ -156,7 +169,6 @@
             ? flyoutId
             : undefined
         "
-        :aria-haspopup="hasSub(bottomItem) && !bottomItem.disable ? 'true' : undefined"
         :aria-label="isExpanded ? undefined : bottomItem.label"
         :aria-disabled="bottomItem.disable ? 'true' : undefined"
         :tabindex="bottomItem.disable ? -1 : undefined"
@@ -272,10 +284,27 @@ export interface NsNavSidebarProps {
    * Pass false when a parent already provides its own collapse affordance.
    */
   showToggle?: boolean
+  /**
+   * VISIBLE text on the toggle when the sidebar is expanded. Overrides the
+   * active locale for this instance.
+   *
+   * It drives the visible string, and the accessible name follows FROM it —
+   * there is deliberately no separate label prop. One that set `aria-label`
+   * independently would let the name and the visible text disagree again,
+   * which is the WCAG 2.5.3 failure componentLibrary-1ps fixed here.
+   */
+  collapseLabel?: string
+  /**
+   * Accessible name for the toggle when COLLAPSED, where it is icon-only and
+   * has no visible text to be named from. Overrides the active locale.
+   */
+  expandLabel?: string
 }
 
 const props = withDefaults(defineProps<NsNavSidebarProps>(), {
   bottomItem: undefined,
+  collapseLabel: undefined,
+  expandLabel: undefined,
   defaultExpanded: true,
   expanded: undefined,
   showToggle: true,
@@ -286,6 +315,25 @@ const props = withDefaults(defineProps<NsNavSidebarProps>(), {
 // spots, and a hardcoded string is invisible to every gate we run.
 // Story: componentLibrary-1ps.
 const locale = useNsLocale()
+
+// `?.trim() ||`, NOT `??`. Nullish coalescing treats '' as a VALUE, so
+// collapseLabel="" would render an empty visible span with no aria-label to
+// fall back on — a nameless button. Same for expandLabel="", which would set
+// aria-label to the empty string, which the accessibility tree reads as no name
+// at all. Review reproduced both in Chromium: axe button-name, "aria-label
+// attribute does not exist or is empty".
+//
+// This is the empty-but-present class that has bitten this repo twice already
+// (componentLibrary-3sy, and NsBrandLogo's hasValue helper). An earlier version
+// of this comment claimed `??` matched NsBreadcrumbs — it does not.
+// NsBreadcrumbs.vue:57 is `props.ariaLabel?.trim() || locale...`, i.e. exactly
+// this guard. It was NsMarketingEmailCapture that uses bare `??`, and that is a
+// pre-existing instance of the same bug (componentLibrary-d13).
+//
+// Realistic input, not contrived: `:collapse-label="t('nav.hide')"` resolves to
+// '' before translations load. componentLibrary-knw.
+const collapseText = computed(() => props.collapseLabel?.trim() || locale.navigation.collapseMenu)
+const expandText = computed(() => props.expandLabel?.trim() || locale.navigation.expandMenu)
 
 const emit = defineEmits<{
   'update:modelValue': [id: string]

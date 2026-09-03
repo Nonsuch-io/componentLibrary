@@ -55,5 +55,7 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     breadcrumbs: 'Breadcrumb',
     collapseMenu: 'Hide Menu',
     expandMenu: 'Expand menu',
+    closeMenu: 'Close menu',
+    openMenu: 'Open menu',
   },
 }

@@ -9,7 +9,7 @@
           flat
           round
           dense
-          :aria-label="drawerOpen ? 'Close menu' : 'Open menu'"
+          :aria-label="drawerOpen ? locale.navigation.closeMenu : locale.navigation.openMenu"
           class="ns-app-shell__menu-btn"
           @click="toggleDrawer"
         >
@@ -176,6 +176,7 @@
 </template>
 
 <script setup lang="ts">
+import { useNsLocale } from '../../composables/useNsLocale'
 import { ref, computed, watch } from 'vue'
 import { useQuasar } from 'quasar'
 import { PhList, PhMagnifyingGlass, PhX } from '@phosphor-icons/vue'
@@ -252,6 +253,16 @@ export interface NsAppShellProps {
   /** Menu items for the user avatar dropdown */
   userMenuItems?: NsAppShellUserMenuItem[]
 }
+
+// The hamburger's accessible name was two hardcoded English literals. It is
+// icon-only so there was never a label-in-name mismatch — purely the i18n half,
+// the same gap componentLibrary-1ps closed one component over.
+//
+// Its own key pair rather than reusing the sidebar's: "Hide Menu" is the
+// SIDEBAR's visible text and reads oddly as a hamburger's name. Measured cost of
+// adopting the locale here is ~10 B, because componentLibrary-1ps already pulled
+// the en-CA object into this chunk. Story: componentLibrary-2ke.
+const locale = useNsLocale()
 
 const props = withDefaults(defineProps<NsAppShellProps>(), {
   tabs: () => [],

@@ -456,7 +456,8 @@ describe('NsNavSidebar', () => {
         },
       })
       const bottomPill = wrapper.find('.ns-nav-sidebar__bottom .ns-nav-sidebar__pill')
-      expect(bottomPill.attributes('aria-haspopup')).toBe('true')
+      // componentLibrary-cfo: no menu claim on the bottom pill either.
+      expect(bottomPill.attributes('aria-haspopup')).toBeUndefined()
       await bottomPill.trigger('click')
       expect(flyoutSubPills().map((p) => p.textContent?.trim())).toEqual(['Profile', 'Billing'])
       expect(bottomPill.attributes('aria-expanded')).toBe('true')
@@ -472,11 +473,44 @@ describe('NsNavSidebar', () => {
     })
 
     // --- 8pi: a11y ---
-    it('sets aria-haspopup only on pills that have sub-items', () => {
+    // WAS: asserted aria-haspopup="true" on pills with sub-items. That claim was
+    // FALSE — "true" maps to "menu" per ARIA, and the flyout is a plain <div> of
+    // links and buttons with no role=menu and no menuitem children. Announced
+    // structure that did not match reality (componentLibrary-cfo).
+    //
+    // Rewritten rather than deleted, because the pill still needs to announce
+    // SOMETHING about the region it toggles — and aria-expanded/aria-controls do
+    // that accurately. Deleting the test would have left nothing checking that.
+    it('does NOT claim a menu, and marks only sub-bearing pills as expandable', () => {
       const wrapper = mount$()
       const pills = wrapper.findAll('.ns-nav-sidebar__pill')
-      expect(pills[1].attributes('aria-haspopup')).toBe('true') // Products (has sub)
-      expect(pills[0].attributes('aria-haspopup')).toBeUndefined() // Home (no sub)
+      const withSub = pills[1] // Products
+      const withoutSub = pills[0] // Home
+
+      expect(
+        withSub.attributes('aria-haspopup'),
+        'claims a menu; the flyout is a div of links and buttons',
+      ).toBeUndefined()
+      expect(withoutSub.attributes('aria-haspopup')).toBeUndefined()
+
+      // The accurate half, kept: this pill does toggle a region.
+      expect(withSub.attributes('aria-expanded')).toBe('false')
+      expect(withoutSub.attributes('aria-expanded')).toBeUndefined()
+    })
+
+    it('points aria-controls at the flyout only while it exists', async () => {
+      const wrapper = mount$()
+      const pill = wrapper.findAll('.ns-nav-sidebar__pill')[1]
+
+      // Closed: the flyout is not rendered, so a reference would dangle.
+      // aria-controls must name an element that EXISTS.
+      expect(pill.attributes('aria-controls')).toBeUndefined()
+
+      await pill.trigger('click')
+      const id = pill.attributes('aria-controls')
+      expect(pill.attributes('aria-expanded')).toBe('true')
+      expect(id, 'no aria-controls once the flyout is open').toBeTruthy()
+      expect(document.getElementById(id as string), 'aria-controls dangles').not.toBeNull()
     })
 
     it('closes the flyout when focus leaves it (focusout)', async () => {
@@ -589,6 +623,77 @@ describe('NsNavSidebar', () => {
     // `expanded` then fails NsNavSidebar's boolean prop. Same shape as the
     // NsDialog case fixed in componentLibrary-9ka — and caught the same way,
     // by typecheck now reading test files, while every test passed.
+    it.each<[string, boolean]>([
+      ['expanded', true],
+      ['collapsed', false],
+    ])('lets a %s consumer override the locale per instance', (_l, expanded) => {
+      // componentLibrary-knw. The README documents per-component overrides as a
+      // general contract and both sibling locale consumers honour it; this one
+      // did not. Provide fr-CA AND a prop, and the PROP must win — otherwise the
+      // test would pass on a component that simply ignored the prop and happened
+      // to read the same locale.
+      const Host = defineComponent({
+        setup: () => {
+          provideNsLocale(nsLocaleFrCA)
+          return () =>
+            h(NsNavSidebar, {
+              items,
+              modelValue: 'home',
+              expanded,
+              collapseLabel: 'Tuck away',
+              expandLabel: 'Bring back',
+            })
+        },
+      })
+      const wrapper = mount(Host, { attachTo: document.body })
+      wrappers.push(wrapper)
+
+      const btn = wrapper.find('.ns-nav-sidebar__toggle-btn')
+      const actual = expanded
+        ? wrapper.find('.ns-nav-sidebar__toggle-label').text()
+        : btn.attributes('aria-label')
+      expect(actual, 'the prop did not beat the injected locale').toBe(
+        expanded ? 'Tuck away' : 'Bring back',
+      )
+    })
+
+    it.each<[string, string]>([
+      ['empty string', ''],
+      ['whitespace', '   '],
+    ])('falls back to the locale when collapseLabel is %s', (_l, value) => {
+      // ?? would treat '' as a VALUE and render an empty span with no aria-label
+      // to fall back on — a nameless button. Review reproduced exactly that in
+      // Chromium (axe button-name) before this guard existed.
+      // Realistic: :collapse-label="t('nav.hide')" resolves to '' pre-load.
+      const wrapper = mount$({ expanded: true, collapseLabel: value })
+      expect(wrapper.find('.ns-nav-sidebar__toggle-label').text()).toBe(
+        nsLocaleEnCA.navigation.collapseMenu,
+      )
+    })
+
+    it.each<[string, string]>([
+      ['empty string', ''],
+      ['whitespace', '   '],
+    ])('falls back to the locale when expandLabel is %s', (_l, value) => {
+      // Symmetric and worse: an empty aria-label is read as NO name, so the
+      // icon-only collapsed button would announce as "button" and nothing else.
+      const wrapper = mount$({ expanded: false, expandLabel: value })
+      expect(wrapper.find('.ns-nav-sidebar__toggle-btn').attributes('aria-label')).toBe(
+        nsLocaleEnCA.navigation.expandMenu,
+      )
+    })
+
+    it('keeps the name coming FROM the visible text when overridden', () => {
+      // The trap this bead had to avoid: a prop that set aria-label separately
+      // would let the name and the visible text disagree again — the WCAG 2.5.3
+      // failure componentLibrary-1ps fixed. collapseLabel drives the VISIBLE
+      // string and the name follows it, so there is still no aria-label.
+      const wrapper = mount$({ expanded: true, collapseLabel: 'Tuck away' })
+      const btn = wrapper.find('.ns-nav-sidebar__toggle-btn')
+      expect(wrapper.find('.ns-nav-sidebar__toggle-label').text()).toBe('Tuck away')
+      expect(btn.attributes('aria-label'), 'override reintroduced label-in-name').toBeUndefined()
+    })
+
     it.each<[string, boolean]>([
       ['expanded', true],
       ['collapsed', false],
