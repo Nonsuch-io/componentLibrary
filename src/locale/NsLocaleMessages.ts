@@ -69,5 +69,18 @@ export interface NsLocaleMessages {
   navigation: {
     /** Accessible name for the breadcrumb <nav> landmark. */
     breadcrumbs: string
+    /**
+     * VISIBLE text on the sidebar toggle when the sidebar is expanded.
+     *
+     * This is the accessible name too — the button takes its name from this
+     * content rather than an aria-label, so the two cannot drift apart. See
+     * NsNavSidebar and WCAG 2.5.3.
+     */
+    collapseMenu: string
+    /**
+     * Accessible name for the sidebar toggle when COLLAPSED, where the button
+     * is icon-only and has no visible text to be named from.
+     */
+    expandMenu: string
   }
 }

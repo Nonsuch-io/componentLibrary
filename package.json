@@ -1,6 +1,6 @@
 {
   "name": "@nonsuch/component-library",
-  "version": "0.31.3",
+  "version": "0.31.7",
   "description": "A Vue 3 component library built on Quasar with opinionated defaults and custom components.",
   "type": "module",
   "sideEffects": false,
@@ -99,10 +99,10 @@
       ]
     },
     {
-      "name": "app shell (heaviest import; contains NsInput, so NsInput changes land here)",
+      "name": "app shell (heaviest import; contains NsInput and NsNavSidebar. Includes the en-CA locale object — a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsAppShell }",
-      "limit": "10.25 kB",
+      "limit": "10.5 kB",
       "gzip": true,
       "ignore": [
         "vue",
@@ -127,14 +127,8 @@
     "@phosphor-icons/vue": "^2.2.1"
   },
   "peerDependencies": {
-    "@quasar/vite-plugin": "^1.8.0",
     "quasar": "^2.17.0",
     "vue": "^3.5.0"
-  },
-  "peerDependenciesMeta": {
-    "@quasar/vite-plugin": {
-      "optional": true
-    }
   },
   "pnpm": {
     "onlyBuiltDependencies": [

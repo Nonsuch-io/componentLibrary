@@ -1,14 +1,29 @@
 <template>
   <nav class="ns-nav-sidebar" :class="{ 'ns-nav-sidebar--expanded': isExpanded }">
     <!-- Toggle button -->
+    <!--
+      NO aria-label WHEN EXPANDED, deliberately. The button then takes its
+      accessible name from the visible text, so the two cannot disagree.
+
+      It used to be named "Collapse menu" while displaying "Hide Menu" — a WCAG
+      2.5.3 label-in-name failure: a voice-control user saying "click Hide Menu"
+      matched nothing, and a screen reader announced words that were not on
+      screen. axe cannot catch this (label-content-name-mismatch is experimental
+      and off by default), so the test in NsNavSidebar.test.ts is the only guard.
+
+      Collapsed, the button is icon-only and has no visible text to be named
+      from, so an aria-label is correct there. Story: componentLibrary-1ps.
+    -->
     <button
       v-if="showToggle"
       class="ns-nav-sidebar__toggle-btn"
-      :aria-label="isExpanded ? 'Collapse menu' : 'Expand menu'"
+      :aria-label="isExpanded ? undefined : locale.navigation.expandMenu"
       @click="isExpanded = !isExpanded"
     >
       <AnimatedEye :open="isExpanded" />
-      <span v-if="isExpanded" class="ns-nav-sidebar__toggle-label">Hide Menu</span>
+      <span v-if="isExpanded" class="ns-nav-sidebar__toggle-label">{{
+        locale.navigation.collapseMenu
+      }}</span>
     </button>
 
     <!-- Main nav items -->
@@ -196,6 +211,7 @@ import {
 // chunk keeps it out of the main bundle (and off consumers who set showToggle=false).
 const AnimatedEye = defineAsyncComponent(() => import('./AnimatedEye.vue'))
 import NsIcon from '../NsIcon/NsIcon.vue'
+import { useNsLocale } from '../../composables/useNsLocale'
 
 /**
  * A sub-item under a parent nav item.
@@ -264,6 +280,12 @@ const props = withDefaults(defineProps<NsNavSidebarProps>(), {
   expanded: undefined,
   showToggle: true,
 })
+
+// The only user-facing strings this component owns. Previously hardcoded
+// English literals in the template — i18n is one of this repo's named blind
+// spots, and a hardcoded string is invisible to every gate we run.
+// Story: componentLibrary-1ps.
+const locale = useNsLocale()
 
 const emit = defineEmits<{
   'update:modelValue': [id: string]

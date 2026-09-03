@@ -4,6 +4,39 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.31.7](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.6...v0.31.7) (2026-09-03)
+
+
+### Bug Fixes
+
+* **a11y:** name the nav toggle from its visible text (componentLibrary-1ps) ([381261d](https://github.com/Nonsuch-io/componentLibrary/commit/381261d0a54f68ab4b84f5aa9224f55c578ca75d))
+* **a11y:** name the nav toggle from its visible text (componentLibrary-1ps) ([004e914](https://github.com/Nonsuch-io/componentLibrary/commit/004e9143c1cdb54ab2373e6de76bef0d72f0a4e5))
+
+## [0.31.6](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.5...v0.31.6) (2026-09-03)
+
+
+### Bug Fixes
+
+* **NsTooltip:** styles never reached the portal; hover events drifted (componentLibrary-3sy) ([548fd81](https://github.com/Nonsuch-io/componentLibrary/commit/548fd819c7658d57c175383597728fe9e928c69f))
+* **NsTooltip:** styles never reached the portal; hover events drifted (componentLibrary-3sy) ([a5ba6a6](https://github.com/Nonsuch-io/componentLibrary/commit/a5ba6a6d8e7bf6f1b0b1f14f5730bb89f675c6e8))
+
+## [0.31.5](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.4...v0.31.5) (2026-09-02)
+
+
+### Bug Fixes
+
+* **locale:** make NsLocaleKey survive two copies of the library (componentLibrary-b5h.4) ([4a49c1d](https://github.com/Nonsuch-io/componentLibrary/commit/4a49c1d9c75f7ac1a5b338afc85dd2f3851fbebb))
+* **locale:** make NsLocaleKey survive two copies of the library (componentLibrary-b5h.4) ([b740b1f](https://github.com/Nonsuch-io/componentLibrary/commit/b740b1fc523e1e3a7bc20007461665252a9a53b8))
+
+## [0.31.4](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.3...v0.31.4) (2026-09-02)
+
+
+### Bug Fixes
+
+* **NsMenu:** assert the deliberately roleless popup (componentLibrary-nb7) ([1be88ec](https://github.com/Nonsuch-io/componentLibrary/commit/1be88ecfab13543f32fe32462bbb48a08d872521))
+* **NsMenu:** assert the deliberately roleless popup (componentLibrary-nb7) ([be5a12a](https://github.com/Nonsuch-io/componentLibrary/commit/be5a12afeeeaf47242c6198029fd6d09dea5dc05))
+* **NsMenu:** the escape hatch I documented was the wrong layer (componentLibrary-nb7) ([23fdb01](https://github.com/Nonsuch-io/componentLibrary/commit/23fdb0193ce650af8ee2d6f5bd6b23f5e451e431))
+
 ## [0.31.3](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.2...v0.31.3) (2026-08-24)
 
 
