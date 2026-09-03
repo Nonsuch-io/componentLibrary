@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.31.7](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.6...v0.31.7) (2026-09-03)
+
+
+### Bug Fixes
+
+* **a11y:** name the nav toggle from its visible text (componentLibrary-1ps) ([381261d](https://github.com/Nonsuch-io/componentLibrary/commit/381261d0a54f68ab4b84f5aa9224f55c578ca75d))
+* **a11y:** name the nav toggle from its visible text (componentLibrary-1ps) ([004e914](https://github.com/Nonsuch-io/componentLibrary/commit/004e9143c1cdb54ab2373e6de76bef0d72f0a4e5))
+
 ## [0.31.6](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.5...v0.31.6) (2026-09-03)
 
 
