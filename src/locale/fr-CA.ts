@@ -52,5 +52,7 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     breadcrumbs: "Fil d'Ariane",
     collapseMenu: 'Masquer le menu',
     expandMenu: 'Afficher le menu',
+    closeMenu: 'Fermer le menu',
+    openMenu: 'Ouvrir le menu',
   },
 }

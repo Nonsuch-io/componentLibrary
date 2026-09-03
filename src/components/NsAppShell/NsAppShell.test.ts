@@ -1,6 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
+import { defineComponent, h } from 'vue'
 import NsAppShell from './NsAppShell.vue'
+import { nsLocaleEnCA } from '../../locale/en-CA'
+import { nsLocaleFrCA } from '../../locale/fr-CA'
+import { provideNsLocale } from '../../composables/useNsLocale'
 import type { NsAppShellTab, NsAppShellNavItem, NsAppShellUserMenuItem } from './types'
 
 // Mock Quasar's useQuasar to control screen width
@@ -761,5 +765,40 @@ describe('NsAppShell', () => {
       })
       expect(wrapper.find('.stub-icon').exists()).toBe(true)
     })
+  })
+})
+
+describe('hamburger accessible name (componentLibrary-2ke)', () => {
+  beforeEach(() => {
+    mockScreenWidth.value = 800 // below md, so the hamburger renders
+  })
+
+  it('names the hamburger from the locale, not a hardcoded literal', () => {
+    // Icon-only, so there is no visible text and no label-in-name risk — this is
+    // purely the i18n half. It was 'Close menu' / 'Open menu' as literals.
+    const Host = defineComponent({
+      setup: () => {
+        provideNsLocale(nsLocaleFrCA)
+        return () => h(NsAppShell)
+      },
+    })
+    const wrapper = mount(Host, { attachTo: document.body })
+    const btn = wrapper.find('.ns-app-shell__menu-btn')
+
+    expect(btn.exists(), 'hamburger did not render; check the width mock').toBe(true)
+    expect(btn.attributes('aria-label'), 'name did not follow the injected locale').toBe(
+      nsLocaleFrCA.navigation.openMenu,
+    )
+    // Guard the guard: identical fr/en values would pass on a literal.
+    expect(nsLocaleFrCA.navigation.openMenu).not.toBe(nsLocaleEnCA.navigation.openMenu)
+    wrapper.unmount()
+  })
+
+  it('uses its OWN key pair, not the sidebar toggle strings', () => {
+    // "Hide Menu" is the SIDEBAR's visible text. Reusing it here would name an
+    // icon-only button with a phrase written to be read, not announced.
+    expect(nsLocaleEnCA.navigation.openMenu).toBe('Open menu')
+    expect(nsLocaleEnCA.navigation.closeMenu).toBe('Close menu')
+    expect(nsLocaleEnCA.navigation.closeMenu).not.toBe(nsLocaleEnCA.navigation.collapseMenu)
   })
 })

@@ -82,5 +82,13 @@ export interface NsLocaleMessages {
      * is icon-only and has no visible text to be named from.
      */
     expandMenu: string
+    /**
+     * Accessible name for the app-shell hamburger when the drawer is OPEN.
+     * Separate from collapseMenu, which is the sidebar's VISIBLE text and reads
+     * oddly as an icon-only button's name.
+     */
+    closeMenu: string
+    /** Accessible name for the app-shell hamburger when the drawer is CLOSED. */
+    openMenu: string
   }
 }

@@ -56,6 +56,8 @@ describe('nsLocaleEnCA', () => {
     // changes shipped product copy. componentLibrary-1ps.
     expect(nsLocaleEnCA.navigation.collapseMenu).toBe('Hide Menu')
     expect(nsLocaleEnCA.navigation.expandMenu).toBe('Expand menu')
+    expect(nsLocaleEnCA.navigation.closeMenu).toBe('Close menu')
+    expect(nsLocaleEnCA.navigation.openMenu).toBe('Open menu')
   })
 
   it('every top-level key contains only string values (no nesting beyond 1 level)', () => {
@@ -101,6 +103,8 @@ describe('nsLocaleFrCA', () => {
     expect(nsLocaleFrCA.navigation.breadcrumbs).toBe("Fil d'Ariane")
     expect(nsLocaleFrCA.navigation.collapseMenu).toBe('Masquer le menu')
     expect(nsLocaleFrCA.navigation.expandMenu).toBe('Afficher le menu')
+    expect(nsLocaleFrCA.navigation.closeMenu).toBe('Fermer le menu')
+    expect(nsLocaleFrCA.navigation.openMenu).toBe('Ouvrir le menu')
   })
 
   it('every top-level key contains only string values', () => {
