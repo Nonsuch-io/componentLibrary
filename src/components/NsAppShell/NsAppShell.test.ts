@@ -794,6 +794,29 @@ describe('hamburger accessible name (componentLibrary-2ke)', () => {
     wrapper.unmount()
   })
 
+  it('names it from the locale in the OPEN state too, not just closed', async () => {
+    // The closed branch is the default, so a test that only mounts covers
+    // openMenu and leaves closeMenu unexercised. Review proved it: hardcoding
+    // ONLY the closeMenu branch passed all 1085 tests. My "every guard
+    // mutation-tested" claim was false for exactly this path.
+    const Host = defineComponent({
+      setup: () => {
+        provideNsLocale(nsLocaleFrCA)
+        return () => h(NsAppShell)
+      },
+    })
+    const wrapper = mount(Host, { attachTo: document.body })
+    const btn = wrapper.find('.ns-app-shell__menu-btn')
+
+    expect(btn.attributes('aria-label')).toBe(nsLocaleFrCA.navigation.openMenu)
+    await btn.trigger('click')
+    expect(btn.attributes('aria-label'), 'the open-drawer branch is not localised').toBe(
+      nsLocaleFrCA.navigation.closeMenu,
+    )
+    expect(nsLocaleFrCA.navigation.closeMenu).not.toBe(nsLocaleEnCA.navigation.closeMenu)
+    wrapper.unmount()
+  })
+
   it('uses its OWN key pair, not the sidebar toggle strings', () => {
     // "Hide Menu" is the SIDEBAR's visible text. Reusing it here would name an
     // icon-only button with a phrase written to be read, not announced.

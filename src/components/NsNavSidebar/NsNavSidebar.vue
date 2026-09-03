@@ -316,10 +316,24 @@ const props = withDefaults(defineProps<NsNavSidebarProps>(), {
 // Story: componentLibrary-1ps.
 const locale = useNsLocale()
 
-// prop ?? locale, the same shape NsBreadcrumbs and NsMarketingEmailCapture use.
-// componentLibrary-knw.
-const collapseText = computed(() => props.collapseLabel ?? locale.navigation.collapseMenu)
-const expandText = computed(() => props.expandLabel ?? locale.navigation.expandMenu)
+// `?.trim() ||`, NOT `??`. Nullish coalescing treats '' as a VALUE, so
+// collapseLabel="" would render an empty visible span with no aria-label to
+// fall back on — a nameless button. Same for expandLabel="", which would set
+// aria-label to the empty string, which the accessibility tree reads as no name
+// at all. Review reproduced both in Chromium: axe button-name, "aria-label
+// attribute does not exist or is empty".
+//
+// This is the empty-but-present class that has bitten this repo twice already
+// (componentLibrary-3sy, and NsBrandLogo's hasValue helper). An earlier version
+// of this comment claimed `??` matched NsBreadcrumbs — it does not.
+// NsBreadcrumbs.vue:57 is `props.ariaLabel?.trim() || locale...`, i.e. exactly
+// this guard. It was NsMarketingEmailCapture that uses bare `??`, and that is a
+// pre-existing instance of the same bug (componentLibrary-d13).
+//
+// Realistic input, not contrived: `:collapse-label="t('nav.hide')"` resolves to
+// '' before translations load. componentLibrary-knw.
+const collapseText = computed(() => props.collapseLabel?.trim() || locale.navigation.collapseMenu)
+const expandText = computed(() => props.expandLabel?.trim() || locale.navigation.expandMenu)
 
 const emit = defineEmits<{
   'update:modelValue': [id: string]

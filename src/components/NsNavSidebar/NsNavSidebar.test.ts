@@ -481,7 +481,7 @@ describe('NsNavSidebar', () => {
     // Rewritten rather than deleted, because the pill still needs to announce
     // SOMETHING about the region it toggles — and aria-expanded/aria-controls do
     // that accurately. Deleting the test would have left nothing checking that.
-    it('announces the flyout with expanded/controls, and does NOT claim a menu', () => {
+    it('does NOT claim a menu, and marks only sub-bearing pills as expandable', () => {
       const wrapper = mount$()
       const pills = wrapper.findAll('.ns-nav-sidebar__pill')
       const withSub = pills[1] // Products
@@ -654,6 +654,32 @@ describe('NsNavSidebar', () => {
         : btn.attributes('aria-label')
       expect(actual, 'the prop did not beat the injected locale').toBe(
         expanded ? 'Tuck away' : 'Bring back',
+      )
+    })
+
+    it.each<[string, string]>([
+      ['empty string', ''],
+      ['whitespace', '   '],
+    ])('falls back to the locale when collapseLabel is %s', (_l, value) => {
+      // ?? would treat '' as a VALUE and render an empty span with no aria-label
+      // to fall back on — a nameless button. Review reproduced exactly that in
+      // Chromium (axe button-name) before this guard existed.
+      // Realistic: :collapse-label="t('nav.hide')" resolves to '' pre-load.
+      const wrapper = mount$({ expanded: true, collapseLabel: value })
+      expect(wrapper.find('.ns-nav-sidebar__toggle-label').text()).toBe(
+        nsLocaleEnCA.navigation.collapseMenu,
+      )
+    })
+
+    it.each<[string, string]>([
+      ['empty string', ''],
+      ['whitespace', '   '],
+    ])('falls back to the locale when expandLabel is %s', (_l, value) => {
+      // Symmetric and worse: an empty aria-label is read as NO name, so the
+      // icon-only collapsed button would announce as "button" and nothing else.
+      const wrapper = mount$({ expanded: false, expandLabel: value })
+      expect(wrapper.find('.ns-nav-sidebar__toggle-btn').attributes('aria-label')).toBe(
+        nsLocaleEnCA.navigation.expandMenu,
       )
     })
 
