@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.31.6](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.5...v0.31.6) (2026-09-03)
+
+
+### Bug Fixes
+
+* **NsTooltip:** styles never reached the portal; hover events drifted (componentLibrary-3sy) ([548fd81](https://github.com/Nonsuch-io/componentLibrary/commit/548fd819c7658d57c175383597728fe9e928c69f))
+* **NsTooltip:** styles never reached the portal; hover events drifted (componentLibrary-3sy) ([a5ba6a6](https://github.com/Nonsuch-io/componentLibrary/commit/a5ba6a6d8e7bf6f1b0b1f14f5730bb89f675c6e8))
+
 ## [0.31.5](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.4...v0.31.5) (2026-09-02)
 
 
