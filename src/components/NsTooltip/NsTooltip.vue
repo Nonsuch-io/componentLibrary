@@ -122,18 +122,31 @@ function handleKeydown(event: KeyboardEvent) {
   tooltipRef.value?.hide()
 }
 
+// BOTH EVENTS, because Quasar changed which one it listens to and our peer
+// range spans the change. Measured in dist/quasar.client.js, the artifact that
+// actually runs:
+//
+//   2.25.0  QTooltip binds mouseenter / mouseleave on the anchor
+//   2.27.0  binds pointerenter / pointerleave — mouseenter is not listened to
+//
+// The tooltip lives in a body-level portal, not inside the anchor, so a pointer
+// moving onto it never reaches Quasar's anchor logic and the pending hide fires
+// anyway. Re-dispatching on the anchor drives Quasar's own delayShow, which
+// cancels that hide as a side effect of registering its own timer — reusing its
+// delay/hideDelay handling rather than reimplementing it.
+//
+// Old Quasar ignores the PointerEvent, new Quasar ignores the MouseEvent, so
+// dispatching both is correct across ^2.17.0 rather than only on the version we
+// happen to develop against. Quasar's delayShow explicitly tolerates synthetic
+// PointerEvents (isPrimary false, pointerType empty), with a comment saying it
+// is for everyone dispatching them, tests included. Story: componentLibrary-b6j.
 function handleTooltipMouseEnter() {
-  // Quasar only wires mouseenter/mouseleave on the anchor, so moving the
-  // pointer onto the tooltip itself (which lives in a body-level portal, not
-  // inside the anchor) never reaches that logic and the pending hide timer
-  // fires anyway. Re-dispatching mouseenter on the anchor drives Quasar's
-  // own delayShow, which cancels that pending hide as a side effect of
-  // registering its own timer — reusing Quasar's existing delay/hideDelay
-  // handling instead of reimplementing it.
+  anchorEl?.dispatchEvent(new PointerEvent('pointerenter'))
   anchorEl?.dispatchEvent(new MouseEvent('mouseenter'))
 }
 
 function handleTooltipMouseLeave() {
+  anchorEl?.dispatchEvent(new PointerEvent('pointerleave'))
   anchorEl?.dispatchEvent(new MouseEvent('mouseleave'))
 }
 
@@ -217,16 +230,27 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
+// NOT SCOPED, AND THAT IS THE POINT. Quasar teleports QTooltip to a body-level
+// portal (usePortal), and Vue does not stamp a component scope attribute onto a
+// teleported root — so `.ns-tooltip[data-v-xxxx]` matched NOTHING. Measured: the
+// live element's attributes are id, class, role, style, with no data-v-*.
+//
+// Every rule below was therefore inert for the whole life of this component. The
+// tooltip rendered with Quasar's default font, size, radius and padding, and the
+// pointer-events override never applied — which is why the hoverable half of
+// WCAG 2.1 SC 1.4.13 could not work even with the correct events.
+//
+// COST OF THE FIX, stated because it is real: a global selector leaves our scope,
+// so `.ns-tooltip` is now a name a consumer stylesheet can collide with. That is
+// the price of styling something Vue has teleported out of reach; the alternative
+// is not styling it at all. Story: componentLibrary-3sy.
 .ns-tooltip
-  // Quasar renders tooltip content with its `no-pointer-events` class, which is
-  // `pointer-events: none !important` (quasar/src/css/core/mouse.sass). That makes
-  // the tooltip invisible to hit-testing, so a real pointer moving onto it never
-  // generates mouseenter and the tooltip closes out from under the reader — the
-  // "hoverable" half of WCAG 2.1 SC 1.4.13. !important is required to beat theirs.
-  // NsTooltip.test.ts asserts this DECLARATION rather than computed style: jsdom
-  // loads no external stylesheet, so Quasar's rule never applies there and
-  // getComputedStyle reports the same value with or without this line.
+  // Quasar renders tooltip content with `no-pointer-events`, which is
+  // `pointer-events: none !important` (quasar/src/css/core/mouse.sass). That
+  // makes the tooltip invisible to hit-testing, so a real pointer moving onto it
+  // never generates an enter event and it closes out from under the reader.
+  // !important is required to beat theirs.
   pointer-events: auto !important
   font-family: var(--ns-font-family-text)
   font-size: var(--ns-font-size-sm, 0.875rem)

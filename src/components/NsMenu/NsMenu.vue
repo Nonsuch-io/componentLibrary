@@ -44,7 +44,13 @@ export interface NsMenuProps {}
 defineProps<NsMenuProps>()
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
+// NOT SCOPED: QMenu is teleported to a body-level portal, and Vue does not stamp
+// a scope attribute onto a teleported root — measured, the live element carries
+// the ns-menu class but no data-v-*. So `.ns-menu[data-v-xxxx]` matched nothing
+// and this font-family never applied. Same defect as NsTooltip; the trade-off is
+// the same too, a global selector a consumer could collide with.
+// Story: componentLibrary-3sy.
 .ns-menu
   font-family: var(--ns-font-family-text)
 </style>
