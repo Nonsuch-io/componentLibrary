@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.32.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.7...v0.32.0) (2026-09-03)
+
+
+### Features
+
+* **brand:** add NsBrandLogo, a brand-agnostic logo built on NsImage (componentLibrary-zxe) ([1525d3d](https://github.com/Nonsuch-io/componentLibrary/commit/1525d3d57a02bb8d195773715317ea058df64948))
+
 ## [0.31.7](https://github.com/Nonsuch-io/componentLibrary/compare/v0.31.6...v0.31.7) (2026-09-03)
 
 
