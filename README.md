@@ -208,7 +208,7 @@ provideNsLocale(myLocale)
 <NsButton label="Ajouter" />
 ```
 
-The locale interface covers four sections: `common`, `product`, `media`, and `validation`. See the full type in `NsLocaleMessages`.
+The locale interface covers six sections: `common`, `product`, `media`, `validation`, `navigation`, and `marketing`. See the full type in `NsLocaleMessages`.
 
 ### Design Tokens (Optional)
 

@@ -2,6 +2,9 @@ import { describe, it, expect, afterEach, vi } from 'vitest'
 import { mount, type VueWrapper } from '@vue/test-utils'
 import { defineComponent, h, nextTick } from 'vue'
 import NsNavSidebar from './NsNavSidebar.vue'
+import { nsLocaleEnCA } from '../../locale/en-CA'
+import { nsLocaleFrCA } from '../../locale/fr-CA'
+import { provideNsLocale } from '../../composables/useNsLocale'
 import type { NsNavItem } from './NsNavSidebar.vue'
 
 const MockIcon = defineComponent({ render: () => h('span', 'icon') })
@@ -541,6 +544,83 @@ describe('NsNavSidebar', () => {
       await nextTick()
       // top 700 + 300 = 1000 > 760 → clamp to 768 - 300 - 8 = 460
       expect(flyout.style.top).toBe('460px')
+    })
+  })
+
+  describe('toggle accessible name (componentLibrary-1ps)', () => {
+    // WCAG 2.5.3 LABEL IN NAME. The button used to display "Hide Menu" while
+    // being NAMED "Collapse menu": a voice-control user saying "click Hide Menu"
+    // matched nothing, and a screen reader announced words that were not on
+    // screen.
+    //
+    // THESE TESTS ARE THE ONLY GUARD. axe cannot catch it —
+    // label-content-name-mismatch is experimental and off by default — so the
+    // a11y gate turned on in componentLibrary-057 stays green on this defect.
+
+    it('takes its name FROM the visible text when expanded, rather than overriding it', () => {
+      const wrapper = mount$({ expanded: true })
+      const btn = wrapper.find('.ns-nav-sidebar__toggle-btn')
+      const label = wrapper.find('.ns-nav-sidebar__toggle-label')
+
+      // exists() BEFORE text(): deleting the span makes .text() throw
+      // "Cannot call text on an empty DOMWrapper", which reads like a broken
+      // test rather than a nameless button. Review finding.
+      expect(label.exists(), 'no visible label to be named from').toBe(true)
+      expect(label.text(), 'visible label is empty').not.toBe('')
+      // An aria-label here would REPLACE the visible text as the accessible
+      // name, which is the defect. Absent means the name comes from content.
+      expect(
+        btn.attributes('aria-label'),
+        'aria-label is set while visible text exists — it overrides the name a ' +
+          'voice-control user can see and say',
+      ).toBeUndefined()
+    })
+
+    it('names itself with aria-label when collapsed, because there is no visible text', () => {
+      const wrapper = mount$({ expanded: false })
+      const btn = wrapper.find('.ns-nav-sidebar__toggle-btn')
+
+      expect(wrapper.find('.ns-nav-sidebar__toggle-label').exists()).toBe(false)
+      // Icon-only: without this the button announces as "button" and nothing else.
+      expect(btn.attributes('aria-label')).toBe(nsLocaleEnCA.navigation.expandMenu)
+    })
+
+    // Annotated, not inferred: the tuples widen to (string | boolean)[] and
+    // `expanded` then fails NsNavSidebar's boolean prop. Same shape as the
+    // NsDialog case fixed in componentLibrary-9ka — and caught the same way,
+    // by typecheck now reading test files, while every test passed.
+    it.each<[string, boolean]>([
+      ['expanded', true],
+      ['collapsed', false],
+    ])('renders %s text from the injected locale, not a hardcoded literal', (_label, expanded) => {
+      // The strongest anti-hardcoding check available: swap the locale and
+      // require the output to follow. A literal in the template passes every
+      // other test in this file and fails only this one.
+      const Host = defineComponent({
+        setup: () => {
+          provideNsLocale(nsLocaleFrCA)
+          // modelValue is REQUIRED; omitting it typechecks as a confusing
+          // overload failure while the test still passes at runtime.
+          return () => h(NsNavSidebar, { items, modelValue: 'home', expanded })
+        },
+      })
+      const wrapper = mount(Host, { attachTo: document.body })
+      wrappers.push(wrapper)
+
+      const btn = wrapper.find('.ns-nav-sidebar__toggle-btn')
+      const actual = expanded
+        ? wrapper.find('.ns-nav-sidebar__toggle-label').text()
+        : btn.attributes('aria-label')
+      const expected = expanded
+        ? nsLocaleFrCA.navigation.collapseMenu
+        : nsLocaleFrCA.navigation.expandMenu
+
+      expect(actual, 'string did not follow the injected locale').toBe(expected)
+      // Guard the guard: if fr-CA ever equalled en-CA for this key the test
+      // above would pass on a hardcoded literal too.
+      expect(expected, 'fr-CA matches en-CA, so this test proves nothing').not.toBe(
+        expanded ? nsLocaleEnCA.navigation.collapseMenu : nsLocaleEnCA.navigation.expandMenu,
+      )
     })
   })
 })

@@ -87,10 +87,10 @@
       ]
     },
     {
-      "name": "app shell (heaviest import; contains NsInput, so NsInput changes land here)",
+      "name": "app shell (heaviest import; contains NsInput and NsNavSidebar. Includes the en-CA locale object \u2014 a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsAppShell }",
-      "limit": "10.25 kB",
+      "limit": "10.5 kB",
       "gzip": true,
       "ignore": [
         "vue",
