@@ -1,8 +1,10 @@
 <template>
+  <label v-if="isLabelAbove" class="ns-input__label" :for="fieldId">{{ label }}</label>
   <q-input
     v-bind="attrsWithoutDisabled"
     :model-value="modelValue"
-    :label="label"
+    :label="isLabelAbove ? undefined : label"
+    :for="isLabelAbove ? fieldId : undefined"
     :outlined="outlined"
     :dense="resolvedDense"
     :type="resolvedType"
@@ -19,7 +21,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useAttrs, watchEffect } from 'vue'
+import { computed, useAttrs, useId, watchEffect } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'
 
 declare const process: { env: { NODE_ENV?: string } } | undefined
@@ -42,9 +44,24 @@ import type { QInput, ValidationRule } from 'quasar'
  */
 export type NsInputSize = 'dense' | 'default' | 'large'
 
+export type NsInputLabelPlacement = 'inside' | 'above'
+
 export interface NsInputProps {
   /** Input label text */
   label?: string
+  /**
+   * Where the label sits.
+   *
+   * `inside` (the default) is Quasar's floating label, which sits on the border
+   * when outlined. `above` renders it as the design specifies — 14px text above
+   * a clean box, with the placeholder inside.
+   *
+   * DEFAULTED TO `inside` ON PURPOSE, and it must stay that way: butiq has 369
+   * NsInput call sites and this prop must not restyle a single one. Same
+   * reasoning as `size` being deliberately undefaulted — see componentLibrary-b5e
+   * and the batched breaking release. Story: componentLibrary-eag.
+   */
+  labelPlacement?: NsInputLabelPlacement
   /** v-model value */
   modelValue?: string
   /** Use outlined style */
@@ -70,6 +87,7 @@ export interface NsInputProps {
 }
 
 const props = withDefaults(defineProps<NsInputProps>(), {
+  labelPlacement: 'inside',
   label: undefined,
   modelValue: undefined,
   outlined: true,
@@ -94,6 +112,35 @@ defineOptions({ inheritAttrs: false })
 const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsInput', () => props.disable)
 
 const attrs = useAttrs()
+
+/**
+ * EXTERNAL LABEL. Quasar CANNOT produce the design's layout: q-field__label is
+ * rendered `absolute` INSIDE q-field__control, and `stack-label` only forces it
+ * to the floated position — it never leaves the box. Measured: with stack-label
+ * set, the label carries `q-field__label no-pointer-events absolute ellipsis`
+ * and control.contains(label) is true.
+ *
+ * So the label is rendered by us and QInput is given none. The association is
+ * `for`/`id`, NOT proximity — without it the field loses its accessible name,
+ * which is worse than the floating label being replaced. Quasar's own `for`
+ * prop becomes the native input's id (use-field.js:82,391), so this uses its
+ * wiring rather than fighting it.
+ *
+ * The template is a FRAGMENT as a result. Safe here because inheritAttrs is
+ * already false and attrs are bound explicitly, so nothing changes for the 369
+ * butiq call sites — verified none of their 18 NsInput test files assert on
+ * wrapper.classes(). Story: componentLibrary-eag.
+ */
+const isLabelAbove = computed(() => props.labelPlacement === 'above')
+
+// Vue's useId is stable across SSR and hydration, which a Math.random id is
+// not — a mismatched for/id would silently break the association on hydration
+// while looking correct in a client-only test.
+//
+// A consumer-supplied `for` wins, so an app that already owns its ids keeps
+// them rather than having ours imposed.
+const generatedId = useId()
+const fieldId = computed(() => (attrs.for as string | undefined) ?? generatedId)
 
 const NS_INPUT_SIZES: readonly NsInputSize[] = ['dense', 'default', 'large']
 
@@ -196,6 +243,16 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
 </script>
 
 <style lang="sass" scoped>
+// 14px above a clean box, per the design. Scoped is correct here — unlike the
+// portalled cases in componentLibrary-3sy, this label is rendered by THIS
+// component into its own tree, so the scope attribute lands on it.
+.ns-input__label
+  display: block
+  margin-bottom: 6px
+  font-family: var(--ns-font-family-text)
+  font-size: var(--ns-font-size-sm, 0.875rem)
+  color: var(--ns-color-text-primary)
+
 .ns-input
   font-family: var(--ns-font-family-text)
 

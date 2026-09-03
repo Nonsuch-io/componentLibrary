@@ -69,6 +69,20 @@ export default ts.config(
       'vue/multi-word-component-names': 'off',
       // Allow v-bind with same-name shorthand
       'vue/attribute-hyphenation': ['error', 'always'],
+      // ACCEPT for/id AS A VALID LABEL ASSOCIATION, not just nesting.
+      //
+      // The rule's default demands the control be NESTED inside the <label>.
+      // That is one valid association; `for`/`id` is the other, and it is the
+      // one NsInput needs — the label sits above a QInput whose native <input>
+      // is several elements deep inside Quasar's markup, so wrapping is not
+      // available to us.
+      //
+      // Narrowed rather than disabled: a label with NEITHER is still an error,
+      // which is the case that actually matters. NsInput's association is also
+      // asserted directly in its tests (for and id must match), because a lint
+      // rule cannot tell whether the id it sees is the right one.
+      // componentLibrary-eag.
+      'vuejs-accessibility/label-has-for': ['error', { required: { some: ['nesting', 'id'] } }],
     },
   },
 
