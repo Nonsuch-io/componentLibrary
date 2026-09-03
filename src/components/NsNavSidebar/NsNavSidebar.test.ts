@@ -560,9 +560,13 @@ describe('NsNavSidebar', () => {
     it('takes its name FROM the visible text when expanded, rather than overriding it', () => {
       const wrapper = mount$({ expanded: true })
       const btn = wrapper.find('.ns-nav-sidebar__toggle-btn')
-      const visible = wrapper.find('.ns-nav-sidebar__toggle-label').text()
+      const label = wrapper.find('.ns-nav-sidebar__toggle-label')
 
-      expect(visible, 'no visible label to be named from').not.toBe('')
+      // exists() BEFORE text(): deleting the span makes .text() throw
+      // "Cannot call text on an empty DOMWrapper", which reads like a broken
+      // test rather than a nameless button. Review finding.
+      expect(label.exists(), 'no visible label to be named from').toBe(true)
+      expect(label.text(), 'visible label is empty').not.toBe('')
       // An aria-label here would REPLACE the visible text as the accessible
       // name, which is the defect. Absent means the name comes from content.
       expect(

@@ -50,6 +50,12 @@ describe('nsLocaleEnCA', () => {
 
   it('has navigation strings', () => {
     expect(nsLocaleEnCA.navigation.breadcrumbs).toBe('Breadcrumb')
+    // Pinned as LITERALS, following this file's own pattern. The component
+    // test compares against nsLocaleEnCA.*, which is tautological — it stays
+    // green if someone "tidies" Hide Menu into Collapse menu and silently
+    // changes shipped product copy. componentLibrary-1ps.
+    expect(nsLocaleEnCA.navigation.collapseMenu).toBe('Hide Menu')
+    expect(nsLocaleEnCA.navigation.expandMenu).toBe('Expand menu')
   })
 
   it('every top-level key contains only string values (no nesting beyond 1 level)', () => {
@@ -93,6 +99,8 @@ describe('nsLocaleFrCA', () => {
 
   it('has French navigation strings', () => {
     expect(nsLocaleFrCA.navigation.breadcrumbs).toBe("Fil d'Ariane")
+    expect(nsLocaleFrCA.navigation.collapseMenu).toBe('Masquer le menu')
+    expect(nsLocaleFrCA.navigation.expandMenu).toBe('Afficher le menu')
   })
 
   it('every top-level key contains only string values', () => {
