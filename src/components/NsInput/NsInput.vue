@@ -1,18 +1,35 @@
 <template>
-  <label v-if="isLabelAbove" class="ns-input__label" :for="fieldId">{{ label }}</label>
+  <!--
+    v-if/v-else, NOT a sibling label. A sibling makes the root a FRAGMENT, and
+    Vue only stamps a parent's scope id onto a child's root when that element IS
+    the subTree — so with a fragment every consumer's scoped-style rule
+    targeting a class on <ns-input> silently stops matching. Review measured 8
+    such call sites in butiq plus NsAppShell here, all green in tests. It bit the
+    DEFAULT placement too, so "no existing call site moves" was false.
+
+    An if/else chain is a single root at runtime, so the scope id lands again.
+    Story: componentLibrary-eag.
+  -->
+  <div v-if="isLabelAbove" :class="['ns-input__field', attrs.class]" :style="attrs.style">
+    <label v-if="label" class="ns-input__label" :for="fieldId">{{ label }}</label>
+    <q-input
+      v-bind="fieldBindings"
+      :model-value="modelValue"
+      :for="fieldId"
+      @update:model-value="onUpdate"
+    >
+      <template v-for="(_, name) in $slots" #[name]="slotData">
+        <slot :name="name" v-bind="slotData ?? {}" />
+      </template>
+    </q-input>
+  </div>
   <q-input
-    v-bind="attrsWithoutDisabled"
+    v-else
+    v-bind="fieldBindings"
     :model-value="modelValue"
-    :label="isLabelAbove ? undefined : label"
-    :for="isLabelAbove ? fieldId : undefined"
-    :outlined="outlined"
-    :dense="resolvedDense"
-    :type="resolvedType"
-    :autogrow="resolvedAutogrow"
-    :rules="rules"
-    :disable="resolvedDisable"
-    :class="['ns-input', sizeClass]"
-    @update:model-value="$emit('update:modelValue', $event)"
+    :label="label"
+    :for="consumerFor"
+    @update:model-value="onUpdate"
   >
     <template v-for="(_, name) in $slots" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />
@@ -21,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useAttrs, useId, watchEffect } from 'vue'
+import { computed, mergeProps, useAttrs, useId, watchEffect } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'
 
 declare const process: { env: { NODE_ENV?: string } } | undefined
@@ -97,7 +114,7 @@ const props = withDefaults(defineProps<NsInputProps>(), {
   disable: false,
 })
 
-defineEmits<{
+const emit = defineEmits<{
   'update:modelValue': [value: string | number | null]
 }>()
 
@@ -140,7 +157,59 @@ const isLabelAbove = computed(() => props.labelPlacement === 'above')
 // A consumer-supplied `for` wins, so an app that already owns its ids keeps
 // them rather than having ours imposed.
 const generatedId = useId()
-const fieldId = computed(() => (attrs.for as string | undefined) ?? generatedId)
+
+// `||`, NOT `??`. Nullish treats '' as a supplied id, and Quasar's own getId
+// passes it straight through — so for="" produced for=""/id="" and a field with
+// NO accessible name. Review measured it in Chromium: computeAccessibleName was
+// the empty string, and AXE DID NOT FLAG IT, so the gate cannot catch this one.
+// Realistic trigger: :for="row.id" bound before the row loads.
+// Third instance of this class here after componentLibrary-3sy and -knw.
+const fieldId = computed(() => (attrs.for as string | undefined) || generatedId)
+
+// Everything the field needs in both branches, so the two <q-input>s below stay
+// one line each rather than duplicating twelve bindings.
+// In `above` the consumer's class/style go on the WRAPPER, bound directly in
+// the template. They must travel WITH the scope id, which lands on the root —
+// split them and a consumer's `.my-field { width: 100% }` sits on one element
+// and its `data-v-parent` on another, matching nothing. The wrapper is also the
+// honest target: in this placement "the field" is the label and box together.
+
+// mergeProps, NOT an object spread. Vue merges `class` and `style` specially —
+// a plain spread would let our `class` key REPLACE the consumer's rather than
+// combine with it, which is what `v-bind` followed by `:class` used to do in the
+// template. Caught by the co-location test above, which is the same test that
+// caught the fragment problem.
+const fieldBindings = computed(() =>
+  mergeProps(
+    isLabelAbove.value
+      ? { ...attrsWithoutDisabled.value, class: undefined, style: undefined }
+      : attrsWithoutDisabled.value,
+    {
+      outlined: props.outlined,
+      dense: resolvedDense.value,
+      type: resolvedType.value,
+      autogrow: resolvedAutogrow.value,
+      rules: props.rules,
+      disable: resolvedDisable.value,
+      class: ['ns-input', sizeClass.value],
+    },
+  ),
+)
+
+// A computed, not an inline cast: a `|` inside a template expression parses as
+// a Vue FILTER (vue/no-deprecated-filter), so `attrs.for as string | undefined`
+// is a lint error rather than a type assertion.
+const consumerFor = computed(() => attrs.for as string | undefined)
+
+// The consumer's `for` is passed through in the default branch rather than
+// bound to undefined. `:for` sits after v-bind, so binding undefined would DELETE a
+// consumer-supplied for rather than leave it alone — the trap this file
+// documents for `type` below. `for` was the only pre-existing way to attach an
+// external label, so deleting it would break the people this feature is for.
+
+function onUpdate(value: string | number | null) {
+  emit('update:modelValue', value as string)
+}
 
 const NS_INPUT_SIZES: readonly NsInputSize[] = ['dense', 'default', 'large']
 
@@ -248,6 +317,10 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
 // component into its own tree, so the scope attribute lands on it.
 .ns-input__label
   display: block
+  // 6px is the design's label-to-box gap, which falls between --ns-space-1
+  // (4px) and --ns-space-2 (8px). Left as a literal deliberately rather than
+  // rounded to a token — rounding would change the design by 2px to make the
+  // code tidier. If a 6px step is ever added to the scale, use it.
   margin-bottom: 6px
   font-family: var(--ns-font-family-text)
   font-size: var(--ns-font-size-sm, 0.875rem)

@@ -136,3 +136,71 @@ describe('external label (componentLibrary-eag)', () => {
     expect(ids[0], 'two fields in one form share an id').not.toBe(ids[1])
   })
 })
+
+describe('single root (componentLibrary-eag)', () => {
+  // THE REGRESSION THIS BEAD ALMOST SHIPPED. An earlier version rendered the
+  // label as a SIBLING, making the root a fragment. Vue only stamps a parent's
+  // scope id onto a child's root when that element IS the subTree, so every
+  // consumer `<style scoped>` rule targeting a class on <ns-input> silently
+  // stopped matching — including in the DEFAULT placement, which no consumer
+  // opted into. Review measured 8 such sites in butiq plus NsAppShell here.
+  //
+  // Attrs were fine throughout; scope ids are not attrs, which is exactly why
+  // checking class/style was not enough.
+  it.each<[string, 'inside' | 'above']>([
+    ['inside', 'inside'],
+    ['above', 'above'],
+  ])(
+    'puts the consumer class and the scope id on the SAME element when %s',
+    (_l, labelPlacement) => {
+      // That co-location IS the property scoped styles depend on. Asserting the
+      // scope id alone would pass with the class on a different element, which
+      // matches nothing — so this checks both on one node.
+      const Parent = defineComponent({
+        __scopeId: 'data-v-parent',
+        setup: () => () => h(NsInput, { label: 'Email', labelPlacement, class: 'consumer-class' }),
+      })
+      const wrapper = mount(Parent)
+      const styled = wrapper.find('.consumer-class')
+
+      expect(styled.exists(), 'the consumer class is nowhere').toBe(true)
+      expect(
+        styled.attributes('data-v-parent'),
+        'consumer class and scope id are on different elements — scoped styles match nothing',
+      ).toBeDefined()
+    },
+  )
+})
+
+describe('for handling (componentLibrary-eag)', () => {
+  it('passes a consumer for THROUGH in the default placement', () => {
+    // `:for` sits after v-bind, so binding undefined DELETES the consumer's
+    // value rather than leaving it alone — the same trap this file documents
+    // for `type`. `for` was the only pre-existing way to attach an external
+    // label, so deleting it would break exactly the people this feature is for.
+    const wrapper = mount(NsInput, { props: { label: 'E' }, attrs: { for: 'my-id' } })
+    expect(wrapper.find('input').attributes('id')).toBe('my-id')
+  })
+
+  it.each<[string, string]>([
+    ['empty string', ''],
+    ['whitespace', '  '],
+  ])('falls back to a generated id when for is %s', (_l, value) => {
+    // ?? treated '' as a supplied id and Quasar passed it through, giving
+    // for=""/id="" and NO accessible name. Axe does not flag it.
+    const wrapper = mount(NsInput, {
+      props: { label: 'E', labelPlacement: 'above' },
+      attrs: { for: value },
+    })
+    const forAttr = wrapper.find('label.ns-input__label').attributes('for')
+    expect(forAttr, 'for is empty — the label names nothing').toBeTruthy()
+    expect(wrapper.find('input').attributes('id')).toBe(forAttr)
+  })
+
+  it('renders no label element when there is no label text', () => {
+    // An empty associated <label> plus its margin is a phantom element; the
+    // aria-label-only pattern must stay clean.
+    const wrapper = mount(NsInput, { props: { labelPlacement: 'above' } })
+    expect(wrapper.find('label.ns-input__label').exists()).toBe(false)
+  })
+})

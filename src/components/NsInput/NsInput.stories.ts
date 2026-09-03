@@ -200,3 +200,47 @@ export const HeightsAreReal: Story = {
     await expect(large.offsetHeight).toBeGreaterThan(before)
   },
 }
+
+/**
+ * THE DESIGN'S LAYOUT, MEASURED IN A REAL BROWSER.
+ *
+ * A 14px label above a clean 50px box, placeholder inside. Quasar cannot render
+ * this — q-field__label is absolute INSIDE q-field__control — so NsInput renders
+ * the label itself and associates it by for/id.
+ *
+ * This story exists because the unit tests can assert for/id match but not that
+ * the NAME actually computes from the label: a placeholder can substitute as an
+ * accessible name, so a broken association would still look named. happy-dom
+ * also has no layout, so the 50px box and 14px label can only be checked here.
+ * Story: componentLibrary-eag.
+ */
+export const LabelAbove: Story = {
+  // size="default" is EXPLICIT, and that is the design talking. `size` is
+  // deliberately undefaulted (componentLibrary-b5e) so existing call sites keep
+  // Quasar's geometry — so the design's 50px box is opt-in, not automatic. A
+  // consumer building this screen needs both props, which is worth seeing here.
+  args: {
+    label: 'Email address',
+    labelPlacement: 'above',
+    size: 'default',
+    placeholder: 'your@email.ca',
+  },
+  play: async ({ canvasElement }) => {
+    const input = canvasElement.querySelector('input') as HTMLInputElement
+    const label = canvasElement.querySelector('label.ns-input__label') as HTMLElement
+    const control = canvasElement.querySelector('.q-field__control') as HTMLElement
+
+    // The name comes from the LABEL, not the placeholder. If the association
+    // broke, the placeholder would silently take over as the accessible name.
+    await expect(input.labels?.[0]).toBe(label)
+    await expect(label.getAttribute('for')).toBe(input.id)
+    await expect(input.id).not.toBe('')
+
+    // Quasar's own label must be gone, or the box keeps its floating-label
+    // padding and is no longer the design's clean 50px.
+    await expect(canvasElement.querySelector('.q-field__label')).toBeNull()
+
+    await expect(getComputedStyle(label).fontSize).toBe('14px')
+    await expect(getComputedStyle(control).minHeight).toBe('50px')
+  },
+}
