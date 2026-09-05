@@ -32,25 +32,44 @@
 </template>
 
 <script setup lang="ts">
-const rows = [
-  { token: 'caption', sample: 'Caption text', props: '10px · regular · lh 1.6' },
-  { token: 'overline', sample: 'Overline label', props: '10px · medium · uppercase · ls 0.08em' },
-  { token: 'body-sm', sample: 'Small body text', props: '12px · regular · lh 1.5' },
-  { token: 'body-md', sample: 'Medium body text', props: '14px · regular · lh 1.5' },
-  { token: 'label-xs', sample: 'Extra small label', props: '10px · semibold · lh 1.6' },
-  { token: 'label-sm', sample: 'Small label', props: '12px · semibold · lh 1.4' },
-  { token: 'label-md', sample: 'Medium label', props: '14px · semibold · lh 1.4' },
-  { token: 'heading-sm', sample: 'Small heading', props: '16px · semibold · lh 1.3' },
-  { token: 'heading-sm-regular', sample: 'Small heading', props: '16px · regular · lh 1.3' },
-  { token: 'heading-md', sample: 'Medium heading', props: '20px · semibold · lh 1.25' },
-  { token: 'heading-md-regular', sample: 'Medium heading', props: '20px · regular · lh 1.25' },
-  { token: 'heading-lg', sample: 'Large heading', props: '24px · semibold · lh 1.2' },
-  { token: 'heading-lg-regular', sample: 'Large heading', props: '24px · regular · lh 1.2' },
-  { token: 'heading-xl', sample: 'XL heading', props: '32px · semibold · lh 1.15' },
-  { token: 'heading-xl-regular', sample: 'XL heading', props: '32px · regular · lh 1.15' },
-  { token: 'heading-2xl', sample: '2XL heading', props: '48px · semibold · lh 1.1' },
-  { token: 'heading-2xl-regular', sample: '2XL heading', props: '48px · regular · lh 1.1' },
-]
+/**
+ * THE ROW LIST IS DERIVED, NOT HAND-MAINTAINED. This table was a fifth copy of
+ * NsText's vocabulary and had already drifted — it was missing overline-lg,
+ * overline-md, overline-md-bold and display, so four shipped type styles were
+ * absent from the page documenting the type scale, silently. Found by review;
+ * see componentLibrary-lrw.8.
+ *
+ * Now it iterates KNOWN_VARIANTS, so a new variant appears here automatically
+ * and a missing DETAILS entry is caught by TypographyScale.test.ts rather than
+ * quietly rendering a blank cell.
+ */
+import { KNOWN_VARIANTS } from '../components/NsText/variants'
+
+const DETAILS: Record<string, { sample: string; props: string }> = {
+  caption: { sample: 'Caption text', props: '10px · regular · lh 1.6' },
+  overline: { sample: 'Overline label', props: '10px · medium · uppercase · ls 0.08em' },
+  'overline-lg': { sample: 'Large overline', props: '28px · regular · uppercase · lh 1.1' },
+  'overline-md': { sample: 'Medium overline', props: '14px · medium · uppercase · lh 1.28' },
+  'overline-md-bold': { sample: 'Medium overline', props: '14px · bold · uppercase · lh 1.28' },
+  'body-sm': { sample: 'Small body text', props: '12px · regular · lh 1.5' },
+  'body-md': { sample: 'Medium body text', props: '14px · regular · lh 1.5' },
+  'label-xs': { sample: 'Extra small label', props: '10px · semibold · lh 1.6' },
+  'label-sm': { sample: 'Small label', props: '12px · semibold · lh 1.4' },
+  'label-md': { sample: 'Medium label', props: '14px · semibold · lh 1.4' },
+  'heading-sm': { sample: 'Small heading', props: '16px · semibold · lh 1.3' },
+  'heading-sm-regular': { sample: 'Small heading', props: '16px · regular · lh 1.3' },
+  'heading-md': { sample: 'Medium heading', props: '20px · semibold · lh 1.25' },
+  'heading-md-regular': { sample: 'Medium heading', props: '20px · regular · lh 1.25' },
+  'heading-lg': { sample: 'Large heading', props: '24px · semibold · lh 1.2' },
+  'heading-lg-regular': { sample: 'Large heading', props: '24px · regular · lh 1.2' },
+  'heading-xl': { sample: 'XL heading', props: '32px · semibold · lh 1.15' },
+  'heading-xl-regular': { sample: 'XL heading', props: '32px · regular · lh 1.15' },
+  'heading-2xl': { sample: '2XL heading', props: '48px · semibold · lh 1.1' },
+  'heading-2xl-regular': { sample: '2XL heading', props: '48px · regular · lh 1.1' },
+  display: { sample: 'Display', props: '92px · semibold · italic · lh 1.1' },
+}
+
+const rows = KNOWN_VARIANTS.map((token) => ({ token, ...DETAILS[token] }))
 </script>
 
 <style scoped>
