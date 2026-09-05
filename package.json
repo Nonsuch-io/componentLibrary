@@ -66,7 +66,7 @@
       "name": "full library (gzip) — a SOFT ceiling: it exists to make you stop and ask whether the gain is worth the bytes, or whether an audit could win them back. Bump it deliberately, with the reason, never incidentally",
       "path": "dist/nonsuch-components.js",
       "import": "*",
-      "limit": "23.5 kB",
+      "limit": "23.75 kB",
       "gzip": true,
       "ignore": [
         "vue",
@@ -117,9 +117,9 @@
       "gzip": true
     },
     {
-      "name": "styles",
+      "name": "styles (gzip) — ALSO A SOFT CEILING. Raised to 6.25 kB for the type ramp: typography.css is now imported by src/index.ts, so the 21 type classes ship with the components instead of sitting in an optional file no consumer imported. Reclaim available in componentLibrary-cqy",
       "path": "dist/nonsuch-components.css",
-      "limit": "6 kB",
+      "limit": "6.25 kB",
       "gzip": true
     }
   ],

@@ -1,6 +1,16 @@
 // @nonsuch/component-library
 // Custom components built on top of Quasar
 
+// THE TYPE RAMP SHIPS WITH THE COMPONENTS, not as an optional extra.
+// `./typography.css` is a separate export, and all three butiq apps import
+// `tokens.css` + `style.css` + `fonts/global.css` and NOT that one. NsText
+// renders entirely from these classes, so without this import it would have
+// rendered completely unstyled in every consumer — and the `--ns-styles-loaded`
+// sentinel would NOT have fired, because style.css itself IS loaded.
+// Imported here rather than duplicated into a <style> block so the ramp keeps
+// ONE definition. Story: componentLibrary-lrw.8.
+import './tokens/typography.css'
+
 // Components
 export { default as NsButton } from './components/NsButton/NsButton.vue'
 export type { NsButtonProps } from './components/NsButton/NsButton.vue'
@@ -80,6 +90,14 @@ export type { NsListProps } from './components/NsList/NsList.vue'
 
 export { default as NsTooltip } from './components/NsTooltip/NsTooltip.vue'
 export type { NsTooltipProps, NsTooltipAnchor } from './components/NsTooltip/NsTooltip.vue'
+
+export { default as NsText } from './components/NsText/NsText.vue'
+export type {
+  NsTextProps,
+  NsTextVariant,
+  NsTextElement,
+  NsTextTone,
+} from './components/NsText/NsText.vue'
 
 export { default as NsBadge } from './components/NsBadge/NsBadge.vue'
 export type { NsBadgeProps } from './components/NsBadge/NsBadge.vue'
