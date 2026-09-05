@@ -160,7 +160,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(14) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name), 13->14 NsBrandLogo (missing src)
+    ).toBe(15) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name), 13->14 NsBrandLogo (missing src), 14->15 NsText (unknown variant + unknown tone, one shared guard)
   })
 
   it("warns for NsBrandLogo's missing box from the built bundle", async () => {

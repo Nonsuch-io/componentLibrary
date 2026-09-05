@@ -1,43 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import NsText from './NsText.vue'
+import { KNOWN_VARIANTS, KNOWN_TONES, KNOWN_ELEMENTS } from './variants'
 
-const VARIANTS = [
-  'display',
-  'heading-2xl',
-  'heading-2xl-regular',
-  'heading-xl',
-  'heading-xl-regular',
-  'heading-lg',
-  'heading-lg-regular',
-  'heading-md',
-  'heading-md-regular',
-  'heading-sm',
-  'heading-sm-regular',
-  'body-md',
-  'body-sm',
-  'label-md',
-  'label-sm',
-  'label-xs',
-  'overline-lg',
-  'overline-md',
-  'overline-md-bold',
-  'overline',
-  'caption',
-] as const
+// Source order runs smallest to largest; the story renders the ramp in that order.
+const VARIANTS = KNOWN_VARIANTS
 
-const TONES = [
-  'primary',
-  'secondary',
-  'tertiary',
-  'brand',
-  'accent',
-  'positive',
-  'negative',
-  'warning',
-  'info',
-  'link',
-  'disabled',
-] as const
+const TONES = KNOWN_TONES
 
 const meta: Meta<typeof NsText> = {
   title: 'Components/NsText',
@@ -46,10 +14,7 @@ const meta: Meta<typeof NsText> = {
   argTypes: {
     variant: { control: 'select', options: VARIANTS },
     tone: { control: 'select', options: TONES },
-    as: {
-      control: 'select',
-      options: ['span', 'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'label', 'strong', 'small'],
-    },
+    as: { control: 'select', options: KNOWN_ELEMENTS },
   },
 }
 
