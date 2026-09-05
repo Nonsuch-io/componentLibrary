@@ -163,6 +163,53 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
     ).toBe(15) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name), 13->14 NsBrandLogo (missing src), 14->15 NsText (unknown variant + unknown tone, one shared guard)
   })
 
+  it("warns for NsText's unknown variant and tone from the built bundle", () => {
+    // The pinned count above moved 14 -> 15 for this guard, and a count CANNOT
+    // tell a working guard from a fail-CLOSED one: the regex matches either
+    // polarity. Without this mount, refactoring isDev() to
+    // `typeof process === 'undefined' ? false : ...` would keep the count at 15,
+    // keep all 46 NsText unit tests green (vitest runs in Node, where `process`
+    // exists), and silence NsText in every consumer browser — the exact
+    // regression this file was created for. Both warnings share one guard, so
+    // one mount covers both. Found by review; see componentLibrary-lrw.8.
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsText as Component, {
+      props: { variant: 'heading-huge', tone: 'chartreuse' },
+    })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the NsText unknown-variant warning did not fire with `process` undefined — it ' +
+        'is dead in every consumer browser, whatever the unit tests say',
+    ).toContain('Unknown variant "heading-huge"')
+    expect(
+      text,
+      'the NsText unknown-tone warning did not fire with `process` undefined — a tone ' +
+        'that resolves to nothing then inherits its parent colour in silence',
+    ).toContain('Unknown tone "chartreuse"')
+  })
+
+  it('stays silent from the built bundle for a valid variant and tone', () => {
+    // Anti-vacuity for the mount above: if the guard warned unconditionally,
+    // that test would pass just as well. This is the half that fails if it does.
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsText as Component, { props: { variant: 'heading-xl', tone: 'brand' } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(text, 'NsText warned about a perfectly valid variant/tone pair').not.toContain(
+      '[NsText]',
+    )
+  })
+
   it("warns for NsBrandLogo's missing box from the built bundle", async () => {
     // Without `ratio` or `height`, QImg reserves a 16:9 box no brand lockup has,
     // and the logo renders in dead space until the asset loads. Silent in a

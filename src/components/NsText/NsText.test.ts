@@ -98,12 +98,44 @@ describe('NsText', () => {
     const typography = readFileSync(resolve(__dirname, '../../tokens/typography.css'), 'utf8')
     const tokens = readFileSync(resolve(__dirname, '../../tokens/tokens.css'), 'utf8')
 
-    it.each(VARIANTS)('typography.css defines .ns-%s', (variant) => {
-      expect(typography).toContain(`.ns-${variant} {`)
+    it.each(VARIANTS)('typography.css gives .ns-%s a real rule', (variant) => {
+      // NOT just `toContain('.ns-x {')` — that passes for an EMPTY rule, so a
+      // cleanup that stripped the declarations and left the selector would go
+      // unnoticed and every use of that variant would render at the browser
+      // default. Assert the body actually sizes the text.
+      const rule = new RegExp(`\\.ns-${variant} \\{([^}]*)\\}`).exec(typography)
+      expect(rule, `typography.css has no .ns-${variant} rule at all`).not.toBeNull()
+      expect(rule![1], `.ns-${variant} exists but is an empty rule`).toContain('font-size')
     })
 
-    it.each(TONES)('tokens.css defines --ns-color-text-%s', (tone) => {
-      expect(tokens).toContain(`--ns-color-text-${tone}:`)
+    // tokens.css defines each colour once per THEME BLOCK (:root, the explicit
+    // dark block, and the prefers-color-scheme one). A bare `toContain` is
+    // satisfied by a single occurrence, so a token added to :root but forgotten
+    // in the dark blocks passes — and then `tone="link"` in dark mode inherits
+    // the LIGHT value through :root: not "nothing", but light-on-dark with no
+    // warning and a contrast failure invisible in a light-mode Storybook.
+    // Anchor on a tone that must exist in every block and require parity.
+    const blocksPerTone = (tone: string) =>
+      tokens.match(new RegExp(`--ns-color-text-${tone}:`, 'g'))?.length ?? 0
+    const expectedBlocks = blocksPerTone('primary')
+
+    it('the anchor tone itself spans more than one theme block', () => {
+      // Without this, a regression that flattened tokens.css to a single block
+      // would make every parity assertion below trivially true.
+      expect(
+        expectedBlocks,
+        'anchor tone --ns-color-text-primary appears in fewer than two theme ' +
+          'blocks, so the parity check below cannot detect a missing dark value',
+      ).toBeGreaterThanOrEqual(2)
+    })
+
+    it.each(TONES)('tokens.css defines --ns-color-text-%s in every theme block', (tone) => {
+      expect(
+        blocksPerTone(tone),
+        `--ns-color-text-${tone} is missing from a theme block (found ` +
+          `${blocksPerTone(tone)}, expected ${expectedBlocks}) — it will fall back ` +
+          'to the light value in dark mode, silently',
+      ).toBe(expectedBlocks)
     })
 
     it('checks non-empty lists, so it.each cannot pass vacuously', () => {
