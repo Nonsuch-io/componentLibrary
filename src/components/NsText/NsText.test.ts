@@ -108,34 +108,52 @@ describe('NsText', () => {
       expect(rule![1], `.ns-${variant} exists but is an empty rule`).toContain('font-size')
     })
 
-    // tokens.css defines each colour once per THEME BLOCK (:root, the explicit
-    // dark block, and the prefers-color-scheme one). A bare `toContain` is
-    // satisfied by a single occurrence, so a token added to :root but forgotten
-    // in the dark blocks passes — and then `tone="link"` in dark mode inherits
-    // the LIGHT value through :root: not "nothing", but light-on-dark with no
-    // warning and a contrast failure invisible in a light-mode Storybook.
-    // Anchor on a tone that must exist in every block and require parity.
-    const blocksPerTone = (tone: string) =>
-      tokens.match(new RegExp(`--ns-color-text-${tone}:`, 'g'))?.length ?? 0
-    const expectedBlocks = blocksPerTone('primary')
+    // tokens.css declares each colour once per THEME BLOCK. Counting occurrences
+    // ACROSS THE WHOLE FILE is not enough: a tone duplicated inside :root and
+    // absent from the dark block sums to the same total as one-per-block, so the
+    // check passes while the tone is genuinely missing from dark mode. That is a
+    // check that cannot fail against the input it exists to catch. Slice the file
+    // into its blocks and require the tone in EACH one.
+    //
+    // What goes wrong without this: `tone="link"` in dark mode inherits the LIGHT
+    // value through :root — not "nothing", but light-on-dark, with no warning and
+    // a contrast failure invisible in a light-mode Storybook.
+    const BLOCK_STARTS = [
+      { name: ':root', at: tokens.indexOf(':root {') },
+      { name: "the .dark / [data-theme='dark'] block", at: tokens.indexOf(':root.dark,') },
+      {
+        name: 'the prefers-color-scheme block',
+        at: tokens.indexOf('@media (prefers-color-scheme: dark)'),
+      },
+    ]
 
-    it('the anchor tone itself spans more than one theme block', () => {
-      // Without this, a regression that flattened tokens.css to a single block
-      // would make every parity assertion below trivially true.
-      expect(
-        expectedBlocks,
-        'anchor tone --ns-color-text-primary appears in fewer than two theme ' +
-          'blocks, so the parity check below cannot detect a missing dark value',
-      ).toBeGreaterThanOrEqual(2)
+    it('finds every theme block it intends to check', () => {
+      // If a selector is renamed, indexOf returns -1 and every slice below would
+      // silently become the whole file — turning the parity check back into the
+      // global count it is replacing.
+      for (const block of BLOCK_STARTS) {
+        expect(block.at, `could not locate ${block.name} in tokens.css`).toBeGreaterThan(-1)
+      }
+      const ordered = BLOCK_STARTS.map((b) => b.at)
+      expect(ordered, 'theme blocks are not in the order this test assumes').toEqual(
+        [...ordered].sort((a, b) => a - b),
+      )
     })
 
+    const sliceFor = (index: number) =>
+      tokens.slice(BLOCK_STARTS[index].at, BLOCK_STARTS[index + 1]?.at ?? tokens.length)
+
     it.each(TONES)('tokens.css defines --ns-color-text-%s in every theme block', (tone) => {
-      expect(
-        blocksPerTone(tone),
-        `--ns-color-text-${tone} is missing from a theme block (found ` +
-          `${blocksPerTone(tone)}, expected ${expectedBlocks}) — it will fall back ` +
-          'to the light value in dark mode, silently',
-      ).toBe(expectedBlocks)
+      BLOCK_STARTS.forEach((block, index) => {
+        const found =
+          sliceFor(index).match(new RegExp(`--ns-color-text-${tone}:`, 'g'))?.length ?? 0
+        expect(
+          found,
+          `--ns-color-text-${tone} appears ${found} time(s) in ${block.name}, expected exactly ` +
+            'once. Missing means it falls back to the light value there, silently; ' +
+            'duplicated means one declaration is dead.',
+        ).toBe(1)
+      })
     })
 
     it('checks non-empty lists, so it.each cannot pass vacuously', () => {
