@@ -167,10 +167,6 @@ const buttonPadding = computed(() => {
     color 150ms ease,
     box-shadow 150ms ease;
 
-  :deep(.q-btn__wrapper) {
-    min-height: unset; /* Quasar 2.x internal — revisit on major Quasar bump */
-  }
-
   :deep(.q-btn__content) {
     gap: 4px; /* Quasar 2.x internal — revisit on major Quasar bump */
   }
