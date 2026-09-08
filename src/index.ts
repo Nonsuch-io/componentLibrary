@@ -91,6 +91,9 @@ export type { NsListProps } from './components/NsList/NsList.vue'
 export { default as NsTooltip } from './components/NsTooltip/NsTooltip.vue'
 export type { NsTooltipProps, NsTooltipAnchor } from './components/NsTooltip/NsTooltip.vue'
 
+export { default as NsPageTitle } from './components/NsPageTitle/NsPageTitle.vue'
+export type { NsPageTitleProps } from './components/NsPageTitle/NsPageTitle.vue'
+
 export { default as NsText } from './components/NsText/NsText.vue'
 export type {
   NsTextProps,

@@ -63,10 +63,10 @@
   },
   "size-limit": [
     {
-      "name": "full library (gzip) — a SOFT ceiling: it exists to make you stop and ask whether the gain is worth the bytes, or whether an audit could win them back. Bump it deliberately, with the reason, never incidentally",
+      "name": "full library (gzip) — a SOFT ceiling: it exists to make you stop and ask whether the gain is worth the bytes, or whether an audit could win them back. Bump it deliberately, with the reason, never incidentally. TRAJECTORY WORTH WATCHING: 23.11 before NsText, 23.55 with it, 23.83 with NsPageTitle — roughly 280-440 B per component, and epic componentLibrary-lrw has ~8 more to build. Expect another 2-3 kB by the end of it. If that is not acceptable, the time to run a reclaim audit (componentLibrary-qhu, componentLibrary-cqy) is before the epic, not after",
       "path": "dist/nonsuch-components.js",
       "import": "*",
-      "limit": "23.75 kB",
+      "limit": "24.25 kB",
       "gzip": true,
       "ignore": [
         "vue",
