@@ -99,22 +99,30 @@ const slots = useSlots()
  * produced `<h1></h1>` with no text and NO warning, which is precisely the
  * a11y failure the `?.trim() ||` below exists to prevent, reached through the
  * other input. Vue's own `renderSlot` already treats an all-Comment slot as
- * empty (which is why a `title` prop still wins there); this matches it.
+ * empty (which is why a `title` prop still wins there). This matches Vue on
+ * Comments and Fragments and is deliberately STRICTER on text: Vue's
+ * `ensureValidVNode` accepts a whitespace-only Text vnode as content, and a
+ * heading whose only content is a space is still a heading with no name.
  *
  * HONEST LIMITS: this sees Comment vnodes, empty Fragments and whitespace-only
  * text — what `v-if`, `v-for` over nothing, and interpolating '' actually
  * produce. It CANNOT see through a child component that renders nothing
  * (`<MyEmpty />` counts as content) or an empty element (`<span></span>`).
- * That is the same limit Vue's fallback logic has, and rendering to DOM to read
- * textContent would be disproportionate for a heading block.
+ * That is the same limit Vue's fallback logic has for components, and rendering
+ * to DOM to read textContent would be disproportionate for a heading block.
  */
 function renders(nodes: VNode[]): boolean {
-  return nodes.some((node) =>
-    node.type === Fragment && Array.isArray(node.children)
-      ? renders(node.children as VNode[])
-      : node.type !== Comment &&
-        !(typeof node.children === 'string' && node.children.trim() === ''),
-  )
+  return nodes.some((node) => {
+    // A Fragment's children are an array for anything the template compiler
+    // emits, but a hand-written `h(Fragment)` carries `null` — which would fall
+    // through to the leaf branch below and count as content.
+    if (node.type === Fragment) {
+      return Array.isArray(node.children) ? renders(node.children as VNode[]) : false
+    }
+    return (
+      node.type !== Comment && !(typeof node.children === 'string' && node.children.trim() === '')
+    )
+  })
 }
 
 function slotRenders(slot: Slot | undefined): boolean {
@@ -216,10 +224,13 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
     if (!isValidLevel(props.level)) {
       if (!warnedBadLevel) {
         warnedBadLevel = true
+        const inRange = props.level >= MIN_LEVEL && props.level <= MAX_LEVEL
         console.warn(
-          `[NsPageTitle] level="${props.level}" is not a heading level. Only 1-6 are ` +
-            `elements; <h${props.level}> would render inline and add nothing to the ` +
-            `document outline, so it was clamped to <${headingTag.value}>.`,
+          `[NsPageTitle] level="${props.level}" is not a heading level, so it was ` +
+            (inRange
+              ? `ROUNDED to <${headingTag.value}>. Levels must be whole numbers.`
+              : `CLAMPED to <${headingTag.value}>. Only 1-6 are elements; ` +
+                `<h${props.level}> would render inline and add nothing to the outline.`),
         )
       }
     } else {
@@ -236,6 +247,13 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
 .ns-page-title {
   display: flex;
   flex-direction: column;
+  // KEEP THIS. Removed once on review advice that it is redundant on a block
+  // container — true standalone, false where this actually gets used. The
+  // measured NsPageTitle fills its NsPageHeading (350 of 350 on 265:30841), and
+  // NsPageHeading lays out `Page Controls + Page Title`, so as a flex ITEM this
+  // would otherwise shrink to its text. The story documents the block as
+  // full-width; that claim and this rule stand or fall together.
+  width: 100%;
   // 12px between title and subtitle, 8px above and below — Figma space-3 and
   // space-2 on 265:30901 (title y=8 h=37, subtitle y=57 h=75, container 140).
   gap: var(--ns-space-3);

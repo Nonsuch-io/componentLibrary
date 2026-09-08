@@ -201,6 +201,13 @@ describe('NsPageTitle', () => {
       const wrapper = mount(harness('subtitle'))
       wrapper.vm.show = true
       await nextTick()
+      // ASSERT IT ARRIVED FIRST. Without this line the test passes against a
+      // completely dead implementation: if neither transition works, the
+      // subtitle was never shown, and "absent at the end" holds trivially.
+      // Verified in review — it passed against a reintroduced computed. A check
+      // that cannot fail, testing the state that works rather than the one that
+      // might not.
+      expect(wrapper.find('.ns-page-title__subtitle').text()).toBe('now here')
       wrapper.vm.show = false
       await nextTick()
       expect(wrapper.find('.ns-page-title__subtitle').exists()).toBe(false)
