@@ -1,16 +1,30 @@
 <template>
   <div class="ns-page-title">
-    <NsText v-if="hasTitle" :as="headingTag" variant="heading-xl" class="ns-page-title__title">
+    <NsText v-if="hasTitle()" :as="headingTag" variant="heading-xl" class="ns-page-title__title">
       <slot>{{ props.title }}</slot>
     </NsText>
-    <NsText v-if="hasSubtitle" as="p" variant="heading-md-regular" class="ns-page-title__subtitle">
+    <NsText
+      v-if="hasSubtitle()"
+      as="p"
+      variant="heading-md-regular"
+      class="ns-page-title__subtitle"
+    >
       <slot name="subtitle">{{ props.subtitle }}</slot>
     </NsText>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, useSlots, watchEffect } from 'vue'
+import {
+  Comment,
+  Fragment,
+  computed,
+  onMounted,
+  onUpdated,
+  useSlots,
+  type Slot,
+  type VNode,
+} from 'vue'
 import NsText from '../NsText/NsText.vue'
 
 declare const process: { env: { NODE_ENV?: string } } | undefined
@@ -56,7 +70,8 @@ export interface NsPageTitleProps {
   subtitle?: string
   /**
    * Which heading element to render, 1-6. Defaults to 1 for a page that has no
-   * other title; set it lower when this sits inside a shell that already has one.
+   * other title; set it lower (`:level="2"`, bound — not `level="2"`, which is a string) when this
+   * sits inside a shell that already has one.
    */
   level?: 1 | 2 | 3 | 4 | 5 | 6
 }
@@ -76,38 +91,144 @@ defineSlots<{
 
 const slots = useSlots()
 
-const headingTag = computed(() => `h${props.level}` as const)
+/**
+ * SLOT PRESENCE IS NOT SLOT CONTENT, and the difference renders an empty
+ * heading. `slots.default !== undefined` is true for any slot the parent
+ * declares — including `<template #default><span v-if="false"/></template>`, or
+ * one interpolating a value that has not loaded yet. Measured in review: that
+ * produced `<h1></h1>` with no text and NO warning, which is precisely the
+ * a11y failure the `?.trim() ||` below exists to prevent, reached through the
+ * other input. Vue's own `renderSlot` already treats an all-Comment slot as
+ * empty (which is why a `title` prop still wins there); this matches it.
+ *
+ * HONEST LIMITS: this sees Comment vnodes, empty Fragments and whitespace-only
+ * text — what `v-if`, `v-for` over nothing, and interpolating '' actually
+ * produce. It CANNOT see through a child component that renders nothing
+ * (`<MyEmpty />` counts as content) or an empty element (`<span></span>`).
+ * That is the same limit Vue's fallback logic has, and rendering to DOM to read
+ * textContent would be disproportionate for a heading block.
+ */
+function renders(nodes: VNode[]): boolean {
+  return nodes.some((node) =>
+    node.type === Fragment && Array.isArray(node.children)
+      ? renders(node.children as VNode[])
+      : node.type !== Comment &&
+        !(typeof node.children === 'string' && node.children.trim() === ''),
+  )
+}
+
+function slotRenders(slot: Slot | undefined): boolean {
+  return slot !== undefined && renders(slot())
+}
 
 /**
- * `?.trim() ||` and NOT `??`. Nullish coalescing treats an empty string as a
+ * PLAIN FUNCTIONS, NOT COMPUTEDS — called from the template so they re-run on
+ * every render. `useSlots()` returns a NON-REACTIVE object, so a computed over
+ * it evaluates once and never again. NsTable.vue:45 already documents this
+ * exact trap ("a consumer's `<template v-if="show" #top>` rendered on main and
+ * NEVER on this branch") and this component re-shipped it: measured in review,
+ * a `#subtitle` toggled on after mount never appeared, one toggled off left an
+ * empty `<p>` behind, and a default slot arriving late never produced an `<h1>`.
+ *
+ * `?.trim() ||` and NOT `??` for the props. Nullish treats an empty string as a
  * present value, so `title=""` would render an EMPTY HEADING — which a screen
  * reader announces as a heading with no name, and which is worse than no
- * heading at all because it lands in the outline. This is the recurring bug in
+ * heading at all because it still lands in the outline. The recurring bug in
  * this library (NsBreadcrumbs, NsNavSidebar); the fix is the same each time.
  */
-const hasTitle = computed(() => slots.default !== undefined || (props.title?.trim() ?? '') !== '')
-const hasSubtitle = computed(
-  () => slots.subtitle !== undefined || (props.subtitle?.trim() ?? '') !== '',
-)
+/**
+ * The last value each function returned, recorded AS THE TEMPLATE RENDERS.
+ *
+ * The dev check below must not call these itself: invoking a slot outside the
+ * render function makes Vue emit "Slot \"default\" invoked outside of the render
+ * function: this will not track dependencies used in the slot" into every
+ * consumer's console. Measured — an earlier version of this fix did exactly
+ * that on every mount. Reading a flag the render already set costs nothing and
+ * keeps slot invocation where Vue wants it.
+ */
+let titleRendered = false
+let subtitleRendered = false
+
+function hasTitle(): boolean {
+  titleRendered = slotRenders(slots.default) || (props.title?.trim() ?? '') !== ''
+  return titleRendered
+}
+
+function hasSubtitle(): boolean {
+  subtitleRendered = slotRenders(slots.subtitle) || (props.subtitle?.trim() ?? '') !== ''
+  return subtitleRendered
+}
+
+/**
+ * `level` is a union to TypeScript and a bare Number at runtime, so a JS
+ * consumer or a bound value can hand us 7 or 0. `<h7>` is not an element: it
+ * renders inline, contributes NOTHING to the outline, and looks almost right.
+ * Clamp to a real heading rather than emit a tag that is silently not one.
+ */
+const HEADING_TAGS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'] as const
+const MIN_LEVEL = 1
+const MAX_LEVEL = HEADING_TAGS.length
+
+const isValidLevel = (level: number) =>
+  Number.isInteger(level) && level >= MIN_LEVEL && level <= MAX_LEVEL
+
+/**
+ * Indexed rather than interpolated: `h${clamped}` is typed `\`h${number}\`` and
+ * does not narrow to NsText's element union, so a template literal would need a
+ * cast — and a cast here would silently accept `h7` again, which is the whole
+ * thing being guarded against. NaN is handled explicitly because Math.round(NaN)
+ * survives both clamps and would index past the end.
+ */
+const headingTag = computed<(typeof HEADING_TAGS)[number]>(() => {
+  const level = Number.isFinite(props.level) ? Math.round(props.level) : MIN_LEVEL
+  return HEADING_TAGS[Math.min(MAX_LEVEL, Math.max(MIN_LEVEL, level)) - 1]
+})
 
 /**
  * FAIL OPEN — warn unless we can PROVE production, matching the house pattern
- * (see NsText, useNsStylesheetWarning). A bundler cannot fold `typeof process`,
- * and a Vite SPA ships no `process` polyfill, so this is live in browsers too.
- * That is deliberate: a page-title block with no title renders an empty box,
- * which looks like a layout bug rather than a missing prop and is exactly the
- * kind of silence that survives review.
+ * (NsText, useNsStylesheetWarning). A bundler cannot fold `typeof process`, and
+ * a Vite SPA ships no `process` polyfill, so this is live in browsers too.
+ *
+ * On mount AND update, not `watchEffect`: the conditions depend on SLOT content,
+ * which a reactive effect over the non-reactive `slots` object cannot track — so
+ * a watchEffect would warn once at mount and then describe a state that is no
+ * longer true. The flags make each warning fire once per transition rather than
+ * on every render.
  */
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
-  watchEffect(() => {
-    if (!hasTitle.value) {
-      console.warn(
-        '[NsPageTitle] No title: the `title` prop is empty or whitespace and no default ' +
-          'slot was given, so no heading was rendered and this page has no title in its ' +
-          'outline. Pass `title`, or the default slot.',
-      )
+  let warnedNoTitle = false
+  let warnedBadLevel = false
+
+  const check = () => {
+    if (!titleRendered) {
+      if (!warnedNoTitle) {
+        warnedNoTitle = true
+        console.warn(
+          '[NsPageTitle] No title: the `title` prop is empty or whitespace and the default ' +
+            'slot rendered nothing, so no heading was rendered and this page has no title ' +
+            'in its outline. Pass `title`, or content in the default slot.',
+        )
+      }
+    } else {
+      warnedNoTitle = false
     }
-  })
+
+    if (!isValidLevel(props.level)) {
+      if (!warnedBadLevel) {
+        warnedBadLevel = true
+        console.warn(
+          `[NsPageTitle] level="${props.level}" is not a heading level. Only 1-6 are ` +
+            `elements; <h${props.level}> would render inline and add nothing to the ` +
+            `document outline, so it was clamped to <${headingTag.value}>.`,
+        )
+      }
+    } else {
+      warnedBadLevel = false
+    }
+  }
+
+  onMounted(check)
+  onUpdated(check)
 }
 </script>
 
@@ -119,7 +240,6 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   // space-2 on 265:30901 (title y=8 h=37, subtitle y=57 h=75, container 140).
   gap: var(--ns-space-3);
   padding: var(--ns-space-2) 0;
-  width: 100%;
 
   &__title {
     color: var(--ns-color-text-primary);
