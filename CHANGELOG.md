@@ -4,6 +4,19 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.34.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.33.0...v0.34.0) (2026-09-08)
+
+
+### Features
+
+* **text:** add NsText, and ship the type ramp with it (componentLibrary-lrw.8) ([1f32f2b](https://github.com/Nonsuch-io/componentLibrary/commit/1f32f2b1129ca38673372e4aae50127335e4d298))
+* **text:** add NsText, the type ramp as a component (componentLibrary-lrw.8) ([7730078](https://github.com/Nonsuch-io/componentLibrary/commit/7730078aa7f5fe73a8165ad13aab83515a8b8ea1))
+
+
+### Bug Fixes
+
+* **text:** close the review's drift gaps and unpin the guard count (componentLibrary-lrw.8) ([1de8513](https://github.com/Nonsuch-io/componentLibrary/commit/1de85138b568a1525efea6c077b0204a85975005))
+
 ## [0.33.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.32.0...v0.33.0) (2026-09-03)
 
 
