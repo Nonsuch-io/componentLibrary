@@ -63,10 +63,10 @@
   },
   "size-limit": [
     {
-      "name": "full library (gzip) — a SOFT ceiling: it exists to make you stop and ask whether the gain is worth the bytes, or whether an audit could win them back. Bump it deliberately, with the reason, never incidentally. TRAJECTORY WORTH WATCHING: 23.11 before NsText, 23.55 with it, 23.83 with NsPageTitle — roughly 280-440 B per component, and epic componentLibrary-lrw has ~8 more to build. Expect another 2-3 kB by the end of it. If that is not acceptable, the time to run a reclaim audit (componentLibrary-qhu, componentLibrary-cqy) is before the epic, not after",
+      "name": "full library (gzip) — a SOFT ceiling, raised to 25.5 kB on 2026-09-08 to cover roughly the next three components of epic componentLibrary-lrw at the observed ~400-640 B each, rather than stopping to bump it every time. DELIBERATELY NOT AN EPIC-END FIGURE: ~12 builds remain (fewer than the bead count — several are NsCard compositions — but more were found nested), which would need ~5 kB of headroom and would stop catching anything at all. At 25.5 a single component adding more than ~1 kB still trips this, which is the case worth stopping for. RE-SET IT at 25.5 rather than drifting past it. The dev warnings are 3,032 B gzip of this, measured 2026-09-08 by short-circuiting all 15 guard sites and rebuilding; they are a tested contract (useNsDisabled.dist.test.ts) and the only mechanism that reclaims them is dual conditional exports — see the conditional-exports bead. This ceiling comes back DOWN when that lands",
       "path": "dist/nonsuch-components.js",
       "import": "*",
-      "limit": "24.25 kB",
+      "limit": "25.5 kB",
       "gzip": true,
       "ignore": [
         "vue",
