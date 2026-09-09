@@ -96,6 +96,50 @@ describe('NsPageHeading', () => {
     })
   })
 
+  describe('forwarding an empty slot does not create an empty element', () => {
+    // THE INTERACTION A REVIEW WENT LOOKING FOR AND WAS INTERRUPTED MID-CHASE.
+    // NsPageHeading gates its forwarded slots on `$slots.X` — PRESENCE — while
+    // controls use a content walk. The worry was that forwarding a declared-but-
+    // empty slot would make NsPageTitle see content where there is none, and
+    // render an empty <p> or <h1>: the exact bug NsPageTitle's own walk exists
+    // to stop, reintroduced one level up by the wrapper.
+    //
+    // MEASURED, and it does not happen. NsPageTitle runs its own content
+    // detection on whatever it receives, and Vue's `<slot>fallback</slot>`
+    // covers the prop case. Presence is sufficient HERE only because content is
+    // checked THERE — so these tests pin that dependency rather than the
+    // wrapper's own logic, and they are the ones that break if NsPageTitle ever
+    // stops doing its own detection.
+    const mountWith = (template: string) => {
+      silenced()
+      return mount(defineComponent({ components: { NsPageHeading }, template }))
+    }
+
+    it('renders no subtitle for an empty subtitle slot and no subtitle prop', () => {
+      const wrapper = mountWith(
+        `<NsPageHeading title="T"><template #subtitle><span v-if="false">n</span></template></NsPageHeading>`,
+      )
+      expect(wrapper.find('.ns-page-title__subtitle').exists()).toBe(false)
+    })
+
+    it('renders no heading for an empty default slot and no title prop', () => {
+      const wrapper = mountWith(
+        `<NsPageHeading><template #default><span v-if="false">n</span></template></NsPageHeading>`,
+      )
+      expect(wrapper.find('h1').exists()).toBe(false)
+    })
+
+    it('falls back to the title prop when the default slot renders nothing', () => {
+      // Standard Vue slot-fallback semantics, and worth pinning: a consumer who
+      // passes both a prop and a conditional slot gets the prop while the slot
+      // is empty, rather than nothing at all.
+      const wrapper = mountWith(
+        `<NsPageHeading title="PROPTITLE"><template #default><span v-if="false">n</span></template></NsPageHeading>`,
+      )
+      expect(wrapper.find('h1').text()).toBe('PROPTITLE')
+    })
+  })
+
   describe('controls are content, not presence', () => {
     // Same failure as NsPageTitle's: a declared-but-empty slot would render an
     // empty controls row that still takes its gap, pushing the title down for
