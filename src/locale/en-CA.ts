@@ -53,6 +53,7 @@ export const nsLocaleEnCA: NsLocaleMessages = {
 
   navigation: {
     breadcrumbs: 'Breadcrumb',
+    pageActions: 'Page actions',
     collapseMenu: 'Hide Menu',
     expandMenu: 'Expand menu',
     closeMenu: 'Close menu',

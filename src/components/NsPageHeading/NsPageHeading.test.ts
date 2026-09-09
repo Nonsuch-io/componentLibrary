@@ -40,27 +40,63 @@ describe('NsPageHeading', () => {
   })
 
   describe('forwards everything to NsPageTitle rather than reimplementing it', () => {
-    // THE DRIFT THIS GUARDS. The props are declared here rather than extended
-    // from NsPageTitleProps, because Vue's defineProps macro cannot resolve an
-    // interface extending a type imported from another SFC — it compiles to a
-    // component with no props at all. That workaround invites exactly one bug:
-    // a prop added to NsPageTitle and never forwarded, which type-checks,
-    // renders, and silently ignores the consumer.
+    // THE DRIFT THIS GUARDS, and what the first version of it MISSED. The props
+    // are declared here rather than extended from NsPageTitleProps, because
+    // Vue's defineProps macro cannot resolve an interface extending a type
+    // imported from another SFC — it compiles to a component with no props at
+    // all. That workaround invites one specific bug: a prop added to
+    // NsPageTitle and never forwarded.
+    //
+    // A KEY-SET COMPARISON ALONE DOES NOT CATCH THAT. Proved in review by
+    // adding an `eyebrow` prop to the interface and wiring it nowhere: all 16
+    // tests passed, because the key existed. The comment claimed the guard
+    // "fails if a prop is added there and not forwarded here" — true only for a
+    // MISSING key, not for a declared-but-unwired one, which is the failure
+    // that actually reaches a consumer.
+    //
+    // So the guard is two halves now: every NsPageTitle prop must exist here,
+    // AND must have a sample value below, which forces a real pass-through
+    // assertion for each. Adding a prop to NsPageTitle without wiring it fails
+    // at the sample check; wiring it wrongly fails at the pass-through.
+    const SAMPLES: Record<string, unknown> = {
+      title: 'a title',
+      subtitle: 'a subtitle',
+      level: 3,
+    }
+
+    const propsOf = (component: unknown) =>
+      Object.keys((component as { props: Record<string, unknown> }).props)
+
     it('accepts every prop NsPageTitle accepts', () => {
-      const titleProps = Object.keys(
-        (NsPageTitle as unknown as { props: Record<string, unknown> }).props,
-      )
-      const headingProps = Object.keys(
-        (NsPageHeading as unknown as { props: Record<string, unknown> }).props,
-      )
+      const titleProps = propsOf(NsPageTitle)
       expect(titleProps.length).toBeGreaterThan(0)
       for (const prop of titleProps) {
         expect(
-          headingProps,
-          `NsPageTitle accepts "${prop}" and NsPageHeading does not forward it — a ` +
+          propsOf(NsPageHeading),
+          `NsPageTitle accepts "${prop}" and NsPageHeading does not declare it — a ` +
             'consumer setting it here would be silently ignored',
         ).toContain(prop)
       }
+    })
+
+    it('has a sample value for every NsPageTitle prop, so each gets a real assertion', () => {
+      for (const prop of propsOf(NsPageTitle)) {
+        expect(
+          Object.keys(SAMPLES),
+          `no sample for "${prop}", so nothing below proves NsPageHeading actually ` +
+            'passes it through. Add one — a declared-but-unwired prop type-checks, ' +
+            'renders, and silently ignores the consumer',
+        ).toContain(prop)
+      }
+    })
+
+    it.each(Object.keys(SAMPLES))('actually passes %s through to NsPageTitle', (prop) => {
+      silenced()
+      const wrapper = mount(NsPageHeading, { props: { title: 'T', [prop]: SAMPLES[prop] } })
+      // `props()` is keyed by NsPageTitle's own prop union; `prop` is a string
+      // from its runtime key list, which is the same set by construction.
+      const forwarded = wrapper.findComponent(NsPageTitle).props() as Record<string, unknown>
+      expect(forwarded[prop]).toStrictEqual(SAMPLES[prop])
     })
 
     it('forwards the subtitle', () => {
@@ -137,6 +173,53 @@ describe('NsPageHeading', () => {
         `<NsPageHeading title="PROPTITLE"><template #default><span v-if="false">n</span></template></NsPageHeading>`,
       )
       expect(wrapper.find('h1').text()).toBe('PROPTITLE')
+    })
+  })
+
+  describe('the controls row is a named group', () => {
+    // A bare div of buttons gives a screen-reader user no signal that they are
+    // one related set. That matters most on a page carrying several of these,
+    // where "Cancel" and "Save changes" repeat with nothing to tell them apart.
+    // NsBreadcrumbs already solves the same problem the same way, with a
+    // locale-sourced default that a consumer can override per instance.
+    it('exposes the controls as a group with a name', () => {
+      const wrapper = mount(NsPageHeading, {
+        props: { title: 'T' },
+        slots: { controls: '<button>Save</button>' },
+      })
+      const controls = wrapper.find('.ns-page-heading__controls')
+      expect(controls.attributes('role')).toBe('group')
+      expect(controls.attributes('aria-label')).toBe('Page actions')
+    })
+
+    it('lets a consumer name the group', () => {
+      const wrapper = mount(NsPageHeading, {
+        props: { title: 'T', controlsLabel: 'Billing actions' },
+        slots: { controls: '<button>Save</button>' },
+      })
+      expect(wrapper.find('.ns-page-heading__controls').attributes('aria-label')).toBe(
+        'Billing actions',
+      )
+    })
+
+    it.each(['', '   '])('falls back to the locale name for %j', (controlsLabel) => {
+      // `??` would treat '' as a value and emit an EMPTY aria-label, naming the
+      // group nothing while looking set — the recurring bug in this library.
+      const wrapper = mount(NsPageHeading, {
+        props: { title: 'T', controlsLabel },
+        slots: { controls: '<button>Save</button>' },
+      })
+      expect(wrapper.find('.ns-page-heading__controls').attributes('aria-label')).toBe(
+        'Page actions',
+      )
+    })
+
+    it('is not a nav landmark — these are page actions, not navigation', () => {
+      const wrapper = mount(NsPageHeading, {
+        props: { title: 'T' },
+        slots: { controls: '<button>Save</button>' },
+      })
+      expect(wrapper.find('nav').exists()).toBe(false)
     })
   })
 

@@ -1,6 +1,11 @@
 <template>
   <header class="ns-page-heading">
-    <div v-if="hasControls()" class="ns-page-heading__controls">
+    <div
+      v-if="hasControls()"
+      class="ns-page-heading__controls"
+      role="group"
+      :aria-label="resolvedControlsLabel"
+    >
       <slot name="controls" />
     </div>
     <NsPageTitle class="ns-page-heading__title" :title="title" :subtitle="subtitle" :level="level">
@@ -11,7 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import { Comment, Fragment, useSlots, type Slot, type VNode } from 'vue'
+import { Comment, Fragment, computed, useSlots, type Slot, type VNode } from 'vue'
+import { useNsLocale } from '../../composables/useNsLocale'
 import NsPageTitle from '../NsPageTitle/NsPageTitle.vue'
 
 /**
@@ -35,6 +41,15 @@ import NsPageTitle from '../NsPageTitle/NsPageTitle.vue'
  * was built. Both are flagged in componentLibrary-8ds with the node ids to
  * re-query. They are laid out here with `--ns-space-2` for consistency with
  * NsPageTitle's own padding, which is a choice, not a measurement.
+ *
+ * THE `<header>` IS DELIBERATE AND SO IS ITS DEMOTION. A `<header>` is exposed
+ * as a `banner` landmark only when it is NOT inside sectioning content, so one
+ * of these at the top of a page is a banner, while the same component inside
+ * `<main>` or an `<article>` is a plain group. That is the behaviour we want —
+ * several page headings on one page must not each claim to be the page banner
+ * — but it comes from HTML semantics rather than from anything asserted here,
+ * so it is recorded rather than left to look like an accident. The
+ * `InsideAMainLandmark` story shows it.
  *
  * EVERY TITLE PROP AND SLOT IS FORWARDED rather than reimplemented. The empty
  * -string handling, the slot-content detection, the heading-level clamp and
@@ -61,9 +76,16 @@ export interface NsPageHeadingProps {
   subtitle?: string
   /** Which heading element to render, 1-6. Forwarded; clamped by NsPageTitle. */
   level?: 1 | 2 | 3 | 4 | 5 | 6
+  /**
+   * Accessible name for the controls group. Defaults to the locale's
+   * `navigation.pageActions`. NOT forwarded to NsPageTitle — it belongs to this
+   * component's own controls row, which is why the prop-forwarding guard below
+   * compares NsPageTitle's props against a subset rather than an exact match.
+   */
+  controlsLabel?: string
 }
 
-defineProps<NsPageHeadingProps>()
+const props = defineProps<NsPageHeadingProps>()
 
 defineSlots<{
   /** Actions for the page, rendered above the title. Typically NsButton. */
@@ -82,6 +104,14 @@ const slots = useSlots()
  * merely declares, so `<template #controls><NsButton v-if="canEdit"/></template>`
  * would render an empty controls row that still takes its gap. Measured on
  * NsPageTitle in review, where the equivalent bug produced an empty `<h1>`.
+ *
+ * SAME LIMIT AS NsPageTitle'S COPY, and worth repeating rather than leaving a
+ * reader to find it there: this sees Comment vnodes, empty Fragments and
+ * whitespace-only text — what `v-if`, `v-for` over nothing and interpolating
+ * '' produce. It CANNOT see through a child component that renders nothing, so
+ * `<template #controls><SomethingEmpty /></template>` still gets a controls
+ * row and its gap. Confirmed in review. Going further would mean rendering to
+ * DOM and reading textContent, which is disproportionate here.
  *
  * Deliberately a local copy rather than a shared helper. NsBreadcrumbs has the
  * same two functions inline; the size audit found that shared-helper
@@ -107,6 +137,22 @@ function slotRenders(slot: Slot | undefined): boolean {
 function hasControls(): boolean {
   return slotRenders(slots.controls)
 }
+
+/**
+ * `?.trim() ||` and NOT `??`, the same way NsBreadcrumbs resolves its own
+ * landmark name: nullish would treat `controlsLabel=""` as a value and emit an
+ * EMPTY aria-label, which names the group nothing while looking set.
+ *
+ * The row is `role="group"` with a name rather than a bare div. Without it a
+ * screen-reader user hears an unnamed run of buttons with no signal they are
+ * one related set — which matters most on a page carrying several of these,
+ * where "Cancel" and "Save changes" repeat with nothing to tell them apart.
+ * Not a `<nav>`: these are actions on the current page, not navigation.
+ */
+const locale = useNsLocale()
+const resolvedControlsLabel = computed(
+  () => props.controlsLabel?.trim() || locale.navigation.pageActions,
+)
 </script>
 
 <style lang="scss" scoped>

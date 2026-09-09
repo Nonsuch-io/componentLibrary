@@ -78,3 +78,29 @@ export const MultipleControls: Story = {
 export const InsideAShell: Story = {
   args: { level: 2, subtitle: 'This page sits inside a layout that already owns the h1.' },
 }
+
+/**
+ * THE LANDMARK DEMOTES ITSELF, AND THAT IS THE POINT.
+ *
+ * `<header>` is a `banner` landmark only outside sectioning content. At the top
+ * of a page this component is the banner; inside `<main>` — where most pages
+ * put it — it is a plain group instead. Several of these on one page therefore
+ * never compete to be the page banner. Shown here because the behaviour comes
+ * from HTML semantics rather than from anything the component does, which makes
+ * it easy to mistake for an accident.
+ */
+export const InsideAMainLandmark: Story = {
+  render: (args) => ({
+    components: { NsPageHeading, NsButton },
+    setup: () => ({ args }),
+    template: `
+      <main>
+        <NsPageHeading v-bind="args">
+          <template #controls>
+            <NsButton variant="tertiary" size="sm">Cancel</NsButton>
+          </template>
+        </NsPageHeading>
+      </main>
+    `,
+  }),
+}
