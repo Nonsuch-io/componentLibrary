@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.34.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.34.0...v0.34.1) (2026-09-09)
+
+
+### Bug Fixes
+
+* **button:** delete the dead .q-btn__wrapper rule (componentLibrary-cqy) ([cd290d6](https://github.com/Nonsuch-io/componentLibrary/commit/cd290d6ad9ed868c3728488f30005a242eb72554))
+* **button:** delete the dead .q-btn__wrapper rule (componentLibrary-cqy) ([f5eb865](https://github.com/Nonsuch-io/componentLibrary/commit/f5eb865bd3e6e40967be2e5e6153971ebb31e20b))
+
 ## [0.34.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.33.0...v0.34.0) (2026-09-08)
 
 
