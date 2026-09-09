@@ -160,7 +160,63 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(15) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name), 13->14 NsBrandLogo (missing src), 14->15 NsText (unknown variant + unknown tone, one shared guard)
+    ).toBe(16) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name), 13->14 NsBrandLogo (missing src), 14->15 NsText (unknown variant + unknown tone, one shared guard), 15->16 NsPageTitle (empty title)
+  })
+
+  it("warns for NsPageTitle's missing title from the built bundle", () => {
+    // The pinned count moved 15 -> 16 for this guard, and a count cannot tell a
+    // working guard from a fail-CLOSED one — the regex matches either polarity.
+    // NsPageTitle inlines its own isDev() rather than sharing NsText's, so it is
+    // a separate polarity to get wrong. An empty page-title block renders an
+    // empty box, which reads as a layout bug rather than a missing prop.
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsPageTitle as Component, { props: { title: '   ' } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the NsPageTitle missing-title warning did not fire with `process` undefined — ' +
+        'it is dead in every consumer browser, whatever the unit tests say',
+    ).toContain('[NsPageTitle] No title')
+  })
+
+  it("warns for NsPageTitle's out-of-range level from the built bundle", () => {
+    // NsPageTitle gates TWO warnings behind ONE `isDev()`, so the pinned count
+    // covers them jointly and cannot distinguish them. They share a guard today;
+    // if that guard is ever split, this is the half that would otherwise go
+    // untested for build-survival. `<h7>` is not an element — it renders inline
+    // and adds nothing to the outline, which is invisible without the warning.
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsPageTitle as Component, { props: { title: 'Settings', level: 7 } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the NsPageTitle level warning did not fire with `process` undefined — a JS ' +
+        'consumer passing 7 gets a silently clamped heading in every browser',
+    ).toContain('is not a heading level')
+  })
+
+  it('stays silent from the built bundle for a real page title', () => {
+    // Anti-vacuity for the mount above: a guard that warned unconditionally
+    // would pass that test just as well. This is the half that fails if it does.
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsPageTitle as Component, { props: { title: 'Account settings', level: 2 } })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(text, 'NsPageTitle warned about a perfectly valid title').not.toContain('[NsPageTitle]')
   })
 
   it("warns for NsText's unknown variant and tone from the built bundle", () => {
