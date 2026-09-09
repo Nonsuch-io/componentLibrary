@@ -182,9 +182,12 @@ export const Loading: Story = {
  * property left for this rule to falsifiably own, so no assertion for it is
  * included here — writing one would be exactly the kind of check that
  * cannot fail this bead exists to stop shipping. See componentLibrary-7lp
- * for the full investigation. Deleting the dead selector is filed separately
- * as componentLibrary-cqy; it is a behaviour-adjacent change and out of
- * scope for a test-only bead.
+ * for the full investigation. THE DEAD SELECTOR IS NOW DELETED
+ * (componentLibrary-cqy) and this story asserts BOTH halves of the finding
+ * instead: that `.q-btn__wrapper` matches nothing, and that the inline
+ * min-height reset we actually rely on is present. Re-verified on Quasar
+ * 2.28.0 — `q-btn__wrapper` appears in 0 files of its src and dist, against
+ * 39 for `.q-btn__content` as a control that the search works.
  */
 export const LayoutIsReal: Story = {
   args: { variant: 'primary' },
@@ -212,6 +215,17 @@ export const LayoutIsReal: Story = {
     await expect(gapOf('lg')).toBe('8px')
     // .ns-btn--xl override.
     await expect(gapOf('xl')).toBe('12px')
+
+    // THE min-height MECHANISM, now that the dead rule that pretended to own it
+    // is gone (componentLibrary-cqy). Two assertions, and the pair is the point:
+    // the first proves the selector we deleted still matches nothing, so nobody
+    // reinstates it; the second proves the reset we actually depend on is real.
+    // If a future Quasar starts rendering `.q-btn__wrapper`, or stops setting
+    // the inline min-height when `padding` is passed, exactly one of these fails
+    // and names which. The deleted rule could do neither — it owned no property.
+    const md = canvasElement.querySelector('[data-testid="md"]') as HTMLElement
+    await expect(md.querySelector('.q-btn__wrapper')).toBeNull()
+    await expect(md.style.minHeight).toBe('0px')
   },
 }
 
