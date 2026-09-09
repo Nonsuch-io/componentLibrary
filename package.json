@@ -1,6 +1,6 @@
 {
   "name": "@nonsuch/component-library",
-  "version": "0.34.1",
+  "version": "0.35.0",
   "description": "A Vue 3 component library built on Quasar with opinionated defaults and custom components.",
   "type": "module",
   "sideEffects": false,
@@ -117,7 +117,7 @@
       "gzip": true
     },
     {
-      "name": "styles (gzip) — ALSO A SOFT CEILING. Raised to 6.25 kB for the type ramp: typography.css is now imported by src/index.ts, so the 21 type classes ship with the components instead of sitting in an optional file no consumer imported. Reclaim available in componentLibrary-cqy",
+      "name": "styles (gzip) — ALSO A SOFT CEILING. Raised to 6.25 kB for the type ramp: typography.css is now imported by src/index.ts, so the 21 type classes ship with the components instead of sitting in an optional file no consumer imported. componentLibrary-cqy is done — it reclaimed 17 B, which is the honest size of that kind of win; the weight is in the dev warnings, see the conditional-exports bead",
       "path": "dist/nonsuch-components.css",
       "limit": "6.25 kB",
       "gzip": true
