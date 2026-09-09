@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.35.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.34.1...v0.35.0) (2026-09-09)
+
+
+### Features
+
+* **page-title:** add NsPageTitle, the title and subtitle block (componentLibrary-8ds) ([56ff1bb](https://github.com/Nonsuch-io/componentLibrary/commit/56ff1bb8e81f7657a29b44565cff7448bbc5c59a))
+
 ## [0.34.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.34.0...v0.34.1) (2026-09-09)
 
 
