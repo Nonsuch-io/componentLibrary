@@ -70,6 +70,15 @@ export interface NsLocaleMessages {
     /** Accessible name for the breadcrumb <nav> landmark. */
     breadcrumbs: string
     /**
+     * Accessible name for the group of actions in an NsPageHeading.
+     *
+     * A bare div of buttons gives a screen-reader user no signal that they are
+     * one related set, which matters most when several NsPageHeading appear on
+     * a page and the buttons repeat ("Cancel", "Save changes"). Overridable
+     * per-instance via NsPageHeading's `controlsLabel`.
+     */
+    pageActions: string
+    /**
      * VISIBLE text on the sidebar toggle when the sidebar is expanded.
      *
      * This is the accessible name too — the button takes its name from this
