@@ -165,29 +165,8 @@ export const Loading: Story = {
  * distinguishing our value from Quasar's; it is presence vs. absence,
  * exactly the HeightsAreReal principle (componentLibrary-7lp).
  *
- * NOTE ON `.q-btn__wrapper`: this story does NOT assert the
- * `:deep(.q-btn__wrapper) { min-height: unset }` rule in NsButton.vue.
- * Measured directly in Chromium (and confirmed by reading QBtn.js's render
- * function, in both the installed 2.25.0 and the 2.18.6 used elsewhere in
- * the monorepo): Quasar's QBtn NEVER renders an element with the class
- * `q-btn__wrapper`, in any version checked — only `.q-btn__content`. The
- * selector cannot ever match, so this rule is dead CSS, not merely
- * currently-inert. The button's actual min-height reset comes from
- * elsewhere: NsButton always passes Quasar's own `padding` prop
- * (`:padding="buttonPadding"`), and QBtn's use-btn.js sets an INLINE style
- * `min-width: 0; min-height: 0` whenever `padding` is provided — with
- * higher specificity than any class selector, dead or not. Confirmed by
- * reading the rendered button's `style` attribute in Chromium:
- * `padding: 8px 16px; min-width: 0px; min-height: 0px;`. There is no
- * property left for this rule to falsifiably own, so no assertion for it is
- * included here — writing one would be exactly the kind of check that
- * cannot fail this bead exists to stop shipping. See componentLibrary-7lp
- * for the full investigation. THE DEAD SELECTOR IS NOW DELETED
- * (componentLibrary-cqy) and this story asserts BOTH halves of the finding
- * instead: that `.q-btn__wrapper` matches nothing, and that the inline
- * min-height reset we actually rely on is present. Re-verified on Quasar
- * 2.28.0 — `q-btn__wrapper` appears in 0 files of its src and dist, against
- * 39 for `.q-btn__content` as a control that the search works.
+ * The min-height half of this investigation moved to MinHeightIsReal below,
+ * so a failure here names the gap and a failure there names the height.
  */
 export const LayoutIsReal: Story = {
   args: { variant: 'primary' },
@@ -215,17 +194,57 @@ export const LayoutIsReal: Story = {
     await expect(gapOf('lg')).toBe('8px')
     // .ns-btn--xl override.
     await expect(gapOf('xl')).toBe('12px')
+  },
+}
 
-    // THE min-height MECHANISM, now that the dead rule that pretended to own it
-    // is gone (componentLibrary-cqy). Two assertions, and the pair is the point:
-    // the first proves the selector we deleted still matches nothing, so nobody
-    // reinstates it; the second proves the reset we actually depend on is real.
-    // If a future Quasar starts rendering `.q-btn__wrapper`, or stops setting
-    // the inline min-height when `padding` is passed, exactly one of these fails
-    // and names which. The deleted rule could do neither — it owned no property.
+/**
+ * THE min-height MECHANISM, after deleting the rule that pretended to own it
+ * (componentLibrary-cqy).
+ *
+ * NsButton used to carry `:deep(.q-btn__wrapper) { min-height: unset }`. Quasar
+ * has never rendered that class — 0 files in quasar 2.28.0's src and dist,
+ * against 13 for `.q-btn__content` in the same two directories as a control
+ * that the search works. (An earlier version of this comment said 39; that
+ * number came from a glob spanning three cached Quasar versions in the pnpm
+ * store, not from 2.28.0. Corrected in review — a number in a permanent comment
+ * has to reproduce as written.)
+ *
+ * The reset is real, it is just not ours: QBtn's use-btn.js sets an INLINE
+ * `min-width: 0; min-height: 0` whenever the `padding` prop is DEFINED — the
+ * gate is `props.padding !== void 0`, not truthiness — and NsButton always
+ * passes `:padding="buttonPadding"`. Inline beats any class selector, dead or
+ * not, which is exactly why the deleted rule looked like it worked.
+ *
+ * THREE ASSERTIONS, EACH OWNING A DIFFERENT FAILURE:
+ *   1. `.q-btn__wrapper` matches nothing — fails if a future Quasar starts
+ *      rendering that class, which is the day the deleted rule would have
+ *      mattered. It does NOT guard against someone reinstating the rule: a
+ *      non-matching scoped selector cannot change the DOM either way.
+ *   2. the inline declaration is PRESENT — fails if NsButton stops passing
+ *      `padding`, or Quasar stops setting it.
+ *   3. the computed value WINS. Added in review, and it is the one that turns
+ *      this from a description into a guarantee: presence is not victory.
+ *      Every other min-height Quasar sets on a button (.q-btn 2.572em, --round
+ *      3em, --dense 2em, --dense.--round 2.4em, --fab 56px, --fab-mini 40px) is
+ *      a non-`!important` class rule on the root, so inline wins TODAY. A
+ *      future Quasar or a consumer sheet adding `!important` would leave the
+ *      inline value present-but-dead — syntactically there, semantically gone,
+ *      the exact shape componentLibrary-cqy existed to remove — with assertion
+ *      2 still green.
+ */
+export const MinHeightIsReal: Story = {
+  args: { variant: 'primary' },
+  render: (args) => ({
+    components: { NsButton },
+    setup: () => ({ args }),
+    template: `<NsButton v-bind="args" size="md" data-testid="md">Send</NsButton>`,
+  }),
+  play: async ({ canvasElement }) => {
     const md = canvasElement.querySelector('[data-testid="md"]') as HTMLElement
+
     await expect(md.querySelector('.q-btn__wrapper')).toBeNull()
     await expect(md.style.minHeight).toBe('0px')
+    await expect(getComputedStyle(md).minHeight).toBe('0px')
   },
 }
 
