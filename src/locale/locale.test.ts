@@ -58,6 +58,7 @@ describe('nsLocaleEnCA', () => {
     expect(nsLocaleEnCA.navigation.expandMenu).toBe('Expand menu')
     expect(nsLocaleEnCA.navigation.closeMenu).toBe('Close menu')
     expect(nsLocaleEnCA.navigation.openMenu).toBe('Open menu')
+    expect(nsLocaleEnCA.navigation.pageActions).toBe('Page actions')
   })
 
   it('every top-level key contains only string values (no nesting beyond 1 level)', () => {
@@ -105,6 +106,7 @@ describe('nsLocaleFrCA', () => {
     expect(nsLocaleFrCA.navigation.expandMenu).toBe('Afficher le menu')
     expect(nsLocaleFrCA.navigation.closeMenu).toBe('Fermer le menu')
     expect(nsLocaleFrCA.navigation.openMenu).toBe('Ouvrir le menu')
+    expect(nsLocaleFrCA.navigation.pageActions).toBe('Actions de la page')
   })
 
   it('every top-level key contains only string values', () => {

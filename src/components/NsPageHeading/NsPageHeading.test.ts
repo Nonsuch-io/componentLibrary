@@ -3,6 +3,8 @@ import { mount } from '@vue/test-utils'
 import { defineComponent, h, nextTick, ref } from 'vue'
 import NsPageHeading from './NsPageHeading.vue'
 import NsPageTitle from './../NsPageTitle/NsPageTitle.vue'
+import { NsLocaleKey } from '../../composables/useNsLocale'
+import { nsLocaleEnCA } from '../../locale/en-CA'
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -92,9 +94,27 @@ describe('NsPageHeading', () => {
 
     it.each(Object.keys(SAMPLES))('actually passes %s through to NsPageTitle', (prop) => {
       silenced()
+      // `props()` returns RESOLVED props, so an unwired prop reads as
+      // NsPageTitle's OWN DEFAULT rather than as absent. If a sample happens to
+      // equal that default — `undefined` for any optional string, or the literal
+      // default for `level` — the assertion below passes with the binding gone,
+      // and the sample check above reports the prop covered. Measured in review:
+      // adding `eyebrow` wired nowhere with `eyebrow: undefined` in SAMPLES left
+      // all 26 tests green. That is the same overclaim this describe block was
+      // rewritten to remove, one level down.
+      //
+      // So the sample must DIFFER from the default, and this asserts it. Today's
+      // three all do ('a title'/undefined, 'a subtitle'/undefined, 3/1); the gap
+      // was entirely in the future state the guard exists for.
+      const bare = mount(NsPageHeading, { props: { title: 'T' } })
+      const defaults = bare.findComponent(NsPageTitle).props() as Record<string, unknown>
+      expect(
+        defaults[prop],
+        `the sample for "${prop}" equals NsPageTitle's own default, so an unwired ` +
+          'prop would still pass the assertion below. Pick a sample that differs',
+      ).not.toStrictEqual(SAMPLES[prop])
+
       const wrapper = mount(NsPageHeading, { props: { title: 'T', [prop]: SAMPLES[prop] } })
-      // `props()` is keyed by NsPageTitle's own prop union; `prop` is a string
-      // from its runtime key list, which is the same set by construction.
       const forwarded = wrapper.findComponent(NsPageTitle).props() as Record<string, unknown>
       expect(forwarded[prop]).toStrictEqual(SAMPLES[prop])
     })
@@ -211,6 +231,32 @@ describe('NsPageHeading', () => {
       })
       expect(wrapper.find('.ns-page-heading__controls').attributes('aria-label')).toBe(
         'Page actions',
+      )
+    })
+
+    it('takes the group name from the injected locale, not a hardcoded string', () => {
+      // Replacing `locale.navigation.pageActions` with the literal 'Page actions'
+      // passed every other test here — measured in review. A later refactor that
+      // inlines the string, or reads the wrong key, would ship English to fr-CA
+      // users with nothing going red. NsBreadcrumbs pins its own name this way.
+      //
+      // SPREAD `navigation`, do not replace it: replacing drops every other key,
+      // `pageActions` becomes undefined, and the `||` fallback then emits no
+      // label at all — the test would pass for the wrong reason.
+      const wrapper = mount(NsPageHeading, {
+        props: { title: 'T' },
+        slots: { controls: '<button>Save</button>' },
+        global: {
+          provide: {
+            [NsLocaleKey as symbol]: {
+              ...nsLocaleEnCA,
+              navigation: { ...nsLocaleEnCA.navigation, pageActions: 'Actions de la page' },
+            },
+          },
+        },
+      })
+      expect(wrapper.find('.ns-page-heading__controls').attributes('aria-label')).toBe(
+        'Actions de la page',
       )
     })
 

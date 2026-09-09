@@ -45,7 +45,11 @@ import NsPageTitle from '../NsPageTitle/NsPageTitle.vue'
  * THE `<header>` IS DELIBERATE AND SO IS ITS DEMOTION. A `<header>` is exposed
  * as a `banner` landmark only when it is NOT inside sectioning content, so one
  * of these at the top of a page is a banner, while the same component inside
- * `<main>` or an `<article>` is a plain group. That is the behaviour we want —
+ * `<main>` or an `<article>` LOSES ITS LANDMARK ROLE — HTML-AAM maps it to
+ * `sectionheader`, which shipping browsers expose as generic. Deliberately not
+ * the word "group" here: this file adds a real ARIA `role="group"` ten lines
+ * away, and calling the demoted header a group invites reading them as the same
+ * thing. That is the behaviour we want —
  * several page headings on one page must not each claim to be the page banner
  * — but it comes from HTML semantics rather than from anything asserted here,
  * so it is recorded rather than left to look like an accident. The

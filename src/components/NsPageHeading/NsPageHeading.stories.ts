@@ -55,8 +55,17 @@ export const ControlsThatRenderNothing: Story = {
   }),
 }
 
-/** Several actions. The row is a flex line with its own gap. */
+/**
+ * Several actions, and the case that needs `controlsLabel`.
+ *
+ * The controls row is a named `role="group"`, but the DEFAULT name is the same
+ * for every instance ("Page actions"). On a page carrying more than one of
+ * these — where "Cancel" and "Save changes" repeat verbatim — the default
+ * groups the buttons without distinguishing the groups. Passing
+ * `controlsLabel` is what tells a screen-reader user which set they are in.
+ */
 export const MultipleControls: Story = {
+  args: { controlsLabel: 'Billing actions' },
   render: (args) => ({
     components: { NsPageHeading, NsButton },
     setup: () => ({ args }),
