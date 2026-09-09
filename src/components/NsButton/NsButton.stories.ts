@@ -156,7 +156,7 @@ export const Loading: Story = {
  * deleted — it passes on the bug. Only Chromium, via the storybook project,
  * proves the rule is actually in the cascade.
  *
- * ASSERTS `gap` EXACTLY. Verified against installed Quasar 2.25.0 source
+ * ASSERTS `gap` EXACTLY. Verified against installed Quasar 2.28.0 source
  * (node_modules/quasar/src/components/btn/QBtn.sass and the compiled
  * dist/quasar.css): Quasar sets NO `gap` anywhere on `.q-btn__content`, at
  * any size/dense/round/fab variant. A fallback cannot produce "4px", "8px",
@@ -201,13 +201,22 @@ export const LayoutIsReal: Story = {
  * THE min-height MECHANISM, after deleting the rule that pretended to own it
  * (componentLibrary-cqy).
  *
- * NsButton used to carry `:deep(.q-btn__wrapper) { min-height: unset }`. Quasar
- * has never rendered that class — 0 files in quasar 2.28.0's src and dist,
- * against 13 for `.q-btn__content` in the same two directories as a control
- * that the search works. (An earlier version of this comment said 39; that
- * number came from a glob spanning three cached Quasar versions in the pnpm
- * store, not from 2.28.0. Corrected in review — a number in a permanent comment
- * has to reproduce as written.)
+ * NsButton used to carry `:deep(.q-btn__wrapper) { min-height: unset }`.
+ *
+ * QUASAR 1 DID RENDER THAT CLASS — `QBtn.js` emitted
+ * `staticClass: 'q-btn__wrapper col row q-anchor--skip'` as a span wrapping
+ * `.q-btn__content`. So this rule was almost certainly a Quasar 1 override
+ * carried across the 2.x migration and never re-checked, which is a more
+ * useful thing to know than "dead". An earlier version of this comment said
+ * Quasar had NEVER rendered it; that was wrong, and it was wrong in a comment
+ * whose whole purpose is to reproduce as written. Corrected in review.
+ *
+ * QUASAR 2 DOES NOT: 0 files contain `q-btn__wrapper` in 2.28.0's src and
+ * dist, against 13 for `.q-btn__content` in the same two directories as a
+ * control that the search works. (An earlier version said 39 — that came from
+ * a glob spanning three cached Quasar versions in the pnpm store, not from
+ * 2.28.0.) Also checked in butiq's installed 2.18.6, the low end of our
+ * `^2.17.0` peer range: same 0, and the same `minHeight` gate below.
  *
  * The reset is real, it is just not ours: QBtn's use-btn.js sets an INLINE
  * `min-width: 0; min-height: 0` whenever the `padding` prop is DEFINED — the
@@ -215,22 +224,32 @@ export const LayoutIsReal: Story = {
  * passes `:padding="buttonPadding"`. Inline beats any class selector, dead or
  * not, which is exactly why the deleted rule looked like it worked.
  *
- * THREE ASSERTIONS, EACH OWNING A DIFFERENT FAILURE:
- *   1. `.q-btn__wrapper` matches nothing — fails if a future Quasar starts
- *      rendering that class, which is the day the deleted rule would have
- *      mattered. It does NOT guard against someone reinstating the rule: a
- *      non-matching scoped selector cannot change the DOM either way.
- *   2. the inline declaration is PRESENT — fails if NsButton stops passing
+ * THE ASSERTIONS, AND HOW THEY DEPEND ON EACH OTHER:
+ *
+ *   1. `.q-btn__wrapper` matches nothing. Fails if a Quasar upgrade starts
+ *      rendering that class AGAIN — which is the day the deleted rule would
+ *      have mattered. It does NOT guard against someone reinstating the rule:
+ *      a non-matching scoped selector cannot change the DOM either way.
+ *
+ *   2. the inline declaration is PRESENT. Fails if NsButton stops passing
  *      `padding`, or Quasar stops setting it.
- *   3. the computed value WINS. Added in review, and it is the one that turns
- *      this from a description into a guarantee: presence is not victory.
- *      Every other min-height Quasar sets on a button (.q-btn 2.572em, --round
- *      3em, --dense 2em, --dense.--round 2.4em, --fab 56px, --fab-mini 40px) is
- *      a non-`!important` class rule on the root, so inline wins TODAY. A
- *      future Quasar or a consumer sheet adding `!important` would leave the
- *      inline value present-but-dead — syntactically there, semantically gone,
- *      the exact shape componentLibrary-cqy existed to remove — with assertion
- *      2 still green.
+ *
+ *   3. the computed value WINS — but ONLY MEANINGFUL GIVEN 2, and an earlier
+ *      version of this comment had that backwards. `0px` is also what NO
+ *      min-height computes to: `auto` resolves to `0px` on a non-flex-item, so
+ *      a bare unstyled button reads `0px` too. Measured in review — with the
+ *      padding prop removed and a `min-height: auto` rule added, assertion 3
+ *      ALONE passes. It is not the strong one. Do not delete 2 as redundant.
+ *
+ *   The control below fixes that dependency in place: clearing the inline
+ *   value must CHANGE the computed one, which proves a real competitor exists
+ *   to be beaten rather than assuming one does.
+ *
+ * WHAT THIS CANNOT SEE: a consumer's own stylesheet. None is loaded here, so
+ * these assertions cover Quasar's CSS and this library's SCSS only. Every
+ * button min-height Quasar 2.28.0 ships (.q-btn 2.572em, --round 3em, --dense
+ * 2em, --dense.--round 2.4em, --fab 56px, --fab-mini 40px) is a
+ * non-`!important` class rule on the root, which is why inline wins today.
  */
 export const MinHeightIsReal: Story = {
   args: { variant: 'primary' },
@@ -244,6 +263,15 @@ export const MinHeightIsReal: Story = {
 
     await expect(md.querySelector('.q-btn__wrapper')).toBeNull()
     await expect(md.style.minHeight).toBe('0px')
+    await expect(getComputedStyle(md).minHeight).toBe('0px')
+
+    // THE CONTROL. Without it, assertion 3 above passes against a button with
+    // no min-height at all. Clearing the inline value must change the computed
+    // one — that is what proves Quasar's own rule is really there and really
+    // being beaten, rather than that nothing is setting anything.
+    md.style.minHeight = ''
+    await expect(getComputedStyle(md).minHeight).not.toBe('0px')
+    md.style.minHeight = '0px'
     await expect(getComputedStyle(md).minHeight).toBe('0px')
   },
 }
