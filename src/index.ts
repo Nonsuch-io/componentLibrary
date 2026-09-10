@@ -91,6 +91,11 @@ export type { NsListProps } from './components/NsList/NsList.vue'
 export { default as NsTooltip } from './components/NsTooltip/NsTooltip.vue'
 export type { NsTooltipProps, NsTooltipAnchor } from './components/NsTooltip/NsTooltip.vue'
 
+export { default as NsFormSection } from './components/NsFormSection/NsFormSection.vue'
+export type { NsFormSectionProps } from './components/NsFormSection/NsFormSection.vue'
+
+export { default as NsFormFooter } from './components/NsFormFooter/NsFormFooter.vue'
+
 export { default as NsPageHeading } from './components/NsPageHeading/NsPageHeading.vue'
 export type { NsPageHeadingProps } from './components/NsPageHeading/NsPageHeading.vue'
 

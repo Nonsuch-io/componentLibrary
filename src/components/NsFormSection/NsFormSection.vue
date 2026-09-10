@@ -4,7 +4,7 @@
       <NsText
         v-if="hasTitle()"
         :as="headingTag"
-        variant="heading-sm"
+        variant="heading-sm-regular"
         class="ns-form-section__title"
       >
         <slot name="title">{{ title }}</slot>
@@ -68,6 +68,26 @@ import NsText from '../NsText/NsText.vue'
  * walks while looking identical in a screenshot. A row-level banner belongs to
  * whatever occupies that row; a second slot here would recreate the ambiguity
  * one level down.
+ *
+ * TYPE STYLES ARE MEASURED, and both of my first guesses were wrong — which is
+ * why they were checked before any test pinned them. get_variable_defs on
+ * 163:9495 and 164:10056, agreeing exactly:
+ *
+ *     title        "Small heading regular"  16/400/20.8  -> .ns-heading-sm-regular EXACT
+ *     description  "Medium body text"       14/400/19.6  -> no exact class exists
+ *
+ * I had inferred `heading-sm` from the measured 21px height; that class is
+ * WEIGHT 600 and the design is 400, so the title would have rendered semibold.
+ * Height alone cannot see weight.
+ *
+ * THE DESCRIPTION USES ns-body-md UNDER PROTEST: it matches on size and weight
+ * and misses on line-height, 1.5 against the design's 1.4 — 1.4px per line, so
+ * about 4px on a three-line description. It is the closest class that exists.
+ * The wider finding is filed as componentLibrary-3mg: every HEADING style in
+ * our ramp matches the design exactly and every BODY style does not, which
+ * suggests the body half was invented rather than derived. Nothing renders
+ * wrong today because no component used these classes before this one. Change
+ * this to whatever 3mg settles on — it is a one-word edit.
  *
  * `notice` IS SEVERITY-NEUTRAL, and that is not a hedge — it is where
  * verification failures, refusals, plan downgrades and section validation
@@ -196,6 +216,10 @@ const headingTag = computed<(typeof HEADING_TAGS)[number]>(() => {
     color: var(--ns-color-text-primary);
   }
 
+  // Colour is measured: 163:9495 resolves only --ns-color-text-primary for its
+  // heading, so the description is not a distinct token there. `secondary` is a
+  // deliberate choice for a supporting line, set in CSS rather than via NsText's
+  // `tone` prop so a selector of equal specificity can override it.
   &__description {
     color: var(--ns-color-text-secondary);
   }
