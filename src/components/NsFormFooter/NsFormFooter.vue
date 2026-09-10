@@ -41,12 +41,22 @@
  * Nothing here enforces a count: the slot takes what it is given.
  *
  * WHAT THIS COMPONENT DOES NOT DO, deliberately: set the size of the buttons
- * inside it. The design uses 36px tall on desktop and 45px on mobile, which are
- * NsButton's `md` and `lg` (36 = 8px padding + 14px text, 45 = 12px + 16px —
- * checked against NsButton's own paddingMap rather than assumed). A footer that
- * reached in and set its children's size would be overriding a decision the
- * consumer owns. WIDTH is different and is layout: full-bleed on mobile is what
- * makes the stack usable, so this does set that.
+ * inside it. A footer that reached in and set its children's size would be
+ * overriding a decision the consumer owns — and NsButton's `padding` prop lands
+ * as an inline style, so CSS here could not override it without `!important`
+ * anyway. WIDTH is different and is layout, which is why the reflow is this
+ * component's business and the height is not.
+ *
+ * THE DESIGN'S BUTTON HEIGHTS ARE NOT REACHABLE WITH TODAY'S NsButton, and an
+ * earlier version of this comment said they were. It claimed 36px = `md`
+ * because 8px padding + 14px text = 36 — which ignores that Quasar's `.q-btn`
+ * carries `line-height: 1.715em`, making the line box 24px. MEASURED in
+ * Chromium: `md` renders 40px and `lg` about 51px, against the design's 36 and
+ * 45. Computing a height from padding and font-size is not measuring it.
+ * Filed as componentLibrary-4l2; it is NsButton's gap, not the footer's.
+ * Until it is settled, a consumer wanting the design exactly needs
+ * `:size="$q.screen.lt.md ? 'lg' : 'md'"` — $q.screen is Quasar core, no
+ * plugin needed.
  * Story: componentLibrary-lrw.1.
  */
 
@@ -60,10 +70,19 @@ defineSlots<{
 .ns-form-footer {
   width: 100%;
   // Mobile first, because the mobile shape is the one that breaks if it is
-  // treated as a scaled desktop. 8px vertical, none horizontal: measured at
-  // 53 - 45 and 110 - 102, with the footer sitting inside a container that
-  // already carries the page's own margins.
-  padding: var(--ns-space-2) 0;
+  // treated as a scaled desktop.
+  //
+  // 8px BELOW ONLY, not 8px each side. The Actions child sits at y=0 in both
+  // mobile frames (253:40942 350x53 over a 45 child, 83:8002 350x110 over 102),
+  // so 53 - 45 is the TOTAL vertical padding and all of it is underneath. An
+  // earlier version read that difference as a per-side value and rendered the
+  // footer 8px too tall — caught in review, and the desktop arithmetic three
+  // rules down (68 = 16 + 36 + 16) had it right all along.
+  //
+  // No horizontal padding here: on mobile the footer is placed INSIDE the
+  // page's own gutters (the instance sits at x=20 in a 390 device), so it is
+  // already inset. Desktop is the opposite — see below.
+  padding: 0 0 var(--ns-space-2);
 
   &__actions {
     display: flex;
@@ -81,6 +100,12 @@ defineSlots<{
     // `.q-btn__wrapper` rule deleted in componentLibrary-cqy — a declaration
     // that looks load-bearing and owns nothing.
     //
+    // "Changed nothing" is true only for auto-width children, and the
+    // difference is worth knowing: the scoped rule compiled to (0,2,0) and so
+    // BEAT a consumer setting a width on their own button, where `stretch`
+    // yields to any explicit cross-size. Removing it stopped the footer
+    // overriding a child's own width, which is the right side to be on.
+    //
     // The behaviour is guarded by LayoutIsRealOnMobile, which asserts the
     // rendered WIDTH rather than the rule. Verified: adding an unscoped
     // `align-items: center` — the realistic way someone breaks this while
@@ -88,11 +113,27 @@ defineSlots<{
     // to 320". So the protection does not depend on the rule existing.
   }
 
-  // 1024px is this library's only breakpoint — 22 components already use it and
-  // nothing else comes close, so this follows rather than inventing a second.
+  // 1024px is nsBreakpoints.md from src/breakpoints/index.ts — the library
+  // defines seven breakpoints and this is the desktop one, used by a dozen
+  // components. Chosen for consistency with that boundary, NOT because two
+  // buttons stop fitting: 251px of actions fits far below 1024. An earlier
+  // comment called 1024 "this library's only breakpoint", which was wrong on
+  // both counts.
   @media (min-width: 1024px) {
-    // 16px vertical (68 = 16 + 36 + 16) and 32px on the right (1440 - 1408).
-    padding: var(--ns-space-4) var(--ns-space-8) var(--ns-space-4) 0;
+    // 16px vertical: 68 = 16 + 36 + 16 on 65:3657.
+    //
+    // 32px HORIZONTAL, and the footer really does own it. Measured in the same
+    // 1440 frame: NsPageHeading and all three form sections sit at x=265 w=910
+    // (a 910 content column), while THIS footer is x=0 w=1440 — full bleed —
+    // with its actions ending at 1408. So the 32 is the footer's own gutter,
+    // not the page's, and the mobile rule above is describing a genuinely
+    // different placement rather than contradicting this one.
+    //
+    // SYMMETRIC, though only the right side is measurable: the row is
+    // right-aligned, so 0 and 32 on the left render identically and the frame
+    // cannot distinguish them. Symmetric is the safer reading of an
+    // unmeasurable value, and it behaves sanely if a consumer ever left-aligns.
+    padding: var(--ns-space-4) var(--ns-space-8);
 
     &__actions {
       flex-direction: row;

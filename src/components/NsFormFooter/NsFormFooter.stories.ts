@@ -49,19 +49,40 @@ export const LayoutIsRealOnDesktop: Story = {
   render: twoActions,
   play: async ({ canvasElement }) => {
     const actions = canvasElement.querySelector('.ns-form-footer__actions') as HTMLElement
-    const cs = getComputedStyle(actions)
+    const footer = canvasElement.querySelector('.ns-form-footer') as HTMLElement
 
+    // The viewport guard is LOAD-BEARING, not belt-and-braces: the storybook
+    // vitest addon silently ignores an unknown viewport name and falls back to
+    // 1200x900, so without this a renamed viewport would leave the mobile story
+    // asserting the mobile branch while rendering this one.
     await expect(window.innerWidth).toBeGreaterThanOrEqual(1024)
-    await expect(cs.flexDirection).toBe('row')
-    await expect(cs.justifyContent).toBe('flex-end')
-    await expect(cs.gap).toBe('12px')
+    await expect(getComputedStyle(actions).flexDirection).toBe('row')
 
-    // AUTO-WIDTH, not full-bleed. Asserted as "narrower than the container"
-    // rather than an exact px, because the width is the button's own content.
-    const back = canvasElement.querySelector('[data-testid="back"]') as HTMLElement
-    await expect(back.getBoundingClientRect().width).toBeLessThan(
-      actions.getBoundingClientRect().width / 2,
-    )
+    // ASSERT RENDERED POSITION, NOT THE DECLARED RULE. An earlier version
+    // checked `justifyContent === 'flex-end'` and compared the button to the
+    // ACTIONS width — which passes for a shrink-wrapped container sitting at
+    // the LEFT edge, and for `margin-right: auto` on the first child pushing
+    // the two apart. Three such mutants passed 4/4 in review. Anchoring to the
+    // footer's own box is what makes right-packing falsifiable.
+    const rect = footer.getBoundingClientRect()
+    const back = canvasElement.querySelector('[data-testid="back"]').getBoundingClientRect()
+    const next = canvasElement.querySelector('[data-testid="next"]').getBoundingClientRect()
+
+    // The trailing action ends one 32px gutter in from the footer's right edge.
+    await expect(next.right).toBeCloseTo(rect.right - 32, 0)
+    // Both actions live in the right half — this is what "right-aligned" means.
+    await expect(back.left).toBeGreaterThan(rect.left + rect.width / 2)
+    // 12px between them, measured rather than read off the `gap` declaration.
+    await expect(next.left - back.right).toBeCloseTo(12, 0)
+    // And they share a row.
+    await expect(next.top).toBeCloseTo(back.top, 0)
+
+    // PADDING, PINNED. Deleting every padding rule left all four stories green
+    // in review — nothing asserted it. 16px above and below the actions;
+    // 68 = 16 + 36 + 16 on 65:3657.
+    const actionsRect = actions.getBoundingClientRect()
+    await expect(actionsRect.top - rect.top).toBeCloseTo(16, 0)
+    await expect(rect.bottom - actionsRect.bottom).toBeCloseTo(16, 0)
   },
 }
 
@@ -87,19 +108,34 @@ export const LayoutIsRealOnMobile: Story = {
 
     await expect(window.innerWidth).toBeLessThan(1024)
     await expect(cs.flexDirection).toBe('column')
-    await expect(cs.gap).toBe('12px')
 
-    // FULL-BLEED. A stack of content-width buttons reads as a ragged list
-    // rather than a set of choices.
-    const back = canvasElement.querySelector('[data-testid="back"]') as HTMLElement
-    const next = canvasElement.querySelector('[data-testid="next"]') as HTMLElement
-    const containerWidth = actions.getBoundingClientRect().width
-    await expect(back.getBoundingClientRect().width).toBeCloseTo(containerWidth, 0)
-    await expect(next.getBoundingClientRect().width).toBeCloseTo(containerWidth, 0)
+    // FULL-BLEED, MEASURED AGAINST THE CANVAS. Comparing the button to the
+    // ACTIONS width proves nothing on its own — a shrink-wrapped container
+    // makes content-width buttons equal to it, and that mutant passed 4/4 in
+    // review. The canvas is the fixed reference the viewport actually sets.
+    const canvas = canvasElement.clientWidth
+    const back = canvasElement.querySelector('[data-testid="back"]').getBoundingClientRect()
+    const next = canvasElement.querySelector('[data-testid="next"]').getBoundingClientRect()
+    await expect(actions.getBoundingClientRect().width).toBeCloseTo(canvas, 0)
+    await expect(back.width).toBeCloseTo(canvas, 0)
+    await expect(next.width).toBeCloseTo(canvas, 0)
 
-    // AND STACKED, not merely narrow — the two must not share a row.
-    await expect(next.getBoundingClientRect().top).toBeGreaterThan(
-      back.getBoundingClientRect().bottom - 1,
-    )
+    // 12px apart, measured from the rendered boxes rather than the declaration.
+    await expect(next.top - back.bottom).toBeCloseTo(12, 0)
+
+    // AND STACKED, not merely narrow. On a shared row `next.top === back.top`,
+    // which is a full button-height below `back.bottom`, so this fails hard —
+    // the -1 only absorbs subpixel rounding.
+    await expect(next.top).toBeGreaterThan(back.bottom - 1)
+
+    // PADDING, PINNED: nothing above, 8px below. The Actions child sits at y=0
+    // in both mobile frames, so the 53 - 45 difference is entirely underneath.
+    // An earlier version read it as per-side and rendered 8px too tall.
+    const footerRect = (
+      canvasElement.querySelector('.ns-form-footer') as HTMLElement
+    ).getBoundingClientRect()
+    const actionsRect = actions.getBoundingClientRect()
+    await expect(actionsRect.top - footerRect.top).toBeCloseTo(0, 0)
+    await expect(footerRect.bottom - actionsRect.bottom).toBeCloseTo(8, 0)
   },
 }

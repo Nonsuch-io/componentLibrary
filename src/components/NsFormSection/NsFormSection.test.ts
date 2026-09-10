@@ -113,6 +113,95 @@ describe('NsFormSection', () => {
     })
   })
 
+  describe('slot content detection sees through fragments', () => {
+    // The `renders()` walk recurses into Fragment vnodes, and NOTHING tested
+    // that branch: every other "renders nothing" case here uses a single
+    // `v-if`, which Vue compiles to one bare Comment, never a Fragment.
+    // Deleting the recursion would have left the whole suite green.
+    it('treats a v-for over an empty list as no content', () => {
+      silenced()
+      const wrapper = mount(
+        defineComponent({
+          components: { NsFormSection },
+          template: `<NsFormSection><template #title><span v-for="n in []" :key="n">{{ n }}</span></template></NsFormSection>`,
+        }),
+      )
+      expect(wrapper.find('.ns-form-section__title').exists()).toBe(false)
+    })
+
+    it('sees content inside a v-for that does render', () => {
+      const wrapper = mount(
+        defineComponent({
+          components: { NsFormSection },
+          template: `<NsFormSection><template #title><span v-for="n in [1]" :key="n">Title {{ n }}</span></template></NsFormSection>`,
+        }),
+      )
+      expect(wrapper.find('.ns-form-section__title').text()).toBe('Title 1')
+    })
+  })
+
+  describe('the title names the fields', () => {
+    // THE BLOCKER FROM REVIEW. A visible title with no programmatic tie to its
+    // inputs is the commonest failure of exactly this component: someone
+    // tabbing straight into a field hears its own label and never the section's.
+    // Verified absent before the fix — the root had no role and no
+    // aria-labelledby at all.
+    it('groups the card and points its name at the title', () => {
+      const wrapper = mount(NsFormSection, {
+        props: { title: 'Business details' },
+        slots: { default: '<input />' },
+      })
+      const root = wrapper.element as HTMLElement
+      const titleId = wrapper.find('.ns-form-section__title').attributes('id')
+      expect(root.getAttribute('role')).toBe('group')
+      expect(titleId).toBeTruthy()
+      expect(root.getAttribute('aria-labelledby')).toBe(titleId)
+    })
+
+    it('gives each section on a page a distinct name target', () => {
+      // A hardcoded id would make every section name itself after the first
+      // one's title — and a form page carries several of these.
+      //
+      // BOTH IN ONE APP, deliberately. `useId()` counts per app, so two
+      // separate `mount()` calls each restart at v-0 and would fail this while
+      // the component is correct. Measured: that is exactly what happened when
+      // this test was first written the naive way.
+      const wrapper = mount(
+        defineComponent({
+          components: { NsFormSection },
+          template: `<div>
+            <NsFormSection title="A" />
+            <NsFormSection title="B" />
+          </div>`,
+        }),
+      )
+      const ids = wrapper.findAll('.ns-form-section__title').map((t) => t.attributes('id'))
+      expect(ids).toHaveLength(2)
+      expect(ids[0]).toBeTruthy()
+      expect(ids[0]).not.toBe(ids[1])
+
+      // And each card points at its OWN title, not at the first one.
+      const cards = wrapper.findAll('.ns-form-section')
+      expect(cards.map((c) => c.attributes('aria-labelledby'))).toEqual(ids)
+    })
+
+    it('adds no group when there is no title', () => {
+      // A group whose name points at nothing is announced as an unnamed group:
+      // noise rather than structure.
+      const wrapper = mount(NsFormSection, { slots: { default: '<input />' } })
+      expect((wrapper.element as HTMLElement).getAttribute('role')).toBeNull()
+      expect((wrapper.element as HTMLElement).getAttribute('aria-labelledby')).toBeNull()
+    })
+
+    it("lets a consumer's own role win", () => {
+      const wrapper = mount(NsFormSection, {
+        props: { title: 'T' },
+        attrs: { role: 'none' },
+      })
+      expect((wrapper.element as HTMLElement).getAttribute('role')).toBe('none')
+    })
+  })
+
   describe('the notice is section-scoped', () => {
     it('renders above the fields, not inside them', () => {
       // Position is the contract. PaymentMethod (185:10738) puts a banner
@@ -131,13 +220,21 @@ describe('NsFormSection', () => {
       expect(wrapper.find('.ns-form-section__fields p').exists()).toBe(false)
     })
 
-    it('has no row-level notice slot, deliberately', () => {
-      // A second banner slot here would recreate the ambiguity one level down.
-      // A row-level notice belongs to whatever occupies that row.
+    it('exposes exactly one notice region, not one per row', () => {
+      // REPLACES A TEST THAT COULD NOT FAIL. It used to mount with an
+      // undeclared `rowNotice` slot and assert the content did not appear —
+      // but Vue drops content passed under ANY name a template does not
+      // declare, so it passed identically whether the design decision had been
+      // made, reversed, or never considered. It proved nothing.
+      //
+      // What is actually worth pinning is that a section has ONE notice
+      // position. If someone later adds a per-row notice here, this fails and
+      // makes them justify it.
       const wrapper = mount(NsFormSection, {
-        slots: { rowNotice: '<p>should not render</p>' },
+        props: { title: 'T' },
+        slots: { notice: '<p>Section-wide</p>', default: '<input /><input />' },
       })
-      expect(wrapper.text()).not.toContain('should not render')
+      expect(wrapper.findAll('.ns-form-section__notice')).toHaveLength(1)
     })
   })
 

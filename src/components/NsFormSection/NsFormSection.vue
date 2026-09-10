@@ -1,8 +1,13 @@
 <template>
-  <NsCard class="ns-form-section">
+  <NsCard
+    class="ns-form-section"
+    :role="groupRole"
+    :aria-labelledby="hasTitle() ? titleId : undefined"
+  >
     <div v-if="hasTitle() || hasDescription()" class="ns-form-section__heading">
       <NsText
         v-if="hasTitle()"
+        :id="titleId"
         :as="headingTag"
         variant="heading-sm-regular"
         class="ns-form-section__title"
@@ -25,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { Comment, Fragment, computed, useSlots, type Slot, type VNode } from 'vue'
+import { Comment, Fragment, computed, useAttrs, useId, useSlots, type Slot, type VNode } from 'vue'
 import NsCard from '../NsCard/NsCard.vue'
 import NsText from '../NsText/NsText.vue'
 
@@ -68,6 +73,29 @@ import NsText from '../NsText/NsText.vue'
  * walks while looking identical in a screenshot. A row-level banner belongs to
  * whatever occupies that row; a second slot here would recreate the ambiguity
  * one level down.
+ *
+ * THE TITLE NAMES THE FIELDS, PROGRAMMATICALLY. A visible section title that
+ * a screen reader cannot connect to the inputs beneath it is the commonest
+ * failure of exactly this component: a sighted user sees an unambiguous group,
+ * and someone tabbing straight into an input hears only that field's own label
+ * — never "Business details". Verified absent in review before it was fixed:
+ * the root carried no role and no aria-labelledby at all.
+ *
+ * `role="group"` with `aria-labelledby`, not `<fieldset>`/`<legend>`: legend
+ * cannot carry the measured type styles without fighting its own layout rules,
+ * and group is the accepted modern equivalent for a named set of controls. Not
+ * `region` either — NsCard uses that for a landmark, and eleven landmarks on a
+ * signup page is worse than none.
+ *
+ * NsCard already implements region+aria-labelledby, but ONLY for its own
+ * `title` prop or `header` slot, which would impose its `.text-h6` markup and
+ * discard the type styles measured below. So the attributes are set here
+ * instead — verified they reach the card root through `$attrs` rather than
+ * being clobbered by NsCard's own `:role`.
+ *
+ * There is no group when there is no title, deliberately: a group whose
+ * `aria-labelledby` points at nothing is announced as an unnamed group, which
+ * is noise rather than structure.
  *
  * TYPE STYLES ARE MEASURED, and both of my first guesses were wrong — which is
  * why they were checked before any test pinned them. get_variable_defs on
@@ -127,6 +155,17 @@ defineSlots<{
 }>()
 
 const slots = useSlots()
+const attrs = useAttrs()
+const titleId = useId()
+
+/**
+ * A consumer's own `role` wins. Passing `role="none"` to strip the grouping, or
+ * a more specific role, should not have to fight the component.
+ */
+const groupRole = computed(() => {
+  if (typeof attrs.role === 'string') return attrs.role
+  return hasTitle() ? 'group' : undefined
+})
 
 /**
  * Slot CONTENT, not presence — the same walk NsPageTitle and NsPageHeading use.
