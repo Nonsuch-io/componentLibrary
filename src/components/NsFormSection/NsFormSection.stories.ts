@@ -4,6 +4,7 @@ import NsFormSection from './NsFormSection.vue'
 import NsFormFooter from '../NsFormFooter/NsFormFooter.vue'
 import NsInput from '../NsInput/NsInput.vue'
 import NsBanner from '../NsBanner/NsBanner.vue'
+import NsCard from '../NsCard/NsCard.vue'
 import NsButton from '../NsButton/NsButton.vue'
 
 const meta: Meta<typeof NsFormSection> = {
@@ -163,4 +164,37 @@ export const HeadingLevels: Story = {
     setup: () => ({ args }),
     template: `<NsFormSection v-bind="args"><NsInput label="Field" /></NsFormSection>`,
   }),
+}
+
+/**
+ * A CARD INSIDE THE FIELDS SLOT KEEPS ITS OWN PADDING.
+ *
+ * NsFormSection zeroes its wrapping NsCard's section padding to own the 20px
+ * inset. The first version of that rule had no combinator and reached every
+ * card-section in the subtree — a reviewer nested an NsCard here and measured
+ * both of its sections at 0px. The Fields slot is documented as taking a whole
+ * component, so a card-based one would have silently lost its internal padding
+ * with nothing failing. This is the other half of the Default story's inset
+ * assertion: that one proves the reset reaches the right section, this one
+ * proves it reaches ONLY that section.
+ */
+export const NestedCardKeepsItsPadding: Story = {
+  render: () => ({
+    components: { NsFormSection, NsCard },
+    template: `
+      <NsFormSection title="Outer">
+        <NsCard title="Inner card" data-testid="inner">
+          <div>Content that must not be flush to the card edge.</div>
+        </NsCard>
+      </NsFormSection>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const inner = canvasElement.querySelector('[data-testid="inner"]') as HTMLElement
+    const sections = inner.querySelectorAll('.q-card__section')
+    await expect(sections.length).toBeGreaterThan(0)
+    for (const section of sections) {
+      await expect(getComputedStyle(section).padding).not.toBe('0px')
+    }
+  },
 }

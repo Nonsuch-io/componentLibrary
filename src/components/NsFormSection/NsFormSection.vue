@@ -282,12 +282,22 @@ const headingTag = computed<(typeof HEADING_TAGS)[number]>(() => {
   // It wraps its default slot in <q-card-section>, which is Quasar's 16px —
   // so the fields sat 36px inside the card against the design's 20. Declared,
   // not measured, and a reviewer measured it. Zeroed here so this component
-  // owns the inset it documents. Unlike the .q-btn__wrapper rule deleted in
-  // componentLibrary-cqy, .q-card__section is a class Quasar genuinely renders
-  // (measured: 16px on it in Chromium) — and NsFormSection.stories.ts pins
-  // the resulting 20px inset in a real browser, so if Quasar ever stops
-  // rendering it, that story fails rather than this rule going quietly dead.
-  :deep(.q-card__section) {
+  // owns the inset it documents.
+  //
+  // DIRECT CHILD ONLY. The first version was `:deep(.q-card__section)` with
+  // no combinator, which reaches EVERY card-section in the subtree — a
+  // reviewer nested an NsCard in the Fields slot and both of its sections
+  // came back 0px. The docstring promises Fields takes a whole component, so
+  // a card-based one would silently lose its internal padding with no test
+  // failing anywhere. `>` loses nothing for the intended case, because NsCard
+  // renders its body section as a direct child of the root this class is on.
+  //
+  // This is NOT the .q-btn__wrapper case from componentLibrary-cqy, and not
+  // for the reason first written here. That rule matched NOTHING; this one
+  // matched TOO MUCH. "The class genuinely renders" was true and answered the
+  // wrong question. Two stories now pin it from both sides: the 20px inset in
+  // Chromium, and a nested NsCard keeping its own padding.
+  > :deep(.q-card__section) {
     padding: 0;
   }
 
