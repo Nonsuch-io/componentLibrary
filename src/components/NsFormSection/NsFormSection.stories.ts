@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect } from 'storybook/test'
 import NsFormSection from './NsFormSection.vue'
 import NsFormFooter from '../NsFormFooter/NsFormFooter.vue'
 import NsInput from '../NsInput/NsInput.vue'
@@ -101,7 +102,15 @@ export const ArbitraryFieldsContent: Story = {
   }),
 }
 
-/** The pair, as a form actually composes: sections above, one footer below. */
+/**
+ * The pair, as a form actually composes: sections above, one footer below.
+ *
+ * ASSERTS ALIGNMENT IN A REAL BROWSER. A review measured this exact story with
+ * the section card ending at x=1200 and the footer's trailing button at 1168 —
+ * a 32px misalignment, because the footer then carried a gutter that belongs
+ * to the page. It carries none now, and this pins that the trailing action
+ * lines up with the card edge above it.
+ */
 export const WithFooter: Story = {
   render: () => ({
     components: { NsFormSection, NsFormFooter, NsInput, NsButton },
@@ -116,11 +125,19 @@ export const WithFooter: Story = {
         </NsFormSection>
         <NsFormFooter>
           <NsButton variant="tertiary">Back</NsButton>
-          <NsButton variant="primary">Continue</NsButton>
+          <NsButton variant="primary" data-testid="continue">Continue</NsButton>
         </NsFormFooter>
       </div>
     `,
   }),
+  play: async ({ canvasElement }) => {
+    const card = canvasElement.querySelector('.ns-form-section') as HTMLElement
+    const next = canvasElement.querySelector('[data-testid="continue"]') as HTMLElement
+    await expect(next.getBoundingClientRect().right).toBeCloseTo(
+      card.getBoundingClientRect().right,
+      0,
+    )
+  },
 }
 
 /** `level` sets the element, never the type — the page heading owns the h1. */

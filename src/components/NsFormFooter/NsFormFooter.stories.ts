@@ -43,7 +43,9 @@ export const SingleAction: Story = {
  *
  * Measured on 65:3657 (1440x68): `form actions` begins at x=1157 of 1440 — a
  * RIGHT-ALIGNED ROW — with buttons at their content width (119.5) and 12px
- * between them (131.5 - 119.5).
+ * between them (131.5 - 119.5). The 32px between the last button and the frame
+ * edge is the PAGE's gutter (the footer is a full-bleed bar there), so it is
+ * not asserted here; see FullBleedPlacement for how a page reproduces it.
  */
 export const LayoutIsRealOnDesktop: Story = {
   render: twoActions,
@@ -68,8 +70,11 @@ export const LayoutIsRealOnDesktop: Story = {
     const back = canvasElement.querySelector('[data-testid="back"]').getBoundingClientRect()
     const next = canvasElement.querySelector('[data-testid="next"]').getBoundingClientRect()
 
-    // The trailing action ends one 32px gutter in from the footer's right edge.
-    await expect(next.right).toBeCloseTo(rect.right - 32, 0)
+    // The trailing action ends AT the footer's right edge — the footer owns no
+    // horizontal inset. The design's 32px viewport gutter is the page's to add
+    // when it places this full-bleed; inline after form sections, this is what
+    // makes the buttons align with the cards above them.
+    await expect(next.right).toBeCloseTo(rect.right, 0)
     // Both actions live in the right half — this is what "right-aligned" means.
     await expect(back.left).toBeGreaterThan(rect.left + rect.width / 2)
     // 12px between them, measured rather than read off the `gap` declaration.
@@ -137,5 +142,36 @@ export const LayoutIsRealOnMobile: Story = {
     const actionsRect = actions.getBoundingClientRect()
     await expect(actionsRect.top - footerRect.top).toBeCloseTo(0, 0)
     await expect(footerRect.bottom - actionsRect.bottom).toBeCloseTo(8, 0)
+  },
+}
+
+/**
+ * HOW THE DESIGN ACTUALLY PLACES IT: a full-bleed bar at the foot of the page,
+ * actions 32px from the viewport edge. The footer does not carry that inset —
+ * placement is the page's, so that the same component aligns with form
+ * sections when it flows inline after them. This story is the full-bleed case,
+ * with the page supplying the gutter.
+ */
+export const FullBleedPlacement: Story = {
+  render: () => ({
+    components: { NsFormFooter, NsButton },
+    template: `
+      <div style="border-top: 1px solid var(--ns-color-border-default)">
+        <NsFormFooter style="padding-inline: var(--ns-space-8)">
+          <NsButton variant="tertiary" data-testid="back">Back</NsButton>
+          <NsButton variant="primary" data-testid="next">Continue</NsButton>
+        </NsFormFooter>
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    // With the page's gutter applied, the trailing action ends 32px in from
+    // the footer's edge — reproducing the design measurement exactly.
+    const footer = canvasElement.querySelector('.ns-form-footer') as HTMLElement
+    const next = canvasElement.querySelector('[data-testid="next"]') as HTMLElement
+    await expect(next.getBoundingClientRect().right).toBeCloseTo(
+      footer.getBoundingClientRect().right - 32,
+      0,
+    )
   },
 }

@@ -122,18 +122,21 @@ defineSlots<{
   @media (min-width: 1024px) {
     // 16px vertical: 68 = 16 + 36 + 16 on 65:3657.
     //
-    // 32px HORIZONTAL, and the footer really does own it. Measured in the same
-    // 1440 frame: NsPageHeading and all three form sections sit at x=265 w=910
-    // (a 910 content column), while THIS footer is x=0 w=1440 — full bleed —
-    // with its actions ending at 1408. So the 32 is the footer's own gutter,
-    // not the page's, and the mobile rule above is describing a genuinely
-    // different placement rather than contradicting this one.
+    // NO HORIZONTAL PADDING, and this changed after a review measured the
+    // codebase's own WithFooter story: a section card ending at x=1200 over a
+    // footer button ending at 1168, a 32px misalignment in the most natural
+    // composition. The 32 came from the design — but from the design's PAGE.
+    // In the 1440 frame the footer is x=0 w=1440 and its bottom edge is the
+    // page's bottom edge (y 1726 + 68 = 1794 = page height): a full-bleed bar
+    // at the foot of the viewport, with its actions 32px from the VIEWPORT.
+    // That is placement, which the page owns, not layout, which this does.
+    // The same line this component draws for button size: it lays out its
+    // children and does not decide where it sits.
     //
-    // SYMMETRIC, though only the right side is measurable: the row is
-    // right-aligned, so 0 and 32 on the left render identically and the frame
-    // cannot distinguish them. Symmetric is the safer reading of an
-    // unmeasurable value, and it behaves sanely if a consumer ever left-aligns.
-    padding: var(--ns-space-4) var(--ns-space-8);
+    // A consumer placing it full-bleed, as the design does, adds the gutter
+    // themselves — `style="padding-inline: var(--ns-space-8)"` reproduces the
+    // measured 32. Placed inline after form sections it now aligns with them.
+    padding: var(--ns-space-4) 0;
 
     &__actions {
       flex-direction: row;
