@@ -31,6 +31,21 @@ export const Default: Story = {
       </NsFormSection>
     `,
   }),
+  play: async ({ canvasElement }) => {
+    // THE INSET IS 20, MEASURED IN A REAL BROWSER — because it was 36 until a
+    // reviewer measured it. NsCard wraps its slot in <q-card-section>, which
+    // carries Quasar's 16px on top of this component's 20; a comment claimed
+    // NsCard had no padding of its own. This is the assertion that comment
+    // should have been. It also guards the `:deep(.q-card__section)` reset:
+    // if Quasar ever stops rendering that class, the inset lands somewhere
+    // other than 20 and this fails, rather than the rule going quietly dead.
+    const card = canvasElement.querySelector('.ns-form-section') as HTMLElement
+    const fields = canvasElement.querySelector('.ns-form-section__fields') as HTMLElement
+    const c = card.getBoundingClientRect()
+    const f = fields.getBoundingClientRect()
+    await expect(f.left - c.left).toBeCloseTo(20, 0)
+    await expect(c.right - f.right).toBeCloseTo(20, 0)
+  },
 }
 
 /**

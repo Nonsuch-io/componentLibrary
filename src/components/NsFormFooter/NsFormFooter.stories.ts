@@ -173,5 +173,18 @@ export const FullBleedPlacement: Story = {
       footer.getBoundingClientRect().right - 32,
       0,
     )
+
+    // THIS ASSERTION ALONE PROVES LESS THAN IT LOOKS. Inline padding
+    // OVERRIDES the component's rule rather than stacking on it, so the line
+    // above passes whether the component's own horizontal padding is 0 or 32.
+    // I predicted in a review brief that restoring the component's gutter
+    // would double this to 64 and fail here; the reviewer ran it and it did
+    // not. The pair below is what distinguishes "inline overrode 0" from
+    // "inline overrode 32": strip the inline style and the footer must fall
+    // back to NO horizontal padding of its own.
+    await expect(getComputedStyle(footer).paddingRight).toBe('32px')
+    footer.style.paddingInline = ''
+    await expect(getComputedStyle(footer).paddingRight).toBe('0px')
+    footer.style.paddingInline = 'var(--ns-space-8)'
   },
 }

@@ -79,9 +79,8 @@ defineSlots<{
   // footer 8px too tall — caught in review, and the desktop arithmetic three
   // rules down (68 = 16 + 36 + 16) had it right all along.
   //
-  // No horizontal padding here: on mobile the footer is placed INSIDE the
-  // page's own gutters (the instance sits at x=20 in a 390 device), so it is
-  // already inset. Desktop is the opposite — see below.
+  // No horizontal padding here, or at desktop either — see the note below
+  // for why the design's gutter belongs to the page at both widths.
   padding: 0 0 var(--ns-space-2);
 
   &__actions {
@@ -122,20 +121,26 @@ defineSlots<{
   @media (min-width: 1024px) {
     // 16px vertical: 68 = 16 + 36 + 16 on 65:3657.
     //
-    // NO HORIZONTAL PADDING, and this changed after a review measured the
-    // codebase's own WithFooter story: a section card ending at x=1200 over a
-    // footer button ending at 1168, a 32px misalignment in the most natural
-    // composition. The 32 came from the design — but from the design's PAGE.
-    // In the 1440 frame the footer is x=0 w=1440 and its bottom edge is the
-    // page's bottom edge (y 1726 + 68 = 1794 = page height): a full-bleed bar
-    // at the foot of the viewport, with its actions 32px from the VIEWPORT.
-    // That is placement, which the page owns, not layout, which this does.
-    // The same line this component draws for button size: it lays out its
-    // children and does not decide where it sits.
+    // NO HORIZONTAL PADDING, AND THE REASON IS A LIBRARY CONVENTION, not the
+    // frame. A layout primitive owns no outer inset — NsFormSection carries no
+    // external margin for the same reason — so that the same component aligns
+    // with its siblings inline and sits flush when placed full-bleed.
     //
-    // A consumer placing it full-bleed, as the design does, adds the gutter
-    // themselves — `style="padding-inline: var(--ns-space-8)"` reproduces the
-    // measured 32. Placed inline after form sections it now aligns with them.
+    // The design is CONSISTENT with that rather than proof of it: the page
+    // gutter is 20px on mobile (the 350 instance sits at x=20 in a 390 device)
+    // and 32px on desktop (actions end at 1408 of 1440). A value that differs
+    // by page is a page value, and the component cannot know which page it is
+    // on. An earlier comment argued this from "the footer's bottom edge is the
+    // page's bottom edge", which is true but does not distinguish the 32
+    // horizontal from the 16 vertical that IS kept — a reviewer caught that.
+    //
+    // Measured in the codebase's own WithFooter story before this changed: a
+    // section card ending at x=1200 over a footer button ending at 1168, a
+    // 32px misalignment in the most natural composition.
+    //
+    // A page placing this full-bleed adds the gutter itself, ideally as a
+    // gutter container wrapping the footer — `padding-inline: var(--ns-space-8)`
+    // reproduces the desktop measurement. FullBleedPlacement shows the recipe.
     padding: var(--ns-space-4) 0;
 
     &__actions {

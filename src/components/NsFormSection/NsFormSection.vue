@@ -273,10 +273,23 @@ const headingTag = computed<(typeof HEADING_TAGS)[number]>(() => {
   flex-direction: column;
   // 20px throughout, measured across all eleven variants: Fields sits at x=20,
   // y=20 in a 700-wide card leaving 660 of content, and Field Rows run at a
-  // 94px pitch with 74px rows. NsCard carries no padding of its own.
+  // 94px pitch with 74px rows.
   gap: var(--ns-space-5);
   padding: var(--ns-space-5);
   width: 100%;
+
+  // NsCard DOES carry padding, and an earlier comment here said it did not.
+  // It wraps its default slot in <q-card-section>, which is Quasar's 16px —
+  // so the fields sat 36px inside the card against the design's 20. Declared,
+  // not measured, and a reviewer measured it. Zeroed here so this component
+  // owns the inset it documents. Unlike the .q-btn__wrapper rule deleted in
+  // componentLibrary-cqy, .q-card__section is a class Quasar genuinely renders
+  // (measured: 16px on it in Chromium) — and NsFormSection.stories.ts pins
+  // the resulting 20px inset in a real browser, so if Quasar ever stops
+  // rendering it, that story fails rather than this rule going quietly dead.
+  :deep(.q-card__section) {
+    padding: 0;
+  }
 
   &__heading {
     display: flex;
