@@ -200,6 +200,70 @@ describe('NsFormSection', () => {
       })
       expect((wrapper.element as HTMLElement).getAttribute('role')).toBe('none')
     })
+
+    it.each([undefined, '', '   '])('keeps the group when a consumer passes role=%j', (role) => {
+      // MEASURED before the fix: `:role="cond ? 'presentation' : undefined"` with
+      // cond false fell through as role: undefined and OVERWROTE 'group', so the
+      // consumer lost the association in the exact state where they meant "no
+      // override". Plain attribute fallthrough cannot distinguish "not set"
+      // from "set to nothing"; the component now can.
+      const wrapper = mount(NsFormSection, { props: { title: 'T' }, attrs: { role } })
+      expect((wrapper.element as HTMLElement).getAttribute('role')).toBe('group')
+    })
+
+    it('still passes every other attribute through', () => {
+      // `inheritAttrs: false` is now on, so this is no longer automatic — the
+      // component re-binds everything except `role` by hand, and a typo there
+      // would silently drop data-testids, ids, and event listeners.
+      const wrapper = mount(NsFormSection, {
+        props: { title: 'T' },
+        attrs: { 'data-testid': 'section', 'aria-describedby': 'hint' },
+      })
+      expect(wrapper.attributes('data-testid')).toBe('section')
+      expect(wrapper.attributes('aria-describedby')).toBe('hint')
+    })
+
+    describe('role and name stay in step when the title slot KEY toggles', () => {
+      // THE BLOCKER'S SECOND COAT. The first fix computed the role in a
+      // `computed` over `hasTitle()`, which reads the non-reactive slots
+      // object — so on this exact path the template's aria-labelledby updated
+      // and the role did not, leaving a name with no role to carry it. Every
+      // other test stayed green, because a `v-if` INSIDE the slot happens to
+      // let the computed track the parent's ref by accident. The key toggling
+      // is what a data-loaded `<template v-if="loaded" #title>` actually does.
+      const Harness = defineComponent({
+        setup: () => ({ show: ref(false) }),
+        render() {
+          return h(NsFormSection, {}, this.show ? { title: () => 'Loaded title' } : {})
+        },
+      })
+
+      it('gains BOTH role and name when the title arrives after mount', async () => {
+        silenced()
+        const wrapper = mount(Harness)
+        const root = wrapper.element as HTMLElement
+        expect(root.getAttribute('role')).toBeNull()
+        wrapper.vm.show = true
+        await nextTick()
+        expect(root.getAttribute('role')).toBe('group')
+        expect(root.getAttribute('aria-labelledby')).toBe(
+          wrapper.find('.ns-form-section__title').attributes('id'),
+        )
+      })
+
+      it('loses BOTH when the title leaves', async () => {
+        silenced()
+        const wrapper = mount(Harness)
+        wrapper.vm.show = true
+        await nextTick()
+        expect((wrapper.element as HTMLElement).getAttribute('role')).toBe('group')
+        wrapper.vm.show = false
+        await nextTick()
+        const root = wrapper.element as HTMLElement
+        expect(root.getAttribute('role')).toBeNull()
+        expect(root.getAttribute('aria-labelledby')).toBeNull()
+      })
+    })
   })
 
   describe('the notice is section-scoped', () => {
@@ -227,9 +291,11 @@ describe('NsFormSection', () => {
       // declare, so it passed identically whether the design decision had been
       // made, reversed, or never considered. It proved nothing.
       //
-      // What is actually worth pinning is that a section has ONE notice
-      // position. If someone later adds a per-row notice here, this fails and
-      // makes them justify it.
+      // What is actually worth pinning at runtime is that a section renders
+      // ONE notice region. The "no row-level slot" decision itself is a
+      // TYPE-level contract — `defineSlots` declares four names and TypeScript
+      // rejects a fifth — not a runtime-observable one; a per-row slot under a
+      // different class would leave this count at exactly one.
       const wrapper = mount(NsFormSection, {
         props: { title: 'T' },
         slots: { notice: '<p>Section-wide</p>', default: '<input /><input />' },

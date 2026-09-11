@@ -1,7 +1,8 @@
 <template>
   <NsCard
+    v-bind="attrsWithoutRole"
     class="ns-form-section"
-    :role="groupRole"
+    :role="resolvedRole()"
     :aria-labelledby="hasTitle() ? titleId : undefined"
   >
     <div v-if="hasTitle() || hasDescription()" class="ns-form-section__heading">
@@ -90,8 +91,16 @@ import NsText from '../NsText/NsText.vue'
  * NsCard already implements region+aria-labelledby, but ONLY for its own
  * `title` prop or `header` slot, which would impose its `.text-h6` markup and
  * discard the type styles measured below. So the attributes are set here
- * instead — verified they reach the card root through `$attrs` rather than
- * being clobbered by NsCard's own `:role`.
+ * instead.
+ *
+ * HOW THEY SURVIVE NsCard, PRECISELY, because the mechanism is fragile: NsCard
+ * binds `v-bind="$attrs"` and THEN `:role="… undefined"`, so mergeProps DOES
+ * clobber ours with undefined. What restores them is NsCard's IMPLICIT
+ * attribute fallthrough, which Vue applies to the root after the explicit
+ * bindings. That means adding `inheritAttrs: false` to NsCard — which this
+ * repo has done to thirteen components in one PR before — would silently drop
+ * this component's role and name. The test `groups the card and points its
+ * name at the title` is what would catch that; do not remove it as redundant.
  *
  * There is no group when there is no title, deliberately: a group whose
  * `aria-labelledby` points at nothing is announced as an unnamed group, which
@@ -155,16 +164,42 @@ defineSlots<{
 }>()
 
 const slots = useSlots()
-const attrs = useAttrs()
 const titleId = useId()
 
 /**
- * A consumer's own `role` wins. Passing `role="none"` to strip the grouping, or
- * a more specific role, should not have to fight the component.
+ * THE ROLE IS COMPUTED IN THE TEMPLATE, NOT IN A `computed`. An earlier
+ * version wrapped it in `computed(() => hasTitle() ? 'group' : undefined)`,
+ * which reads the NON-reactive `slots` object — the exact trap the comment on
+ * `hasTitle` below warns about, reintroduced three screens above it in the
+ * same file. Measured in review: with `<template v-if="show" #title>` toggling
+ * true after mount, the template's `aria-labelledby` updated and the computed
+ * `role` did not, leaving a name attribute with no role to carry it — the
+ * original blocker on a different path, in dev AND production. Vue 3.5 only
+ * tracks `$slots` under HMR; there is no build in which that computed recomputes.
+ *
+ * A CONSUMER'S OWN `role` WINS, AND THE UNDEFINED CASE IS HANDLED. Plain
+ * attribute fallthrough almost does this for free — but measured: a consumer
+ * writing `:role="cond ? 'presentation' : undefined"` with `cond` false
+ * fell through as `role: undefined`, which OVERWROTE 'group' and left the
+ * card with no role at all. Silent loss of the association in the exact state
+ * where the consumer meant "no override". So attrs are bound explicitly with
+ * `role` split out, and the role resolves through `||` rather than `??` —
+ * `role=""` is not a role either.
  */
-const groupRole = computed(() => {
-  if (typeof attrs.role === 'string') return attrs.role
+defineOptions({ inheritAttrs: false })
+
+const attrs = useAttrs()
+
+function resolvedRole(): string | undefined {
+  const own = attrs.role
+  if (typeof own === 'string' && own.trim() !== '') return own
   return hasTitle() ? 'group' : undefined
+}
+
+/** Everything the consumer passed except `role`, which `resolvedRole` owns. */
+const attrsWithoutRole = computed(() => {
+  const { role: _dropped, ...rest } = attrs
+  return rest
 })
 
 /**
