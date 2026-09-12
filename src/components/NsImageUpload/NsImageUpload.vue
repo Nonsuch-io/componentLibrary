@@ -335,12 +335,21 @@ function announce(text: string): Promise<void> {
   // was GONE. Measured in review: one MutationObserver record for two events.
   // The same silent-loss class the clear-then-set was written to close, one
   // window narrower. Chaining through a promise makes each wait its turn.
-  announcing = announcing.then(async () => {
+  //
+  // `.then(run, run)`, NOT `.then(run)`: a chain that only continues on
+  // success is poisoned forever by one rejection. Measured in review — a
+  // dev-mode error in an UNRELATED component, interleaved one microtask into
+  // the window, rejected the flush promise `nextTick()` returns, and every
+  // later announcement chained onto a dead promise. The region went silent
+  // for the rest of the instance with nothing thrown at any call site. The
+  // pre-chain code did not have this failure; the chain must not introduce it.
+  const run = async () => {
     announcement.value = ''
     await nextTick()
     announcement.value = text
     await nextTick()
-  })
+  }
+  announcing = announcing.then(run, run)
   return announcing
 }
 

@@ -315,7 +315,27 @@ describe('NsImageUpload', () => {
 
       expect(seen, 'the rejection was lost to the race').toContain('That file type is not accepted')
       expect(seen).toContain('Selected image: good.png')
+      // IN ORDER. Presence alone would pass if a later change let the
+      // modelValue watcher bypass the chain; "selected" then "not accepted"
+      // is misleading to hear.
+      expect(seen.indexOf('That file type is not accepted')).toBeLessThan(
+        seen.indexOf('Selected image: good.png'),
+      )
     })
+
+    // NO TEST FOR "the chain survives a rejected announcement", and here is why
+    // rather than a test that cannot fail. The fix is `.then(run, run)` so one
+    // rejection does not poison every later announcement. The trigger a
+    // reviewer measured is a dev-mode error in an UNRELATED component, landing
+    // one microtask into the announce window, which makes Vue's flush promise
+    // reject. Reproducing that in vitest means an unhandled component error —
+    // which vitest itself catches and fails the test on, for the mutant AND the
+    // fix alike. Swallowing it with app.config.errorHandler swallows it before
+    // Vue's logError, so the flush never rejects and the test passes against
+    // the mutant too. Measured both ways. The reviewer's probe ran with
+    // --dangerouslyIgnoreUnhandledErrors; that is not a flag to bake into the
+    // suite for one case. The property is pinned by the code comment and by
+    // this note.
   })
 
   describe('the warning prop', () => {
