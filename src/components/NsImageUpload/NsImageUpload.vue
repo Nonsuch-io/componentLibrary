@@ -1,10 +1,15 @@
 <template>
   <div
     class="ns-image-upload"
-    :class="{
-      'ns-image-upload--dragging': dragging,
-      'ns-image-upload--warning': hasWarning(),
-    }"
+    :class="[
+      attrs.class,
+      {
+        'ns-image-upload--dragging': dragging,
+        'ns-image-upload--warning': hasWarning(),
+        'ns-image-upload--disabled': resolvedDisable,
+      },
+    ]"
+    :style="attrs.style"
   >
     <!--
       The drag handlers on this div are an ENHANCEMENT with a complete
@@ -23,23 +28,25 @@
       class="ns-image-upload__surface"
       @dragenter.prevent="onDragEnter"
       @dragover.prevent="onDragEnter"
-      @dragleave="onDragLeave"
+      @dragleave="onDragLeave($event)"
       @drop.prevent="onDrop"
     >
       <input
+        v-bind="attrsWithoutDisabled"
         :id="inputId"
         ref="inputEl"
         type="file"
         class="ns-image-upload__input"
         :accept="accept"
+        :disabled="resolvedDisable"
         :aria-label="label"
         :aria-describedby="describedBy()"
-        :aria-invalid="hasWarning() ? 'true' : undefined"
+        :aria-invalid="internalWarning !== null ? 'true' : undefined"
         @change="onChange"
       />
 
       <label v-if="!modelValue" :for="inputId" class="ns-image-upload__dropzone">
-        <NsText as="span" variant="heading-sm-regular" class="ns-image-upload__label">
+        <NsText ref="labelEl" as="span" variant="heading-sm-regular" class="ns-image-upload__label">
           <slot name="label">{{ label }}</slot>
         </NsText>
         <NsText as="span" variant="body-md" class="ns-image-upload__prompt">
@@ -82,11 +89,28 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeUnmount, ref, useId, useSlots, watch, type Slot, type VNode } from 'vue'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  onUpdated,
+  ref,
+  useAttrs,
+  useId,
+  useSlots,
+  watch,
+  type ComponentPublicInstance,
+  type Slot,
+  type VNode,
+} from 'vue'
 import { Comment, Fragment } from 'vue'
 import NsText from '../NsText/NsText.vue'
 import NsButton from '../NsButton/NsButton.vue'
 import { useNsLocale } from '../../composables/useNsLocale'
+import { useNsDisabled } from '../../composables/useNsDisabled'
+
+declare const process: { env: { NODE_ENV?: string } } | undefined
 
 /**
  * NsImageUpload — pick or drop one image, with a preview and a remove button.
@@ -154,16 +178,48 @@ export interface NsImageUploadProps {
   label: string
   /**
    * Accepted MIME types or extensions, as the native `accept` attribute takes
-   * them. Checked on drop as well, since `accept` only filters the picker.
+   * them: `image/*`, `image/png`, `.png`, comma-separated. Checked on DROP as
+   * well as pick, since `accept` only filters the picker dialog.
+   *
+   * MIME rules test `File.type` ONLY. A dropped file with an empty type — which
+   * some platforms produce — passes only an extension rule, so list
+   * `.png,.jpg` alongside `image/*` if those must be accepted. A rule that is
+   * none of the three shapes (e.g. `image/` without the star) can never match,
+   * and the component warns about it in development rather than rejecting
+   * every user's file forever in silence.
    */
   accept?: string
   /** A warning to show under the control, tied to it with aria-describedby. */
   warning?: string
+  /** Disables the input. `disabled` (the attribute) is treated as this too, with a warning. */
+  disable?: boolean
 }
 
 const props = withDefaults(defineProps<NsImageUploadProps>(), {
   accept: 'image/*',
   warning: undefined,
+  disable: false,
+})
+
+/**
+ * `inheritAttrs: false` is REQUIRED, not tidiness. Measured on the built
+ * output before this: `<NsImageUpload disabled name="photo" required>` put all
+ * three on the wrapper DIV, where they do nothing — the input reported
+ * disabled=false, name=undefined. The ob8 shape this library fixed in nineteen
+ * other components. Now `class`/`style` stay on the root and everything else
+ * lands on the `<input>`, which is where `name`, `required`, `data-testid` and
+ * `disabled` belong for a file control.
+ */
+defineOptions({ inheritAttrs: false })
+const attrs = useAttrs()
+const { resolvedDisable, attrsWithoutDisabled: attrsMinusDisabled } = useNsDisabled(
+  'NsImageUpload',
+  () => props.disable,
+)
+/** Everything for the input: the consumer's attrs minus `disabled`, `class` and `style`. */
+const attrsWithoutDisabled = computed(() => {
+  const { class: _c, style: _s, ...rest } = attrsMinusDisabled.value
+  return rest
 })
 
 const emit = defineEmits<{
@@ -189,6 +245,7 @@ const inputId = useId()
 const warningId = useId()
 const liveId = useId()
 const inputEl = ref<HTMLInputElement | null>(null)
+const labelEl = ref<ComponentPublicInstance | null>(null)
 const dragging = ref(false)
 const previewUrl = ref<string | null>(null)
 const announcement = ref('')
@@ -261,10 +318,35 @@ function revokePreview() {
   }
 }
 
+/**
+ * A live region announces on DOM MUTATION. Setting the same string twice does
+ * not mutate the text node, so the second announcement never fires — measured
+ * in review with a MutationObserver: two identical rejections produced one
+ * mutation, and a screen-reader user trying a second bad file heard nothing at
+ * all. Clearing across a tick forces a mutation every time.
+ */
+async function announce(text: string) {
+  announcement.value = ''
+  await nextTick()
+  announcement.value = text
+}
+
+/**
+ * Only the FIRST dropped file is taken; the rest are ignored, and a drop with
+ * no files (dragged text) does nothing. Both deliberate for a single-image
+ * control, and both are silent — there is nothing to say about a file that
+ * was never a candidate.
+ *
+ * ON REJECTION THE EXISTING FILE STAYS. `update:modelValue` is not emitted, so
+ * a PDF dropped over a chosen image leaves the image; the warning shows under
+ * the preview. Replacing the image with nothing because the replacement was
+ * bad would be worse than either outcome.
+ */
 function select(file: File) {
+  if (resolvedDisable.value) return
   if (!isAccepted(file)) {
     internalWarning.value = locale.media.uploadRejected
-    announcement.value = locale.media.uploadRejected
+    void announce(locale.media.uploadRejected)
     emit('rejected', file)
     return
   }
@@ -291,7 +373,12 @@ function onChange(event: Event) {
 function onDragEnter() {
   dragging.value = true
 }
-function onDragLeave() {
+function onDragLeave(event: DragEvent) {
+  // Moving between CHILDREN of the surface fires dragleave on the parent with
+  // the child as relatedTarget — the classic flicker. Only a leave to OUTSIDE
+  // the surface should clear the state.
+  const to = event.relatedTarget as Node | null
+  if (to && (event.currentTarget as Node).contains(to)) return
   dragging.value = false
 }
 function onDrop(event: DragEvent) {
@@ -306,15 +393,72 @@ watch(
     revokePreview()
     if (file) {
       previewUrl.value = URL.createObjectURL(file)
-      announcement.value = `${locale.media.uploadSelected}: ${file.name}`
+      void announce(`${locale.media.uploadSelected}: ${file.name}`)
     } else if (previous) {
-      announcement.value = locale.media.uploadCleared
+      void announce(locale.media.uploadCleared)
     }
   },
   { immediate: true },
 )
 
 onBeforeUnmount(revokePreview)
+
+/**
+ * TWO DEV WARNINGS, ONE GUARD. Both fail-open, warn unless production is
+ * proven, same polarity as useNsDisabled.
+ *
+ * 1. An `accept` rule that is none of `.ext`, `type/*` or `type/sub` can never
+ *    match. The native attribute ignores malformed tokens, so the picker would
+ *    disagree with the drop path, and every drop would say "not accepted"
+ *    forever with no signal to the developer.
+ *
+ * 2. The `label` slot showing text that does not include the `label` prop
+ *    puts a visible label outside its control's accessible name (WCAG 2.5.3).
+ *    The slot exists for formatting; different words are a defect, and the
+ *    component's own doc naming the hazard is not a guard — NsImage warns for
+ *    the equivalent (missing alt), and this earns the same bytes.
+ */
+if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
+  const RULE = /^(\.[a-z0-9]+|[a-z0-9.+-]+\/(\*|[a-z0-9.+-]+))$/i
+  watch(
+    () => props.accept,
+    (accept) => {
+      const bad = accept
+        .split(',')
+        .map((r) => r.trim())
+        .filter((r) => r !== '' && !RULE.test(r))
+      if (bad.length > 0) {
+        console.warn(
+          `[NsImageUpload] accept contains ${bad.map((r) => `"${r}"`).join(', ')}, which ` +
+            'matches no file: rules must be ".ext", "type/*" or "type/subtype". Every ' +
+            'dropped file will be rejected until this is fixed.',
+        )
+      }
+    },
+    { immediate: true },
+  )
+
+  // READ THE RENDERED TEXT, do not invoke the slot. The first version called
+  // `slots.label?.()` inside a watch, and Vue warned "Slot invoked outside of
+  // the render function" on every mount — the trap NsPageTitle hit too. The
+  // label NsText has already rendered the slot; its textContent is the truth.
+  let warnedLabel = false
+  const checkLabel = () => {
+    if (warnedLabel || slots.label === undefined) return
+    const el = labelEl.value?.$el as HTMLElement | undefined
+    const text = el?.textContent?.trim() ?? ''
+    if (text !== '' && !text.includes(props.label.trim())) {
+      warnedLabel = true
+      console.warn(
+        `[NsImageUpload] the label slot shows "${text}" but the input is named ` +
+          `"${props.label}". The visible label must be part of the accessible name ` +
+          '(WCAG 2.5.3) — use the slot for formatting the same text, not different text.',
+      )
+    }
+  }
+  onMounted(checkLabel)
+  onUpdated(checkLabel)
+}
 </script>
 
 <style lang="scss" scoped>
@@ -365,14 +509,30 @@ onBeforeUnmount(revokePreview)
   // The FOCUS RING IS ON THE ZONE, driven by the INPUT'S focus. Tab lands on
   // the input; the user sees the zone light up. `:focus-visible` so a mouse
   // click on the label does not leave a ring behind.
-  &__input:focus-visible + &__dropzone {
+  // BOTH SIBLINGS. The input's next sibling is the drop zone before a file is
+  // chosen and the preview after. The first version rang only the drop zone —
+  // measured in Chromium: with a file selected, Tab landed on a 1px clipped
+  // input and nothing on screen changed. WCAG 2.4.7, in exactly the state the
+  // doc comment calls the replace path. axe cannot see this.
+  &__input:focus-visible + &__dropzone,
+  &__input:focus-visible + &__preview {
     outline: 2px solid var(--ns-color-border-focus);
     outline-offset: 2px;
   }
 
+  // Drop feedback in both states too: a drop over the preview REPLACES the
+  // file, so the preview is a live target and must say so.
   &__dropzone:hover,
-  &--dragging &__dropzone {
+  &--dragging &__dropzone,
+  &--dragging &__preview {
     border-color: var(--ns-color-border-primary);
+  }
+
+  &--disabled &__dropzone,
+  &--disabled &__preview {
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
   }
 
   &__label {

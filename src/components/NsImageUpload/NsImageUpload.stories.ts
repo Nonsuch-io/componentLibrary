@@ -22,8 +22,26 @@ const controlled = (initial: File | null = null) => ({
 
 export const Empty: Story = { render: () => controlled() }
 
+/**
+ * THE FOCUS RING IN THE SELECTED STATE — the blocker a reviewer measured.
+ *
+ * The input's next sibling is the drop zone before a file is chosen and the
+ * PREVIEW after. The first version rang only the drop zone, so with a file
+ * selected, Tab landed on a 1px clipped input and nothing on screen changed:
+ * WCAG 2.4.7, in exactly the state the component's own doc calls the replace
+ * path. axe cannot see this; only a real browser can.
+ */
 export const WithSelection: Story = {
   render: () => controlled(new File(['x'], 'storefront.png', { type: 'image/png' })),
+  play: async ({ canvasElement }) => {
+    ;(document.activeElement as HTMLElement | null)?.blur()
+    const input = canvasElement.querySelector('input[type="file"]') as HTMLInputElement
+    const preview = canvasElement.querySelector('.ns-image-upload__preview') as HTMLElement
+    await userEvent.tab()
+    await expect(document.activeElement).toBe(input)
+    await expect(getComputedStyle(preview).outlineStyle).not.toBe('none')
+    await expect(parseFloat(getComputedStyle(preview).outlineWidth)).toBeGreaterThan(0)
+  },
 }
 
 export const WithWarning: Story = {
@@ -64,6 +82,8 @@ export const KeyboardReachesTheInput: Story = {
     // Visually hidden, present in the tree: it has a box and is not display:none.
     await expect(getComputedStyle(input).display).not.toBe('none')
 
+    // Start from nowhere, whatever a previous story left focused.
+    ;(document.activeElement as HTMLElement | null)?.blur()
     // Tab from the body lands on the input — the thing display:none breaks.
     await userEvent.tab()
     await expect(document.activeElement).toBe(input)
