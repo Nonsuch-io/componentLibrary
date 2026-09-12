@@ -83,7 +83,9 @@ describe('NsImageUpload', () => {
     it('emits a dropped file through the same path', async () => {
       const wrapper = mountEmpty()
       const file = png()
-      await wrapper.trigger('drop', { dataTransfer: { files: [file] } })
+      await wrapper
+        .find('.ns-image-upload__surface')
+        .trigger('drop', { dataTransfer: { files: [file] } })
       expect(wrapper.emitted('update:modelValue')).toEqual([[file]])
     })
   })
@@ -93,14 +95,18 @@ describe('NsImageUpload', () => {
     it('rejects a dropped file that does not match accept', async () => {
       const wrapper = mountEmpty()
       const file = pdf()
-      await wrapper.trigger('drop', { dataTransfer: { files: [file] } })
+      await wrapper
+        .find('.ns-image-upload__surface')
+        .trigger('drop', { dataTransfer: { files: [file] } })
       expect(wrapper.emitted('update:modelValue')).toBeUndefined()
       expect(wrapper.emitted('rejected')).toEqual([[file]])
     })
 
     it('shows the rejection warning tied to the input', async () => {
       const wrapper = mountEmpty()
-      await wrapper.trigger('drop', { dataTransfer: { files: [pdf()] } })
+      await wrapper
+        .find('.ns-image-upload__surface')
+        .trigger('drop', { dataTransfer: { files: [pdf()] } })
       const warning = wrapper.find('.ns-image-upload__warning')
       expect(warning.text()).toBe('That file type is not accepted')
       expect(wrapper.find('input').attributes('aria-describedby')).toBe(warning.attributes('id'))
@@ -109,9 +115,13 @@ describe('NsImageUpload', () => {
 
     it('clears the rejection warning when an accepted file follows', async () => {
       const wrapper = mountEmpty()
-      await wrapper.trigger('drop', { dataTransfer: { files: [pdf()] } })
+      await wrapper
+        .find('.ns-image-upload__surface')
+        .trigger('drop', { dataTransfer: { files: [pdf()] } })
       expect(wrapper.find('.ns-image-upload__warning').exists()).toBe(true)
-      await wrapper.trigger('drop', { dataTransfer: { files: [png()] } })
+      await wrapper
+        .find('.ns-image-upload__surface')
+        .trigger('drop', { dataTransfer: { files: [png()] } })
       expect(wrapper.find('.ns-image-upload__warning').exists()).toBe(false)
     })
 
@@ -128,7 +138,9 @@ describe('NsImageUpload', () => {
       const file = typeOrName.includes('/')
         ? new File(['x'], 'f', { type: typeOrName })
         : new File(['x'], typeOrName, { type: '' })
-      await wrapper.trigger('drop', { dataTransfer: { files: [file] } })
+      await wrapper
+        .find('.ns-image-upload__surface')
+        .trigger('drop', { dataTransfer: { files: [file] } })
       expect(wrapper.emitted('update:modelValue') !== undefined).toBe(ok)
     })
   })
@@ -204,7 +216,9 @@ describe('NsImageUpload', () => {
 
     it('announces a rejection', async () => {
       const wrapper = mountEmpty()
-      await wrapper.trigger('drop', { dataTransfer: { files: [pdf()] } })
+      await wrapper
+        .find('.ns-image-upload__surface')
+        .trigger('drop', { dataTransfer: { files: [pdf()] } })
       expect(wrapper.find('[aria-live="polite"]').text()).toBe('That file type is not accepted')
     })
   })
@@ -251,7 +265,9 @@ describe('NsImageUpload', () => {
       const empty = mount(NsImageUpload, { props: { modelValue: null, label: 'L' }, global })
       expect(empty.text()).toContain('PROMPT')
       expect(empty.text()).toContain('BROWSE')
-      await empty.trigger('drop', { dataTransfer: { files: [pdf()] } })
+      await empty
+        .find('.ns-image-upload__surface')
+        .trigger('drop', { dataTransfer: { files: [pdf()] } })
       expect(empty.find('.ns-image-upload__warning').text()).toBe('REJECTED')
 
       const filled = mount(NsImageUpload, { props: { modelValue: png(), label: 'L' }, global })

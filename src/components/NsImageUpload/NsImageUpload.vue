@@ -1,74 +1,82 @@
 <template>
-  <!--
-    The drag handlers on this div are an ENHANCEMENT with a complete keyboard
-    equivalent: the <input type="file"> inside it. The rule below exists to
-    catch elements reachable only by pointer; this one is reachable by Tab,
-    Enter and the picker. Drop has no keyboard analogue by nature, and putting
-    the handlers on the input itself would not help — a drop lands on the
-    visible zone, not the 1px clipped control.
-  -->
-  <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
   <div
     class="ns-image-upload"
     :class="{
       'ns-image-upload--dragging': dragging,
       'ns-image-upload--warning': hasWarning(),
     }"
-    @dragenter.prevent="onDragEnter"
-    @dragover.prevent="onDragEnter"
-    @dragleave="onDragLeave"
-    @drop.prevent="onDrop"
   >
-    <input
-      :id="inputId"
-      ref="inputEl"
-      type="file"
-      class="ns-image-upload__input"
-      :accept="accept"
-      :aria-label="label"
-      :aria-describedby="describedBy()"
-      :aria-invalid="hasWarning() ? 'true' : undefined"
-      @change="onChange"
-    />
+    <!--
+      The drag handlers on this div are an ENHANCEMENT with a complete
+      keyboard equivalent: the <input type="file"> inside it. The rule below
+      exists to catch elements reachable only by pointer; this one is reachable
+      by Tab, Enter and the picker. Drop has no keyboard analogue by nature,
+      and putting the handlers on the input would not help — a drop lands on
+      the visible zone, not the 1px clipped control.
 
-    <label v-if="!modelValue" :for="inputId" class="ns-image-upload__dropzone">
-      <NsText as="span" variant="heading-sm-regular" class="ns-image-upload__label">
-        <slot name="label">{{ label }}</slot>
-      </NsText>
-      <NsText as="span" variant="body-md" class="ns-image-upload__prompt">
-        {{ locale.media.uploadPrompt }}
-        <span class="ns-image-upload__browse">{{ locale.media.uploadBrowse }}</span>
-      </NsText>
-    </label>
-
-    <div v-else class="ns-image-upload__preview">
-      <img v-if="previewUrl" :src="previewUrl" alt="" class="ns-image-upload__thumb" />
-      <NsText as="span" variant="label-sm" class="ns-image-upload__filename">
-        {{ modelValue.name }}
-      </NsText>
-      <NsButton
-        variant="tertiary"
-        size="sm"
-        class="ns-image-upload__remove"
-        :aria-label="`${locale.media.uploadRemove}: ${modelValue.name}`"
-        @click="clear"
-      >
-        {{ locale.media.uploadRemove }}
-      </NsButton>
-    </div>
-
-    <NsText
-      v-if="hasWarning()"
-      :id="warningId"
-      as="p"
-      variant="body-sm"
-      class="ns-image-upload__warning"
+      This is an INNER div, not the root, on purpose: an eslint directive
+      comment before the root element makes the template a multi-root
+      fragment, which broke attribute fallthrough and every drop test.
+    -->
+    <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+    <div
+      class="ns-image-upload__surface"
+      @dragenter.prevent="onDragEnter"
+      @dragover.prevent="onDragEnter"
+      @dragleave="onDragLeave"
+      @drop.prevent="onDrop"
     >
-      <slot name="warning">{{ warningText() }}</slot>
-    </NsText>
+      <input
+        :id="inputId"
+        ref="inputEl"
+        type="file"
+        class="ns-image-upload__input"
+        :accept="accept"
+        :aria-label="label"
+        :aria-describedby="describedBy()"
+        :aria-invalid="hasWarning() ? 'true' : undefined"
+        @change="onChange"
+      />
 
-    <div :id="liveId" class="ns-image-upload__live" aria-live="polite" aria-atomic="true">
-      {{ announcement }}
+      <label v-if="!modelValue" :for="inputId" class="ns-image-upload__dropzone">
+        <NsText as="span" variant="heading-sm-regular" class="ns-image-upload__label">
+          <slot name="label">{{ label }}</slot>
+        </NsText>
+        <NsText as="span" variant="body-md" class="ns-image-upload__prompt">
+          {{ locale.media.uploadPrompt }}
+          <span class="ns-image-upload__browse">{{ locale.media.uploadBrowse }}</span>
+        </NsText>
+      </label>
+
+      <div v-else class="ns-image-upload__preview">
+        <img v-if="previewUrl" :src="previewUrl" alt="" class="ns-image-upload__thumb" />
+        <NsText as="span" variant="label-sm" class="ns-image-upload__filename">
+          {{ modelValue.name }}
+        </NsText>
+        <NsButton
+          variant="tertiary"
+          size="sm"
+          class="ns-image-upload__remove"
+          :aria-label="`${locale.media.uploadRemove}: ${modelValue.name}`"
+          @click="clear"
+        >
+          {{ locale.media.uploadRemove }}
+        </NsButton>
+      </div>
+
+      <NsText
+        v-if="hasWarning()"
+        :id="warningId"
+        as="p"
+        variant="body-sm"
+        class="ns-image-upload__warning"
+      >
+        <slot name="warning">{{ warningText() }}</slot>
+      </NsText>
+
+      <div :id="liveId" class="ns-image-upload__live" aria-live="polite" aria-atomic="true">
+        {{ announcement }}
+      </div>
     </div>
   </div>
 </template>
@@ -311,11 +319,14 @@ onBeforeUnmount(revokePreview)
 
 <style lang="scss" scoped>
 .ns-image-upload {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ns-space-2);
   width: 100%;
+
+  &__surface {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--ns-space-2);
+  }
 
   // VISUALLY HIDDEN, NOT display:none. The input must stay in the tab order and
   // the accessibility tree; this is the standard clip pattern for exactly that.
