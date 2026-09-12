@@ -4,6 +4,24 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.37.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.36.0...v0.37.0) (2026-09-12)
+
+
+### Features
+
+* **form-section:** add the NsFormSection structure — WIP, no tests yet (componentLibrary-lrw.1) ([0a8eb81](https://github.com/Nonsuch-io/componentLibrary/commit/0a8eb81c8e7d0cf4ed22b65abe8dc2fc2c4668e8))
+* **form:** add NsFormSection and NsFormFooter (componentLibrary-lrw.1) ([926a31f](https://github.com/Nonsuch-io/componentLibrary/commit/926a31f5297d84a18aca1f76df4c23a86580a44e))
+* **form:** add NsFormSection and NsFormFooter with tests (componentLibrary-lrw.1) ([fe5b3b9](https://github.com/Nonsuch-io/componentLibrary/commit/fe5b3b98df3aeef9a09702d4b279f9f9a954acc6))
+
+
+### Bug Fixes
+
+* **form-footer:** the horizontal gutter is the page's, not the footer's (componentLibrary-lrw.1) ([1e30c21](https://github.com/Nonsuch-io/componentLibrary/commit/1e30c21d493b3adebd0037288a30aedc1c3cae55))
+* **form-section:** compute the group role in the template, not over slots (componentLibrary-lrw.1) ([f4edd72](https://github.com/Nonsuch-io/componentLibrary/commit/f4edd72a03a537b9f76ec31e5b695c7322ca7850))
+* **form-section:** own the card inset — NsCard adds 16px I said it did not (componentLibrary-lrw.1) ([862567d](https://github.com/Nonsuch-io/componentLibrary/commit/862567d45b358298a3d104cf1a1d8c2e473f127d))
+* **form-section:** scope the card-section reset to the direct child (componentLibrary-lrw.1) ([91d3cbe](https://github.com/Nonsuch-io/componentLibrary/commit/91d3cbe948ae4b6dd50cc0edd272fdf58deab130))
+* **form:** name the fields from the title, and anchor the reflow assertions (componentLibrary-lrw.1) ([e9aec85](https://github.com/Nonsuch-io/componentLibrary/commit/e9aec85a036508389aa8d3f6d35df38b710e7928))
+
 ## [0.36.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.35.0...v0.36.0) (2026-09-09)
 
 
