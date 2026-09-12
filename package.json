@@ -63,10 +63,10 @@
   },
   "size-limit": [
     {
-      "name": "full library (gzip) — a SOFT ceiling, raised to 25.5 kB on 2026-09-08 to cover roughly the next three components of epic componentLibrary-lrw at the observed ~400-640 B each, rather than stopping to bump it every time. DELIBERATELY NOT AN EPIC-END FIGURE: ~12 builds remain (fewer than the bead count — several are NsCard compositions — but more were found nested), which would need ~5 kB of headroom and would stop catching anything at all. At 25.5 a single component adding more than ~1 kB still trips this, which is the case worth stopping for. RE-SET IT at 25.5 rather than drifting past it. The dev warnings are 3,032 B gzip of this, measured 2026-09-08 by short-circuiting all 15 guard sites and rebuilding; they are a tested contract (useNsDisabled.dist.test.ts) and the only mechanism that reclaims them is dual conditional exports — see the conditional-exports bead. This ceiling comes back DOWN when that lands",
+      "name": "full library (gzip) — a SOFT ceiling. 27 kB as of 2026-09-12. NsImageUpload was 1,298 B on first commit and 530 B MORE after two review passes — a disable prop routed through useNsDisabled, two dev warnings (a malformed accept rule; a label slot whose words leave the accessible name), a live region that re-announces repeats, and a drag-flicker guard. That is the price of review, and it is worth paying: every one of those closed a silent failure a reviewer measured. Tightening the warning text saved 0 B at gzip. Epic componentLibrary-lrw has ~6 left; the dev warnings are now ~3.3 kB of this and only dual conditional exports reclaims them — see the conditional-exports bead. RE-SET rather than drift",
       "path": "dist/nonsuch-components.js",
       "import": "*",
-      "limit": "25.5 kB",
+      "limit": "27 kB",
       "gzip": true,
       "ignore": [
         "vue",
@@ -117,9 +117,9 @@
       "gzip": true
     },
     {
-      "name": "styles (gzip) — ALSO A SOFT CEILING, raised to 6.75 kB on 2026-09-10. The type ramp put it at 6.25; NsFormSection and NsFormFooter added ~110 B between them and took it 15 B over, which is the shape of the rest of epic componentLibrary-lrw: roughly 50-60 B of scoped CSS per component, with ~10 to build. 6.75 covers those with room, and a single component adding more than ~300 B still trips it. THE FAILURE THIS EXISTS TO CATCH IS ALSO THE FAILURE MODE OF READING IT: the JS entry passed while this one was 15 B over, and a report that grepped only the first entry called the whole gate green. Read every row and the exit code, never a head -n",
+      "name": "styles (gzip) — ALSO A SOFT CEILING, 7 kB as of 2026-09-12 (NsImageUpload +363 B; the next two components would have tripped 6.75). Before that, raised to 6.75 kB on 2026-09-10. The type ramp put it at 6.25; NsFormSection and NsFormFooter added ~110 B between them and took it 15 B over, which is the shape of the rest of epic componentLibrary-lrw: roughly 50-60 B of scoped CSS per component, with ~10 to build. 6.75 covers those with room, and a single component adding more than ~300 B still trips it. THE FAILURE THIS EXISTS TO CATCH IS ALSO THE FAILURE MODE OF READING IT: the JS entry passed while this one was 15 B over, and a report that grepped only the first entry called the whole gate green. Read every row and the exit code, never a head -n",
       "path": "dist/nonsuch-components.css",
-      "limit": "6.75 kB",
+      "limit": "7 kB",
       "gzip": true
     }
   ],

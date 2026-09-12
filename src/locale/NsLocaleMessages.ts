@@ -49,6 +49,20 @@ export interface NsLocaleMessages {
     exitFullscreen: string
     previousImage: string
     nextImage: string
+    /**
+     * NsImageUpload. The drop zone's prompt is split so the "browse" word can
+     * be styled as the affordance while the whole sentence stays one label.
+     */
+    uploadPrompt: string
+    uploadBrowse: string
+    /** Accessible name of the remove button beside a selected image. */
+    uploadRemove: string
+    /** Live-region prefix announced when a file is selected. */
+    uploadSelected: string
+    /** Live-region text announced when the selection is cleared. */
+    uploadCleared: string
+    /** Warning shown when a dropped/chosen file is not an accepted type. */
+    uploadRejected: string
   }
 
   /** Form validation messages */
