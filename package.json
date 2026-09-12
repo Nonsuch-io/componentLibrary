@@ -117,9 +117,9 @@
       "gzip": true
     },
     {
-      "name": "styles (gzip) — ALSO A SOFT CEILING. Raised to 6.25 kB for the type ramp: typography.css is now imported by src/index.ts, so the 21 type classes ship with the components instead of sitting in an optional file no consumer imported. componentLibrary-cqy is done — it reclaimed 17 B, which is the honest size of that kind of win; the weight is in the dev warnings, see the conditional-exports bead",
+      "name": "styles (gzip) — ALSO A SOFT CEILING, raised to 6.75 kB on 2026-09-10. The type ramp put it at 6.25; NsFormSection and NsFormFooter added ~110 B between them and took it 15 B over, which is the shape of the rest of epic componentLibrary-lrw: roughly 50-60 B of scoped CSS per component, with ~10 to build. 6.75 covers those with room, and a single component adding more than ~300 B still trips it. THE FAILURE THIS EXISTS TO CATCH IS ALSO THE FAILURE MODE OF READING IT: the JS entry passed while this one was 15 B over, and a report that grepped only the first entry called the whole gate green. Read every row and the exit code, never a head -n",
       "path": "dist/nonsuch-components.css",
-      "limit": "6.25 kB",
+      "limit": "6.75 kB",
       "gzip": true
     }
   ],

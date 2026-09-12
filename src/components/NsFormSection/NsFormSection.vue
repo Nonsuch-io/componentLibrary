@@ -1,0 +1,331 @@
+<template>
+  <NsCard
+    v-bind="attrsWithoutRole"
+    class="ns-form-section"
+    :role="resolvedRole()"
+    :aria-labelledby="hasTitle() ? titleId : undefined"
+  >
+    <div v-if="hasTitle() || hasDescription()" class="ns-form-section__heading">
+      <NsText
+        v-if="hasTitle()"
+        :id="titleId"
+        :as="headingTag"
+        variant="heading-sm-regular"
+        class="ns-form-section__title"
+      >
+        <slot name="title">{{ title }}</slot>
+      </NsText>
+      <NsText v-if="hasDescription()" as="p" variant="body-md" class="ns-form-section__description">
+        <slot name="description">{{ description }}</slot>
+      </NsText>
+    </div>
+
+    <div v-if="hasNotice()" class="ns-form-section__notice">
+      <slot name="notice" />
+    </div>
+
+    <div class="ns-form-section__fields">
+      <slot />
+    </div>
+  </NsCard>
+</template>
+
+<script setup lang="ts">
+import { Comment, Fragment, computed, useAttrs, useId, useSlots, type Slot, type VNode } from 'vue'
+import NsCard from '../NsCard/NsCard.vue'
+import NsText from '../NsText/NsText.vue'
+
+/**
+ * NsFormSection — one titled block of a form.
+ *
+ * ONE COMPONENT, NOT ELEVEN. butiq asked for eleven NsFormSection* variants —
+ * ShopAddress, ShopHours, SignUpProfile, PlanCheckOutBillingInformation and so
+ * on. All eleven were expanded in Figma and every one is this component with
+ * different content: the design names INSTANCES after what they contain, not
+ * after their type. Sample size 11 of 11, each expanded by id.
+ *
+ * The strongest evidence is the `hidden="true"` children. Variants carry each
+ * OTHER's dead nodes — a hidden second Field Row in SignUpProfile, hidden
+ * NsInput and NsSelect in the base. Eleven independent components would not
+ * each ship the others' switched-off slots; one component with optional slots
+ * would, and does.
+ *
+ * That makes genericity the design constraint rather than a nicety. Eleven
+ * bespoke sections would make a GST/HST label change a library release — the
+ * coupling this library refused once for NsPlanBuilder and would have accepted
+ * twenty times over here. Story: componentLibrary-lrw.1.
+ *
+ * THE SLOT CONTRACT, agreed with butiq:
+ *
+ *     NsCard > [title]? > [description]? > [notice]? > Fields = n x (row | component)
+ *
+ * TITLE AND DESCRIPTION ARE INDEPENDENTLY OPTIONAL, not one optional pair.
+ * PlanCheckOutPaymentMethod (185:10738) has a title and NO description, which
+ * is the sample that disproved the pair reading — the first three variants
+ * expanded all happened to have both. Modelling them as a pair ships an empty
+ * descender or a collapsed heading for anyone with a title only, and it reaches
+ * screenshot review looking fine.
+ *
+ * `notice` IS SECTION-SCOPED AND THERE IS DELIBERATELY NO ROW-LEVEL SLOT HERE.
+ * Measured: PaymentMethod puts NsBanner directly in the card above Fields;
+ * StorageLocation (202:23429) puts one INSIDE Fields as a row. Those are not
+ * the same content in two positions — one is section-wide, the other is scoped
+ * to the input beside it, and they differ in the DOM order a screen reader
+ * walks while looking identical in a screenshot. A row-level banner belongs to
+ * whatever occupies that row; a second slot here would recreate the ambiguity
+ * one level down.
+ *
+ * THE TITLE NAMES THE FIELDS, PROGRAMMATICALLY. A visible section title that
+ * a screen reader cannot connect to the inputs beneath it is the commonest
+ * failure of exactly this component: a sighted user sees an unambiguous group,
+ * and someone tabbing straight into an input hears only that field's own label
+ * — never "Business details". Verified absent in review before it was fixed:
+ * the root carried no role and no aria-labelledby at all.
+ *
+ * `role="group"` with `aria-labelledby`, not `<fieldset>`/`<legend>`: legend
+ * cannot carry the measured type styles without fighting its own layout rules,
+ * and group is the accepted modern equivalent for a named set of controls. Not
+ * `region` either — NsCard uses that for a landmark, and eleven landmarks on a
+ * signup page is worse than none.
+ *
+ * NsCard already implements region+aria-labelledby, but ONLY for its own
+ * `title` prop or `header` slot, which would impose its `.text-h6` markup and
+ * discard the type styles measured below. So the attributes are set here
+ * instead.
+ *
+ * HOW THEY SURVIVE NsCard, PRECISELY, because the mechanism is fragile: NsCard
+ * binds `v-bind="$attrs"` and THEN `:role="… undefined"`, so mergeProps DOES
+ * clobber ours with undefined. What restores them is NsCard's IMPLICIT
+ * attribute fallthrough, which Vue applies to the root after the explicit
+ * bindings. That means adding `inheritAttrs: false` to NsCard — which this
+ * repo has done to thirteen components in one PR before — would silently drop
+ * this component's role and name. The test `groups the card and points its
+ * name at the title` is what would catch that; do not remove it as redundant.
+ *
+ * There is no group when there is no title, deliberately: a group whose
+ * `aria-labelledby` points at nothing is announced as an unnamed group, which
+ * is noise rather than structure.
+ *
+ * TYPE STYLES ARE MEASURED, and both of my first guesses were wrong — which is
+ * why they were checked before any test pinned them. get_variable_defs on
+ * 163:9495 and 164:10056, agreeing exactly:
+ *
+ *     title        "Small heading regular"  16/400/20.8  -> .ns-heading-sm-regular EXACT
+ *     description  "Medium body text"       14/400/19.6  -> no exact class exists
+ *
+ * I had inferred `heading-sm` from the measured 21px height; that class is
+ * WEIGHT 600 and the design is 400, so the title would have rendered semibold.
+ * Height alone cannot see weight.
+ *
+ * THE DESCRIPTION USES ns-body-md UNDER PROTEST: it matches on size and weight
+ * and misses on line-height, 1.5 against the design's 1.4 — 1.4px per line, so
+ * about 4px on a three-line description. It is the closest class that exists.
+ * The wider finding is filed as componentLibrary-3mg: every HEADING style in
+ * our ramp matches the design exactly and every BODY style does not, which
+ * suggests the body half was invented rather than derived. Nothing renders
+ * wrong today because no component used these classes before this one. Change
+ * this to whatever 3mg settles on — it is a one-word edit.
+ *
+ * `notice` IS SEVERITY-NEUTRAL, and that is not a hedge — it is where
+ * verification failures, refusals, plan downgrades and section validation
+ * summaries go, as much as informational messages. It takes any content, not
+ * only NsBanner, which is why it is not called `banner`. Severity is carried by
+ * whatever fills it.
+ */
+
+export interface NsFormSectionProps {
+  /** Section title. Ignored when the `title` slot is used. */
+  title?: string
+  /** Supporting line under the title. Ignored when the `description` slot is used. */
+  description?: string
+  /**
+   * Heading level for the title, 2-6. Defaults to 2: a form section sits under
+   * a page heading, which owns the h1. Never renders h1 — a section title is by
+   * definition not the page's own title, and offering it would invite a second.
+   */
+  level?: 2 | 3 | 4 | 5 | 6
+}
+
+const props = withDefaults(defineProps<NsFormSectionProps>(), {
+  title: undefined,
+  description: undefined,
+  level: 2,
+})
+
+defineSlots<{
+  /** The fields. Rows, or a whole component — ShopHours puts NsHoursOfOperation here. */
+  default?: () => unknown
+  /** Section title. Overrides the `title` prop. */
+  title?: () => unknown
+  /** Supporting line. Overrides the `description` prop. */
+  description?: () => unknown
+  /** Section-scoped messaging of ANY severity, above the fields. */
+  notice?: () => unknown
+}>()
+
+const slots = useSlots()
+const titleId = useId()
+
+/**
+ * THE ROLE IS COMPUTED IN THE TEMPLATE, NOT IN A `computed`. An earlier
+ * version wrapped it in `computed(() => hasTitle() ? 'group' : undefined)`,
+ * which reads the NON-reactive `slots` object — the exact trap the comment on
+ * `hasTitle` below warns about, reintroduced three screens above it in the
+ * same file. Measured in review: with `<template v-if="show" #title>` toggling
+ * true after mount, the template's `aria-labelledby` updated and the computed
+ * `role` did not, leaving a name attribute with no role to carry it — the
+ * original blocker on a different path, in dev AND production. Vue 3.5 only
+ * tracks `$slots` under HMR; there is no build in which that computed recomputes.
+ *
+ * A CONSUMER'S OWN `role` WINS, AND THE UNDEFINED CASE IS HANDLED. Plain
+ * attribute fallthrough almost does this for free — but measured: a consumer
+ * writing `:role="cond ? 'presentation' : undefined"` with `cond` false
+ * fell through as `role: undefined`, which OVERWROTE 'group' and left the
+ * card with no role at all. Silent loss of the association in the exact state
+ * where the consumer meant "no override". So attrs are bound explicitly with
+ * `role` split out, and the role resolves through `||` rather than `??` —
+ * `role=""` is not a role either.
+ */
+defineOptions({ inheritAttrs: false })
+
+const attrs = useAttrs()
+
+function resolvedRole(): string | undefined {
+  const own = attrs.role
+  if (typeof own === 'string' && own.trim() !== '') return own
+  return hasTitle() ? 'group' : undefined
+}
+
+/** Everything the consumer passed except `role`, which `resolvedRole` owns. */
+const attrsWithoutRole = computed(() => {
+  const { role: _dropped, ...rest } = attrs
+  return rest
+})
+
+/**
+ * Slot CONTENT, not presence — the same walk NsPageTitle and NsPageHeading use.
+ * `slots.title !== undefined` is true for a slot the parent merely declares, so
+ * `<template #title><span v-if="loaded"/></template>` would render an empty
+ * heading: announced by a screen reader as a heading with no name, and worse
+ * than no heading because it still lands in the outline.
+ *
+ * SAME LIMIT AS THE OTHER TWO COPIES: this sees Comment vnodes, empty Fragments
+ * and whitespace-only text — what `v-if`, `v-for` over nothing and interpolating
+ * '' produce. It CANNOT see through a child component that renders nothing.
+ * Local copy rather than a shared helper, deliberately: the size audit found
+ * that shared-helper indirection can cost more than the duplication, since gzip
+ * already deduplicates.
+ */
+function renders(nodes: VNode[]): boolean {
+  return nodes.some((node) => {
+    if (node.type === Fragment) {
+      return Array.isArray(node.children) ? renders(node.children as VNode[]) : false
+    }
+    return (
+      node.type !== Comment && !(typeof node.children === 'string' && node.children.trim() === '')
+    )
+  })
+}
+
+function slotRenders(slot: Slot | undefined): boolean {
+  return slot !== undefined && renders(slot())
+}
+
+/**
+ * Plain functions, not computeds: `useSlots()` returns a NON-reactive object, so
+ * a computed over it evaluates once and never again. NsTable.vue:45 documents
+ * the same trap, and NsPageTitle re-shipped it once before this was understood.
+ *
+ * `?.trim() ||` and not `??` for the props: nullish treats '' as a value, so
+ * `title=""` would render an empty heading. The recurring bug in this library.
+ */
+function hasTitle(): boolean {
+  return slotRenders(slots.title) || (props.title?.trim() ?? '') !== ''
+}
+
+function hasDescription(): boolean {
+  return slotRenders(slots.description) || (props.description?.trim() ?? '') !== ''
+}
+
+function hasNotice(): boolean {
+  return slotRenders(slots.notice)
+}
+
+const HEADING_TAGS = ['h2', 'h3', 'h4', 'h5', 'h6'] as const
+const MIN_LEVEL = 2
+const MAX_LEVEL = 6
+
+/**
+ * Indexed rather than interpolated: `h${n}` does not narrow to NsText's element
+ * union, and a cast would silently accept `h7` — which is not an element, renders
+ * inline and adds nothing to the outline. NaN survives both clamps and would
+ * index past the end, so it is handled before them.
+ */
+const headingTag = computed<(typeof HEADING_TAGS)[number]>(() => {
+  const level = Number.isFinite(props.level) ? Math.round(props.level) : MIN_LEVEL
+  return HEADING_TAGS[Math.min(MAX_LEVEL, Math.max(MIN_LEVEL, level)) - MIN_LEVEL]
+})
+</script>
+
+<style lang="scss" scoped>
+.ns-form-section {
+  display: flex;
+  flex-direction: column;
+  // 20px throughout, measured across all eleven variants: Fields sits at x=20,
+  // y=20 in a 700-wide card leaving 660 of content, and Field Rows run at a
+  // 94px pitch with 74px rows.
+  gap: var(--ns-space-5);
+  padding: var(--ns-space-5);
+  width: 100%;
+
+  // NsCard DOES carry padding, and an earlier comment here said it did not.
+  // It wraps its default slot in <q-card-section>, which is Quasar's 16px —
+  // so the fields sat 36px inside the card against the design's 20. Declared,
+  // not measured, and a reviewer measured it. Zeroed here so this component
+  // owns the inset it documents.
+  //
+  // DIRECT CHILD ONLY. The first version was `:deep(.q-card__section)` with
+  // no combinator, which reaches EVERY card-section in the subtree — a
+  // reviewer nested an NsCard in the Fields slot and both of its sections
+  // came back 0px. The docstring promises Fields takes a whole component, so
+  // a card-based one would silently lose its internal padding with no test
+  // failing anywhere. `>` loses nothing for the intended case, because NsCard
+  // renders its body section as a direct child of the root this class is on.
+  //
+  // This is NOT the .q-btn__wrapper case from componentLibrary-cqy, and not
+  // for the reason first written here. That rule matched NOTHING; this one
+  // matched TOO MUCH. "The class genuinely renders" was true and answered the
+  // wrong question. Two stories now pin it from both sides: the 20px inset in
+  // Chromium, and a nested NsCard keeping its own padding.
+  > :deep(.q-card__section) {
+    padding: 0;
+  }
+
+  &__heading {
+    display: flex;
+    flex-direction: column;
+    // Section Heading is 49 tall for a 21px title over a 20px description:
+    // 21 + 8 + 20 = 49. Measured on 163:9495 and 164:10056.
+    gap: var(--ns-space-2);
+  }
+
+  &__title {
+    color: var(--ns-color-text-primary);
+  }
+
+  // Colour is measured: 163:9495 resolves only --ns-color-text-primary for its
+  // heading, so the description is not a distinct token there. `secondary` is a
+  // deliberate choice for a supporting line, set in CSS rather than via NsText's
+  // `tone` prop so a selector of equal specificity can override it.
+  &__description {
+    color: var(--ns-color-text-secondary);
+  }
+
+  &__fields {
+    display: flex;
+    flex-direction: column;
+    // Field Rows are 20px apart — y = 0, 94, 188, 282 with 74px rows.
+    gap: var(--ns-space-5);
+  }
+}
+</style>
