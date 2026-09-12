@@ -24,10 +24,13 @@ afterEach(() => {
   __resetNsDisabledWarnings()
 })
 
-/** announce() clears then sets across a tick, so the live text needs two. */
+/**
+ * announce() is a serialised chain: each entry clears, ticks, sets, ticks. Two
+ * queued announcements (mount + change) therefore need four ticks to land.
+ * Eight is generous and deterministic — these are microtasks, not timers.
+ */
 const settled = async () => {
-  await nextTick()
-  await nextTick()
+  for (let i = 0; i < 8; i++) await nextTick()
 }
 
 const mountEmpty = (extra: Record<string, unknown> = {}) =>
@@ -282,6 +285,37 @@ describe('NsImageUpload', () => {
       const announced = observed.filter((t) => t === 'That file type is not accepted')
       expect(announced.length, 'the second identical rejection did not re-announce').toBe(2)
     })
+
+    it('announces BOTH of two events that race in the same flush', async () => {
+      // A rejected drop followed at once by an accepted one, with no await
+      // between. The first clear-then-set implementation lost the rejection
+      // entirely — measured in review: one MutationObserver record, the
+      // acceptance only. Serialising through a promise chain makes each wait.
+      const Host = defineComponent({
+        components: { NsImageUpload },
+        data: () => ({ file: null as File | null }),
+        template: `<NsImageUpload v-model="file" label="L" />`,
+      })
+      const wrapper = mount(Host)
+      const live = () => wrapper.find('[aria-live="polite"]').element
+      const seen: string[] = []
+      const observer = new MutationObserver(() => {
+        const t = live().textContent?.trim() ?? ''
+        if (t) seen.push(t)
+      })
+      observer.observe(live(), { childList: true, characterData: true, subtree: true })
+
+      const surface = wrapper.find('.ns-image-upload__surface')
+      // No await between the two: they land in the same flush.
+      void surface.trigger('drop', { dataTransfer: { files: [pdf()] } })
+      void surface.trigger('drop', { dataTransfer: { files: [png('good.png')] } })
+      await settled()
+      await settled()
+      observer.disconnect()
+
+      expect(seen, 'the rejection was lost to the race').toContain('That file type is not accepted')
+      expect(seen).toContain('Selected image: good.png')
+    })
   })
 
   describe('the warning prop', () => {
@@ -405,14 +439,22 @@ describe('NsImageUpload', () => {
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('accept contains "image/"'))
     })
 
-    it.each(['image/*', 'image/png', '.png', '.png, image/*', 'image/svg+xml'])(
-      'stays silent for a valid accept %j',
-      (accept) => {
-        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-        mountEmpty({ accept })
-        expect(warn).not.toHaveBeenCalled()
-      },
-    )
+    it.each([
+      'image/*',
+      'image/png',
+      '.png',
+      '.png, image/*',
+      'image/svg+xml',
+      // Compound extensions are valid native tokens. The first regex flagged
+      // `.tar.gz` as unmatchable — a false warning on a valid config.
+      '.tar.gz',
+      'application/vnd.ms-excel',
+      '.jpeg,.JPG',
+    ])('stays silent for a valid accept %j', (accept) => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      mountEmpty({ accept })
+      expect(warn).not.toHaveBeenCalled()
+    })
 
     it('warns when the label slot shows different words from the label prop', () => {
       const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})

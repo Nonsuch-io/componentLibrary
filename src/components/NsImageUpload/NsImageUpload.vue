@@ -325,10 +325,23 @@ function revokePreview() {
  * mutation, and a screen-reader user trying a second bad file heard nothing at
  * all. Clearing across a tick forces a mutation every time.
  */
-async function announce(text: string) {
-  announcement.value = ''
-  await nextTick()
-  announcement.value = text
+let announcing: Promise<void> = Promise.resolve()
+
+function announce(text: string): Promise<void> {
+  // SERIALISED. Two announcements in the same flush — a rejected drop followed
+  // at once by an accepted one, or an external modelValue change racing a
+  // user's drop — would otherwise interleave: the second's clear ran before
+  // the first's text was ever committed, and the first was not delayed, it
+  // was GONE. Measured in review: one MutationObserver record for two events.
+  // The same silent-loss class the clear-then-set was written to close, one
+  // window narrower. Chaining through a promise makes each wait its turn.
+  announcing = announcing.then(async () => {
+    announcement.value = ''
+    await nextTick()
+    announcement.value = text
+    await nextTick()
+  })
+  return announcing
 }
 
 /**
@@ -419,7 +432,11 @@ onBeforeUnmount(revokePreview)
  *    the equivalent (missing alt), and this earns the same bytes.
  */
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
-  const RULE = /^(\.[a-z0-9]+|[a-z0-9.+-]+\/(\*|[a-z0-9.+-]+))$/i
+  // Extensions may carry interior dots — `.tar.gz` is a valid native accept
+  // token and isAccepted() handles it with endsWith. The first regex allowed
+  // one segment only and cried wolf on it: a false warning on a valid config
+  // is worse than no warning, because it teaches people to ignore the real one.
+  const RULE = /^(\.[a-z0-9]+(\.[a-z0-9]+)*|[a-z0-9.+-]+\/(\*|[a-z0-9.+-]+))$/i
   watch(
     () => props.accept,
     (accept) => {
