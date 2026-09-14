@@ -11,9 +11,15 @@
  */
 
 .ns-caption {
-  font-size: 0.625rem;
+  /* Design "Caption": 12px / 400 / 16px, measured on 164:10056 (componentLibrary-3mg).
+     Was 10px / 1.6. WHEN TO USE THIS vs body-sm, which is the same 12px/400 two
+     pixels taller: the design has both as distinct named styles. Caption is for
+     an annotation on something else — a timestamp, a photo credit, helper text
+     under a control. body-sm is running copy that happens to be small. If it
+     wraps to a paragraph, it is body-sm. */
+  font-size: 0.75rem;
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.3333;
 }
 
 .ns-overline {
@@ -31,9 +37,18 @@
 }
 
 .ns-body-md {
+  /* Design "Medium body text": 14px / 400 / 19.6px, measured on five nodes
+     (componentLibrary-3mg). Was 1.5; 1.4 is what the design ships and what every
+     NsFormSection description and NsImageUpload prompt now renders.
+
+     On the ramp's origin: nine of eleven measured styles matched, which is
+     CONSISTENT WITH individual errors in a design-derived ramp — but also with
+     a hand-authored conventional scale (1.6/1.5/1.4/1.3/1.25…) that the
+     designer mostly shared. The two that differed are the two the design
+     expresses in px that are not round ratios. Either way the ruling stands. */
   font-size: 0.875rem;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .ns-label-xs {
@@ -130,15 +145,25 @@
 }
 
 .ns-overline-md {
+  /* Design "Overline label medium": 14px / 500 / 18px, measured on 63:2797
+     (componentLibrary-3mg). Was 1.28, which renders 17.92px — a sub-pixel miss
+     I had called a match by eye until the design parity test disagreed. */
   font-size: 0.875rem;
   font-weight: 500;
   text-transform: uppercase;
-  line-height: 1.28;
+  line-height: 1.2857;
 }
 
 .ns-overline-md-bold {
+  /* INFERRED, not measured, and here is the inference: 1.28 is 18/14
+     truncated to two decimals, and both overline-md siblings carried the
+     identical truncation, so the ramp's author was aiming at an 18px line box
+     for both. The sibling was then measured at exactly 18px on 63:2797. That
+     is evidence about intent, not a guess by proximity — a reviewer made the
+     argument and it holds. Set to match; NOT in typography.design.test.ts
+     until a node is found (componentLibrary-63k asks for one). */
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
-  line-height: 1.28;
+  line-height: 1.2857;
 }
