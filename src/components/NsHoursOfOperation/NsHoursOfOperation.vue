@@ -59,6 +59,13 @@
  * emitting an empty array, not by rejecting one: a value handed in with an
  * empty `ranges` renders no rows for that day and warns in dev.
  *
+ * A value missing a day named in `days` is FILLED for rendering, and the
+ * fill is what goes out: the first edit to ANY day emits a value carrying
+ * every day in `days`, including the ones the caller never had. That is the
+ * shape the caller asked to edit, and butiq's seven-key BusinessHours meets
+ * it on the first keystroke — documented here because a one-key record
+ * silently becoming an eight-key one is the kind of thing that surprises.
+ *
  * MEASURED (componentLibrary-f6b, 2026-09-14): the design's default instance
  * is a column at a 20px gap of EIGHT days — Mondays through Sundays and
  * Holidays — each an NsHoursDay of one or more NsHoursRow at a 12px gap. The
@@ -183,7 +190,10 @@ const value = computed<NsHoursOfOperationValue>(() => {
   const source = props.modelValue ?? fallback.value
   let out = source
   for (const key of props.days) {
-    if (source[key]) continue
+    // `?.ranges` and Array.isArray, not a truthiness check on the day: a day
+    // object with no `ranges` (a partial update from a backend) passed the
+    // first version of this guard and crashed the dev warning one line down.
+    if (Array.isArray(source[key]?.ranges)) continue
     if (out === source) out = { ...source }
     out[key] = createNsHoursDay()
   }
@@ -331,7 +341,7 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   watch(
     () => {
       const source = props.modelValue ?? fallback.value
-      return props.days.filter((key) => !source[key] || source[key].ranges.length === 0)
+      return props.days.filter((key) => !(source[key]?.ranges?.length > 0))
     },
     (bad) => {
       if (warned || bad.length === 0) return
@@ -361,6 +371,35 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
     display: flex;
     flex-direction: column;
     gap: var(--ns-space-3);
+  }
+
+  // Desktop: ONE grid for the whole editor, days and rows as subgrids, so the
+  // three columns are sized once across every row. Each row used to be its
+  // own grid, and when the actions track was allowed to grow for French,
+  // review measured a split day's rows at 263 and a single day's at 317 —
+  // the selects no longer lined up down the form. The track widths live
+  // here; NsHoursRow declares `subgrid` and inherits them. `position:
+  // relative` so the live region's absolute box stays inside the editor.
+  @media (min-width: 1024px) {
+    position: relative;
+    display: grid;
+    grid-template-columns: 95px minmax(0, 1fr) minmax(263px, max-content);
+    column-gap: var(--ns-space-6);
+    row-gap: var(--ns-space-5);
+
+    &__day {
+      display: grid;
+      grid-column: 1 / -1;
+      grid-template-columns: subgrid;
+      // A subgrid's own gap overrides the inherited one, and the mobile
+      // block above sets a `gap` shorthand here — restate the column gap.
+      column-gap: var(--ns-space-6);
+      row-gap: var(--ns-space-3);
+    }
+
+    &__error {
+      grid-column: 2 / -1;
+    }
   }
 
   &__error {

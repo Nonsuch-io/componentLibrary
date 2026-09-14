@@ -129,7 +129,7 @@
       "gzip": true
     },
     {
-      "name": "styles (gzip) \u2014 ALSO A SOFT CEILING, 7.5 kB as of 2026-09-14 (NsHoursOfOperation: 6.76 \u2192 7.33, +570 B \u2014 a mobile stack, a desktop grid, per-breakpoint remove-button placement, and after review a tighter mobile select for two-digit times and a growable actions track for French). Was 7 kB as of 2026-09-12 (NsImageUpload +363 B). Same rule as the JS row: re-set with a reason, never drift.",
+      "name": "styles (gzip) \u2014 ALSO A SOFT CEILING, 7.5 kB as of 2026-09-14 (NsHoursOfOperation: 6.76 \u2192 7.21, +450 B \u2014 a mobile stack, a desktop grid, per-breakpoint remove-button placement, and after review a tighter mobile select for two-digit times and one editor-level grid with subgrid rows so a growable actions track for French stays aligned across days). Was 7 kB as of 2026-09-12 (NsImageUpload +363 B). Same rule as the JS row: re-set with a reason, never drift.",
       "path": "dist/nonsuch-components.css",
       "limit": "7.5 kB",
       "gzip": true

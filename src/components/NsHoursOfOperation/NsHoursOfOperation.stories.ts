@@ -148,6 +148,22 @@ export const FrenchFitsOnDesktop: Story = {
   play: async ({ canvasElement }) => {
     await expect(window.innerWidth).toBeGreaterThanOrEqual(1024)
     await frenchFits(canvasElement)
+
+    // ONE actions column for the whole editor. When each row sized its own
+    // grid, review measured a split day's rows at 263 and a single day's at
+    // 317 in French — the selects stopped lining up between days. The
+    // editor's grid sizes the track once and the rows inherit it (subgrid),
+    // so every row's actions cell starts at the same x and is the same width.
+    const cells = [...canvasElement.querySelectorAll<HTMLElement>('.ns-hours-row__actions')].map(
+      (el) => el.getBoundingClientRect(),
+    )
+    await expect(cells.length).toBe(3)
+    for (const cell of cells) {
+      await expect(cell.left).toBe(cells[0].left)
+      await expect(cell.width).toBe(cells[0].width)
+    }
+    // …and the French column really is wider than the English 263.
+    await expect(cells[0].width).toBeGreaterThan(263)
   },
 }
 
@@ -236,6 +252,15 @@ export const LayoutIsRealOnDesktop: Story = {
     // The first row of a split day has neither Closed nor Add (Top Row of Multiple).
     await expect(rows[0].querySelector('.ns-hours-row__closed')).toBeNull()
     await expect(rows[0].querySelector('.ns-hours-row__add')).toBeNull()
+
+    // The SECOND row of a split day keeps the desktop 20px gap and 16px select
+    // padding. The mobile deviation for rows with an X is written at the same
+    // specificity and wins there only by source order — this is the pin that
+    // notices if the two blocks are ever reordered.
+    const secondTimes = bottom.querySelector('.ns-hours-row__times') as HTMLElement
+    await expect(getComputedStyle(secondTimes).columnGap).toBe('20px')
+    const secondControl = bottom.querySelector('.q-field__control') as HTMLElement
+    await expect(getComputedStyle(secondControl).paddingLeft).toBe('16px')
   },
 }
 

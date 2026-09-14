@@ -178,6 +178,33 @@ describe('NsHoursOfOperation — values the caller got wrong', () => {
     w.unmount()
   })
 
+  it('fills a day that is present but has no `ranges`, without the dev warning itself crashing', () => {
+    // Review: `{ closed: false }` with no `ranges` passed a truthiness check
+    // on the day and then threw inside the warning watcher — the safety net
+    // was the crash. Same class as the missing-day fix, one field deeper.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const v = createNsHoursOfOperationValue()
+    ;(v as Record<string, unknown>).monday = { closed: false }
+    const w = mountWith({ modelValue: v, days: ['monday'] })
+    expect(rowsOf(w, 'Mondays').length).toBe(1)
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn.mock.calls[0][0]).toContain('[NsHoursOfOperation] monday')
+    warn.mockRestore()
+    w.unmount()
+  })
+
+  it('editing a day the caller HAS also emits the days it lacked, filled', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const partial = { monday: createNsHoursDay() } as unknown as NsHoursOfOperationValue
+    const w = mountWith({ modelValue: partial, days: ['monday', 'tuesday'] })
+    await rowsOf(w, 'Mondays')[0].vm.$emit('update:closed', true)
+    const next = lastEmitted(w)!
+    expect(Object.keys(next).sort()).toEqual(['monday', 'tuesday'])
+    expect(next.tuesday).toEqual(createNsHoursDay())
+    warn.mockRestore()
+    w.unmount()
+  })
+
   it('treats a null modelValue as uncontrolled — the edit is kept, not emitted and then dropped', async () => {
     const w = mount(NsHoursOfOperation, {
       props: { label: 'x', modelValue: null as unknown as undefined, days: ['monday'] },

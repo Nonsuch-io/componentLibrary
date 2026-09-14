@@ -380,13 +380,20 @@ defineExpose({ focusOpen, focusAdd })
 @media (min-width: 1024px) {
   .ns-hours-row {
     display: grid;
-    // 263 is the design's actions column, and it is EXACTLY Closed (118) +
-    // 20 + Add Hours (125) in en-CA — zero slack. `max-content` lets the
-    // track grow for a longer language (fr-CA's "Ajouter des heures" is 179
-    // wide; review measured it 54px past the row at a fixed 263) and the
-    // times cell, which is the flexible one, gives the space up.
-    grid-template-columns: 95px minmax(0, 1fr) minmax(263px, max-content);
-    column-gap: var(--ns-space-6);
+    grid-column: 1 / -1;
+    // The tracks are NsHoursOfOperation's — 95px | 1fr | minmax(263px,
+    // max-content) — inherited through subgrid so every row across every day
+    // shares one actions column. 263 is the design's, and it is EXACTLY
+    // Closed (118) + 20 + Add Hours (125) in en-CA — zero slack. max-content
+    // lets it grow for a longer language (fr-CA's "Ajouter des heures" is
+    // 179 wide; review measured it 54px past the row at a fixed 263), and
+    // sizing it ONCE at the editor is what keeps a split day's rows aligned
+    // with a single day's (review measured 263 vs 317 when each row sized
+    // its own). The times cell, the flexible one, gives the space up.
+    grid-template-columns: subgrid;
+    column-gap: var(
+      --ns-space-6
+    ); // restated: the mobile `gap` above would override the inherited one
     // The error row: INFERRED, the design has no error state for this row.
     // 8 rather than the column gap's 24, which is what a `gap` shorthand
     // would have given it (review measured the message 24px under the field).
