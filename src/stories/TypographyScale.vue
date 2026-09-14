@@ -46,13 +46,13 @@
 import { KNOWN_VARIANTS } from '../components/NsText/variants'
 
 const DETAILS: Record<string, { sample: string; props: string }> = {
-  caption: { sample: 'Caption text', props: '10px · regular · lh 1.6' },
+  caption: { sample: 'Caption text', props: '12px · regular · lh 1.33' },
   overline: { sample: 'Overline label', props: '10px · medium · uppercase · ls 0.08em' },
   'overline-lg': { sample: 'Large overline', props: '28px · regular · uppercase · lh 1.1' },
-  'overline-md': { sample: 'Medium overline', props: '14px · medium · uppercase · lh 1.28' },
+  'overline-md': { sample: 'Medium overline', props: '14px · medium · uppercase · lh 1.29' },
   'overline-md-bold': { sample: 'Medium overline', props: '14px · bold · uppercase · lh 1.28' },
   'body-sm': { sample: 'Small body text', props: '12px · regular · lh 1.5' },
-  'body-md': { sample: 'Medium body text', props: '14px · regular · lh 1.5' },
+  'body-md': { sample: 'Medium body text', props: '14px · regular · lh 1.4' },
   'label-xs': { sample: 'Extra small label', props: '10px · semibold · lh 1.6' },
   'label-sm': { sample: 'Small label', props: '12px · semibold · lh 1.4' },
   'label-md': { sample: 'Medium label', props: '14px · semibold · lh 1.4' },

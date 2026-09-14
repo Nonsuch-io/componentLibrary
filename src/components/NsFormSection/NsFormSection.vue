@@ -117,14 +117,11 @@ import NsText from '../NsText/NsText.vue'
  * WEIGHT 600 and the design is 400, so the title would have rendered semibold.
  * Height alone cannot see weight.
  *
- * THE DESCRIPTION USES ns-body-md UNDER PROTEST: it matches on size and weight
- * and misses on line-height, 1.5 against the design's 1.4 — 1.4px per line, so
- * about 4px on a three-line description. It is the closest class that exists.
- * The wider finding is filed as componentLibrary-3mg: every HEADING style in
- * our ramp matches the design exactly and every BODY style does not, which
- * suggests the body half was invented rather than derived. Nothing renders
- * wrong today because no component used these classes before this one. Change
- * this to whatever 3mg settles on — it is a one-word edit.
+ * THE DESCRIPTION IS ns-body-md, AND IT NOW MATCHES THE DESIGN. When this
+ * component shipped, body-md was 14/400/1.5 against the design's 1.4 — a
+ * 1.4px-per-line miss, filed as componentLibrary-3mg. The ruling was that the
+ * design is authoritative; the ramp was corrected there. This was the first
+ * consumer of body-md, so nothing else moved.
  *
  * `notice` IS SEVERITY-NEUTRAL, and that is not a hedge — it is where
  * verification failures, refusals, plan downgrades and section validation

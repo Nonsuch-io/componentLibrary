@@ -11,9 +11,12 @@
  */
 
 .ns-caption {
-  font-size: 0.625rem;
+  /* Design "Caption": 12px / 400 / 16px, measured on 164:10056 (componentLibrary-3mg).
+     Was 10px / 1.6 — one of exactly two ramp entries that did not match the design;
+     nine measured styles did, so this was an individual error, not a scale drift. */
+  font-size: 0.75rem;
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.3333;
 }
 
 .ns-overline {
@@ -31,9 +34,12 @@
 }
 
 .ns-body-md {
+  /* Design "Medium body text": 14px / 400 / 19.6px, measured on five nodes
+     (componentLibrary-3mg). Was 1.5; 1.4 is what the design ships and what every
+     NsFormSection description and NsImageUpload prompt now renders. */
   font-size: 0.875rem;
   font-weight: 400;
-  line-height: 1.5;
+  line-height: 1.4;
 }
 
 .ns-label-xs {
@@ -130,13 +136,20 @@
 }
 
 .ns-overline-md {
+  /* Design "Overline label medium": 14px / 500 / 18px, measured on 63:2797
+     (componentLibrary-3mg). Was 1.28, which renders 17.92px — a sub-pixel miss
+     I had called a match by eye until the design parity test disagreed. */
   font-size: 0.875rem;
   font-weight: 500;
   text-transform: uppercase;
-  line-height: 1.28;
+  line-height: 1.2857;
 }
 
 .ns-overline-md-bold {
+  /* UNMEASURED — no design sample yet. Left at 1.28 even though its sibling
+     overline-md was corrected to 1.2857, because changing an unmeasured value
+     to match a measured neighbour is a guess with a good argument, not a
+     measurement. Add it to typography.design.test.ts when a node is found. */
   font-size: 0.875rem;
   font-weight: 700;
   text-transform: uppercase;
