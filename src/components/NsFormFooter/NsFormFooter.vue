@@ -47,16 +47,16 @@
  * anyway. WIDTH is different and is layout, which is why the reflow is this
  * component's business and the height is not.
  *
- * THE DESIGN'S BUTTON HEIGHTS ARE NOT REACHABLE WITH TODAY'S NsButton, and an
- * earlier version of this comment said they were. It claimed 36px = `md`
- * because 8px padding + 14px text = 36 — which ignores that Quasar's `.q-btn`
- * carries `line-height: 1.715em`, making the line box 24px. MEASURED in
- * Chromium: `md` renders 40px and `lg` about 51px, against the design's 36 and
- * 45. Computing a height from padding and font-size is not measuring it.
- * Filed as componentLibrary-4l2; it is NsButton's gap, not the footer's.
- * Until it is settled, a consumer wanting the design exactly needs
- * `:size="$q.screen.lt.md ? 'lg' : 'md'"` — $q.screen is Quasar core, no
- * plugin needed.
+ * THE DESIGN'S BUTTON HEIGHTS ARE `md` = 36 AND `lg` = 45, and they were not
+ * reachable until componentLibrary-4l2. An earlier version of this comment
+ * claimed 36 = `md` because 8px padding + 14px text = 36 — which ignored that
+ * Quasar's `.q-btn` carried `line-height: 1.715em`, a 24px line box, so `md`
+ * MEASURED 40px in Chromium and `lg` about 51. Computing a height from padding
+ * and font-size is not measuring it. NsButton now sets the line box per size
+ * (HeightsMatchTheDesign story is the Chromium gate). A consumer wanting the
+ * design's desktop/mobile pair still chooses the size, because that is the
+ * consumer's decision: `:size="$q.screen.lt.md ? 'lg' : 'md'"` — $q.screen is
+ * Quasar core, no plugin needed.
  * Story: componentLibrary-lrw.1.
  */
 
