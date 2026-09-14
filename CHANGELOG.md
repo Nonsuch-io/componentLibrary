@@ -4,6 +4,22 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.38.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.37.0...v0.38.0) (2026-09-14)
+
+
+### Features
+
+* **upload:** add NsImageUpload on a real file input (componentLibrary-s5b) ([8028be9](https://github.com/Nonsuch-io/componentLibrary/commit/8028be95f8f2870979bd3ab605bf999a040ee5ba))
+* **upload:** add NsImageUpload on a real file input (componentLibrary-s5b) ([fdb5616](https://github.com/Nonsuch-io/componentLibrary/commit/fdb5616b5c72aec4922b777fba8c94c66972929b))
+
+
+### Bug Fixes
+
+* **upload:** a rejected announcement must not silence the region forever (componentLibrary-s5b) ([9c8cb2e](https://github.com/Nonsuch-io/componentLibrary/commit/9c8cb2e372ebc225cee90bb5fe94e19e35389d56))
+* **upload:** keep a single root — the lint directive had made it a fragment (componentLibrary-s5b) ([8c6353b](https://github.com/Nonsuch-io/componentLibrary/commit/8c6353bfec1efb80d4a59ab31d880d956f0aff6b))
+* **upload:** ring the preview, re-announce repeats, disable reaches the input (componentLibrary-s5b) ([f55efbf](https://github.com/Nonsuch-io/componentLibrary/commit/f55efbf19c0f8a30b173bc6c1f65122839a51501))
+* **upload:** serialise announcements and accept compound extensions (componentLibrary-s5b) ([0adc226](https://github.com/Nonsuch-io/componentLibrary/commit/0adc22621c2be51d63ab7d288ddf021a42e0c126))
+
 ## [0.37.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.36.0...v0.37.0) (2026-09-12)
 
 
