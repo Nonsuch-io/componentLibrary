@@ -116,7 +116,17 @@ const MEASURED: ReadonlyArray<{
   { design: 'Caption', cls: 'caption', px: 12, weight: 400, lineHeightPx: 16, nodes: '164:10056' },
 ]
 
-const css = readFileSync(resolve(__dirname, 'typography.css'), 'utf8')
+// COMMENTS STRIPPED BEFORE PARSING, and this is not tidiness. The regexes
+// below read `property: value` out of a rule block, and a comment inside the
+// block that says "design says line-height: 1.4" — the most natural sentence to
+// write beside a corrected value — would be read INSTEAD of the declaration.
+// Measured in review: such a comment ahead of a reverted `line-height: 1.5`
+// made all eleven rows pass with both original errors shipped. A `}` inside a
+// comment also truncated the block. Stripping once, at load, closes all of it.
+const css = readFileSync(resolve(__dirname, 'typography.css'), 'utf8').replace(
+  /\/\*[\s\S]*?\*\//g,
+  '',
+)
 
 function rule(cls: string) {
   const m = new RegExp(`\\.ns-${cls} \\{([^}]*)\\}`).exec(css)
@@ -124,7 +134,11 @@ function rule(cls: string) {
   const b = m[1]
   const rem = /font-size:\s*([\d.]+)rem/.exec(b)
   const w = /font-weight:\s*(\d+)/.exec(b)
-  const lh = /line-height:\s*([\d.]+)/.exec(b)
+  // Unitless ONLY. `line-height: 16px` would parse as 16 and fail with a
+  // misleading "expected 192" — a unit bug reported as a ratio bug — and
+  // `1.333em` would pass while inheriting differently to children. Either
+  // form now hits the "no parseable rule" path, whose message is accurate.
+  const lh = /line-height:\s*([\d.]+)\s*;/.exec(b)
   return rem && w && lh
     ? { px: parseFloat(rem[1]) * 16, weight: parseInt(w[1], 10), lineHeight: parseFloat(lh[1]) }
     : null
@@ -147,8 +161,11 @@ describe('typography.css matches the design where the design has been measured',
       row.weight,
     )
     // The design expresses line-height in px; ours is unitless. Compare the
-    // rendered line box at the class's own font size, to a tenth of a pixel —
-    // Figma's 36.79999923706055 is 1.15 × 32.
+    // rendered line box at the class's own font size. `toBeCloseTo(x, 1)` is
+    // ±0.05px: every 3- and 4-decimal ratio in the ramp passes (largest
+    // residual today is 0.0004px), and most 2-decimal roundings fail — 1.29
+    // at 14px is +0.06 and would be rejected, which is the point. Figma's
+    // 36.79999923706055 is 1.15 × 32 and passes.
     expect(
       got.lineHeight * got.px,
       `line box differs from "${row.design}" (nodes ${row.nodes}) — design ${row.lineHeightPx}px`,

@@ -121,7 +121,8 @@ import NsText from '../NsText/NsText.vue'
  * component shipped, body-md was 14/400/1.5 against the design's 1.4 — a
  * 1.4px-per-line miss, filed as componentLibrary-3mg. The ruling was that the
  * design is authoritative; the ramp was corrected there. This was the first
- * consumer of body-md, so nothing else moved.
+ * consumer of body-md; NsImageUpload's prompt has since joined it and moved
+ * with it.
  *
  * `notice` IS SEVERITY-NEUTRAL, and that is not a hedge — it is where
  * verification failures, refusals, plan downgrades and section validation
