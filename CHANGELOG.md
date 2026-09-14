@@ -4,6 +4,21 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.39.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.38.1...v0.39.0) (2026-09-14)
+
+
+### Features
+
+* **hours:** add NsHoursOfOperation on an errors-in, value-out contract (componentLibrary-f6b) ([4b537c6](https://github.com/Nonsuch-io/componentLibrary/commit/4b537c6c21887f2eee1e82eee50b270c670f0e70))
+* **hours:** add NsHoursOfOperation on an errors-in, value-out contract (componentLibrary-f6b) ([169e0c0](https://github.com/Nonsuch-io/componentLibrary/commit/169e0c05d69aa4ecd717d8f1de983c2184dd042d))
+
+
+### Bug Fixes
+
+* **hours:** one day predicate, pin the error column, subgrid fallback (componentLibrary-f6b) ([43028f7](https://github.com/Nonsuch-io/componentLibrary/commit/43028f7a6e2e47df0b29b170809f502f3510f9f8))
+* **hours:** size the actions column once, and guard a day with no ranges (componentLibrary-f6b) ([3c41089](https://github.com/Nonsuch-io/componentLibrary/commit/3c41089aad084c897dae26bb2b54dd5d727ec4b3))
+* **hours:** survive a partial value, fit French, hold one line on mobile (componentLibrary-f6b) ([4259526](https://github.com/Nonsuch-io/componentLibrary/commit/42595266bef39eca33046734999cf3881f555a7b))
+
 ## [0.38.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.38.0...v0.38.1) (2026-09-14)
 
 
