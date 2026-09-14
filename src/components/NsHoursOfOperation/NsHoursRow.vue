@@ -157,7 +157,7 @@ import NsSelect, { type NsSelectOption } from '../NsSelect/NsSelect.vue'
 import NsCheckbox from '../NsCheckbox/NsCheckbox.vue'
 import NsButton from '../NsButton/NsButton.vue'
 import { useNsLocale } from '../../composables/useNsLocale'
-import { fill } from './fill'
+import { fill } from '../../locale/fill'
 import type { NsHoursRange } from './types'
 
 /**

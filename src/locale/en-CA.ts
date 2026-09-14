@@ -52,6 +52,17 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     hoursRemoved: 'Hours removed for {day}, {count} remaining',
   },
 
+  checklist: {
+    tasksToComplete: '{count} Tasks to Complete',
+    taskToComplete: '1 Task to Complete',
+    allComplete: 'All tasks complete',
+    hide: 'Hide',
+    show: 'Show',
+    complete: 'Complete',
+    notComplete: 'Not complete',
+    dismiss: 'Dismiss',
+  },
+
   media: {
     zoomIn: 'Zoom in',
     zoomOut: 'Zoom out',

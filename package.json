@@ -63,10 +63,10 @@
   },
   "size-limit": [
     {
-      "name": "full library (gzip) — a SOFT ceiling. 31 kB as of 2026-09-14: NsHoursOfOperation (componentLibrary-f6b) took it 26.78 → 30.16, the largest single addition to date — a compound input of eight days × (two selects, a checkbox, add and remove buttons) with its own live region and focus choreography; ~2 kB of it is the per-range row template, whose remove button appears twice so CSS can place it per breakpoint. Measured before bumping, gzip with vue/quasar/phosphor ignored: `{ NsHoursOfOperation }` = 7.16 kB; `{ NsSelect, NsCheckbox, NsButton }` = 3.42 kB; the same plus `nsLocaleEnCA` (which the component pulls through useNsLocale's default) = 4.16 kB. So the component's own code is ~3.0 kB counting the locale as a dependency, ~3.7 kB not. Previously 27 kB as of 2026-09-12 (NsImageUpload +1.8 kB across two review passes; the dev warnings are ~3.3 kB in total and only dual conditional exports reclaims them — see componentLibrary-49m). RE-SET rather than drift: when a bump is needed, write the reason here.",
+      "name": "full library (gzip) — a SOFT ceiling. 32 kB as of 2026-09-14: NsChecklistBanner (componentLibrary-lrw.4) took it 30.17 → 31.38; `{ NsChecklistBanner }` = 4.97 kB against `{ NsBadge, NsButton, nsLocaleEnCA }` = 3.6, so ~1.2 kB of its own, ~0.2 of that the en-CA `checklist` strings every locale consumer pays. Earlier the same day, 31 kB: NsHoursOfOperation (componentLibrary-f6b) took it 26.78 → 30.16, the largest single addition to date — a compound input of eight days × (two selects, a checkbox, add and remove buttons) with its own live region and focus choreography; ~2 kB of it is the per-range row template, whose remove button appears twice so CSS can place it per breakpoint. Measured before bumping, gzip with vue/quasar/phosphor ignored: `{ NsHoursOfOperation }` = 7.16 kB; `{ NsSelect, NsCheckbox, NsButton }` = 3.42 kB; the same plus `nsLocaleEnCA` (which the component pulls through useNsLocale's default) = 4.16 kB. So the component's own code is ~3.0 kB counting the locale as a dependency, ~3.7 kB not. Previously 27 kB as of 2026-09-12 (NsImageUpload +1.8 kB across two review passes; the dev warnings are ~3.3 kB in total and only dual conditional exports reclaims them — see componentLibrary-49m). RE-SET rather than drift: when a bump is needed, write the reason here.",
       "path": "dist/nonsuch-components.js",
       "import": "*",
-      "limit": "31 kB",
+      "limit": "32 kB",
       "gzip": true,
       "ignore": [
         "vue",
@@ -129,9 +129,9 @@
       "gzip": true
     },
     {
-      "name": "styles (gzip) — ALSO A SOFT CEILING, 7.5 kB as of 2026-09-14 (NsHoursOfOperation: 6.76 → 7.24, +480 B — a mobile stack, a desktop grid, per-breakpoint remove-button placement, and after review a tighter mobile select for two-digit times and one editor-level grid with subgrid rows so a growable actions track for French stays aligned across days). Was 7 kB as of 2026-09-12 (NsImageUpload +363 B). Same rule as the JS row: re-set with a reason, never drift.",
+      "name": "styles (gzip) — ALSO A SOFT CEILING, 8 kB as of 2026-09-14 (NsChecklistBanner: 7.24 → 7.61, +370 B — a card, a task row with a mobile column / desktop row switch, a step circle and a badge). Earlier the same day, 7.5 kB: NsHoursOfOperation 6.76 → 7.24. Was 7 kB as of 2026-09-12 (NsImageUpload +363 B). Same rule as the JS row: re-set with a reason, never drift.",
       "path": "dist/nonsuch-components.css",
-      "limit": "7.5 kB",
+      "limit": "8 kB",
       "gzip": true
     }
   ],

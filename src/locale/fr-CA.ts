@@ -49,6 +49,17 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     hoursRemoved: 'Heures retirées pour {day}, {count} restantes',
   },
 
+  checklist: {
+    tasksToComplete: '{count} tâches à faire',
+    taskToComplete: '1 tâche à faire',
+    allComplete: 'Toutes les tâches sont faites',
+    hide: 'Masquer',
+    show: 'Afficher',
+    complete: 'Faite',
+    notComplete: 'À faire',
+    dismiss: 'Ignorer',
+  },
+
   media: {
     zoomIn: 'Agrandir',
     zoomOut: 'Réduire',
