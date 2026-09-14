@@ -63,10 +63,10 @@
   },
   "size-limit": [
     {
-      "name": "full library (gzip) — a SOFT ceiling. 27 kB as of 2026-09-12. NsImageUpload was 1,298 B on first commit and 530 B MORE after two review passes — a disable prop routed through useNsDisabled, two dev warnings (a malformed accept rule; a label slot whose words leave the accessible name), a live region that re-announces repeats, and a drag-flicker guard. That is the price of review, and it is worth paying: every one of those closed a silent failure a reviewer measured. Tightening the warning text saved 0 B at gzip. Epic componentLibrary-lrw has ~6 left; the dev warnings are now ~3.3 kB of this and only dual conditional exports reclaims them — see the conditional-exports bead. RE-SET rather than drift",
+      "name": "full library (gzip) \u2014 a SOFT ceiling. 31 kB as of 2026-09-14: NsHoursOfOperation (componentLibrary-f6b) took it 26.78 \u2192 30.16, the largest single addition to date \u2014 a compound input of eight days \u00d7 (two selects, a checkbox, add and remove buttons) with its own live region and focus choreography; ~2 kB of it is the per-range row template, whose remove button appears twice so CSS can place it per breakpoint. Measured before bumping, gzip with vue/quasar/phosphor ignored: `{ NsHoursOfOperation }` = 7.16 kB; `{ NsSelect, NsCheckbox, NsButton }` = 3.42 kB; the same plus `nsLocaleEnCA` (which the component pulls through useNsLocale's default) = 4.16 kB. So the component's own code is ~3.0 kB counting the locale as a dependency, ~3.7 kB not. Previously 27 kB as of 2026-09-12 (NsImageUpload +1.8 kB across two review passes; the dev warnings are ~3.3 kB in total and only dual conditional exports reclaims them \u2014 see componentLibrary-49m). RE-SET rather than drift: when a bump is needed, write the reason here.",
       "path": "dist/nonsuch-components.js",
       "import": "*",
-      "limit": "27 kB",
+      "limit": "31 kB",
       "gzip": true,
       "ignore": [
         "vue",
@@ -99,10 +99,22 @@
       ]
     },
     {
-      "name": "app shell (heaviest import; contains NsInput and NsNavSidebar. Includes the en-CA locale object — a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
+      "name": "single component: NsHoursOfOperation (largest in the sign-up flow; pulls NsSelect, NsCheckbox, NsButton, the en-CA locale)",
+      "path": "dist/nonsuch-components.js",
+      "import": "{ NsHoursOfOperation }",
+      "limit": "7.5 kB",
+      "gzip": true,
+      "ignore": [
+        "vue",
+        "quasar",
+        "@phosphor-icons/vue"
+      ]
+    },
+    {
+      "name": "app shell (heaviest import; 11 kB as of 2026-09-14 \u2014 the en-CA `hours` strings for NsHoursOfOperation cost every locale consumer 200 B, measured 10.67 \u2192 10.87 on this row against main d207a2c (an earlier draft said 122, which was the overage, not the delta); contains NsInput and NsNavSidebar. Includes the en-CA locale object \u2014 a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsAppShell }",
-      "limit": "10.75 kB",
+      "limit": "11 kB",
       "gzip": true,
       "ignore": [
         "vue",
@@ -117,9 +129,9 @@
       "gzip": true
     },
     {
-      "name": "styles (gzip) — ALSO A SOFT CEILING, 7 kB as of 2026-09-12 (NsImageUpload +363 B; the next two components would have tripped 6.75). Before that, raised to 6.75 kB on 2026-09-10. The type ramp put it at 6.25; NsFormSection and NsFormFooter added ~110 B between them and took it 15 B over, which is the shape of the rest of epic componentLibrary-lrw: roughly 50-60 B of scoped CSS per component, with ~10 to build. 6.75 covers those with room, and a single component adding more than ~300 B still trips it. THE FAILURE THIS EXISTS TO CATCH IS ALSO THE FAILURE MODE OF READING IT: the JS entry passed while this one was 15 B over, and a report that grepped only the first entry called the whole gate green. Read every row and the exit code, never a head -n",
+      "name": "styles (gzip) \u2014 ALSO A SOFT CEILING, 7.5 kB as of 2026-09-14 (NsHoursOfOperation: 6.76 \u2192 7.24, +480 B \u2014 a mobile stack, a desktop grid, per-breakpoint remove-button placement, and after review a tighter mobile select for two-digit times and one editor-level grid with subgrid rows so a growable actions track for French stays aligned across days). Was 7 kB as of 2026-09-12 (NsImageUpload +363 B). Same rule as the JS row: re-set with a reason, never drift.",
       "path": "dist/nonsuch-components.css",
-      "limit": "7 kB",
+      "limit": "7.5 kB",
       "gzip": true
     }
   ],

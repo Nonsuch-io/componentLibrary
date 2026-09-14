@@ -27,6 +27,28 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     sale: 'Solde',
   },
 
+  hours: {
+    dayMonday: 'Les lundis',
+    dayTuesday: 'Les mardis',
+    dayWednesday: 'Les mercredis',
+    dayThursday: 'Les jeudis',
+    dayFriday: 'Les vendredis',
+    daySaturday: 'Les samedis',
+    daySunday: 'Les dimanches',
+    dayHolidays: 'Les jours fériés',
+    select: 'Choisir',
+    to: 'à',
+    opens: 'Ouverture, {day}, plage {index} sur {count}',
+    closes: 'Fermeture, {day}, plage {index} sur {count}',
+    range: '{day}, plage {index} sur {count}',
+    closed: 'Fermé',
+    addHours: 'Ajouter des heures',
+    addHoursFor: 'Ajouter des heures pour {day}',
+    removeHours: 'Retirer la plage {index} sur {count} pour {day}',
+    hoursAdded: 'Heures ajoutées pour {day}, {index} sur {count}',
+    hoursRemoved: 'Heures retirées pour {day}, {count} restantes',
+  },
+
   media: {
     zoomIn: 'Agrandir',
     zoomOut: 'Réduire',
