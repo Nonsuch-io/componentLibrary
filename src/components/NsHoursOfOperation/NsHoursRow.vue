@@ -391,9 +391,18 @@ defineExpose({ focusOpen, focusAdd })
     // with a single day's (review measured 263 vs 317 when each row sized
     // its own). The times cell, the flexible one, gives the space up.
     grid-template-columns: subgrid;
-    column-gap: var(
-      --ns-space-6
-    ); // restated: the mobile `gap` above would override the inherited one
+    // Without subgrid (Chrome < 117, Safari < 16, Firefox < 71 — below the
+    // library's Baseline-widely-available floor) the declaration above is
+    // dropped and the row would render as a single-column stack. Fall back
+    // to the row sizing its own tracks: the design's numbers in English,
+    // and in French a split day misaligned with a single day — the defect
+    // subgrid exists to fix, which is still a working editor. `@supports
+    // not` rather than a duplicate declaration, so a minifier cannot fold it.
+    @supports not (grid-template-columns: subgrid) {
+      grid-template-columns: 95px minmax(0, 1fr) minmax(263px, max-content);
+    }
+    // Restated: the mobile `gap` above would override the inherited one.
+    column-gap: var(--ns-space-6);
     // The error row: INFERRED, the design has no error state for this row.
     // 8 rather than the column gap's 24, which is what a `gap` shorthand
     // would have given it (review measured the message 24px under the field).

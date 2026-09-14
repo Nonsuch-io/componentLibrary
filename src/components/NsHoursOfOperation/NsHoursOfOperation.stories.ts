@@ -106,6 +106,16 @@ export const WithErrors: Story = {
     const control = row.querySelector('.q-field__control') as HTMLElement
     const error = row.querySelector('.ns-hours-row__error') as HTMLElement
     await expect(error.getBoundingClientRect().top - control.getBoundingClientRect().bottom).toBe(8)
+
+    // BOTH messages sit under the times column (x=119), not the label's.
+    // Review ran three mutants that survived a vertical-only pin: dropping
+    // the day's column-gap restatement (day error at 113), the day error's
+    // grid-column (at 0, 95 wide), and the row error's (same).
+    const root = canvasElement.querySelector('.ns-hours-of-operation')!.getBoundingClientRect()
+    await expect(error.getBoundingClientRect().left - root.left).toBe(119)
+    const dayError = canvasElement.querySelector('.ns-hours-of-operation__error') as HTMLElement
+    await expect(dayError.getBoundingClientRect().left - root.left).toBe(119)
+    await expect(dayError.getBoundingClientRect().width).toBe(910 - 119)
   },
 }
 

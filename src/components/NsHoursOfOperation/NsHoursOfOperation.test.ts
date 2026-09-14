@@ -183,14 +183,22 @@ describe('NsHoursOfOperation — values the caller got wrong', () => {
     // on the day and then threw inside the warning watcher — the safety net
     // was the crash. Same class as the missing-day fix, one field deeper.
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    const v = createNsHoursOfOperationValue()
-    ;(v as Record<string, unknown>).monday = { closed: false }
-    const w = mountWith({ modelValue: v, days: ['monday'] })
-    expect(rowsOf(w, 'Mondays').length).toBe(1)
-    expect(warn).toHaveBeenCalledTimes(1)
-    expect(warn.mock.calls[0][0]).toContain('[NsHoursOfOperation] monday')
+    for (const monday of [
+      { closed: false },
+      { closed: false, ranges: 'abc' }, // a double-encoded backend field: truthy length, not an array
+      { closed: false, ranges: { length: 2 } },
+      null,
+    ]) {
+      warn.mockClear()
+      const v = createNsHoursOfOperationValue()
+      ;(v as Record<string, unknown>).monday = monday
+      const w = mountWith({ modelValue: v, days: ['monday'] })
+      expect(rowsOf(w, 'Mondays').length, JSON.stringify(monday)).toBe(1)
+      expect(warn, JSON.stringify(monday)).toHaveBeenCalledTimes(1)
+      expect(warn.mock.calls[0][0]).toContain('[NsHoursOfOperation] monday')
+      w.unmount()
+    }
     warn.mockRestore()
-    w.unmount()
   })
 
   it('editing a day the caller HAS also emits the days it lacked, filled', async () => {

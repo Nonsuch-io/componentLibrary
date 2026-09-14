@@ -108,6 +108,7 @@ import {
   createNsHoursOfOperationValue,
   createNsHoursRange,
   nsHoursTimeOptions,
+  type NsHoursDay,
   type NsHoursDayKey,
   type NsHoursOfOperationErrors,
   type NsHoursOfOperationValue,
@@ -186,14 +187,23 @@ watch(
  * are reported by the same warning as empty ones. Untouched days keep their
  * identity: the spread copies references, not objects.
  */
+/**
+ * ONE predicate for "this day is usable", shared by the normaliser and the
+ * dev warning. Review found them disagreeing twice: first a truthiness check
+ * on the day let `{ closed: false }` through to crash the warning; then
+ * Array.isArray here against `?.length > 0` there let `ranges: "abc"` be
+ * filled and later emitted over the caller's data with no warning at all —
+ * the silent-overwrite class this library weights most heavily.
+ */
+function hasRanges(day: unknown): day is NsHoursDay {
+  return Array.isArray((day as { ranges?: unknown } | null | undefined)?.ranges)
+}
+
 const value = computed<NsHoursOfOperationValue>(() => {
   const source = props.modelValue ?? fallback.value
   let out = source
   for (const key of props.days) {
-    // `?.ranges` and Array.isArray, not a truthiness check on the day: a day
-    // object with no `ranges` (a partial update from a backend) passed the
-    // first version of this guard and crashed the dev warning one line down.
-    if (Array.isArray(source[key]?.ranges)) continue
+    if (hasRanges(source[key])) continue
     if (out === source) out = { ...source }
     out[key] = createNsHoursDay()
   }
@@ -341,7 +351,7 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   watch(
     () => {
       const source = props.modelValue ?? fallback.value
-      return props.days.filter((key) => !(source[key]?.ranges?.length > 0))
+      return props.days.filter((key) => !hasRanges(source[key]) || source[key].ranges.length === 0)
     },
     (bad) => {
       if (warned || bad.length === 0) return
@@ -397,6 +407,9 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
       row-gap: var(--ns-space-3);
     }
 
+    // The day-level message sits under the times column, like a per-range
+    // one, not full-width under the label. INFERRED — the design has no
+    // error state — and deliberate: a message at x=0 reads as a heading.
     &__error {
       grid-column: 2 / -1;
     }
