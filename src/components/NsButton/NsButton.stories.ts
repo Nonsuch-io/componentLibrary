@@ -276,6 +276,72 @@ export const MinHeightIsReal: Story = {
   },
 }
 
+/**
+ * THE RENDERED HEIGHTS ARE THE DESIGN'S, MEASURED IN A REAL BROWSER.
+ *
+ * componentLibrary-4l2: `md` rendered 40px and `lg` about 51px against the
+ * design's 36 and 45, because Quasar's `.q-btn` line box is 1.715em and the
+ * design's is the type ramp's (14 → 20, 16 → 21, whole pixels). Kale ruled the
+ * design authoritative. The expected values here are Figma frame heights read
+ * by id — 65:3657 (two 119.5x36), 185:14419 (152x45, text child y=12 h=21),
+ * 253:40942 and 83:8002 (350x45) — not recomputed from padding + font-size,
+ * which is the mistake that produced the wrong number the first time.
+ *
+ * WITH AND WITHOUT AN ICON, because `.q-btn .q-icon { font-size: 1.715em }`
+ * is a second, independent route to 40px: fix the line-height alone and an
+ * icon-bearing md button stays 24px tall inside. No measured design button
+ * carried an icon, so "an icon does not change the height" is the library's
+ * inference, stated as such in NsButton.vue — but the ASSERTION that both
+ * render the same height is exact either way.
+ *
+ * THE CONTROL: clearing the size class's line-height must change the height.
+ * Without it, this story cannot distinguish "the rule lands" from "Quasar's
+ * value happened to coincide" — it does not today, but `getBoundingClientRect`
+ * reads the same whichever rule won, so the story has to prove there was a
+ * competitor. Same shape as MinHeightIsReal.
+ *
+ * jsdom would pass this with the rule deleted: no stylesheet, no layout.
+ * Chromium only.
+ */
+export const HeightsMatchTheDesign: Story = {
+  args: { variant: 'primary' },
+  render: (args) => ({
+    components: { NsButton },
+    setup: () => ({ args }),
+    template: `
+      <div style="display: flex; gap: 12px; align-items: flex-start; flex-wrap: wrap;">
+        <NsButton v-bind="args" size="md" data-testid="md">Continue</NsButton>
+        <NsButton v-bind="args" size="md" icon="send" data-testid="md-icon">Continue</NsButton>
+        <NsButton v-bind="args" size="lg" data-testid="lg">Continue</NsButton>
+        <NsButton v-bind="args" size="lg" icon="send" data-testid="lg-icon">Continue</NsButton>
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const el = (testId: string) =>
+      canvasElement.querySelector(`[data-testid="${testId}"]`) as HTMLElement
+    const heightOf = (testId: string) => el(testId).getBoundingClientRect().height
+
+    // The design's numbers, per the doc comment. Exact: 8 + 20 + 8 and
+    // 12 + 21 + 12 are integers, and Quasar sets min-height: 0 inline
+    // whenever `padding` is defined, so nothing else contributes.
+    await expect(heightOf('md')).toBe(36)
+    await expect(heightOf('lg')).toBe(45)
+
+    // An icon must not grow the button — the second route to 40px.
+    await expect(heightOf('md-icon')).toBe(36)
+    await expect(heightOf('lg-icon')).toBe(45)
+
+    // THE CONTROL. Put Quasar's line box back on md and the height must move
+    // — proving the scoped rule is what holds it at 36, not a coincidence.
+    const md = el('md')
+    md.style.lineHeight = '1.715em'
+    await expect(heightOf('md')).not.toBe(36)
+    md.style.lineHeight = ''
+    await expect(heightOf('md')).toBe(36)
+  },
+}
+
 export const MarketingCTA: Story = {
   render: () => ({
     components: { NsButton },

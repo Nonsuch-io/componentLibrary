@@ -173,20 +173,67 @@ const buttonPadding = computed(() => {
 }
 
 // ---- Sizes ----
+//
+// HEIGHT = padding + line box, and the line box is set HERE, not by Quasar.
+// `.q-btn` carries `line-height: 1.715em` and `.q-btn .q-icon { font-size:
+// 1.715em }`, so a 14px button had a 24px line box and an icon-bearing one a
+// 24px icon: 8 + 24 + 8 = 40 where the design has 36 (componentLibrary-4l2).
+// The design's buttons use the type ramp's line-heights, laid out to whole
+// pixels — MEASURED, expanded by id, 2026-09-14:
+//
+//   md  "Medium label"  14/600/19.6  text box 20  space-2 (8)   8+20+8  = 36
+//         65:3657 desktop footer, two instances 119.5x36
+//   lg  "Small heading" 16/600/20.8  text box 21  space-3 (12)  12+21+12 = 45
+//         185:14419 152x45 with its NsText child at y=12 h=21; 253:40942 and
+//         83:8002 mobile footers, 350x45; 265:30841 page control 37 = 8+21+8
+//
+// xs/sm (12px → 17) and xl (20px → 25) are INFERRED from the same ramp rows
+// (`label-sm` 1.4, `heading-md` 1.25); no design instance of either was found
+// in the SIGN UP section. Whole pixels rather than the ramp's ratios because
+// 14 × 1.4 = 19.6 renders 35.6 in a browser and 36 in Figma, and the design's
+// number is the one consumers are measured against.
+//
+// The icon and spinner are sized to the line box so that adding an icon never
+// changes a button's height — INFERRED: every measured button shares one
+// height per text style, but none of them contained an icon.
 .ns-btn--xs {
   font-size: 12px;
+  line-height: 17px;
+
+  :deep(.q-icon),
+  :deep(.q-spinner) {
+    font-size: 17px;
+  }
 }
 
 .ns-btn--sm {
   font-size: 12px;
+  line-height: 17px;
+
+  :deep(.q-icon),
+  :deep(.q-spinner) {
+    font-size: 17px;
+  }
 }
 
 .ns-btn--md {
   font-size: 14px;
+  line-height: 20px;
+
+  :deep(.q-icon),
+  :deep(.q-spinner) {
+    font-size: 20px;
+  }
 }
 
 .ns-btn--lg {
   font-size: 16px;
+  line-height: 21px;
+
+  :deep(.q-icon),
+  :deep(.q-spinner) {
+    font-size: 21px;
+  }
 
   :deep(.q-btn__content) {
     gap: 8px; /* Quasar 2.x internal — revisit on major Quasar bump */
@@ -195,6 +242,12 @@ const buttonPadding = computed(() => {
 
 .ns-btn--xl {
   font-size: 20px;
+  line-height: 25px;
+
+  :deep(.q-icon),
+  :deep(.q-spinner) {
+    font-size: 25px;
+  }
 
   :deep(.q-btn__content) {
     gap: 12px; /* Quasar 2.x internal — revisit on major Quasar bump */
@@ -365,6 +418,15 @@ const buttonPadding = computed(() => {
 .ns-btn--marketing-pushed {
   border-radius: 9999px;
   font-size: 1.5rem;
+  // Quasar's own value, restated so the size class's pixel line box above
+  // (declared earlier, same specificity) does not land under 24px text.
+  // Marketing is unmeasured against any design; its height is unchanged here.
+  line-height: 1.715em;
+
+  :deep(.q-icon),
+  :deep(.q-spinner) {
+    font-size: 1.715em;
+  }
 
   :deep(.q-btn__content) {
     gap: 12px;
