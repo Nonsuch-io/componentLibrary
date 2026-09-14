@@ -287,7 +287,7 @@ export const MinHeightIsReal: Story = {
  * 253:40942 and 83:8002 (350x45) — not recomputed from padding + font-size,
  * which is the mistake that produced the wrong number the first time.
  *
- * WITH AND WITHOUT AN ICON, because `.q-btn .q-icon { font-size: 1.715em }`
+ * ALL FIVE SIZES, WITH AND WITHOUT AN ICON, because `.q-btn .q-icon { font-size: 1.715em }`
  * is a second, independent route to 40px: fix the line-height alone and an
  * icon-bearing md button stays 24px tall inside. No measured design button
  * carried an icon, so "an icon does not change the height" is the library's
@@ -314,6 +314,12 @@ export const HeightsMatchTheDesign: Story = {
         <NsButton v-bind="args" size="md" icon="send" data-testid="md-icon">Continue</NsButton>
         <NsButton v-bind="args" size="lg" data-testid="lg">Continue</NsButton>
         <NsButton v-bind="args" size="lg" icon="send" data-testid="lg-icon">Continue</NsButton>
+        <NsButton v-bind="args" size="xs" data-testid="xs">Continue</NsButton>
+        <NsButton v-bind="args" size="xs" icon="send" data-testid="xs-icon">Continue</NsButton>
+        <NsButton v-bind="args" size="sm" data-testid="sm">Continue</NsButton>
+        <NsButton v-bind="args" size="sm" icon="send" data-testid="sm-icon">Continue</NsButton>
+        <NsButton v-bind="args" size="xl" data-testid="xl">Continue</NsButton>
+        <NsButton v-bind="args" size="xl" icon="send" data-testid="xl-icon">Continue</NsButton>
       </div>
     `,
   }),
@@ -331,6 +337,20 @@ export const HeightsMatchTheDesign: Story = {
     // An icon must not grow the button — the second route to 40px.
     await expect(heightOf('md-icon')).toBe(36)
     await expect(heightOf('lg-icon')).toBe(45)
+
+    // The INFERRED sizes. These numbers are not the design's — no xs/sm/xl
+    // instance was found to measure — they are the library's own claim
+    // (padding + ramp line box: 4+17+4, 8+17+8, 20+25+20), pinned so the
+    // rules cannot be deleted silently. Review deleted them and every story
+    // stayed green; that is what these six lines close. If a measurement
+    // arrives and disagrees, change the number here and in NsButton.vue
+    // together.
+    await expect(heightOf('xs')).toBe(25)
+    await expect(heightOf('xs-icon')).toBe(25)
+    await expect(heightOf('sm')).toBe(33)
+    await expect(heightOf('sm-icon')).toBe(33)
+    await expect(heightOf('xl')).toBe(65)
+    await expect(heightOf('xl-icon')).toBe(65)
 
     // THE CONTROL. Put Quasar's line box back on md and the height must move
     // — proving the scoped rule is what holds it at 36, not a coincidence.

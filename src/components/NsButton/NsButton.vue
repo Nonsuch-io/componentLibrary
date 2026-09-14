@@ -181,11 +181,18 @@ const buttonPadding = computed(() => {
 // The design's buttons use the type ramp's line-heights, laid out to whole
 // pixels — MEASURED, expanded by id, 2026-09-14:
 //
-//   md  "Medium label"  14/600/19.6  text box 20  space-2 (8)   8+20+8  = 36
-//         65:3657 desktop footer, two instances 119.5x36
 //   lg  "Small heading" 16/600/20.8  text box 21  space-3 (12)  12+21+12 = 45
-//         185:14419 152x45 with its NsText child at y=12 h=21; 253:40942 and
-//         83:8002 mobile footers, 350x45; 265:30841 page control 37 = 8+21+8
+//         185:14419 152x45 with its NsText child at y=12 h=21 — the one
+//         instance whose child geometry was read, so the only line box that
+//         is measured rather than derived; 253:40942 and 83:8002 mobile
+//         footers, 350x45
+//   md  "Medium label"  14/600/19.6  space-2 (8)                        = 36
+//         65:3657 desktop footer, two instances 119.5x36. The 20px box is
+//         DERIVED: 36 − 2 × space-2, on the same rounding lg showed.
+//
+// NOT evidence for either row: 265:30841's page control is a tertiary
+// NsButton at 143x37, a height no size here renders (md 36, lg 45). Its
+// decomposition is unmeasured; see componentLibrary-ksg.
 //
 // xs/sm (12px → 17) and xl (20px → 25) are INFERRED from the same ramp rows
 // (`label-sm` 1.4, `heading-md` 1.25); no design instance of either was found
@@ -193,9 +200,14 @@ const buttonPadding = computed(() => {
 // 14 × 1.4 = 19.6 renders 35.6 in a browser and 36 in Figma, and the design's
 // number is the one consumers are measured against.
 //
-// The icon and spinner are sized to the line box so that adding an icon never
-// changes a button's height — INFERRED: every measured button shares one
-// height per text style, but none of them contained an icon.
+// The icon is sized to the line box so that adding an icon never changes a
+// button's height — INFERRED: every measured button shares one height per
+// text style, but none of them contained an icon. The spinner rule is
+// COSMETIC, not structural: Quasar renders the loading slot in an
+// `absolute-full` overlay, so it cannot affect height either way; it is sized
+// alongside the icon so the loading state matches the icon it replaces. Note
+// `fab`/`fab-mini` icons render at this size too (the scoped rule outranks
+// Quasar's `.q-btn--fab .q-icon` 24px), consistent with the warning above.
 .ns-btn--xs {
   font-size: 12px;
   line-height: 17px;
