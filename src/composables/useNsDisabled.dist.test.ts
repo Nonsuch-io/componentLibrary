@@ -160,7 +160,61 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(16) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name), 13->14 NsBrandLogo (missing src), 14->15 NsText (unknown variant + unknown tone, one shared guard), 15->16 NsPageTitle (empty title)
+    ).toBe(17) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name), 13->14 NsBrandLogo (missing src), 14->15 NsText (unknown variant + unknown tone, one shared guard), 15->16 NsPageTitle (empty title), 16->17 NsImageUpload (bad accept rule + label-slot name drift, one shared guard)
+  })
+
+  it("warns for NsImageUpload's unmatchable accept rule from the built bundle", () => {
+    // NsImageUpload gates two warnings behind one isDev(): a malformed accept
+    // rule, and a label slot whose words differ from the label prop. The pin
+    // moved 16 -> 17 for them jointly; this and the next mount cover each.
+
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsImageUpload as Component, {
+      props: { modelValue: null, label: 'Photo', accept: 'image/' },
+    })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the NsImageUpload accept warning did not fire with `process` undefined — a ' +
+        'malformed rule would reject every file in every browser with no signal',
+    ).toContain('matches no file')
+  })
+
+  it("warns for NsImageUpload's label-slot name drift from the built bundle", () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsImageUpload as Component, {
+      props: { modelValue: null, label: 'Photo' },
+      slots: { label: 'Something else' },
+    })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the NsImageUpload label-drift warning did not fire with `process` undefined',
+    ).toContain('WCAG 2.5.3')
+  })
+
+  it('stays silent from the built bundle for a well-formed NsImageUpload', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    mount(mod.NsImageUpload as Component, {
+      props: { modelValue: null, label: 'Photo', accept: 'image/*,.heic' },
+      slots: { label: 'Photo' },
+    })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(text, 'NsImageUpload warned about a valid configuration').not.toContain(
+      '[NsImageUpload]',
+    )
   })
 
   it("warns for NsPageTitle's missing title from the built bundle", () => {
