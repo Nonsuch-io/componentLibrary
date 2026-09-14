@@ -148,6 +148,57 @@ describe('NsHoursOfOperation — the value model', () => {
   })
 })
 
+describe('NsHoursOfOperation — values the caller got wrong', () => {
+  it('renders a day named in `days` but missing from the value as open with one empty range', () => {
+    // butiq's existing BusinessHours has seven keys and no `holidays`; this
+    // is the first value the component will meet. Review reproduced a
+    // TypeError on `.ranges` of undefined here before the fix.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const partial = { monday: createNsHoursDay() } as unknown as NsHoursOfOperationValue
+    const w = mountWith({ modelValue: partial, days: ['monday', 'holidays'] })
+    expect(rowsOf(w, 'Mondays').length).toBe(1)
+    expect(rowsOf(w, 'Holidays').length).toBe(1)
+    expect(rowsOf(w, 'Holidays')[0].props('range')).toEqual({ open: null, close: null })
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn.mock.calls[0][0]).toContain('[NsHoursOfOperation] holidays')
+    warn.mockRestore()
+    w.unmount()
+  })
+
+  it("emits the filled day alongside the caller's own, untouched", async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const monday = createNsHoursDay()
+    const partial = { monday } as unknown as NsHoursOfOperationValue
+    const w = mountWith({ modelValue: partial, days: ['monday', 'holidays'] })
+    await rowsOf(w, 'Holidays')[0].vm.$emit('update:closed', true)
+    const next = lastEmitted(w)!
+    expect(next.holidays.closed).toBe(true)
+    expect(next.monday).toBe(monday)
+    warn.mockRestore()
+    w.unmount()
+  })
+
+  it('treats a null modelValue as uncontrolled — the edit is kept, not emitted and then dropped', async () => {
+    const w = mount(NsHoursOfOperation, {
+      props: { label: 'x', modelValue: null as unknown as undefined, days: ['monday'] },
+    })
+    await rowsOf(w, 'Mondays')[0].vm.$emit('update:closed', true)
+    expect(lastEmitted(w)!.monday.closed).toBe(true)
+    // Still shown after the parent does nothing with the emit.
+    expect(rowsOf(w, 'Mondays')[0].props('closed')).toBe(true)
+    w.unmount()
+  })
+
+  it('keeps the last controlled value when modelValue becomes undefined', async () => {
+    const v = createNsHoursOfOperationValue()
+    v.monday = { closed: false, ranges: [{ open: '09:00', close: '17:00' }] }
+    const w = mountWith({ modelValue: v, days: ['monday'] })
+    await w.setProps({ modelValue: undefined })
+    expect(rowsOf(w, 'Mondays')[0].props('range')).toEqual({ open: '09:00', close: '17:00' })
+    w.unmount()
+  })
+})
+
 describe('NsHoursOfOperation — no validation, by contract', () => {
   it('shows an overnight span with no error of its own', () => {
     const v = createNsHoursOfOperationValue()

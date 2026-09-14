@@ -97,6 +97,7 @@ import { useNsDisabled } from '../../composables/useNsDisabled'
 import { fill } from './fill'
 import {
   NS_HOURS_DAY_KEYS,
+  createNsHoursDay,
   createNsHoursOfOperationValue,
   createNsHoursRange,
   nsHoursTimeOptions,
@@ -149,9 +150,45 @@ const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled(
   () => props.disable,
 )
 
-/** Uncontrolled fallback so an omitted v-model still edits, and emits a full value on first change. */
+/**
+ * Uncontrolled fallback so an omitted v-model still edits, and emits a full
+ * value on first change. `== null` throughout, not `=== undefined`: a store
+ * that defaults the field to `null` is controlled-by-nothing in exactly the
+ * same way, and review found the two checks disagreeing — an edit was
+ * emitted, never written to the fallback, and reverted on the next render.
+ */
 const fallback = ref<NsHoursOfOperationValue>(createNsHoursOfOperationValue())
-const value = computed(() => props.modelValue ?? fallback.value)
+const isUncontrolled = () => props.modelValue == null
+
+// A controlled instance that becomes uncontrolled keeps the last value it was
+// given rather than snapping back to the initial default — the React
+// controlled→uncontrolled trap, closed at the boundary instead of warned about.
+watch(
+  () => props.modelValue,
+  (next, previous) => {
+    if (next == null && previous != null) fallback.value = toRaw(previous)
+  },
+)
+
+/**
+ * Every day named in `days` exists here, whatever the caller handed over.
+ * A value missing a key (butiq's existing BusinessHours has seven days and
+ * no `holidays`) would otherwise read `.ranges` of undefined in the template
+ * — a crash, where every other contract slip in this component is a quiet
+ * no-op and a dev warning. Missing days render open with one empty range and
+ * are reported by the same warning as empty ones. Untouched days keep their
+ * identity: the spread copies references, not objects.
+ */
+const value = computed<NsHoursOfOperationValue>(() => {
+  const source = props.modelValue ?? fallback.value
+  let out = source
+  for (const key of props.days) {
+    if (source[key]) continue
+    if (out === source) out = { ...source }
+    out[key] = createNsHoursDay()
+  }
+  return out
+})
 
 const resolvedOptions = computed(() => props.options ?? nsHoursTimeOptions(30, props.localeTag))
 
@@ -200,7 +237,7 @@ function rangeError(key: NsHoursDayKey, index: number): string | null {
 // ---- Mutation: always a NEW value, never a mutation of the prop ----
 
 function commit(next: NsHoursOfOperationValue) {
-  if (props.modelValue === undefined) fallback.value = next
+  if (isUncontrolled()) fallback.value = next
   emit('update:modelValue', next)
 }
 
@@ -208,10 +245,13 @@ function withDay(
   key: NsHoursDayKey,
   patch: (day: NsHoursOfOperationValue[NsHoursDayKey]) => NsHoursOfOperationValue[NsHoursDayKey],
 ): NsHoursOfOperationValue {
-  // toRaw so the untouched days go out as the consumer's own objects, not as
-  // reactive proxies of them: a consumer diffing by identity then sees
-  // exactly one day change, which is what happened.
-  const current = toRaw(value.value)
+  // Each day through toRaw, so the untouched ones go out as the consumer's
+  // own objects rather than reactive proxies of them: a consumer diffing by
+  // identity then sees exactly one day change, which is what happened. Per
+  // day, not on the whole: `value` may be a normalised copy holding proxies.
+  const current = Object.fromEntries(
+    Object.entries(value.value).map(([k, day]) => [k, toRaw(day)]),
+  ) as NsHoursOfOperationValue
   return { ...current, [key]: patch(current[key]) }
 }
 
@@ -289,15 +329,19 @@ function announce(text: string): Promise<void> {
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   let warned = false
   watch(
-    () => props.days.filter((key) => value.value[key]?.ranges.length === 0),
-    (empty) => {
-      if (warned || empty.length === 0) return
+    () => {
+      const source = props.modelValue ?? fallback.value
+      return props.days.filter((key) => !source[key] || source[key].ranges.length === 0)
+    },
+    (bad) => {
+      if (warned || bad.length === 0) return
       warned = true
       console.warn(
-        `[NsHoursOfOperation] ${empty.join(', ')}: \`ranges\` is empty. Every day must have at ` +
-          'least one range (types.ts) — the editor never produces an empty array and renders ' +
-          'no rows for one, so the user cannot add hours to this day. Start the day from ' +
-          '`createNsHoursDay()`.',
+        `[NsHoursOfOperation] ${bad.join(', ')}: missing from the value, or \`ranges\` is ` +
+          'empty. Every day named in `days` must be present with at least one range ' +
+          '(types.ts). A missing day is shown as open with one empty range; an empty one ' +
+          'renders no rows, so the user cannot add hours to it. Start days from ' +
+          '`createNsHoursDay()` and the whole value from `createNsHoursOfOperationValue()`.',
       )
     },
     { immediate: true },

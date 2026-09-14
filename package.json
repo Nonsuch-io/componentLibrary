@@ -63,7 +63,7 @@
   },
   "size-limit": [
     {
-      "name": "full library (gzip) \u2014 a SOFT ceiling. 31 kB as of 2026-09-14: NsHoursOfOperation (componentLibrary-f6b) was +3.2 kB, the largest single addition to date \u2014 a compound input of eight days \u00d7 (two selects, a checkbox, add and remove buttons) with its own live region and focus choreography; ~2.1 kB of it is the per-range row template, whose remove button appears twice so CSS can place it per breakpoint. Measured before bumping: its dependencies alone (NsSelect, NsCheckbox, NsButton, en-CA) are 4.17 kB, so the component's own code is ~3 kB. Previously 27 kB as of 2026-09-12 (NsImageUpload +1.8 kB across two review passes; the dev warnings are ~3.3 kB in total and only dual conditional exports reclaims them \u2014 see componentLibrary-49m). RE-SET rather than drift: when a bump is needed, write the reason here.",
+      "name": "full library (gzip) \u2014 a SOFT ceiling. 31 kB as of 2026-09-14: NsHoursOfOperation (componentLibrary-f6b) took it 26.78 \u2192 30.16, the largest single addition to date \u2014 a compound input of eight days \u00d7 (two selects, a checkbox, add and remove buttons) with its own live region and focus choreography; ~2 kB of it is the per-range row template, whose remove button appears twice so CSS can place it per breakpoint. Measured before bumping, gzip with vue/quasar/phosphor ignored: `{ NsHoursOfOperation }` = 7.16 kB; `{ NsSelect, NsCheckbox, NsButton }` = 3.42 kB; the same plus `nsLocaleEnCA` (which the component pulls through useNsLocale's default) = 4.16 kB. So the component's own code is ~3.0 kB counting the locale as a dependency, ~3.7 kB not. Previously 27 kB as of 2026-09-12 (NsImageUpload +1.8 kB across two review passes; the dev warnings are ~3.3 kB in total and only dual conditional exports reclaims them \u2014 see componentLibrary-49m). RE-SET rather than drift: when a bump is needed, write the reason here.",
       "path": "dist/nonsuch-components.js",
       "import": "*",
       "limit": "31 kB",
@@ -111,7 +111,7 @@
       ]
     },
     {
-      "name": "app shell (heaviest import; 11 kB as of 2026-09-14 \u2014 the en-CA `hours` strings for NsHoursOfOperation cost every locale consumer 122 B; contains NsInput and NsNavSidebar. Includes the en-CA locale object \u2014 a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
+      "name": "app shell (heaviest import; 11 kB as of 2026-09-14 \u2014 the en-CA `hours` strings for NsHoursOfOperation cost every locale consumer 200 B, measured 10.67 \u2192 10.87 on this row against main d207a2c (an earlier draft said 122, which was the overage, not the delta); contains NsInput and NsNavSidebar. Includes the en-CA locale object \u2014 a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsAppShell }",
       "limit": "11 kB",
@@ -129,7 +129,7 @@
       "gzip": true
     },
     {
-      "name": "styles (gzip) \u2014 ALSO A SOFT CEILING, 7.5 kB as of 2026-09-14 (NsHoursOfOperation +350 B: a mobile stack and a desktop grid with per-breakpoint remove-button placement). Was 7 kB as of 2026-09-12 (NsImageUpload +363 B). Same rule as the JS row: re-set with a reason, never drift.",
+      "name": "styles (gzip) \u2014 ALSO A SOFT CEILING, 7.5 kB as of 2026-09-14 (NsHoursOfOperation: 6.76 \u2192 7.33, +570 B \u2014 a mobile stack, a desktop grid, per-breakpoint remove-button placement, and after review a tighter mobile select for two-digit times and a growable actions track for French). Was 7 kB as of 2026-09-12 (NsImageUpload +363 B). Same rule as the JS row: re-set with a reason, never drift.",
       "path": "dist/nonsuch-components.css",
       "limit": "7.5 kB",
       "gzip": true

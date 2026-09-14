@@ -34,7 +34,10 @@
           @update:model-value="update('open', $event)"
         >
           <template #selected>
-            <span :class="{ 'ns-hours-row__placeholder': range.open === null }">
+            <span
+              class="ns-hours-row__value"
+              :class="{ 'ns-hours-row__placeholder': range.open === null }"
+            >
               {{ labelFor(range.open) }}
             </span>
           </template>
@@ -55,7 +58,10 @@
           @update:model-value="update('close', $event)"
         >
           <template #selected>
-            <span :class="{ 'ns-hours-row__placeholder': range.close === null }">
+            <span
+              class="ns-hours-row__value"
+              :class="{ 'ns-hours-row__placeholder': range.close === null }"
+            >
               {{ labelFor(range.close) }}
             </span>
           </template>
@@ -73,7 +79,7 @@
         :disable="disable"
         @click="$emit('remove')"
       >
-        <PhX :size="ICON_SIZE" weight="regular" />
+        <PhX :size="REMOVE_ICON_SIZE" weight="regular" />
       </NsButton>
     </div>
 
@@ -89,7 +95,7 @@
         :disable="disable"
         @click="$emit('remove')"
       >
-        <PhX :size="ICON_SIZE" weight="regular" />
+        <PhX :size="REMOVE_ICON_SIZE" weight="regular" />
       </NsButton>
 
       <!--
@@ -155,11 +161,18 @@ import { fill } from './fill'
 import type { NsHoursRange } from './types'
 
 /**
- * 20px, the line box of a 14px button (componentLibrary-4l2); NsButton's own
- * icon rule sizes a `.q-icon`, but a Phosphor SVG in the default slot is not
- * one, so the size is given here.
+ * Phosphor SVGs in a button's default slot are not `.q-icon`s, so NsButton's
+ * per-size icon rule (componentLibrary-4l2) does not reach them and the size
+ * is given here. Add Hours is md/lg — a 20px icon sits inside either line box
+ * (20 / 21). The X is `sm` icon-only with a 16px icon: an icon-only button
+ * has no text, so its content is the SVG and it renders 8 + 16 + 8 = 32 —
+ * the design's 32 exactly (2440:260552), with no new button size. MEASURED
+ * in Chromium; an earlier comment reasoned "33" from the 17px line box, and
+ * review measured 36 when the X carried the 20px icon. An icon-only button
+ * is as tall as its icon plus padding, whatever the line box says.
  */
 const ICON_SIZE = 20
+const REMOVE_ICON_SIZE = 16
 
 const props = withDefaults(
   defineProps<{
@@ -253,6 +266,9 @@ defineExpose({ focusOpen, focusAdd })
   &__day {
     display: block;
     min-height: 21px; // the 95x21 NsText; keeps the first row's rhythm when the label wraps
+    // 95 is the design's column and not every label fits it: "Wednesdays" in
+    // Fixel is 96 and bleeds 1px into the gap; French names wrap to two lines
+    // inside the 50px row. Both measured in review, both invisible in use.
 
     // Mobile drops the label column after the first row (2440:260515 has no
     // NsText at all); desktop keeps it as an empty cell for alignment.
@@ -266,6 +282,21 @@ defineExpose({ focusOpen, focusAdd })
     align-items: center;
     gap: var(--ns-space-4); // 16 on mobile (2440:260526), 20 on desktop below
     min-width: 0;
+
+    // DELIBERATE DEVIATION on mobile rows that carry the inline X. The design
+    // (2440:260515) gives those selects 108px, and 108 minus Quasar's 16px
+    // side padding and the arrow leaves ~52px for the value — narrower than
+    // "11:30 p.m.", the widest label en-CA produces. Measured in review: two
+    // lines inside the 50px control. An 8px gap and 8px side padding give
+    // the value ~74px. The first row (no X, 132px selects) keeps the design's
+    // 16 / 16.
+    .ns-hours-row:not(.ns-hours-row--first) > & {
+      gap: var(--ns-space-2);
+
+      :deep(.q-field__control) {
+        padding: 0 var(--ns-space-2);
+      }
+    }
   }
 
   &__select {
@@ -280,6 +311,9 @@ defineExpose({ focusOpen, focusAdd })
       height: 50px;
       min-height: 50px;
     }
+    :deep(.q-field__control) {
+      padding: 0 var(--ns-space-4); // the design's selector: px 16 (6283:19919)
+    }
     :deep(.q-field__native) {
       min-height: 0;
     }
@@ -289,22 +323,33 @@ defineExpose({ focusOpen, focusAdd })
     color: var(--ns-color-text-tertiary);
   }
 
+  // A time is one line or it is wrong. Review measured "11:30 p.m." wrapping
+  // to two lines inside a 50px control on the mobile row that carries an X;
+  // nowrap makes an overflow a measurable overflow instead of a quiet stack.
+  &__value {
+    white-space: nowrap;
+  }
+
   &__to {
     flex: 0 0 auto;
     color: var(--ns-color-text-secondary);
   }
 
   &__actions {
-    display: flex;
+    // Mobile: the actions row exists on the LAST row of a day only (Closed +
+    // Add on a single row, Add on the bottom of a split day). A middle row's
+    // actions div holds only the desktop X, which is hidden here — an earlier
+    // `:empty` rule missed it (a hidden child is not empty) and review
+    // measured a phantom 8px gap under every middle row. The design's empty
+    // 44px "Field Row" on those variants is the variant system holding frame
+    // heights and is deliberately not reproduced (componentLibrary-f6b).
+    display: none;
+    flex-wrap: wrap; // French "Ajouter des heures" does not fit beside Closed in 310px
     align-items: center;
     gap: var(--ns-space-5);
 
-    // Nothing to show on the first-of-multiple row on mobile, and an empty
-    // flex row still takes the gap — collapse it. (The design keeps a 44px
-    // empty "Field Row" there; that is the variant system holding frame
-    // heights, deliberately not reproduced. componentLibrary-f6b.)
-    &:empty {
-      display: none;
+    .ns-hours-row--last > & {
+      display: flex;
     }
   }
 
@@ -335,8 +380,17 @@ defineExpose({ focusOpen, focusAdd })
 @media (min-width: 1024px) {
   .ns-hours-row {
     display: grid;
-    grid-template-columns: 95px minmax(0, 1fr) 263px;
-    gap: var(--ns-space-6);
+    // 263 is the design's actions column, and it is EXACTLY Closed (118) +
+    // 20 + Add Hours (125) in en-CA — zero slack. `max-content` lets the
+    // track grow for a longer language (fr-CA's "Ajouter des heures" is 179
+    // wide; review measured it 54px past the row at a fixed 263) and the
+    // times cell, which is the flexible one, gives the space up.
+    grid-template-columns: 95px minmax(0, 1fr) minmax(263px, max-content);
+    column-gap: var(--ns-space-6);
+    // The error row: INFERRED, the design has no error state for this row.
+    // 8 rather than the column gap's 24, which is what a `gap` shorthand
+    // would have given it (review measured the message 24px under the field).
+    row-gap: var(--ns-space-2);
     align-items: center;
     min-height: 50px;
 
@@ -351,6 +405,15 @@ defineExpose({ focusOpen, focusAdd })
 
     &__times {
       gap: 20px; // 2440:260517: selects at 0 and 279, "to" 14 wide at 245
+
+      // Same selector as the mobile deviation above, so it wins here.
+      .ns-hours-row:not(.ns-hours-row--first) > & {
+        gap: 20px;
+
+        :deep(.q-field__control) {
+          padding: 0 var(--ns-space-4);
+        }
+      }
     }
 
     &__remove--inline {
@@ -361,6 +424,9 @@ defineExpose({ focusOpen, focusAdd })
     }
 
     &__actions {
+      display: flex;
+      flex-wrap: nowrap;
+
       // Bottom row: X at 0, Add Hours at 138 of 263 (2440:260551) — the
       // space between is what justify gives, not a fixed gap.
       .ns-hours-row--last:not(.ns-hours-row--single) > & {
