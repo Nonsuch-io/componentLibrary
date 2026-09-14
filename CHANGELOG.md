@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.38.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.38.0...v0.38.1) (2026-09-14)
+
+
+### Bug Fixes
+
+* **button:** render the design's 36px md and 45px lg (componentLibrary-4l2) ([d207a2c](https://github.com/Nonsuch-io/componentLibrary/commit/d207a2ced4deff479318b0e6f9d45a655aa03942))
+* **tokens:** match body-md, caption and overline-md to the measured design (componentLibrary-3mg) ([cf6d3a1](https://github.com/Nonsuch-io/componentLibrary/commit/cf6d3a10b2396fae19c94a976cc22f9ef6b3f482))
+
 ## [0.38.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.37.0...v0.38.0) (2026-09-14)
 
 
