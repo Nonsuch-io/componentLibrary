@@ -41,6 +41,42 @@ export interface NsLocaleMessages {
     sale: string
   }
 
+  /**
+   * NsHoursOfOperation. Strings with `{name}` placeholders are filled by the
+   * component (`{day}`, `{index}`, `{count}`); every other string is literal.
+   * Day names are PLURAL because the design labels rows "Mondays", meaning
+   * every Monday — a weekly schedule, not a date.
+   */
+  hours: {
+    dayMonday: string
+    dayTuesday: string
+    dayWednesday: string
+    dayThursday: string
+    dayFriday: string
+    daySaturday: string
+    daySunday: string
+    dayHolidays: string
+    /** Placeholder shown in an unpicked time select. */
+    select: string
+    /** The word between the two times of a range. */
+    to: string
+    /** Accessible name of the open-time select: "Opens, Mondays, hours 1 of 2". */
+    opens: string
+    closes: string
+    /** Group name of one range: "{day}, hours {index} of {count}". */
+    range: string
+    /** Checkbox label. */
+    closed: string
+    /** Visible text of the add button, and its accessible name with the day. */
+    addHours: string
+    addHoursFor: string
+    /** Accessible name of the remove (X) button: "Remove hours {index} of {count} for {day}". */
+    removeHours: string
+    /** Live-region announcements after add and remove. */
+    hoursAdded: string
+    hoursRemoved: string
+  }
+
   /** Media/image viewer strings */
   media: {
     zoomIn: string

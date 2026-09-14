@@ -93,6 +93,23 @@ export type { NsTooltipProps, NsTooltipAnchor } from './components/NsTooltip/NsT
 
 export { default as NsImageUpload } from './components/NsImageUpload/NsImageUpload.vue'
 export type { NsImageUploadProps } from './components/NsImageUpload/NsImageUpload.vue'
+export { default as NsHoursOfOperation } from './components/NsHoursOfOperation/NsHoursOfOperation.vue'
+export type { NsHoursOfOperationProps } from './components/NsHoursOfOperation/NsHoursOfOperation.vue'
+export {
+  NS_HOURS_DAY_KEYS,
+  createNsHoursDay,
+  createNsHoursOfOperationValue,
+  createNsHoursRange,
+  nsHoursTimeOptions,
+} from './components/NsHoursOfOperation/types'
+export type {
+  NsHoursDay,
+  NsHoursDayKey,
+  NsHoursOfOperationErrors,
+  NsHoursOfOperationValue,
+  NsHoursRange,
+  NsHoursTimeOption,
+} from './components/NsHoursOfOperation/types'
 
 export { default as NsFormSection } from './components/NsFormSection/NsFormSection.vue'
 export type { NsFormSectionProps } from './components/NsFormSection/NsFormSection.vue'

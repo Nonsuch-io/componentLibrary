@@ -160,7 +160,7 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       guards,
       'dev-warning guard count changed. If you added or removed a warning, update ' +
         'this number. If you did not, one has been tree-shaken out of dist/.',
-    ).toBe(17) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name), 13->14 NsBrandLogo (missing src), 14->15 NsText (unknown variant + unknown tone, one shared guard), 15->16 NsPageTitle (empty title), 16->17 NsImageUpload (bad accept rule + label-slot name drift, one shared guard)
+    ).toBe(18) // 5->6 07u, 6->7 whr, 7->8 b5e, 8->9 057 (icon-only), 9->10 057 (dialog), 10->11 057 (image alt), 11->13 NsBrandLogo (sizing + link name), 13->14 NsBrandLogo (missing src), 14->15 NsText (unknown variant + unknown tone, one shared guard), 15->16 NsPageTitle (empty title), 16->17 NsImageUpload (bad accept rule + label-slot name drift, one shared guard), 17->18 NsHoursOfOperation (a day with empty ranges)
   })
 
   it("warns for NsImageUpload's unmatchable accept rule from the built bundle", () => {
@@ -199,6 +199,27 @@ describe.skipIf(!built)('dev warnings survive the build and fire in a browser', 
       text,
       'the NsImageUpload label-drift warning did not fire with `process` undefined',
     ).toContain('WCAG 2.5.3')
+  })
+
+  it('warns for an NsHoursOfOperation day with no ranges from the built bundle', () => {
+    // The 17 -> 18 pin. Fail-open like the others: `process` undefined must
+    // still warn, because that is what a browser without a bundler define is.
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.stubGlobal('process', undefined)
+    const value = (mod.createNsHoursOfOperationValue as () => Record<string, unknown>)()
+    value.tuesday = { closed: false, ranges: [] }
+    mount(mod.NsHoursOfOperation as Component, {
+      props: { label: 'Hours', modelValue: value },
+    })
+    vi.unstubAllGlobals()
+    const text = warn.mock.calls.flat().join(' ')
+    warn.mockRestore()
+
+    expect(
+      text,
+      'the empty-ranges warning did not fire with `process` undefined — a day the ' +
+        'user cannot add hours to would render silently',
+    ).toContain('[NsHoursOfOperation] tuesday')
   })
 
   it('stays silent from the built bundle for a well-formed NsImageUpload', () => {

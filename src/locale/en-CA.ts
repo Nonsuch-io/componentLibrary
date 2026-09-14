@@ -30,6 +30,28 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     sale: 'Sale',
   },
 
+  hours: {
+    dayMonday: 'Mondays',
+    dayTuesday: 'Tuesdays',
+    dayWednesday: 'Wednesdays',
+    dayThursday: 'Thursdays',
+    dayFriday: 'Fridays',
+    daySaturday: 'Saturdays',
+    daySunday: 'Sundays',
+    dayHolidays: 'Holidays',
+    select: 'Select',
+    to: 'to',
+    opens: 'Opens, {day}, hours {index} of {count}',
+    closes: 'Closes, {day}, hours {index} of {count}',
+    range: '{day}, hours {index} of {count}',
+    closed: 'Closed',
+    addHours: 'Add Hours',
+    addHoursFor: 'Add hours for {day}',
+    removeHours: 'Remove hours {index} of {count} for {day}',
+    hoursAdded: 'Hours added for {day}, {index} of {count}',
+    hoursRemoved: 'Hours removed for {day}, {count} remaining',
+  },
+
   media: {
     zoomIn: 'Zoom in',
     zoomOut: 'Zoom out',
