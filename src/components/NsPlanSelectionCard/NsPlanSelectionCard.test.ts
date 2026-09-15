@@ -23,8 +23,10 @@ describe('NsPlanSelectionCard', () => {
         .find('h3')
         .exists(),
     ).toBe(true)
+    // Out of range at runtime (a JS caller); the union is the type's job.
+    const level = 9 as unknown as 6
     expect(
-      mount(NsPlanSelectionCard, { props: { title: 'T', level: 9 } })
+      mount(NsPlanSelectionCard, { props: { title: 'T', level } })
         .find('h6')
         .exists(),
     ).toBe(true)
