@@ -1,10 +1,10 @@
 <template>
   <span
     class="ns-step-number"
-    :class="[`ns-step-number--${size}`, `ns-step-number--${state}`]"
+    :class="[`ns-step-number--${size}`, `ns-step-number--${variant}`]"
     aria-hidden="true"
   >
-    <PhCheck v-if="state === 'complete'" :size="checkSize" weight="regular" />
+    <PhCheck v-if="variant === 'check'" :size="checkSize" weight="regular" />
     <template v-else>{{ number }}</template>
   </span>
 </template>
@@ -15,28 +15,30 @@
  * 2440:237126 Not Completed, 2440:237128 Complete/Check, 2440:237127 the
  * 20px Not Completed): a circle that says where a step stands.
  *
- *   complete  brand fill, white check (20px icon in the 28 circle)
- *   current   brand fill, white number — the design calls this "Completed"
- *   upcoming  surface fill, brand border, brand number
+ *   check     brand fill, white check (20px icon in the 28 circle)
+ *   filled    brand fill, white number — the design calls this "Completed"
+ *   outlined  surface fill, brand border, brand number
+ *
+ * Named for what they LOOK like, not what they mean: the stepper uses
+ * filled for its current step and the checklist uses it for a done task,
+ * and a variant called "current" on a done task read backwards (review).
+ * Meaning is the parent's to say — in text, or with aria-current.
  *
  * Two sizes, measured: 28 (the stepper; 14/600 number) and 20 (the
- * checklist banner; 12/600 number). DECORATION, `aria-hidden` always: the
- * number is the position in an <ol> and the state is what the parent says
- * in text or with aria-current. Used by NsOnboardingStepper and
- * NsChecklistBanner.
+ * checklist banner; 12/600 number). DECORATION, `aria-hidden` always.
  */
 import { computed } from 'vue'
 import { PhCheck } from '@phosphor-icons/vue'
 
-export type NsStepNumberState = 'complete' | 'current' | 'upcoming'
+export type NsStepNumberVariant = 'check' | 'filled' | 'outlined'
 
 export interface NsStepNumberProps {
   number: number | string
-  state?: NsStepNumberState
+  variant?: NsStepNumberVariant
   size?: 20 | 28
 }
 
-const props = withDefaults(defineProps<NsStepNumberProps>(), { state: 'upcoming', size: 28 })
+const props = withDefaults(defineProps<NsStepNumberProps>(), { variant: 'outlined', size: 28 })
 
 // The 28 circle carries a 20px check (2440:237134); the 20 circle a 14.
 const checkSize = computed(() => (props.size === 28 ? 20 : 14))
@@ -67,13 +69,13 @@ const checkSize = computed(() => (props.size === 28 ? 20 : 14))
     font-size: 0.75rem;
   }
 
-  &--upcoming {
+  &--outlined {
     background: var(--ns-color-bg-surface);
     color: var(--ns-color-text-brand);
   }
 
-  &--current,
-  &--complete {
+  &--filled,
+  &--check {
     background: var(--ns-color-bg-primary);
     color: var(--ns-color-text-on-brand);
   }

@@ -77,7 +77,7 @@
           <NsStepNumber
             class="ns-checklist-banner__step"
             :number="index + 1"
-            :state="task.complete ? 'current' : 'upcoming'"
+            :variant="task.complete ? 'filled' : 'outlined'"
             :size="20"
           />
           <p :id="`${listId}-${task.id}-text`" class="ns-checklist-banner__task-text ns-body-md">
@@ -347,8 +347,7 @@ const badgeText = computed(() => {
 
   // The step circle is NsStepNumber at 20 (2440:237127 for Not Completed);
   // a complete task shows the brand-filled NUMBER rather than the check —
-  // INFERRED from the 28px "Completed" variant (2440:237124), as before,
-  // now expressed as the component's `current` state.
+  // INFERRED from the 28px "Completed" variant (2440:237124).
 
   &__task-text {
     flex: 1 1 auto;

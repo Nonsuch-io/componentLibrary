@@ -78,6 +78,16 @@ export const PartlyComplete: Story = {
   args: {
     tasks: shopSetUp.map((t, i) => ({ ...t, complete: i < 2 })),
   },
+  play: async ({ canvasElement }) => {
+    // The complete fill is INFERRED from the design's 28px variant and was
+    // unpinned: a brand fill with a white number, an outlined brand number
+    // for the rest.
+    const circles = canvasElement.querySelectorAll<HTMLElement>('.ns-checklist-banner__step')
+    await expect(getComputedStyle(circles[0]).backgroundColor).toBe('rgb(213, 99, 7)')
+    await expect(getComputedStyle(circles[0]).color).toBe('rgb(255, 255, 255)')
+    await expect(getComputedStyle(circles[2]).backgroundColor).toBe('rgb(255, 255, 255)')
+    await expect(getComputedStyle(circles[2]).color).toBe('rgb(213, 99, 7)')
+  },
 }
 
 export const AllComplete: Story = {

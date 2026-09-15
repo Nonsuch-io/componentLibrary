@@ -1,6 +1,12 @@
 <template>
   <nav class="ns-onboarding-stepper" :aria-label="label ?? locale.stepper.progress">
-    <ol class="ns-onboarding-stepper__steps">
+    <!--
+      role="list" restated: WebKit drops list semantics from a list-style:
+      none <ol>, and "2 of 6" is the whole point of a stepper. Same rule and
+      the same lint exception as NsChecklistBanner.
+    -->
+    <!-- eslint-disable-next-line vuejs-accessibility/no-redundant-roles -->
+    <ol class="ns-onboarding-stepper__steps" role="list">
       <li
         v-for="(step, index) in resolved"
         :key="step.id"
@@ -8,7 +14,7 @@
         :class="`ns-onboarding-stepper__step--${step.state}`"
         :aria-current="step.state === 'current' ? 'step' : undefined"
       >
-        <NsStepNumber :number="index + 1" :state="step.state" :size="28" />
+        <NsStepNumber :number="index + 1" :variant="VARIANT[step.state]" :size="28" />
         <span class="ns-onboarding-stepper__label" :class="labelClass(step.state)">
           {{ step.label }}
           <span v-if="step.state === 'complete'" class="ns-onboarding-stepper__sr">
@@ -50,7 +56,7 @@
  * step's label.
  */
 import { computed } from 'vue'
-import NsStepNumber, { type NsStepNumberState } from '../NsStepNumber/NsStepNumber.vue'
+import NsStepNumber, { type NsStepNumberVariant } from '../NsStepNumber/NsStepNumber.vue'
 import { useNsLocale } from '../../composables/useNsLocale'
 
 export interface NsOnboardingStep {
@@ -75,18 +81,24 @@ const props = withDefaults(defineProps<NsOnboardingStepperProps>(), {
 
 const locale = useNsLocale()
 
+type StepState = 'complete' | 'current' | 'upcoming'
+const VARIANT: Record<StepState, NsStepNumberVariant> = {
+  complete: 'check',
+  current: 'filled',
+  upcoming: 'outlined',
+}
+
 const resolved = computed(() => {
   const currentIndex = props.steps.findIndex((s) => s.id === props.current)
   return props.steps.map((step, index) => {
-    let state: NsStepNumberState = 'upcoming'
+    let state: StepState = 'upcoming'
     if (index === currentIndex) state = 'current'
     else if (step.complete ?? (currentIndex >= 0 && index < currentIndex)) state = 'complete'
     return { ...step, state }
   })
 })
 
-const labelClass = (state: NsStepNumberState) =>
-  state === 'current' ? 'ns-label-sm' : 'ns-body-sm'
+const labelClass = (state: StepState) => (state === 'current' ? 'ns-label-sm' : 'ns-body-sm')
 </script>
 
 <style lang="scss" scoped>
@@ -124,13 +136,31 @@ const labelClass = (state: NsStepNumberState) =>
     // differed by label width (measured 1px apart in review of this file's
     // own story). With auto, the leftover is shared on top of each step's
     // content, which is the design's equal `flex: 1 0 0` line frames.
+    // No `min-width: 0`: below the content's natural width the row now
+    // OVERFLOWS rather than letting labels paint over the next circle
+    // (review measured labels 10px into the neighbour with ten steps at
+    // 700). The minimum width is the sum of circles, labels and 8px gaps;
+    // a consumer narrower than that at desktop wants fewer steps or the
+    // mobile shape.
     & + & {
       flex: 1 1 auto;
-      min-width: 0;
     }
   }
 
+  // Mobile first (2440:379011): circles and lines only; the labels stay in
+  // the DOM for assistive technology. Desktop un-hides them at the same
+  // `min-width: 1024px` every other block and useNsIsDesktop use — a
+  // `max-width: 1023px` twin leaves a fractional viewport (zoomed browsers)
+  // matching neither.
   &__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    border: 0;
     white-space: nowrap;
   }
 
@@ -147,18 +177,14 @@ const labelClass = (state: NsStepNumberState) =>
   }
 }
 
-// Mobile (2440:379011): circles and lines only. The labels stay for
-// assistive technology.
-@media (max-width: 1023px) {
+@media (min-width: 1024px) {
   .ns-onboarding-stepper__label {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    border: 0;
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
   }
 }
 </style>

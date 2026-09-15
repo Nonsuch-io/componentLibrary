@@ -627,7 +627,7 @@ NEWLY_DISCOVERED_EXCEPTIONS.push(
     belowLarge: false,
     ratios: { light: 3.7386 },
     bead: 'componentLibrary-7jc',
-    note: '.ns-step-number--upcoming (NsStepNumber, in NsChecklistBanner and NsOnboardingStepper) — #d56307 on #ffffff, 3.74:1. aria-hidden decoration.',
+    note: '.ns-step-number--outlined (NsStepNumber, in NsChecklistBanner and NsOnboardingStepper) — #d56307 on #ffffff, 3.74:1. aria-hidden decoration.',
   },
   {
     fg: '--ns-color-text-on-brand',
@@ -636,7 +636,7 @@ NEWLY_DISCOVERED_EXCEPTIONS.push(
     belowLarge: false,
     ratios: { light: 3.7386, darkRoot: 3.7386, darkMedia: 3.7386 },
     bead: 'componentLibrary-7jc',
-    note: '.ns-step-number--current / --complete (NsStepNumber) — white on #d56307, 3.74:1 in every block, the primary-button pair under another token name. aria-hidden decoration.',
+    note: '.ns-step-number--filled / --check (NsStepNumber) — white on #d56307, 3.74:1 in every block, the primary-button pair under another token name. aria-hidden decoration.',
   },
 )
 

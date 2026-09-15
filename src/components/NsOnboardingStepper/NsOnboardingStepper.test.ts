@@ -22,8 +22,12 @@ const steps = [
 const mountWith = (props: Record<string, unknown> = {}) =>
   mount(NsOnboardingStepper, { props: { steps, current: 'address', ...props } })
 
+/** The circle's variant is the state's appearance: complete → check, current → filled, upcoming → outlined. */
+const APPEARANCE = { check: 'complete', filled: 'current', outlined: 'upcoming' } as const
 const statesOf = (w: ReturnType<typeof mountWith>) =>
-  w.findAllComponents(NsStepNumber).map((c) => c.props('state'))
+  w
+    .findAllComponents(NsStepNumber)
+    .map((c) => APPEARANCE[c.props('variant') as keyof typeof APPEARANCE])
 
 describe('NsOnboardingStepper — state from the step graph', () => {
   it('marks steps before the current complete, the current current, the rest upcoming', () => {
@@ -70,6 +74,9 @@ describe('NsOnboardingStepper — what a screen reader is told', () => {
     const w = mountWith()
     expect(w.element.tagName).toBe('NAV')
     expect(w.attributes('aria-label')).toBe('Progress')
+    // role="list" restated for WebKit, which drops list semantics from a
+    // list-style: none <ol> — and "2 of 6" is the point of a stepper.
+    expect(w.find('ol').attributes('role')).toBe('list')
     const items = w.findAll('ol > li')
     expect(items.length).toBe(4)
     expect(items.map((li) => li.attributes('aria-current'))).toEqual([
@@ -115,23 +122,23 @@ describe('NsOnboardingStepper — what a screen reader is told', () => {
 })
 
 describe('NsStepNumber', () => {
-  it('shows a check when complete and the number otherwise, always aria-hidden', () => {
-    const complete = mount(NsStepNumber, { props: { number: 3, state: 'complete' } })
-    expect(complete.find('svg').exists()).toBe(true)
-    expect(complete.text()).toBe('')
-    expect(complete.attributes('aria-hidden')).toBe('true')
-    for (const state of ['current', 'upcoming'] as const) {
-      const w = mount(NsStepNumber, { props: { number: 3, state } })
+  it('shows a check for the check variant and the number otherwise, always aria-hidden', () => {
+    const check = mount(NsStepNumber, { props: { number: 3, variant: 'check' } })
+    expect(check.find('svg').exists()).toBe(true)
+    expect(check.text()).toBe('')
+    expect(check.attributes('aria-hidden')).toBe('true')
+    for (const variant of ['filled', 'outlined'] as const) {
+      const w = mount(NsStepNumber, { props: { number: 3, variant } })
       expect(w.find('svg').exists()).toBe(false)
       expect(w.text()).toBe('3')
-      expect(w.classes()).toContain(`ns-step-number--${state}`)
+      expect(w.classes()).toContain(`ns-step-number--${variant}`)
     }
   })
 
-  it('defaults to the 28 size and upcoming state', () => {
+  it('defaults to the 28 size and the outlined variant', () => {
     const w = mount(NsStepNumber, { props: { number: 1 } })
     expect(w.classes()).toContain('ns-step-number--28')
-    expect(w.classes()).toContain('ns-step-number--upcoming')
+    expect(w.classes()).toContain('ns-step-number--outlined')
     expect(mount(NsStepNumber, { props: { number: 1, size: 20 } }).classes()).toContain(
       'ns-step-number--20',
     )

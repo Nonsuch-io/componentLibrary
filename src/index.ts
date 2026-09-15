@@ -111,7 +111,7 @@ export type { NsPlanFeaturesProps } from './components/NsPlanFeatures/NsPlanFeat
 export { default as NsStepNumber } from './components/NsStepNumber/NsStepNumber.vue'
 export type {
   NsStepNumberProps,
-  NsStepNumberState,
+  NsStepNumberVariant,
 } from './components/NsStepNumber/NsStepNumber.vue'
 export { default as NsOnboardingStepper } from './components/NsOnboardingStepper/NsOnboardingStepper.vue'
 export type {

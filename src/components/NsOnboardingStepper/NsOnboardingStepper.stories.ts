@@ -70,7 +70,17 @@ export const LayoutIsRealOnDesktop: Story = {
       await expect(circle.getBoundingClientRect().height).toBe(28)
     }
 
-    // Labels: visible, 12px; only the current one is bold.
+    // Labels: visible, 8px from their circle, 12px; only the current one is
+    // bold; the "(Completed)" suffix is for screen readers only. Review
+    // deleted the gap and the suffix's hiding and this story stayed green.
+    for (const step of steps) {
+      const circle = step.querySelector('.ns-step-number')!.getBoundingClientRect()
+      const label = step.querySelector('.ns-onboarding-stepper__label')!.getBoundingClientRect()
+      await expect(label.left - circle.right).toBe(8)
+    }
+    for (const sr of canvasElement.querySelectorAll<HTMLElement>('.ns-onboarding-stepper__sr')) {
+      await expect(sr.getBoundingClientRect().width).toBeLessThanOrEqual(1)
+    }
     const weights = steps.map(
       (s) => getComputedStyle(s.querySelector('.ns-onboarding-stepper__label')!).fontWeight,
     )
@@ -124,10 +134,14 @@ export const LayoutIsRealOnMobile: Story = {
     const circles = [...canvasElement.querySelectorAll<HTMLElement>('.ns-step-number')]
     await expect(circles[0].getBoundingClientRect().left).toBe(list.getBoundingClientRect().left)
     await expect(circles[5].getBoundingClientRect().right).toBe(list.getBoundingClientRect().right)
-    // The circle-to-circle pitch is even.
-    const lefts = circles.map((c) => c.getBoundingClientRect().left)
-    const pitch = lefts[1] - lefts[0]
-    for (let i = 2; i < lefts.length; i++)
-      await expect(Math.abs(lefts[i] - lefts[i - 1] - pitch)).toBeLessThan(1)
+    // Circle to circle is 8 + the line + 8, the same line every time — the
+    // decomposition, so a lost gap cannot hide inside an even pitch.
+    const second = canvasElement.querySelectorAll('.ns-onboarding-stepper__step')[1]
+    const lineWidth = parseFloat(getComputedStyle(second, '::before').width)
+    for (let i = 1; i < circles.length; i++) {
+      const gap =
+        circles[i].getBoundingClientRect().left - circles[i - 1].getBoundingClientRect().right
+      await expect(Math.abs(gap - (8 + lineWidth + 8))).toBeLessThan(0.1)
+    }
   },
 }
