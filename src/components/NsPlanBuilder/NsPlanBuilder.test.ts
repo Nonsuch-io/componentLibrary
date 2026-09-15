@@ -193,7 +193,7 @@ describe('NsPlanBuilder — what a screen reader is told', () => {
     // At level 3 the ladder used to be h3 / h3 / h4 — "Choose Add-Ons" and
     // the add-on card were fixed (componentLibrary-lrw.6.4).
     const tags = (level: number) => {
-      const w = mountWith({ level: level as 2 })
+      const w = mountWith({ level }) // mountWith takes unknowns; the clamp is the guard here
       const out = [
         w.find('.ns-plan-selection-card__title').element.tagName,
         w.find('.ns-plan-builder__add-ons-title').element.tagName,
