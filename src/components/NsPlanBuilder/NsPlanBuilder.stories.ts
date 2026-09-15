@@ -108,21 +108,25 @@ export const ConsumerOwnedTotal: Story = {
 }
 
 /**
- * DESKTOP GEOMETRY IS REAL — 170:6802 at 910 (870 inside NsChooseACombo's
- * card, so the builder itself is rendered at 870): the base banner 61 tall
- * on a brand surface, the total 91 on accent, both surfaces with NO role,
- * the tabs 36, the action md right-aligned.
+ * DESKTOP GEOMETRY IS REAL — 170:6802 at 910, the builder's own root being
+ * the selection card with 870 inside: the base banner 61 tall on a brand
+ * surface, the total 91 on accent, both surfaces with NO role, the tabs 36,
+ * the action md right-aligned.
  */
 export const LayoutIsRealOnDesktop: Story = {
   render: (args) => ({
     components: { NsPlanBuilder },
     setup: () => ({ args }),
-    template: `<div style="width: 870px"><NsPlanBuilder v-bind="args" /></div>`,
+    template: `<div style="width: 910px"><NsPlanBuilder v-bind="args" /></div>`,
   }),
   play: async ({ canvasElement }) => {
     await fontsReady()
     await expect(window.innerWidth).toBeGreaterThanOrEqual(1024)
-    const root = canvasElement.querySelector('.ns-plan-builder') as HTMLElement
+    const card = canvasElement.querySelector('.ns-plan-builder') as HTMLElement
+    await expect(card.getBoundingClientRect().width).toBe(910)
+    await expect(card.classList.contains('ns-plan-selection-card')).toBe(true)
+    // Everything below measures the 870 inside the card's 20px inset.
+    const root = card
     const base = root.querySelector('.ns-plan-builder__base') as HTMLElement
     const total = root.querySelector('.ns-plan-builder__total') as HTMLElement
 
@@ -160,7 +164,7 @@ export const LayoutIsRealOnDesktop: Story = {
 
     const action = root.querySelector('.ns-plan-builder__action') as HTMLElement
     await expect(action.getBoundingClientRect().height).toBe(36)
-    await expect(action.getBoundingClientRect().right).toBe(root.getBoundingClientRect().right)
+    await expect(action.getBoundingClientRect().right).toBe(root.getBoundingClientRect().right - 20)
     await expect(action.getBoundingClientRect().width).toBeLessThan(300)
 
     // An option row: details | price | button on one line, 42 tall inside.
@@ -181,7 +185,7 @@ export const LayoutIsRealOnMobile: Story = {
   render: (args) => ({
     components: { NsPlanBuilder },
     setup: () => ({ args }),
-    template: `<div style="width: 310px"><NsPlanBuilder v-bind="args" /></div>`,
+    template: `<div style="width: 350px"><NsPlanBuilder v-bind="args" /></div>`,
   }),
   play: async ({ canvasElement }) => {
     await fontsReady()

@@ -1,9 +1,12 @@
 <template>
-  <section class="ns-plan-builder" :aria-labelledby="titleId">
-    <component :is="headingTag" :id="titleId" class="ns-plan-builder__title ns-heading-md-regular">
-      {{ title }}
-    </component>
-
+  <NsPlanSelectionCard :title="title" :level="level" class="ns-plan-builder">
+    <!--
+      The design's root IS the selection card (170:6802's NsCard, 910 wide
+      with 870 inside) — the same card "Option 2" sits in. The builder
+      renders in it rather than leaving the card to the consumer, so both
+      options line up. (This comment sits INSIDE the root: one before it
+      would make the template a fragment.)
+    -->
     <!-- The base plan: a brand surface (NsBannerbutiqBase, 2361:191348). -->
     <NsBanner type="brand" class="ns-plan-builder__base">
       <div class="ns-plan-builder__base-row">
@@ -57,7 +60,7 @@
 
     <!-- The total: an accent surface (NsBannerPlanTotal, 2361:191733). -->
     <NsBanner type="accent" class="ns-plan-builder__total">
-      <div class="ns-plan-builder__total-row">
+      <div :id="totalId" class="ns-plan-builder__total-row">
         <div class="ns-plan-builder__total-heading">
           <span class="ns-plan-builder__total-label ns-overline">{{ locale.plan.total }}</span>
           <span class="ns-plan-builder__total-price">
@@ -76,13 +79,13 @@
         variant="primary"
         :size="buttonSize"
         class="ns-plan-builder__action"
-        :aria-describedby="titleId"
+        :aria-describedby="actionDescribedBy"
         @click="$emit('select')"
       >
         {{ actionLabel }}
       </NsButton>
     </div>
-  </section>
+  </NsPlanSelectionCard>
 </template>
 
 <script setup lang="ts">
@@ -104,7 +107,8 @@
  * Which category is shown is a v-model (`category`) with an uncontrolled
  * fallback to the first.
  *
- * MEASURED: base banner 61 desktop / 53 mobile (name 24/600 → 16/600, price
+ * `level` is the card title's heading level (2 by default). MEASURED: base
+ * banner 61 desktop / 53 mobile (name 24/600 → 16/600, price
  * 24/600 → 16/600, period 16 → 14, note 20/600 → 16/600); total banner 91
  * at both ("Your Total" overline small, XL price, 16/400 period; the note
  * 16/600 to the right on desktop); tabs 217x36 (dense, icons); action md
@@ -116,6 +120,7 @@ import { computed, ref, toRaw, useId, watch } from 'vue'
 import NsBanner from '../NsBanner/NsBanner.vue'
 import NsButton from '../NsButton/NsButton.vue'
 import NsSeparator from '../NsSeparator/NsSeparator.vue'
+import NsPlanSelectionCard from '../NsPlanSelectionCard/NsPlanSelectionCard.vue'
 import NsTabs from '../NsTabs/NsTabs.vue'
 import NsTab from '../NsTab/NsTab.vue'
 import NsPlanAddOn from './NsPlanAddOn.vue'
@@ -140,7 +145,7 @@ export interface NsPlanBuilderProps {
   addOnsLabel?: string
   /** "Continue With This Plan"; omitted → no button. */
   actionLabel?: string
-  /** Heading level of the title. 2 by default; clamped 1–6. */
+  /** Heading level of the card's title. 2 by default; clamped 1–6 by the card. */
   level?: 1 | 2 | 3 | 4 | 5 | 6
 }
 
@@ -159,15 +164,14 @@ const emit = defineEmits<{
 }>()
 
 const locale = useNsLocale()
-const titleId = useId()
 const panelId = useId()
+// The action is described by the TOTAL rather than the card's title: with
+// two selection cards on a page, "Continue With This Plan" next to "$114
+// /mo" is the description that tells them apart.
+const totalId = useId()
+const actionDescribedBy = totalId
 const isDesktop = useNsIsDesktop()
 const buttonSize = computed<'md' | 'lg'>(() => (isDesktop.value ? 'md' : 'lg'))
-
-const headingTag = computed(() => {
-  const level = Number.isFinite(props.level) ? Math.round(props.level) : 2
-  return `h${Math.min(6, Math.max(1, level))}`
-})
 
 const fallbackCategory = ref<string | undefined>(props.categories[0]?.id)
 watch(
@@ -199,12 +203,6 @@ function setCategory(id: unknown) {
 
 <style lang="scss" scoped>
 .ns-plan-builder {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ns-space-3);
-  color: var(--ns-color-text-primary);
-
-  &__title,
   &__add-ons-title,
   &__total-note {
     margin: 0;
