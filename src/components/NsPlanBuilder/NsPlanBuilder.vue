@@ -128,7 +128,12 @@ export interface NsPlanBuilderProps {
   title: string
   base: NsPlanBase
   categories: readonly NsPlanAddOnCategory[]
-  /** v-model:category — the active category's id. Omitted → the first, toggling on its own. */
+  /**
+   * v-model:category — the active category's id. Omitted → the first,
+   * toggling on its own. An id not in `categories` shows the first WITHOUT
+   * emitting — the model is yours to fix; healing it from here would be an
+   * unsolicited write that can loop with a parent that normalises.
+   */
   category?: string
   total: NsPlanTotal
   /** "Choose Add-Ons"; from the locale by default. */

@@ -146,6 +146,17 @@ describe('NsPlanBuilder — categories', () => {
     w.unmount()
   })
 
+  it('selects the first tab once categories arrive after an empty mount', async () => {
+    // The async-load path: the fallback was seeded from an empty list, so
+    // the tabs used to be bound to `undefined` when categories came in.
+    const w = mountWith({ categories: [] })
+    expect(w.findComponent(NsPlanAddOn).exists()).toBe(false)
+    await w.setProps({ categories: categories() })
+    expect(w.findComponent({ name: 'QTabs' }).props('modelValue')).toBe('inventory')
+    expect(w.findComponent(NsPlanAddOn).props('category')).toMatchObject({ id: 'inventory' })
+    w.unmount()
+  })
+
   it('renders no tabs for a single category, and no card for none', () => {
     const one = mountWith({ categories: [categories()[0]] })
     expect(one.findAllComponents(NsTab).length).toBe(0)
