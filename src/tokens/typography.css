@@ -23,11 +23,14 @@
 }
 
 .ns-overline {
-  font-size: 0.625rem;
+  /* Design "Overline label small": 12px / 500 / 18px, letter-spacing 0,
+     measured on I170:7391;6260:11177 — NsCombo's "Best for" line
+     (componentLibrary-lrw.5). Was 10px / 1.6 / 0.08em, unmeasured; the
+     small overline had no node until this component needed it. */
+  font-size: 0.75rem;
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 
 .ns-body-sm {

@@ -98,6 +98,12 @@ export interface NsLocaleMessages {
     dismissTask: string
   }
 
+  /** NsCombo / NsPlanBuilder: accessible names of the plan's lists. */
+  plan: {
+    highlights: string
+    features: string
+  }
+
   /** Media/image viewer strings */
   media: {
     zoomIn: string

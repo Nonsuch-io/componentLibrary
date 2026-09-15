@@ -86,21 +86,12 @@
  * The design's instance sits inside an NsFormSection whose title is the
  * visible heading, and this component must not render a second one.
  */
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  ref,
-  toRaw,
-  useId,
-  watch,
-  type ComponentPublicInstance,
-} from 'vue'
+import { computed, nextTick, ref, toRaw, useId, watch, type ComponentPublicInstance } from 'vue'
 
 import NsHoursRow from './NsHoursRow.vue'
 import { useNsLocale } from '../../composables/useNsLocale'
 import { useNsDisabled } from '../../composables/useNsDisabled'
+import { useNsIsDesktop } from '../../composables/useNsIsDesktop'
 import { fill } from '../../locale/fill'
 import {
   NS_HOURS_DAY_KEYS,
@@ -214,26 +205,11 @@ const resolvedOptions = computed(() => props.options ?? nsHoursTimeOptions(30, p
 
 /**
  * md on desktop, lg on mobile — the footer's pairing, decided here because
- * the rows are ours. Read from the SAME media query the stylesheet switches
- * on, so the button size and the layout cannot disagree; `$q.screen` was
- * tried first and lagged the viewport in the story runner (measured: md
- * rendered inside a 320px iframe), which is a disagreement of exactly that
- * kind. Desktop until mounted — the shape a server render should carry —
- * then whatever the query says.
+ * the rows are ours. useNsIsDesktop reads the SAME media query the
+ * stylesheet switches on (the reasoning, and the `$q.screen` lag it
+ * replaced, are in the composable).
  */
-const DESKTOP_QUERY = '(min-width: 1024px)'
-const isDesktop = ref(true)
-let mediaQuery: MediaQueryList | null = null
-const onMediaChange = (e: MediaQueryListEvent | MediaQueryList) => {
-  isDesktop.value = e.matches
-}
-onMounted(() => {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return
-  mediaQuery = window.matchMedia(DESKTOP_QUERY)
-  onMediaChange(mediaQuery)
-  mediaQuery.addEventListener('change', onMediaChange)
-})
-onBeforeUnmount(() => mediaQuery?.removeEventListener('change', onMediaChange))
+const isDesktop = useNsIsDesktop()
 const addSize = computed<'md' | 'lg'>(() => (isDesktop.value ? 'md' : 'lg'))
 
 /** `hours.dayMonday` etc. — flat keys, because locale sections are one level deep by convention. */
