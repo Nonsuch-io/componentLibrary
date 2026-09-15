@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.42.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.41.0...v0.42.0) (2026-09-15)
+
+
+### Features
+
+* **stepper:** add NsOnboardingStepper and NsStepNumber (componentLibrary-lrw.6.1) ([3bc7452](https://github.com/Nonsuch-io/componentLibrary/commit/3bc7452e3e29f15d2245d1e5185bf5dddd73b5ab))
+
 ## [0.41.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.40.0...v0.41.0) (2026-09-15)
 
 
