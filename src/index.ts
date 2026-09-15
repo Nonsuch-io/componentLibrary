@@ -100,6 +100,14 @@ export type {
   NsChecklistBannerProps,
   NsChecklistTask,
 } from './components/NsChecklistBanner/NsChecklistBanner.vue'
+export { default as NsCombo } from './components/NsCombo/NsCombo.vue'
+export type { NsComboProps } from './components/NsCombo/NsCombo.vue'
+export { default as NsPlanHeader } from './components/NsPlanHeader/NsPlanHeader.vue'
+export type { NsPlanHeaderProps } from './components/NsPlanHeader/NsPlanHeader.vue'
+export { default as NsPlanHighlights } from './components/NsPlanHighlights/NsPlanHighlights.vue'
+export type { NsPlanHighlightsProps } from './components/NsPlanHighlights/NsPlanHighlights.vue'
+export { default as NsPlanFeatures } from './components/NsPlanFeatures/NsPlanFeatures.vue'
+export type { NsPlanFeaturesProps } from './components/NsPlanFeatures/NsPlanFeatures.vue'
 export {
   NS_HOURS_DAY_KEYS,
   createNsHoursDay,

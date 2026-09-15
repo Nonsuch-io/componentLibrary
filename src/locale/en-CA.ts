@@ -64,6 +64,11 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     dismissTask: 'Dismiss: {title}',
   },
 
+  plan: {
+    highlights: 'Included modules',
+    features: 'Included features',
+  },
+
   media: {
     zoomIn: 'Zoom in',
     zoomOut: 'Zoom out',

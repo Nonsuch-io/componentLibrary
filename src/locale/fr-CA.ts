@@ -61,6 +61,11 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     dismissTask: 'Ignorer : {title}',
   },
 
+  plan: {
+    highlights: 'Modules inclus',
+    features: 'Fonctionnalités incluses',
+  },
+
   media: {
     zoomIn: 'Agrandir',
     zoomOut: 'Réduire',

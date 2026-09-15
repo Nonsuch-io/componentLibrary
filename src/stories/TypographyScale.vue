@@ -48,7 +48,7 @@ import { KNOWN_VARIANTS } from '../components/NsText/variants'
 
 const DETAILS: Record<string, { sample: string; props: string }> = {
   caption: { sample: 'Caption text', props: '12px · regular · lh 1.33' },
-  overline: { sample: 'Overline label', props: '10px · medium · uppercase · ls 0.08em' },
+  overline: { sample: 'Overline label', props: '12px · medium · uppercase · lh 1.5' },
   'overline-lg': { sample: 'Large overline', props: '28px · regular · uppercase · lh 1.1' },
   'overline-md': { sample: 'Medium overline', props: '14px · medium · uppercase · lh 1.29' },
   'overline-md-bold': { sample: 'Medium overline', props: '14px · bold · uppercase · lh 1.29' },
