@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect, fn, userEvent } from 'storybook/test'
 import NsCombo from './NsCombo.vue'
-import NsCard from '../NsCard/NsCard.vue'
+import NsPlanSelectionCard from '../NsPlanSelectionCard/NsPlanSelectionCard.vue'
 
 /** The design's instance (I170:7391 / 178:9614), word for word. */
 const brickAndMortar = {
@@ -37,16 +37,21 @@ export const DisplayOnly: Story = {
   args: { price: undefined, period: undefined, actionLabel: undefined },
 }
 
-/** Placed as the design does (NsChooseACombo 170:7387): under a heading, in a surface card. */
+/**
+ * Placed as the design does: NsChooseACombo (170:7387) is NsPlanSelectionCard
+ * with this inside it — a composition, not a component. The measured version
+ * of that composition, with its pins, is Components/NsPlanSelectionCard →
+ * ChooseACombo; an earlier version of this story hand-rolled the card with
+ * NsCard and an inline heading, which was the wrong chrome and no landmark.
+ */
 export const InsideChooseACombo: Story = {
   render: (args) => ({
-    components: { NsCombo, NsCard },
+    components: { NsCombo, NsPlanSelectionCard },
     setup: () => ({ args }),
     template: `
-      <NsCard flat style="max-width: 910px">
-        <h2 class="ns-heading-md-regular" style="margin: 0 0 12px">Option 2: Choose a Combo</h2>
+      <NsPlanSelectionCard title="Option 2: Choose a Combo" style="max-width: 910px">
         <NsCombo v-bind="args" />
-      </NsCard>
+      </NsPlanSelectionCard>
     `,
   }),
 }
