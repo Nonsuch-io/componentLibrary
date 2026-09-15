@@ -4,6 +4,19 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.43.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.42.0...v0.43.0) (2026-09-15)
+
+
+### Features
+
+* **plan:** add NsPlanBuilder, and brand/accent surface tones on NsBanner (componentLibrary-lrw.6.2) ([dfad862](https://github.com/Nonsuch-io/componentLibrary/commit/dfad862de6b1f779ac1818100b3073f4ba88812b))
+* **plan:** add NsPlanBuilder, and brand/accent surface tones on NsBanner (componentLibrary-lrw.6.2) ([70df1e2](https://github.com/Nonsuch-io/componentLibrary/commit/70df1e2910edf42d46f244ada9a4ac082d761337))
+
+
+### Bug Fixes
+
+* **plan:** bind the tabs to the resolved category; drop an inert guard (componentLibrary-lrw.6.2) ([bb4f236](https://github.com/Nonsuch-io/componentLibrary/commit/bb4f236a4dfe0d40672f039cd2c0ff5796c6965a))
+
 ## [0.42.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.41.0...v0.42.0) (2026-09-15)
 
 
