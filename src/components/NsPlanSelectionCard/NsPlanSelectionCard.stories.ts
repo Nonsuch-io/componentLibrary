@@ -50,7 +50,7 @@ export const ChooseACombo: Story = {
   }),
   play: async ({ canvasElement }) => {
     await fontsReady()
-    if (window.innerWidth < 1024) return
+    await expect(window.innerWidth).toBeGreaterThanOrEqual(1024) // an early return would pass vacuously
     const card = canvasElement.querySelector('.ns-plan-selection-card') as HTMLElement
     const rect = card.getBoundingClientRect()
     await expect(rect.width).toBe(910)

@@ -206,6 +206,15 @@ describe('NsPlanBuilder — what a screen reader is told', () => {
     )
     // The tab points at the panel it controls.
     expect(w.findComponent(NsTab).attributes('aria-controls')).toBe(card.attributes('id'))
+    // The action is described by the TOTAL, not the card's title — two cards
+    // on a page each say "Continue With This Plan" and the price is what
+    // tells them apart. Review deleted the attribute, then left it dangling,
+    // and unit + Chromium + axe stayed green both times: axe files a missing
+    // target as "incomplete", not a violation.
+    const action = w.find('.ns-plan-builder__action')
+    const totalRow = w.find('.ns-plan-builder__total-row')
+    expect(totalRow.attributes('id')).toBeTruthy()
+    expect(action.attributes('aria-describedby')).toBe(totalRow.attributes('id'))
     w.unmount()
   })
 
