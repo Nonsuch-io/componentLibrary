@@ -45,10 +45,20 @@ import { computed, watchEffect } from 'vue'
 
 declare const process: { env: { NODE_ENV?: string } } | undefined
 
-export type NsBannerType = 'info' | 'positive' | 'warning' | 'negative'
+/**
+ * `info` | `positive` | `warning` | `negative` are MESSAGES: a status or
+ * alert with the role and aria-live to match. `brand` | `accent` are
+ * SURFACES: a tinted panel for content that is not a message — the plan
+ * builder's base-plan and total panels (componentLibrary-lrw.6.2), which the
+ * design draws as frames it names "NsBanner" without a shared variant. They
+ * carry NO role and NO aria-live: a running total announced on every add
+ * would be noise, and a consumer who wants it announced adds the attribute.
+ * They pad 16 all round (the design's), where messages keep QBanner's 8/16.
+ */
+export type NsBannerType = 'info' | 'positive' | 'warning' | 'negative' | 'brand' | 'accent'
 
 export interface NsBannerProps {
-  /** Semantic type controlling the banner colour */
+  /** Semantic type controlling the banner colour — and, for the four message types, its role. */
   type?: NsBannerType
   /** Use dense (compact) layout */
   dense?: boolean
@@ -68,7 +78,15 @@ const props = withDefaults(defineProps<NsBannerProps>(), {
  * stays scoped to exactly these two types rather than broadening with the
  * vocabulary change.
  */
-const NS_BANNER_TYPES: readonly NsBannerType[] = ['info', 'positive', 'warning', 'negative']
+const NS_BANNER_TYPES: readonly NsBannerType[] = [
+  'info',
+  'positive',
+  'warning',
+  'negative',
+  'brand',
+  'accent',
+]
+const SURFACE_TYPES: readonly NsBannerType[] = ['brand', 'accent']
 
 /**
  * Warn on ANY value outside the union — not just the renamed ones.
@@ -100,12 +118,14 @@ watchEffect(() => {
   )
 })
 
-const ariaRole = computed(() =>
-  props.type === 'negative' || props.type === 'warning' ? 'alert' : 'status',
-)
-const ariaLive = computed(() =>
-  props.type === 'negative' || props.type === 'warning' ? 'assertive' : 'polite',
-)
+const ariaRole = computed(() => {
+  if (SURFACE_TYPES.includes(props.type)) return undefined
+  return props.type === 'negative' || props.type === 'warning' ? 'alert' : 'status'
+})
+const ariaLive = computed(() => {
+  if (SURFACE_TYPES.includes(props.type)) return undefined
+  return props.type === 'negative' || props.type === 'warning' ? 'assertive' : 'polite'
+})
 </script>
 
 <style lang="sass" scoped>
@@ -142,4 +162,26 @@ const ariaLive = computed(() =>
   &--negative
     background-color: var(--ns-color-bg-negative, #fedee0)
     color: var(--ns-color-text-on-bg-negative, #2d0b00)
+
+  // SURFACES, not messages. Measured on NsPlanBuilder 170:6802 (2026-09-15):
+  // brand = bg-app-header with a 1px primary-subtle border (the base-plan
+  // panel, 2361:191348); accent = bg-accent, no border (the total panel,
+  // 2361:191733). Both 16px all round and radius 8 — the design's radius-sm,
+  // the library's --ns-radius-md (componentLibrary-56l). The padding is set
+  // on the QBanner root, which is where Quasar's 8px/16px lives.
+  &--brand,
+  &--accent
+    padding: var(--ns-space-4)
+    border-radius: var(--ns-radius-md)
+    min-height: 0 // QBanner's 54px floor; the mobile base panel is 52.8 by design
+  &--brand
+    // 15 + the 1px border = the design's 16 inset (Figma's stroke takes no
+    // layout space); measured 62.8 against the design's 61 at 16.
+    padding: calc(var(--ns-space-4) - 1px)
+    background-color: var(--ns-color-bg-app-header, #fdf4e7)
+    color: var(--ns-color-text-primary, #2d0b00)
+    border: 1px solid var(--ns-color-border-primary-subtle, #fce5d2)
+  &--accent
+    background-color: var(--ns-color-bg-accent, #b8e4fa)
+    color: var(--ns-color-text-on-accent, #2d0b00)
 </style>

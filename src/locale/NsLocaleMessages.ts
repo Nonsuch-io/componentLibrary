@@ -104,10 +104,18 @@ export interface NsLocaleMessages {
     completed: string
   }
 
-  /** NsCombo / NsPlanBuilder: accessible names of the plan's lists. */
+  /** NsCombo / NsPlanBuilder: accessible names of the plan's lists, and the builder's labels. */
   plan: {
     highlights: string
     features: string
+    /** The add-ons section's heading. */
+    chooseAddOns: string
+    /** The total panel's overline. */
+    total: string
+    /** Per-option buttons and the added badge. */
+    add: string
+    remove: string
+    added: string
   }
 
   /** Media/image viewer strings */

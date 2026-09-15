@@ -640,6 +640,25 @@ NEWLY_DISCOVERED_EXCEPTIONS.push(
   },
 )
 
+// --- componentLibrary-lrw.6.2: NsBanner's accent SURFACE tone, 2026-09-15 ---
+// The design pairs color-bg-accent (#b8e4fa) with color-text-on-accent
+// (#2d0b00) on NsPlanBuilder's total panel (2361:191733): 10.7:1 in light.
+// In DARK the token file flips --ns-color-bg-accent to a solid #0069b4 and
+// leaves --ns-color-text-on-accent at #2d0b00 — the same "one side of a pair
+// flips" class as the 2p1 status-token entries, and the same 3.17 the accent
+// button already carries under 7jc. Dark mode is scoped WIP and consumers
+// force light; documented, not recoloured. Caught by this check on the
+// commit that added the tone.
+NEWLY_DISCOVERED_EXCEPTIONS.push({
+  fg: '--ns-color-text-on-accent',
+  bg: '--ns-color-bg-accent',
+  blocks: ['darkRoot', 'darkMedia'],
+  belowLarge: false,
+  ratios: { darkRoot: 3.1737, darkMedia: 3.1737 },
+  bead: 'componentLibrary-2p1',
+  note: ".ns-banner--accent (NsBanner surface tone), dark — #2d0b00 on #0069b4, 3.17:1. Light is 10.7:1, the design's pair.",
+})
+
 const ALL_EXCEPTIONS = [...KNOWN_EXCEPTIONS, ...NEWLY_DISCOVERED_EXCEPTIONS]
 
 function findException(

@@ -69,6 +69,11 @@ export const nsLocaleFrCA: NsLocaleMessages = {
   plan: {
     highlights: 'Modules inclus',
     features: 'Fonctionnalités incluses',
+    chooseAddOns: 'Choisir des options',
+    total: 'Votre total',
+    add: 'Ajouter',
+    remove: 'Retirer',
+    added: 'Ajoutée',
   },
 
   media: {
