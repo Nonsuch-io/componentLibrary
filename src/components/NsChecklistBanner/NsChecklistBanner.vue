@@ -74,7 +74,12 @@
       >
         <div class="ns-checklist-banner__task-main">
           <!-- The number is decoration: the list is ordered and the state is read out in text. -->
-          <span class="ns-checklist-banner__step" aria-hidden="true">{{ index + 1 }}</span>
+          <NsStepNumber
+            class="ns-checklist-banner__step"
+            :number="index + 1"
+            :variant="task.complete ? 'filled' : 'outlined'"
+            :size="20"
+          />
           <p :id="`${listId}-${task.id}-text`" class="ns-checklist-banner__task-text ns-body-md">
             <span class="ns-checklist-banner__sr">
               {{ task.complete ? locale.checklist.complete : locale.checklist.notComplete }},
@@ -161,6 +166,7 @@ import { computed, ref, useId, watch } from 'vue'
 import { PhCaretDown, PhCaretUp, PhCheckCircle, PhWarningCircle } from '@phosphor-icons/vue'
 import NsBadge from '../NsBadge/NsBadge.vue'
 import NsButton from '../NsButton/NsButton.vue'
+import NsStepNumber from '../NsStepNumber/NsStepNumber.vue'
 import { useNsLocale } from '../../composables/useNsLocale'
 import { fill } from '../../locale/fill'
 
@@ -339,30 +345,9 @@ const badgeText = computed(() => {
     min-width: 0;
   }
 
-  // NsStepNumber, 20px, Not Completed (2440:237127): surface with a brand
-  // border and a brand 12/600 number. Completed is INFERRED from the 28px
-  // variant (2440:237124): brand fill, white number.
-  &__step {
-    display: inline-flex;
-    flex: 0 0 auto;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    width: 20px;
-    height: 20px;
-    border: 1px solid var(--ns-color-border-primary);
-    border-radius: var(--ns-radius-full);
-    background: var(--ns-color-bg-surface);
-    color: var(--ns-color-text-brand);
-    font-size: 0.75rem;
-    font-weight: 600;
-    line-height: 1;
-
-    .ns-checklist-banner__task--complete & {
-      background: var(--ns-color-bg-primary);
-      color: var(--ns-color-text-on-brand);
-    }
-  }
+  // The step circle is NsStepNumber at 20 (2440:237127 for Not Completed);
+  // a complete task shows the brand-filled NUMBER rather than the check —
+  // INFERRED from the 28px "Completed" variant (2440:237124).
 
   &__task-text {
     flex: 1 1 auto;

@@ -108,6 +108,16 @@ export { default as NsPlanHighlights } from './components/NsPlanHighlights/NsPla
 export type { NsPlanHighlightsProps } from './components/NsPlanHighlights/NsPlanHighlights.vue'
 export { default as NsPlanFeatures } from './components/NsPlanFeatures/NsPlanFeatures.vue'
 export type { NsPlanFeaturesProps } from './components/NsPlanFeatures/NsPlanFeatures.vue'
+export { default as NsStepNumber } from './components/NsStepNumber/NsStepNumber.vue'
+export type {
+  NsStepNumberProps,
+  NsStepNumberVariant,
+} from './components/NsStepNumber/NsStepNumber.vue'
+export { default as NsOnboardingStepper } from './components/NsOnboardingStepper/NsOnboardingStepper.vue'
+export type {
+  NsOnboardingStep,
+  NsOnboardingStepperProps,
+} from './components/NsOnboardingStepper/NsOnboardingStepper.vue'
 export {
   NS_HOURS_DAY_KEYS,
   createNsHoursDay,

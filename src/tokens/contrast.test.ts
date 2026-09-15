@@ -606,7 +606,7 @@ NEWLY_DISCOVERED_EXCEPTIONS.push({
     'documented rather than blocked.',
 })
 
-// --- componentLibrary-lrw.4: NsChecklistBanner's step number, 2026-09-14 ---
+// --- componentLibrary-lrw.4 / lrw.6: NsStepNumber, 2026-09-14 ---
 // The design's NsStepNumber (2440:237127 "Not Completed": brand number on a
 // surface circle; 2440:237124 "Completed": white number on brand) — both the
 // brand orange against white, 3.74:1, the same root cause as every 7jc button
@@ -627,7 +627,7 @@ NEWLY_DISCOVERED_EXCEPTIONS.push(
     belowLarge: false,
     ratios: { light: 3.7386 },
     bead: 'componentLibrary-7jc',
-    note: '.ns-checklist-banner__step (not complete) — #d56307 on #ffffff, 3.74:1. aria-hidden decoration.',
+    note: '.ns-step-number--outlined (NsStepNumber, in NsChecklistBanner and NsOnboardingStepper) — #d56307 on #ffffff, 3.74:1. aria-hidden decoration.',
   },
   {
     fg: '--ns-color-text-on-brand',
@@ -636,7 +636,7 @@ NEWLY_DISCOVERED_EXCEPTIONS.push(
     belowLarge: false,
     ratios: { light: 3.7386, darkRoot: 3.7386, darkMedia: 3.7386 },
     bead: 'componentLibrary-7jc',
-    note: '.ns-checklist-banner__task--complete .ns-checklist-banner__step — white on #d56307, 3.74:1 in every block, the primary-button pair under another token name. aria-hidden decoration.',
+    note: '.ns-step-number--filled / --check (NsStepNumber) — white on #d56307, 3.74:1 in every block, the primary-button pair under another token name. aria-hidden decoration.',
   },
 )
 

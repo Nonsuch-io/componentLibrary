@@ -111,10 +111,10 @@
       ]
     },
     {
-      "name": "app shell (heaviest import; 11 kB as of 2026-09-14 — the en-CA `hours` strings for NsHoursOfOperation cost every locale consumer 200 B, measured 10.67 → 10.87 on this row against main d207a2c (an earlier draft said 122, which was the overage, not the delta); contains NsInput and NsNavSidebar. Includes the en-CA locale object — a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
+      "name": "app shell (heaviest import; 11.25 kB as of 2026-09-15 — the en-CA `stepper` and `plan` strings took it 10.99 → 11.01, over the 11 kB line by 10 B; every locale section lands here because the shell pulls en-CA. Before that, 11 kB as of 2026-09-14 — the en-CA `hours` strings for NsHoursOfOperation cost every locale consumer 200 B, measured 10.67 → 10.87 on this row against main d207a2c (an earlier draft said 122, which was the overage, not the delta); contains NsInput and NsNavSidebar. Includes the en-CA locale object — a ONE-TIME 440 B for the first useNsLocale() consumer in this chunk, ~0 for the next)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsAppShell }",
-      "limit": "11 kB",
+      "limit": "11.25 kB",
       "gzip": true,
       "ignore": [
         "vue",
