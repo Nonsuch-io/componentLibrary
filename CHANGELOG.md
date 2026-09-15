@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.44.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.43.0...v0.44.0) (2026-09-15)
+
+
+### Features
+
+* **plan:** add NsPlanSelectionCard; NsChooseACombo is it around NsCombo (componentLibrary-lrw.6.3) ([c840ceb](https://github.com/Nonsuch-io/componentLibrary/commit/c840ceb44c48b62977e99dd119f183ac023b2211))
+
 ## [0.43.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.42.0...v0.43.0) (2026-09-15)
 
 
