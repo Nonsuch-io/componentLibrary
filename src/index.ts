@@ -108,6 +108,14 @@ export { default as NsPlanHighlights } from './components/NsPlanHighlights/NsPla
 export type { NsPlanHighlightsProps } from './components/NsPlanHighlights/NsPlanHighlights.vue'
 export { default as NsPlanFeatures } from './components/NsPlanFeatures/NsPlanFeatures.vue'
 export type { NsPlanFeaturesProps } from './components/NsPlanFeatures/NsPlanFeatures.vue'
+export { default as NsPlanBuilder } from './components/NsPlanBuilder/NsPlanBuilder.vue'
+export type { NsPlanBuilderProps } from './components/NsPlanBuilder/NsPlanBuilder.vue'
+export type {
+  NsPlanAddOnCategory,
+  NsPlanBase,
+  NsPlanOption,
+  NsPlanTotal,
+} from './components/NsPlanBuilder/types'
 export { default as NsStepNumber } from './components/NsStepNumber/NsStepNumber.vue'
 export type {
   NsStepNumberProps,

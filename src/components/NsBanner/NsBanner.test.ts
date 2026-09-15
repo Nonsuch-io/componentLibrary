@@ -284,8 +284,17 @@ describe('NsBanner', () => {
       // Enumerating the variant blocks also catches a stray new one, which a
       // pair of negative assertions never would.
       const style = sfcSource.slice(sfcSource.indexOf('<style'))
-      const variants = [...style.matchAll(/^\s*&--([a-z]+)/gm)].map((m) => m[1]).sort()
+      // De-duplicated: `brand` and `accent` share a grouped selector for
+      // their padding, then each has its own colour block. The two SURFACE
+      // tones (componentLibrary-lrw.6.2) are listed deliberately — the whole
+      // point of this enumeration is that a new variant cannot appear
+      // without being named here.
+      const variants = [
+        ...new Set([...style.matchAll(/^\s*&--([a-z]+)/gm)].map((m) => m[1])),
+      ].sort()
       expect(variants, `style block defines variants: ${variants.join(', ')}`).toEqual([
+        'accent',
+        'brand',
         'info',
         'negative',
         'positive',
