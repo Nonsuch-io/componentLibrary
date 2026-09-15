@@ -90,12 +90,17 @@ describe('NsChecklistBanner — structure and names', () => {
     w.unmount()
   })
 
-  it('renders no action or dismiss for a task that declares neither', () => {
+  it('renders no action or dismiss for a task that declares neither, or a blank label', () => {
     const w = mountWith()
     const third = w.findAll('ol > li')[2]
     expect(third.find('.ns-checklist-banner__task-actions').exists()).toBe(false)
     expect(third.findAllComponents(NsButton).length).toBe(0)
     w.unmount()
+
+    // '   ' would be a 36px button with no accessible name.
+    const w2 = mountWith({ tasks: [{ id: 'x', title: 'X', actionLabel: '   ' }] })
+    expect(w2.find('.ns-checklist-banner__task-actions').exists()).toBe(false)
+    w2.unmount()
   })
 
   it('lets a per-task slot replace the sentence, keeping the state prefix', () => {
@@ -163,9 +168,24 @@ describe('NsChecklistBanner — expanded', () => {
     w.unmount()
   })
 
-  it('has no toggle when not collapsible, and stays expanded', () => {
+  it('has no toggle when not collapsible, stays expanded, and KEEPS the badge', () => {
+    // The design's actions=false variant (2440:237169): badge, no toggle.
+    // A mutant that gated the tag row on `collapsible` alone passed every
+    // test until this line.
     const w = mountWith({ collapsible: false })
     expect(w.find('.ns-checklist-banner__toggle').exists()).toBe(false)
+    expect(w.find('.ns-checklist-banner__badge').exists()).toBe(true)
+    expect(hidden(w)).toBe(false)
+    w.unmount()
+  })
+
+  it('hides the empty list for zero tasks so it takes no gap, keeping its id for aria-controls', async () => {
+    const w = mountWith({ tasks: [] })
+    expect(hidden(w)).toBe(true)
+    expect(w.find('.ns-checklist-banner__toggle').attributes('aria-controls')).toBe(
+      w.find('ol').attributes('id'),
+    )
+    await w.setProps({ tasks: tasks() })
     expect(hidden(w)).toBe(false)
     w.unmount()
   })

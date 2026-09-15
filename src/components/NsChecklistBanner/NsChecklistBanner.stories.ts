@@ -84,6 +84,24 @@ export const AllComplete: Story = {
   args: { tasks: shopSetUp.map((t) => ({ ...t, complete: true })) },
 }
 
+/**
+ * ZERO TASKS takes no phantom space: no badge, no tag row without a toggle,
+ * and the empty list hidden — review measured 8 + 12px of nothing here.
+ */
+export const NoTasks: Story = {
+  args: { tasks: [], collapsible: false },
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector('.ns-checklist-banner') as HTMLElement
+    const heading = root.querySelector('.ns-checklist-banner__heading') as HTMLElement
+    const titles = root.querySelector('.ns-checklist-banner__titles') as HTMLElement
+    await expect(heading.getBoundingClientRect().height).toBe(titles.getBoundingClientRect().height)
+    // 20 = the container's bottom inset (19 + the 1px border); nothing else below the heading.
+    await expect(root.getBoundingClientRect().bottom - heading.getBoundingClientRect().bottom).toBe(
+      20,
+    )
+  },
+}
+
 /** Collapsed (248:35337): title and tag row only; the subtitle goes with the tasks. */
 export const Collapsed: Story = {
   args: { expanded: false },

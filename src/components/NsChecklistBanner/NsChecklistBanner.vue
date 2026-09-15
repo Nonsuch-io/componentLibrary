@@ -21,7 +21,9 @@
         The whole tag row goes when it would be empty (no tasks AND no
         toggle): an empty flex child still takes the heading's gap — 8px of
         nothing above the title, measured in review. Same class of bug as
-        the hours editor's phantom middle-row gap.
+        the hours editor's phantom middle-row gap — and the same rule hides
+        the empty <ol> below (12px under the heading with zero tasks; the
+        id stays in the DOM for aria-controls, as when collapsed).
       -->
       <div v-if="tasks.length > 0 || collapsible" class="ns-checklist-banner__tag">
         <NsBadge
@@ -57,7 +59,12 @@
       number leans on the list to carry the position.
     -->
     <!-- eslint-disable-next-line vuejs-accessibility/no-redundant-roles -->
-    <ol v-show="isExpanded" :id="listId" class="ns-checklist-banner__tasks" role="list">
+    <ol
+      v-show="isExpanded && tasks.length > 0"
+      :id="listId"
+      class="ns-checklist-banner__tasks"
+      role="list"
+    >
       <li
         v-for="(task, index) in tasks"
         :key="task.id"
@@ -78,9 +85,9 @@
           </p>
         </div>
 
-        <div v-if="task.actionLabel || task.dismissable" class="ns-checklist-banner__task-actions">
+        <div v-if="hasAction(task) || task.dismissable" class="ns-checklist-banner__task-actions">
           <NsButton
-            v-if="task.actionLabel"
+            v-if="hasAction(task)"
             variant="secondary"
             size="md"
             class="ns-checklist-banner__task-action"
@@ -223,6 +230,9 @@ const headingTag = computed(() => {
   const level = Number.isFinite(props.level) ? Math.round(props.level) : 2
   return `h${Math.min(6, Math.max(1, level))}`
 })
+
+/** A whitespace label would render a 36px button with no accessible name (axe: button-name). */
+const hasAction = (task: NsChecklistTask) => Boolean(task.actionLabel?.trim())
 
 const remaining = computed(() => props.tasks.filter((t) => !t.complete).length)
 
