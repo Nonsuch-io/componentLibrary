@@ -17,7 +17,13 @@
         </p>
       </div>
 
-      <div class="ns-checklist-banner__tag">
+      <!--
+        The whole tag row goes when it would be empty (no tasks AND no
+        toggle): an empty flex child still takes the heading's gap — 8px of
+        nothing above the title, measured in review. Same class of bug as
+        the hours editor's phantom middle-row gap.
+      -->
+      <div v-if="tasks.length > 0 || collapsible" class="ns-checklist-banner__tag">
         <NsBadge
           v-if="tasks.length > 0"
           class="ns-checklist-banner__badge"

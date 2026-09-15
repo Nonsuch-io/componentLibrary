@@ -124,6 +124,11 @@ describe('NsChecklistBanner — the badge', () => {
     // No tasks is not "all complete": no badge at all.
     await w.setProps({ tasks: [] })
     expect(w.find('.ns-checklist-banner__badge').exists()).toBe(false)
+    // …and with no toggle either, no tag ROW — an empty flex child would
+    // still take the heading's 8px gap (measured in review).
+    expect(w.find('.ns-checklist-banner__tag').exists()).toBe(true)
+    await w.setProps({ collapsible: false })
+    expect(w.find('.ns-checklist-banner__tag').exists()).toBe(false)
     w.unmount()
   })
 })

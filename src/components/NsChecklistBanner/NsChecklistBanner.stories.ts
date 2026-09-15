@@ -153,6 +153,10 @@ export const LayoutIsRealOnDesktop: Story = {
     // The badge is the warning tone, from the token — nothing else pins a colour.
     const badge = root.querySelector('.ns-checklist-banner__badge') as HTMLElement
     await expect(getComputedStyle(badge).backgroundColor).toBe('rgb(249, 227, 173)')
+    // The design's radius-sm is 8, the library's --ns-radius-md; the wrong
+    // token rendered 4 for a whole review round.
+    await expect(getComputedStyle(root).borderRadius).toBe('8px')
+    await expect(getComputedStyle(rows[0]).borderRadius).toBe('8px')
 
     // THE SENTENCE IS ONE INLINE RUN. An earlier version centred the <p> with
     // `display: flex`, which made the <strong> and the text a pair of flex
