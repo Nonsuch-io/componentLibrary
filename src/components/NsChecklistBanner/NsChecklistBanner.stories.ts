@@ -53,6 +53,15 @@ type Story = StoryObj<typeof meta>
 
 const fontsReady = () => document.fonts.ready
 
+/** The first text node with real content after `el` — Vue's fragment anchors are empty text nodes. */
+const textAfter = (el: Element): Text => {
+  let node = el.nextSibling
+  while (node && !(node.nodeType === Node.TEXT_NODE && /\S/.test(node.textContent ?? ''))) {
+    node = node.nextSibling
+  }
+  return node as Text
+}
+
 /** The design's `NsShopSetUpChecklistBanner` with actions (2440:237171). */
 export const Default: Story = {}
 
@@ -132,10 +141,31 @@ export const LayoutIsRealOnDesktop: Story = {
     const titles = root.querySelector('.ns-checklist-banner__titles')!.getBoundingClientRect()
     const tag = root.querySelector('.ns-checklist-banner__tag')!.getBoundingClientRect()
     await expect(tag.left).toBeGreaterThan(titles.left)
+    // The TOGGLE's centre, not the tag box's: the tag box stretches to the
+    // heading's height and would read as centred with align-items removed
+    // (a mutant review ran and the box-based assertion survived).
+    const toggle = root.querySelector('.ns-checklist-banner__toggle')!.getBoundingClientRect()
     await expect(
-      Math.abs(tag.top + tag.height / 2 - (titles.top + titles.height / 2)),
+      Math.abs(toggle.top + toggle.height / 2 - (titles.top + titles.height / 2)),
     ).toBeLessThan(1)
     await expect(tag.right - root.getBoundingClientRect().right).toBe(-20)
+
+    // The badge is the warning tone, from the token — nothing else pins a colour.
+    const badge = root.querySelector('.ns-checklist-banner__badge') as HTMLElement
+    await expect(getComputedStyle(badge).backgroundColor).toBe('rgb(249, 227, 173)')
+
+    // THE SENTENCE IS ONE INLINE RUN. An earlier version centred the <p> with
+    // `display: flex`, which made the <strong> and the text a pair of flex
+    // items: the word space disappeared on every row and a wrapping sentence
+    // became two columns. Measured in review; box sizes could not see it.
+    const strong = rows[0].querySelector('strong') as HTMLElement
+    const textNode = textAfter(strong)
+    const range = document.createRange()
+    const glyphAt = textNode.textContent!.search(/\S/)
+    range.setStart(textNode, glyphAt)
+    range.setEnd(textNode, glyphAt + 1)
+    const firstGlyph = range.getBoundingClientRect()
+    await expect(firstGlyph.left - strong.getBoundingClientRect().right).toBeGreaterThanOrEqual(3)
 
     // Actions sit at content width on the right of the row, not stretched.
     const actions = rows[0].querySelector('.ns-checklist-banner__task-actions') as HTMLElement
@@ -145,6 +175,48 @@ export const LayoutIsRealOnDesktop: Story = {
     ).toBe(-20)
     await expect(action.getBoundingClientRect().height).toBe(36)
     await expect(action.getBoundingClientRect().width).toBeLessThan(200)
+  },
+}
+
+/**
+ * A LONG SENTENCE WRAPS AS PROSE at a narrow desktop width (a 760px content
+ * column beside an app shell's navigation): the second line returns to the
+ * paragraph's left edge, and the row grows past 58 rather than clipping.
+ */
+export const LongTaskWrapsInline: Story = {
+  args: {
+    tasks: [
+      {
+        id: 'long',
+        title: 'Set up additional account verification',
+        description:
+          'to add security to your shop, protect your customers, and satisfy the payment processor before your first payout.',
+        actionLabel: 'Go to My Profile',
+        dismissable: true,
+      },
+    ],
+  },
+  render: (args) => ({
+    components: { NsChecklistBanner },
+    setup: () => ({ args }),
+    template: `<div style="width: 760px"><NsChecklistBanner v-bind="args" /></div>`,
+  }),
+  play: async ({ canvasElement }) => {
+    await fontsReady()
+    if (window.innerWidth < 1024) return
+    const p = canvasElement.querySelector('.ns-checklist-banner__task-text') as HTMLElement
+    const lines = [...p.getClientRects()]
+    await expect(p.getBoundingClientRect().height).toBeGreaterThan(30) // wrapped
+    const textNode = textAfter(p.querySelector('strong')!)
+    const range = document.createRange()
+    range.selectNodeContents(textNode)
+    const rects = [...range.getClientRects()]
+    await expect(rects.length).toBeGreaterThan(1)
+    // …and the continuation line starts at the paragraph's left, not in a second column.
+    await expect(
+      Math.abs(rects[rects.length - 1].left - p.getBoundingClientRect().left),
+    ).toBeLessThan(1)
+    await expect(lines.length).toBeGreaterThan(0)
   },
 }
 

@@ -615,8 +615,10 @@ NEWLY_DISCOVERED_EXCEPTIONS.push({
 // — the tasks are an <ol>, so the position reaches assistive technology
 // structurally and the circle is decoration — and (b) the fix is the brand
 // token, which is 7jc's, not a per-component override that would leave the
-// button beside it at the same ratio. Caught by this check on the commit that
-// added the component.
+// button beside it at the same ratio. For a SIGHTED low-vision reader the
+// <ol> does nothing; what serves them is the visible order of the cards and
+// the 20px circle whose brand border, as a non-text boundary, passes 3:1.
+// Caught by this check on the commit that added the component.
 NEWLY_DISCOVERED_EXCEPTIONS.push(
   {
     fg: '--ns-color-text-brand',

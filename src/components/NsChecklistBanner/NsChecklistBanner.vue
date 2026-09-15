@@ -19,6 +19,7 @@
 
       <div class="ns-checklist-banner__tag">
         <NsBadge
+          v-if="tasks.length > 0"
           class="ns-checklist-banner__badge"
           :class="{ 'ns-checklist-banner__badge--complete': remaining === 0 }"
         >
@@ -43,7 +44,14 @@
       </div>
     </div>
 
-    <ol v-show="isExpanded" :id="listId" class="ns-checklist-banner__tasks">
+    <!--
+      role="list" restated on a list, which the lint rule rightly calls
+      redundant everywhere except the one place it matters: WebKit drops list
+      semantics from a `list-style: none` <ol>, and the aria-hidden step
+      number leans on the list to carry the position.
+    -->
+    <!-- eslint-disable-next-line vuejs-accessibility/no-redundant-roles -->
+    <ol v-show="isExpanded" :id="listId" class="ns-checklist-banner__tasks" role="list">
       <li
         v-for="(task, index) in tasks"
         :key="task.id"
@@ -80,7 +88,7 @@
             variant="tertiary"
             size="md"
             class="ns-checklist-banner__task-dismiss"
-            :aria-label="`${locale.checklist.dismiss}: ${task.title}`"
+            :aria-label="fill(locale.checklist.dismissTask, { title: task.title })"
             @click="$emit('dismiss', task)"
           >
             {{ locale.checklist.dismiss }}
@@ -203,6 +211,9 @@ function setExpanded(next: boolean) {
 }
 
 const headingTag = computed(() => {
+  // A string ("3" from an unbound `level="3"`) is not finite and falls to
+  // h2; Vue's prop type check warns about it in dev, as it does for
+  // NsPageTitle. Fractions round, out-of-range clamps.
   const level = Number.isFinite(props.level) ? Math.round(props.level) : 2
   return `h${Math.min(6, Math.max(1, level))}`
 })
@@ -226,7 +237,10 @@ const badgeText = computed(() => {
   // padding 20 the task rows measured 1176 against the design's 1178.
   padding: calc(var(--ns-space-5) - 1px);
   border: 1px solid var(--ns-color-border-primary-subtle);
-  border-radius: var(--ns-radius-sm);
+  // The design says `radius-sm` and means 8px; the library's --ns-radius-sm
+  // is 4px and its --ns-radius-md is 8 (the names are one step apart between
+  // Figma and the tokens — componentLibrary-56l). 8 is what is rendered.
+  border-radius: var(--ns-radius-md);
   background: var(--ns-color-bg-subtle);
   color: var(--ns-color-text-primary);
 
@@ -297,7 +311,7 @@ const badgeText = computed(() => {
     // wide (measured 60 and 1176 with the padding at face value).
     padding: calc(var(--ns-space-2) - 1px) calc(var(--ns-space-5) - 1px);
     border: 1px solid var(--ns-color-border-default);
-    border-radius: var(--ns-radius-sm);
+    border-radius: var(--ns-radius-md); // 8, see the container
     background: var(--ns-color-bg-surface);
   }
 
@@ -395,13 +409,15 @@ const badgeText = computed(() => {
       align-items: center;
     }
 
+    // The design's Task Name frame is a FIXED 42 (what makes every row 58);
+    // here it is a min-height on the row's main cell, which already centres
+    // its children, so the paragraph stays a paragraph. An earlier version
+    // put `display: flex` on the <p> itself to centre it — which blockified
+    // the <strong> and the text run into two flex items: the word space
+    // between them vanished on every row and a wrapping sentence became two
+    // columns. Review measured both; nothing that asserts box sizes could.
     &__task-main {
       flex: 1 1 0;
-    }
-
-    &__task-text {
-      display: flex;
-      align-items: center;
       min-height: 42px;
     }
 

@@ -93,8 +93,9 @@ export interface NsLocaleMessages {
     /** Visually hidden state read before a task's text. */
     complete: string
     notComplete: string
-    /** The per-task dismiss button. */
+    /** The per-task dismiss button: its visible text, and its accessible name with the task. */
     dismiss: string
+    dismissTask: string
   }
 
   /** Media/image viewer strings */

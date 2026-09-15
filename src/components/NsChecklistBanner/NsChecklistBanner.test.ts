@@ -49,6 +49,9 @@ describe('NsChecklistBanner — structure and names', () => {
     expect(w.attributes('aria-labelledby')).toBe(heading.attributes('id'))
     const items = w.findAll('ol > li')
     expect(items.length).toBe(3)
+    // role="list" restated: WebKit drops list semantics from a list-style:
+    // none <ol>, and the aria-hidden number below leans on the list.
+    expect(w.find('ol').attributes('role')).toBe('list')
     // The step number is decoration: the <ol> carries the order.
     expect(items[0].find('.ns-checklist-banner__step').attributes('aria-hidden')).toBe('true')
     expect(items[2].find('.ns-checklist-banner__step').text()).toBe('3')
@@ -66,10 +69,12 @@ describe('NsChecklistBanner — structure and names', () => {
     w.unmount()
   })
 
-  it('binds the heading level and clamps it', () => {
+  it('binds the heading level, rounds and clamps it', () => {
     expect(mountWith({ level: 3 }).find('h3').exists()).toBe(true)
     expect(mountWith({ level: 9 }).find('h6').exists()).toBe(true)
     expect(mountWith({ level: 0 }).find('h1').exists()).toBe(true)
+    expect(mountWith({ level: 2.6 }).find('h3').exists()).toBe(true)
+    expect(mountWith({ level: Number.NaN }).find('h2').exists()).toBe(true)
   })
 
   it('names the dismiss button with the task so four of them are not four "Dismiss"s', () => {
@@ -116,6 +121,9 @@ describe('NsChecklistBanner — the badge', () => {
     expect(w.find('.ns-checklist-banner__badge').classes()).toContain(
       'ns-checklist-banner__badge--complete',
     )
+    // No tasks is not "all complete": no badge at all.
+    await w.setProps({ tasks: [] })
+    expect(w.find('.ns-checklist-banner__badge').exists()).toBe(false)
     w.unmount()
   })
 })
@@ -179,8 +187,9 @@ describe('NsChecklistBanner — locale', () => {
     })
     expect(w.find('.ns-checklist-banner__badge').text()).toBe('2 tâches à faire')
     expect(w.find('.ns-checklist-banner__toggle').text()).toBe('Masquer')
+    // French typography's space before the colon comes from the locale string.
     expect(w.find('.ns-checklist-banner__task-dismiss').attributes('aria-label')).toBe(
-      'Ignorer: Add vendors',
+      'Ignorer : Add vendors',
     )
     w.unmount()
   })

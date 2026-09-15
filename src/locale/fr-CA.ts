@@ -58,6 +58,7 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     complete: 'Faite',
     notComplete: 'À faire',
     dismiss: 'Ignorer',
+    dismissTask: 'Ignorer : {title}',
   },
 
   media: {

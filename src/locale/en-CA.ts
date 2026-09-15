@@ -61,6 +61,7 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     complete: 'Complete',
     notComplete: 'Not complete',
     dismiss: 'Dismiss',
+    dismissTask: 'Dismiss: {title}',
   },
 
   media: {
