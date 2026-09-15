@@ -21,9 +21,9 @@
 
     <NsSeparator />
 
-    <h3 class="ns-plan-builder__add-ons-title ns-heading-sm">
+    <component :is="subheadingTag" class="ns-plan-builder__add-ons-title ns-heading-sm">
       {{ addOnsLabel ?? locale.plan.chooseAddOns }}
-    </h3>
+    </component>
 
     <div class="ns-plan-builder__add-ons">
       <NsTabs
@@ -51,6 +51,7 @@
         :id="`${panelId}-${active.id}`"
         :category="active"
         :button-size="buttonSize"
+        :level="clampedLevel + 2"
         @add="$emit('add', $event, active)"
         @remove="$emit('remove', $event, active)"
       />
@@ -165,6 +166,17 @@ const emit = defineEmits<{
 
 const locale = useNsLocale()
 const panelId = useId()
+
+/**
+ * The ladder under the card's title: "Choose Add-Ons" one level down, the
+ * add-on card's name two down, both clamped at 6. They used to be a fixed
+ * h3 and h4, so a level-3 title got an h3 sibling (componentLibrary-lrw.6.4).
+ */
+const clampedLevel = computed(() => {
+  const level = Number.isFinite(props.level) ? Math.round(props.level) : 2
+  return Math.min(6, Math.max(1, level))
+})
+const subheadingTag = computed(() => `h${Math.min(6, clampedLevel.value + 1)}`)
 // The action is described by the TOTAL rather than the card's title: with
 // two selection cards on a page, "Continue With This Plan" next to "$114
 // /mo" is the description that tells them apart.

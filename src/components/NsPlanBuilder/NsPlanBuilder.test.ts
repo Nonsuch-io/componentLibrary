@@ -189,6 +189,24 @@ describe('NsPlanBuilder — categories', () => {
 })
 
 describe('NsPlanBuilder — what a screen reader is told', () => {
+  it('keeps the heading ladder under the title at every level, clamped at 6', () => {
+    // At level 3 the ladder used to be h3 / h3 / h4 — "Choose Add-Ons" and
+    // the add-on card were fixed (componentLibrary-lrw.6.4).
+    const tags = (level: number) => {
+      const w = mountWith({ level: level as 2 })
+      const out = [
+        w.find('.ns-plan-selection-card__title').element.tagName,
+        w.find('.ns-plan-builder__add-ons-title').element.tagName,
+        w.find('.ns-plan-add-on__name').element.tagName,
+      ]
+      w.unmount()
+      return out
+    }
+    expect(tags(2)).toEqual(['H2', 'H3', 'H4'])
+    expect(tags(3)).toEqual(['H3', 'H4', 'H5'])
+    expect(tags(5)).toEqual(['H5', 'H6', 'H6'])
+  })
+
   it('is a section named by its title; the card is a section named by the category; buttons are described by their option', () => {
     const w = mountWith()
     expect(w.element.tagName).toBe('SECTION')
