@@ -4,6 +4,22 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.40.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.39.0...v0.40.0) (2026-09-15)
+
+
+### Features
+
+* **checklist:** add NsChecklistBanner, the design's shop set-up checklist (componentLibrary-lrw.4) ([74235a9](https://github.com/Nonsuch-io/componentLibrary/commit/74235a972c75c99219c22e7cd5760297e561d194))
+* **checklist:** add NsChecklistBanner, the design's shop set-up checklist (componentLibrary-lrw.4) ([0658f20](https://github.com/Nonsuch-io/componentLibrary/commit/0658f20491a212de922cbd779fbbd9654e23e241))
+
+
+### Bug Fixes
+
+* **checklist:** drop the tag row when it would be empty (componentLibrary-lrw.4) ([2b67599](https://github.com/Nonsuch-io/componentLibrary/commit/2b67599885a2f57ea0ad36468d0736b868dec640))
+* **checklist:** hide the empty list, assert the badge arm, trim the label (componentLibrary-lrw.4) ([751baf4](https://github.com/Nonsuch-io/componentLibrary/commit/751baf45c9ced50b4eea92b5093633fa2bbdbbb7))
+* **checklist:** keep the task sentence inline; the radius is the design's 8 (componentLibrary-lrw.4) ([60d615a](https://github.com/Nonsuch-io/componentLibrary/commit/60d615a9047d22f340b6e36b079038138881a0b6))
+* **checklist:** no toggle without tasks (componentLibrary-lrw.4) ([1ff4e66](https://github.com/Nonsuch-io/componentLibrary/commit/1ff4e665b3882ea46cd47602f077deeabd3c5ce2))
+
 ## [0.39.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.38.1...v0.39.0) (2026-09-14)
 
 
