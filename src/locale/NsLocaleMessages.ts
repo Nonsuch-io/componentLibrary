@@ -98,6 +98,12 @@ export interface NsLocaleMessages {
     dismissTask: string
   }
 
+  /** NsOnboardingStepper: the nav's name and the completed-step suffix. */
+  stepper: {
+    progress: string
+    completed: string
+  }
+
   /** NsCombo / NsPlanBuilder: accessible names of the plan's lists. */
   plan: {
     highlights: string

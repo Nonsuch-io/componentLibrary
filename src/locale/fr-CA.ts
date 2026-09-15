@@ -61,6 +61,11 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     dismissTask: 'Ignorer : {title}',
   },
 
+  stepper: {
+    progress: 'Progression',
+    completed: 'Terminée',
+  },
+
   plan: {
     highlights: 'Modules inclus',
     features: 'Fonctionnalités incluses',
