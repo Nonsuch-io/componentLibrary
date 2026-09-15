@@ -606,6 +606,40 @@ NEWLY_DISCOVERED_EXCEPTIONS.push({
     'documented rather than blocked.',
 })
 
+// --- componentLibrary-lrw.4: NsChecklistBanner's step number, 2026-09-14 ---
+// The design's NsStepNumber (2440:237127 "Not Completed": brand number on a
+// surface circle; 2440:237124 "Completed": white number on brand) — both the
+// brand orange against white, 3.74:1, the same root cause as every 7jc button
+// entry. 12px text, so AA normal applies and it fails; passes AA Large. Kept
+// as designed rather than recoloured because (a) the number is `aria-hidden`
+// — the tasks are an <ol>, so the position reaches assistive technology
+// structurally and the circle is decoration — and (b) the fix is the brand
+// token, which is 7jc's, not a per-component override that would leave the
+// button beside it at the same ratio. For a SIGHTED low-vision reader the
+// <ol> does nothing; what serves them is the visible order of the cards and
+// the 20px circle whose brand border, as a non-text boundary, passes 3:1.
+// Caught by this check on the commit that added the component.
+NEWLY_DISCOVERED_EXCEPTIONS.push(
+  {
+    fg: '--ns-color-text-brand',
+    bg: '--ns-color-bg-surface',
+    blocks: ['light'],
+    belowLarge: false,
+    ratios: { light: 3.7386 },
+    bead: 'componentLibrary-7jc',
+    note: '.ns-checklist-banner__step (not complete) — #d56307 on #ffffff, 3.74:1. aria-hidden decoration.',
+  },
+  {
+    fg: '--ns-color-text-on-brand',
+    bg: '--ns-color-bg-primary',
+    blocks: ['light', 'darkRoot', 'darkMedia'],
+    belowLarge: false,
+    ratios: { light: 3.7386, darkRoot: 3.7386, darkMedia: 3.7386 },
+    bead: 'componentLibrary-7jc',
+    note: '.ns-checklist-banner__task--complete .ns-checklist-banner__step — white on #d56307, 3.74:1 in every block, the primary-button pair under another token name. aria-hidden decoration.',
+  },
+)
+
 const ALL_EXCEPTIONS = [...KNOWN_EXCEPTIONS, ...NEWLY_DISCOVERED_EXCEPTIONS]
 
 function findException(

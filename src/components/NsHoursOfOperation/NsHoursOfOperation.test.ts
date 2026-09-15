@@ -7,7 +7,7 @@ import NsCheckbox from '../NsCheckbox/NsCheckbox.vue'
 import NsSelect from '../NsSelect/NsSelect.vue'
 import { NsLocaleKey } from '../../composables/useNsLocale'
 import { nsLocaleFrCA } from '../../locale/fr-CA'
-import { fill } from './fill'
+import { fill } from '../../locale/fill'
 import {
   NS_HOURS_DAY_KEYS,
   createNsHoursDay,

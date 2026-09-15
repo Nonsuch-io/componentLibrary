@@ -101,7 +101,7 @@ import {
 import NsHoursRow from './NsHoursRow.vue'
 import { useNsLocale } from '../../composables/useNsLocale'
 import { useNsDisabled } from '../../composables/useNsDisabled'
-import { fill } from './fill'
+import { fill } from '../../locale/fill'
 import {
   NS_HOURS_DAY_KEYS,
   createNsHoursDay,

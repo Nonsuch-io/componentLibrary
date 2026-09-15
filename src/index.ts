@@ -95,6 +95,11 @@ export { default as NsImageUpload } from './components/NsImageUpload/NsImageUplo
 export type { NsImageUploadProps } from './components/NsImageUpload/NsImageUpload.vue'
 export { default as NsHoursOfOperation } from './components/NsHoursOfOperation/NsHoursOfOperation.vue'
 export type { NsHoursOfOperationProps } from './components/NsHoursOfOperation/NsHoursOfOperation.vue'
+export { default as NsChecklistBanner } from './components/NsChecklistBanner/NsChecklistBanner.vue'
+export type {
+  NsChecklistBannerProps,
+  NsChecklistTask,
+} from './components/NsChecklistBanner/NsChecklistBanner.vue'
 export {
   NS_HOURS_DAY_KEYS,
   createNsHoursDay,

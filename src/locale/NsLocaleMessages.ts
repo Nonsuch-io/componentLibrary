@@ -77,6 +77,27 @@ export interface NsLocaleMessages {
     hoursRemoved: string
   }
 
+  /**
+   * NsChecklistBanner. `{count}` is the number of tasks still to do.
+   * Task titles, descriptions and action labels come from the consumer.
+   */
+  checklist: {
+    /** Badge text while tasks remain; the singular form for exactly one. */
+    tasksToComplete: string
+    taskToComplete: string
+    /** Badge text once every task is complete. */
+    allComplete: string
+    /** Accessible names of the collapse toggle in each state. */
+    hide: string
+    show: string
+    /** Visually hidden state read before a task's text. */
+    complete: string
+    notComplete: string
+    /** The per-task dismiss button: its visible text, and its accessible name with the task. */
+    dismiss: string
+    dismissTask: string
+  }
+
   /** Media/image viewer strings */
   media: {
     zoomIn: string
