@@ -127,6 +127,22 @@ describe('NsPlanBuilder — categories', () => {
     expect(w.findComponent(NsPlanAddOn).props('category')).toMatchObject({ id: 'team' }) // parent has not agreed
     await w.setProps({ category: 'nope' })
     expect(w.findComponent(NsPlanAddOn).props('category')).toMatchObject({ id: 'inventory' })
+    // Review mounted this state and found no tab selected while the card
+    // showed inventory: the tabs were bound to the raw id, not the resolved one.
+    expect(w.findComponent({ name: 'QTabs' }).props('modelValue')).toBe('inventory')
+    w.unmount()
+  })
+
+  it('a tab click while controlled does not survive the parent releasing control', async () => {
+    // The parent said 'team', the user clicked Inventory, the parent never
+    // agreed; when the parent then hands control back, the component stays
+    // where the parent left it (the watch re-seeds the fallback), not where
+    // the unacknowledged click pointed. A guard in setCategory used to
+    // claim this job; it was inert and is gone — this is the behaviour.
+    const w = mountWith({ category: 'team' })
+    await w.findComponent({ name: 'QTabs' }).vm.$emit('update:modelValue', 'inventory')
+    await w.setProps({ category: undefined })
+    expect(w.findComponent(NsPlanAddOn).props('category')).toMatchObject({ id: 'team' })
     w.unmount()
   })
 
@@ -144,11 +160,14 @@ describe('NsPlanBuilder — categories', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     const state = reactive({ categories: categories() })
     const w = mountWith({ categories: state.categories })
-    expect(warn.mock.calls.map((c) => String(c[0]))).not.toContainEqual(
-      expect.stringContaining('made a reactive object'),
-    )
-    warn.mockRestore()
-    w.unmount()
+    try {
+      expect(warn.mock.calls.map((c) => String(c[0]))).not.toContainEqual(
+        expect.stringContaining('made a reactive object'),
+      )
+    } finally {
+      warn.mockRestore() // a failing assertion must not leak the spy into the next test
+      w.unmount()
+    }
     // …and markRaw'd icons are still fine.
     const raw = mountWith({
       categories: categories().map((c) => ({ ...c, icon: markRaw(c.icon!) })),
@@ -168,6 +187,7 @@ describe('NsPlanBuilder — what a screen reader is told', () => {
 
     const card = w.findComponent(NsPlanAddOn)
     expect(card.element.tagName).toBe('SECTION')
+    expect(card.find('ul').attributes('role')).toBe('list') // restated for WebKit; pinned
     expect(card.attributes('aria-labelledby')).toBe(card.find('h4').attributes('id'))
     const add = card.find('.ns-plan-add-on__add')
     expect(add.attributes('aria-describedby')).toBe(
@@ -197,6 +217,7 @@ describe('NsPlanBuilder — what a screen reader is told', () => {
     expect(fr.find('.ns-plan-builder__add-ons-title').text()).toBe('Choisir des options')
     expect(fr.find('.ns-plan-builder__total-label').text()).toBe('Votre total')
     expect(fr.find('.ns-plan-add-on__add').text()).toBe('Ajouter')
+    expect(fr.find('.ns-plan-add-on__remove').text()).toBe('Retirer')
     expect(fr.find('.ns-plan-add-on__added').text()).toBe('Ajoutée')
     fr.unmount()
   })
@@ -219,9 +240,12 @@ describe('NsBanner — surface tones', () => {
 
   it('does not warn for the new tones', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
-    mount(NsBanner, { props: { type: 'accent' }, slots: { default: 'x' } }).unmount()
-    expect(warn).not.toHaveBeenCalled()
-    warn.mockRestore()
+    try {
+      mount(NsBanner, { props: { type: 'accent' }, slots: { default: 'x' } }).unmount()
+      expect(warn).not.toHaveBeenCalled()
+    } finally {
+      warn.mockRestore()
+    }
   })
 })
 

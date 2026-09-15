@@ -25,7 +25,7 @@
     <div class="ns-plan-builder__add-ons">
       <NsTabs
         v-if="categories.length > 1"
-        :model-value="activeId"
+        :model-value="active?.id"
         dense
         align="left"
         no-caps
@@ -172,13 +172,22 @@ watch(
   },
 )
 const activeId = computed(() => props.category ?? fallbackCategory.value)
+// The RESOLVED category, which is what both the tabs and the card show: an
+// unknown or stale id (a consumer filtered its categories, or a typo) falls
+// back to the first. Review found the tabs bound to the raw id — no tab
+// selected while the card showed the first category.
 const active = computed(
   () => props.categories.find((c) => c.id === activeId.value) ?? props.categories[0] ?? undefined,
 )
 
 function setCategory(id: unknown) {
   if (typeof id !== 'string') return
-  if (props.category == null) fallbackCategory.value = id
+  // Always written, even while controlled: `activeId` prefers the prop, and
+  // the watch above re-seeds this from the last controlled value when the
+  // parent releases control, so a guard here decided nothing — review
+  // removed one and every test stayed green. What a tab click does while
+  // controlled is emit and wait for the parent.
+  fallbackCategory.value = id
   emit('update:category', id)
 }
 </script>

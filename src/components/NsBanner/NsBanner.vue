@@ -166,13 +166,12 @@ const ariaLive = computed(() => {
   // SURFACES, not messages. Measured on NsPlanBuilder 170:6802 (2026-09-15):
   // brand = bg-app-header with a 1px primary-subtle border (the base-plan
   // panel, 2361:191348); accent = bg-accent, no border (the total panel,
-  // 2361:191733). Both 16px all round and radius 8 — the design's radius-sm,
-  // the library's --ns-radius-md (componentLibrary-56l). The padding is set
-  // on the QBanner root, which is where Quasar's 8px/16px lives.
+  // 2361:191733). Both 16px all round; radius 8 is the base rule's
+  // --ns-radius-md already (the design's radius-sm, componentLibrary-56l).
+  // The padding is set on the QBanner root, where Quasar's 8px/16px lives.
   &--brand,
   &--accent
     padding: var(--ns-space-4)
-    border-radius: var(--ns-radius-md)
     min-height: 0 // QBanner's 54px floor; the mobile base panel is 52.8 by design
   &--brand
     // 15 + the 1px border = the design's 16 inset (Figma's stroke takes no
