@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.41.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.40.0...v0.41.0) (2026-09-15)
+
+
+### Features
+
+* **plan:** add NsCombo with NsPlanHeader, NsPlanHighlights, NsPlanFeatures (componentLibrary-lrw.5) ([5dfbc97](https://github.com/Nonsuch-io/componentLibrary/commit/5dfbc9791e1b4251a0c3af8b06a5323a4bd30ac0))
+* **plan:** add NsCombo with NsPlanHeader, NsPlanHighlights, NsPlanFeatures (componentLibrary-lrw.5) ([e440399](https://github.com/Nonsuch-io/componentLibrary/commit/e4403997e02de830a6e52c2d49c961fd011075c6))
+
 ## [0.40.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.39.0...v0.40.0) (2026-09-15)
 
 
