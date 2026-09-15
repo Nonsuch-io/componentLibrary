@@ -85,13 +85,16 @@ export const AllComplete: Story = {
 }
 
 /**
- * ZERO TASKS takes no phantom space: no badge, no tag row without a toggle,
- * and the empty list hidden — review measured 8 + 12px of nothing here.
+ * ZERO TASKS takes no phantom space and offers no toggle: no badge, no tag
+ * row, the empty list hidden — review measured 8 + 12px of nothing here,
+ * then a toggle flipping aria-expanded over a list that never showed.
+ * `collapsible` is left at its default so that is the state pinned.
  */
 export const NoTasks: Story = {
-  args: { tasks: [], collapsible: false },
+  args: { tasks: [] },
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('.ns-checklist-banner') as HTMLElement
+    await expect(root.querySelector('.ns-checklist-banner__toggle')).toBeNull()
     const heading = root.querySelector('.ns-checklist-banner__heading') as HTMLElement
     const titles = root.querySelector('.ns-checklist-banner__titles') as HTMLElement
     await expect(heading.getBoundingClientRect().height).toBe(titles.getBoundingClientRect().height)

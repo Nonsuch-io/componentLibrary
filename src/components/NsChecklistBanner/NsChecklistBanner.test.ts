@@ -126,13 +126,13 @@ describe('NsChecklistBanner — the badge', () => {
     expect(w.find('.ns-checklist-banner__badge').classes()).toContain(
       'ns-checklist-banner__badge--complete',
     )
-    // No tasks is not "all complete": no badge at all.
+    // No tasks is not "all complete": no badge, no toggle (nothing to
+    // disclose — review found aria-expanded flipping over a list that never
+    // showed), and no tag ROW, since an empty flex child would still take
+    // the heading's 8px gap (measured in review).
     await w.setProps({ tasks: [] })
     expect(w.find('.ns-checklist-banner__badge').exists()).toBe(false)
-    // …and with no toggle either, no tag ROW — an empty flex child would
-    // still take the heading's 8px gap (measured in review).
-    expect(w.find('.ns-checklist-banner__tag').exists()).toBe(true)
-    await w.setProps({ collapsible: false })
+    expect(w.find('.ns-checklist-banner__toggle').exists()).toBe(false)
     expect(w.find('.ns-checklist-banner__tag').exists()).toBe(false)
     w.unmount()
   })
@@ -179,14 +179,16 @@ describe('NsChecklistBanner — expanded', () => {
     w.unmount()
   })
 
-  it('hides the empty list for zero tasks so it takes no gap, keeping its id for aria-controls', async () => {
+  it('hides the empty list for zero tasks so it takes no gap, and brings the toggle back with the tasks', async () => {
     const w = mountWith({ tasks: [] })
     expect(hidden(w)).toBe(true)
+    expect(w.find('.ns-checklist-banner__toggle').exists()).toBe(false)
+    await w.setProps({ tasks: tasks() })
+    expect(hidden(w)).toBe(false)
+    expect(w.find('.ns-checklist-banner__toggle').attributes('aria-expanded')).toBe('true')
     expect(w.find('.ns-checklist-banner__toggle').attributes('aria-controls')).toBe(
       w.find('ol').attributes('id'),
     )
-    await w.setProps({ tasks: tasks() })
-    expect(hidden(w)).toBe(false)
     w.unmount()
   })
 })

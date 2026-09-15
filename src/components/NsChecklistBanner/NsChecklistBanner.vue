@@ -18,16 +18,17 @@
       </div>
 
       <!--
-        The whole tag row goes when it would be empty (no tasks AND no
-        toggle): an empty flex child still takes the heading's gap — 8px of
-        nothing above the title, measured in review. Same class of bug as
-        the hours editor's phantom middle-row gap — and the same rule hides
-        the empty <ol> below (12px under the heading with zero tasks; the
-        id stays in the DOM for aria-controls, as when collapsed).
+        With NO TASKS there is nothing to count and nothing to disclose, so
+        neither the badge nor the toggle renders — and the whole row goes
+        with them, because an empty flex child still takes the heading's gap
+        (8px of nothing above the title, measured in review; the hours
+        editor's phantom middle-row class). The same rule hides the empty
+        <ol> below (12px). A toggle over a permanently hidden list would
+        flip aria-expanded on nothing — review reached that state by
+        dismissing every task — which is why the toggle needs tasks too.
       -->
-      <div v-if="tasks.length > 0 || collapsible" class="ns-checklist-banner__tag">
+      <div v-if="tasks.length > 0" class="ns-checklist-banner__tag">
         <NsBadge
-          v-if="tasks.length > 0"
           class="ns-checklist-banner__badge"
           :class="{ 'ns-checklist-banner__badge--complete': remaining === 0 }"
         >
