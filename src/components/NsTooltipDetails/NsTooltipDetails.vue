@@ -14,7 +14,12 @@
   >
     <div class="ns-tooltip-details__panel">
       <p :id="textId" class="ns-tooltip-details__text ns-body-md"><slot /></p>
-      <!-- QMenu's own hide(), not a bare emit: the emit reaches nobody when the panel is uncontrolled. -->
+      <!--
+        QMenu's own hide(), not a bare emit: the emit reaches nobody when the
+        panel is uncontrolled. The click event goes along so QMenu's canHide
+        guard applies (under a consumer's `hover`, a click mid-opening is
+        dropped, as it is for the anchor's own clicks).
+      -->
       <NsButton
         variant="tertiary"
         size="sm"
@@ -66,7 +71,13 @@
  * takes focus and gives it back, which is what a screen reader user should
  * hear on landing in it. Named "Details" from the locale and described by
  * its own text; both default through attrs, so a consumer's `aria-label`
- * or `role` wins.
+ * or `role` wins. NOT `aria-modal`, and correctly so: the page is not inert
+ * and a click outside closes it — though QMenu's focusout handler does pull
+ * focus back in, so Tab cannot leave; Escape, the X and a click outside are
+ * the exits, each returning focus. Do not "fix" the trap or add aria-modal.
+ *
+ * Nothing is exposed: v-model (or the popup's own exits) is the way out
+ * from outside; NsMenu's show/hide/toggle are for content INSIDE the popup.
  */
 import { ref, useId } from 'vue'
 import { PhX } from '@phosphor-icons/vue'

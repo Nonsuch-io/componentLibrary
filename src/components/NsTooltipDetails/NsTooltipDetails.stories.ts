@@ -137,6 +137,35 @@ export const OpensClosesAndReturnsFocus: Story = {
 }
 
 /**
+ * ENDS OPEN ON PURPOSE. The a11y addon runs axe AFTER play, on document.body:
+ * every other story here closes the panel before it ends, so the dialog's
+ * role and name were only ever scanned by a race (LayoutIsReal's un-awaited
+ * Escape leaving the popup mid-transition — fable's review). This one leaves
+ * the dialog in the DOM for the scan and pins the ANCHOR's aria-haspopup,
+ * the one consumer-visible change the role makes outside the popup.
+ */
+export const OpenDialogIsNamed: Story = {
+  render: postalCode,
+  play: async ({ canvasElement }) => {
+    const trigger = canvasElement.querySelector('[data-testid="trigger"]') as HTMLElement
+    await expect(trigger.getAttribute('aria-haspopup')).toBe('dialog')
+    await userEvent.click(trigger)
+    const panel = await waitFor(() => {
+      const el = document.querySelector('.ns-tooltip-details__panel') as HTMLElement
+      expect(el).not.toBeNull()
+      return el
+    })
+    const popup = panel.closest('.q-menu') as HTMLElement
+    await expect(popup.getAttribute('role')).toBe('dialog')
+    await expect(popup.getAttribute('aria-label')).toBe('Details')
+    await expect(popup.getAttribute('aria-describedby')).toBe(
+      panel.querySelector('.ns-tooltip-details__text')!.id,
+    )
+    await expect(trigger.getAttribute('aria-expanded')).toBe('true')
+  },
+}
+
+/**
  * GEOMETRY IS REAL — 185:11426: 12px padding, 10 between text and X, a
  * 32px X, radius 8, the panel content-sized up to 450.
  */
@@ -167,5 +196,6 @@ export const LayoutIsReal: Story = {
     await expect(getComputedStyle(menu).borderRadius).toBe('8px')
     await expect(getComputedStyle(menu).boxShadow).not.toBe('none')
     await pressEscape()
+    await waitFor(() => expect(document.querySelector('.ns-tooltip-details__panel')).toBeNull())
   },
 }
