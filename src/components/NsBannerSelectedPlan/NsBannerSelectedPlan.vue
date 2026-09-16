@@ -15,7 +15,7 @@
         <NsPlanHighlights
           v-if="highlights.length"
           :highlights="highlights"
-          :label="highlightsLabel ?? locale.plan.billingTerms"
+          :label="highlightsLabel?.trim() || locale.plan.billingTerms"
         />
 
         <NsPlanFeatures
@@ -89,7 +89,11 @@ export interface NsBannerSelectedPlanProps {
   period?: string
   /** "Billed monthly on the 13th", "Cancel anytime" — shown with pipes between. */
   highlights?: readonly string[]
-  /** The highlights list's accessible name; "Billing terms" from the locale by default. */
+  /**
+   * The highlights list's accessible name; "Billing terms" from the locale by
+   * default. Blank falls through too (`|| `, not `??`): a `t()` that has not
+   * loaded yet hands over '' — componentLibrary-d13, NsNavSidebar's note.
+   */
   highlightsLabel?: string
   /** "butiq Base $99/mo", one per line with a check. */
   features?: readonly string[]

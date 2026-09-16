@@ -120,4 +120,13 @@ describe('NsBannerSelectedPlan — what a screen reader is told', () => {
     expect(w.findComponent(NsPlanHighlights).attributes('aria-label')).toBe('Modules')
     w.unmount()
   })
+
+  // A blank label is not a name: `t()` before load hands over '' (d13).
+  it('falls back to the locale name for a blank label, not to aria-label=""', () => {
+    for (const blank of ['', '   ']) {
+      const w = mountWith({ highlightsLabel: blank })
+      expect(w.findComponent(NsPlanHighlights).attributes('aria-label')).toBe('Billing terms')
+      w.unmount()
+    }
+  })
 })
