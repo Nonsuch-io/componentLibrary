@@ -124,9 +124,11 @@ export interface NsLocaleMessages {
     completed: string
   }
 
-  /** NsCombo / NsPlanBuilder: accessible names of the plan's lists, and the builder's labels. */
+  /** NsCombo / NsPlanBuilder / NsBannerSelectedPlan: accessible names of the plan's lists, and the builder's labels. */
   plan: {
     highlights: string
+    /** Name of the selected-plan banner's highlights list — billing terms there, not modules. */
+    billingTerms: string
     features: string
     /** The add-ons section's heading. */
     chooseAddOns: string
