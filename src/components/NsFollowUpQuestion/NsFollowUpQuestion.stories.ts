@@ -27,17 +27,17 @@ type Story = StoryObj<typeof meta>
 
 const fontsReady = () => document.fonts.ready
 
-const controlled = (initial: string[] = ['mens', 'womens'], width = '870px') => ({
+const controlled = (initial: string[] = ['mens', 'womens'], width = '870px', extra = '') => ({
   components: { NsFollowUpQuestion },
   setup: () => ({ value: ref(initial), gender }),
-  template: `<div style="width: ${width}"><NsFollowUpQuestion v-bind="gender" v-model="value" /></div>`,
+  template: `<div style="width: ${width}"><NsFollowUpQuestion v-bind="gender" v-model="value" ${extra} /></div>`,
 })
 
 export const Default: Story = { render: () => controlled() }
 
 export const NothingChecked: Story = { render: () => controlled([]) }
 
-export const NoTag: Story = { args: { tag: '' } }
+export const NoTag: Story = { render: () => controlled(['mens'], '870px', 'tag=""') }
 
 export const Disabled: Story = { args: { disable: true } }
 
@@ -96,7 +96,11 @@ export const RevealedByASelect: Story = {
       expect(el).not.toBeNull()
       return el
     })
-    // Focus moved onto the group, whose name is the question.
+    // Focus moved onto the group, whose name is the question. (Do not add a
+    // "no ring on mouse" assertion through this path: storybook/test's
+    // userEvent is synthetic and leaves Chromium's input-modality heuristic
+    // on "keyboard", so :focus-visible reads true here and false under a
+    // real mouse — measured in review with CDP input.)
     await waitFor(() => expect(document.activeElement).toBe(card))
     await expect(card.getAttribute('role')).toBe('group')
     await expect(
@@ -125,6 +129,9 @@ export const LayoutIsRealOnDesktop: Story = {
     const question = card.querySelector('.ns-follow-up-question__question')!.getBoundingClientRect()
     const tag = card.querySelector('.ns-follow-up-question__tag') as HTMLElement
     await expect(tag.getBoundingClientRect().left).toBeGreaterThan(question.right)
+    // Content width, not the design's 72px wrapper (which its badge overflows).
+    await expect(tag.getBoundingClientRect().width).toBeCloseTo(140, 0)
+    await expect(tag.getBoundingClientRect().right).toBe(card.getBoundingClientRect().right - 20)
     await expect(getComputedStyle(tag).backgroundColor).toBe('rgb(0, 105, 180)')
     await expect(getComputedStyle(tag).color).toBe('rgb(255, 255, 255)')
 
@@ -141,7 +148,8 @@ export const LayoutIsRealOnDesktop: Story = {
 
 /**
  * MOBILE — 684:62462 at 310: the header stacks and the options go to a
- * column. INFERRED from the 292 height; the internals were not readable.
+ * column. The design is 292 tall; this renders 246.4 — an UNRESOLVED delta
+ * (the mobile internals were not readable), pinned so it stays visible.
  */
 export const LayoutIsRealOnMobile: Story = {
   parameters: { viewport: { defaultViewport: 'mobile1' } },
@@ -151,6 +159,7 @@ export const LayoutIsRealOnMobile: Story = {
     await expect(window.innerWidth).toBeLessThan(1024)
     const card = canvasElement.querySelector('.ns-follow-up-question') as HTMLElement
     await expect(card.getBoundingClientRect().width).toBe(310)
+    await expect(card.getBoundingClientRect().height).toBeCloseTo(246.4, 0) // design 292; see the docstring
     const question = card.querySelector('.ns-follow-up-question__question')!.getBoundingClientRect()
     const tag = card.querySelector('.ns-follow-up-question__tag')!.getBoundingClientRect()
     await expect(tag.top).toBeGreaterThanOrEqual(question.bottom)

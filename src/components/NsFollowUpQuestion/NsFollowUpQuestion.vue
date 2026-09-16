@@ -48,11 +48,14 @@
  * and the consumer shows it. A surface-alt card, 1px border-default,
  * radius 8, padding 20 (incl. the stroke), gap 12: a header row with the
  * question ("Small heading regular" 16/400, flex 1) and an info badge
- * ("Additional Options", 12/600 white on text-info #0069b4, 16px icon, 72
- * wide), then the checkboxes at a 32px gap (NsCheckbox 18px box, 14/400
- * label). Mobile (684:62462): 310x292 — the row becomes a column and the
- * header stacks; INFERRED from the height, the mobile internals could not
- * be read without a selection.
+ * ("Additional Options", 12/600 white on text-info #0069b4, 16px icon; the
+ * design's "Tag" wrapper frame is 72 wide and its badge overflows it —
+ * here the badge renders at its content width, 140), then the checkboxes
+ * at a 32px gap (NsCheckbox 18px box, 14/400 label). Mobile (684:62462):
+ * the design is 310x292 and its internals could not be read without a
+ * selection; the stacked header + column of options built here renders
+ * 246.4 at 310 — an UNRESOLVED 45px delta, pinned in the story so it is
+ * visible, not a match. The mobile node is the thing to select next.
  *
  * DISCLOSURE IS WHERE THIS GOES WRONG, and the bead said so. Showing the
  * card is the consumer's (a `v-if` on the category), which means the
@@ -142,8 +145,10 @@ defineExpose({ focus })
   background: var(--ns-color-bg-surface-alt);
   color: var(--ns-color-text-primary);
 
+  // The library's focus token, as NsImageUpload and NsBrandLogo draw theirs;
+  // a first draft used the brand border and was the one orange ring.
   &:focus-visible {
-    outline: 2px solid var(--ns-color-border-primary);
+    outline: 2px solid var(--ns-color-border-focus);
     outline-offset: 2px;
   }
 
