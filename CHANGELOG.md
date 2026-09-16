@@ -4,6 +4,19 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.47.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.46.0...v0.47.0) (2026-09-16)
+
+
+### Features
+
+* **order-summary:** add NsOrderSummaryTotals, the money lines (componentLibrary-rbe.2) ([2ff999d](https://github.com/Nonsuch-io/componentLibrary/commit/2ff999d9f03708aa245a4bb0d1d22c6d6e8ee8b1))
+* **order-summary:** add NsOrderSummaryTotals, the money lines under the plan (componentLibrary-rbe.2) ([c85a0d7](https://github.com/Nonsuch-io/componentLibrary/commit/c85a0d733fa43db4d37647e3db8ca1fe1489b3ef))
+
+
+### Bug Fixes
+
+* **order-summary:** releasing the code v-model clears the field (componentLibrary-rbe.2) ([96aa07b](https://github.com/Nonsuch-io/componentLibrary/commit/96aa07b6553d55dca42f58c84b7f2ba4ac85c27f))
+
 ## [0.46.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.45.0...v0.46.0) (2026-09-16)
 
 
