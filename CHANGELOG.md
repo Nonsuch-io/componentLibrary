@@ -4,6 +4,19 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.46.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.45.0...v0.46.0) (2026-09-16)
+
+
+### Features
+
+* **tooltip-details:** add NsTooltipDetails, a dismissible details panel (componentLibrary-605) ([2cea13e](https://github.com/Nonsuch-io/componentLibrary/commit/2cea13e81975944dda9d4f6ecff1f0749bd3b890))
+* **tooltip-details:** add NsTooltipDetails, a dismissible panel on NsMenu (componentLibrary-605) ([1df1dec](https://github.com/Nonsuch-io/componentLibrary/commit/1df1dec7ca402444304300bd24345cbf0f917a8d))
+
+
+### Bug Fixes
+
+* **tooltip-details:** close button works uncontrolled; dialog role (componentLibrary-605) ([2cdbf1d](https://github.com/Nonsuch-io/componentLibrary/commit/2cdbf1d68de741b49b64f6ff76f3033d66377249))
+
 ## [0.45.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.44.1...v0.45.0) (2026-09-16)
 
 
