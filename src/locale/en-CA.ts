@@ -64,6 +64,10 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     dismissTask: 'Dismiss: {title}',
   },
 
+  followUp: {
+    additionalOptions: 'Additional Options',
+  },
+
   stepper: {
     progress: 'Progress',
     completed: 'Completed',
