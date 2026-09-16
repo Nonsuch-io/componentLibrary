@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.44.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.44.0...v0.44.1) (2026-09-16)
+
+
+### Bug Fixes
+
+* **plan:** derive the builder's inner heading levels from its title (componentLibrary-lrw.6.4) ([e047ef2](https://github.com/Nonsuch-io/componentLibrary/commit/e047ef2151053ddc61ffd76a2ece8036be346cb4))
+
 ## [0.44.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.43.0...v0.44.0) (2026-09-15)
 
 
