@@ -103,6 +103,17 @@ export interface NsLocaleMessages {
   }
 
   /** NsFollowUpQuestion: the default badge text. */
+  /** NsOrderSummaryTotals — the discount code form and the total. */
+  order: {
+    discountCode: string
+    apply: string
+    /** Example text inside the empty code field ("YOURCODE"). */
+    codePlaceholder: string
+    /** `{code}` — the applied code the chip's remove button takes away. */
+    removeDiscount: string
+    total: string
+  }
+
   followUp: {
     additionalOptions: string
   }

@@ -66,6 +66,14 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     dismissTask: 'Dismiss: {title}',
   },
 
+  order: {
+    discountCode: 'Discount Code',
+    apply: 'Apply',
+    codePlaceholder: 'YOURCODE',
+    removeDiscount: 'Remove discount code {code}',
+    total: 'Total',
+  },
+
   followUp: {
     additionalOptions: 'Additional Options',
   },
