@@ -1,6 +1,7 @@
 <template>
   <div class="ns-order-summary-totals">
-    <dl class="ns-order-summary-totals__lines">
+    <!-- v-if: an empty list is still a flex item and would take the row gap. -->
+    <dl v-if="lines.length || discounts.length" class="ns-order-summary-totals__lines">
       <div
         v-for="line in lines"
         :key="line.id"
@@ -25,7 +26,7 @@
         <dd class="ns-order-summary-totals__value">
           <NsChip
             dense
-            removable
+            :removable="allowDiscountCode"
             class="ns-order-summary-totals__chip"
             :remove-aria-label="fill(locale.order.removeDiscount, { code: discount.code })"
             @remove="$emit('remove', discount)"
@@ -83,7 +84,7 @@
     <dl class="ns-order-summary-totals__lines">
       <div class="ns-order-summary-totals__line ns-order-summary-totals__total">
         <dt class="ns-order-summary-totals__label ns-label-md">
-          {{ totalLabel ?? locale.order.total }}
+          {{ totalLabel?.trim() || locale.order.total }}
         </dt>
         <dd class="ns-order-summary-totals__total-value">
           <span class="ns-order-summary-totals__total-amount ns-heading-md">{{ total.value }}</span>
@@ -153,13 +154,13 @@ export interface NsOrderSummaryTotalsProps {
   total: NsOrderSummaryTotal
   /** Applied codes, each a row with a removable chip. */
   discounts?: readonly NsOrderSummaryDiscount[]
-  /** v-model:discountCode — the field's text. Omitted → kept here. */
+  /** v-model:discountCode — the field's text. Omitted → kept here; `''` clears, and so does `undefined`. */
   discountCode?: string
   /** Shown under the field; INFERRED, no frame shows it. */
   discountCodeError?: string
-  /** `false` hides the code form — a receipt, or a shop without codes. */
+  /** `false` hides the code form and the chips' removes — a receipt, or a shop without codes. */
   allowDiscountCode?: boolean
-  /** "Total"; from the locale by default. */
+  /** "Total"; from the locale by default. Blank falls through too (`||`, not `??` — d13). */
   totalLabel?: string
   disable?: boolean
 }
@@ -184,11 +185,17 @@ const locale = useNsLocale()
 const labelId = useId()
 const inputId = useId()
 
+// A TEXT field's fallback, unlike NsPlanBuilder's category: releasing the
+// v-model (a parent's `code.value = undefined` after a successful apply)
+// CLEARS it, as a native <input v-model> would show ''. The first draft
+// carried the last controlled value over, which review measured as the
+// parent saying empty while the field showed ABC and a second Enter
+// applying it again. `''` clears too; so does release.
 const fallbackCode = ref('')
 watch(
   () => props.discountCode,
-  (next, previous) => {
-    if (next == null && previous != null) fallbackCode.value = previous
+  (next) => {
+    if (next == null) fallbackCode.value = ''
   },
 )
 const code = computed(() => props.discountCode ?? fallbackCode.value)

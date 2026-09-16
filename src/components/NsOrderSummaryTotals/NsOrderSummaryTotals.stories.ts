@@ -51,14 +51,19 @@ export const WithShipping: Story = {
   },
 }
 
-/** No code form — a receipt. */
+/** No code form, and the applied code's chip is not removable — a receipt. */
 export const Receipt: Story = {
   args: { ...filled, allowDiscountCode: false, total: { value: '$8.40', note: 'paid' } },
 }
 
 /** Field error — INFERRED: no frame shows an invalid code; NsInput's own error rendering. */
 export const InvalidCode: Story = {
-  args: { discountCode: 'WINTER99', discountCodeError: 'That code is not valid.' },
+  render: (args) => ({
+    components: { NsOrderSummaryTotals },
+    setup: () => ({ args, code: ref('WINTER99') }),
+    template: `<NsOrderSummaryTotals v-bind="args" v-model:discount-code="code" />`,
+  }),
+  args: { discountCodeError: 'That code is not valid.' },
 }
 
 /**

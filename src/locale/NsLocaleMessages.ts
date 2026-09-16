@@ -102,7 +102,6 @@ export interface NsLocaleMessages {
     dismissTask: string
   }
 
-  /** NsFollowUpQuestion: the default badge text. */
   /** NsOrderSummaryTotals — the discount code form and the total. */
   order: {
     discountCode: string
@@ -114,6 +113,7 @@ export interface NsLocaleMessages {
     total: string
   }
 
+  /** NsFollowUpQuestion: the default badge text. */
   followUp: {
     additionalOptions: string
   }

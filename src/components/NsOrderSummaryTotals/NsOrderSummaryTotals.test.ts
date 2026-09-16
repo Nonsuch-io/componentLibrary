@@ -20,8 +20,11 @@ const filled = {
     { id: 'subtotal', label: 'Subtotal', value: '$10.00' },
     { id: 'taxes', label: 'Taxes', detail: 'GST + 5%', value: '$0.40' },
   ],
-  discounts: [{ id: 'summer20', code: 'SUMMER20', amount: '-$2.00' }],
-  total: { value: '$8.40', note: 'due today' },
+  discounts: [
+    { id: 'summer20', code: 'SUMMER20', amount: '-$2.00' },
+    { id: 'freeship', code: 'FREESHIP', amount: '-$1.00' },
+  ],
+  total: { value: '$7.40', note: 'due today' },
 }
 
 const mountWith = (props: Record<string, unknown> = {}, provide: Record<symbol, unknown> = {}) =>
@@ -49,7 +52,8 @@ describe('NsOrderSummaryTotals — name/value pairs', () => {
       ['Subtotal', '$10.00'],
       ['Taxes', 'GST + 5% $0.40'],
       ['Discount Code', 'SUMMER20 -$2.00'],
-      ['Total', '$8.40 due today'],
+      ['Discount Code', 'FREESHIP -$1.00'],
+      ['Total', '$7.40 due today'],
     ])
     w.unmount()
   })
@@ -87,6 +91,10 @@ describe('NsOrderSummaryTotals — name/value pairs', () => {
     const own = mountWith({ totalLabel: 'Amount due' })
     expect(own.find('.ns-order-summary-totals__total dt').text()).toBe('Amount due')
     own.unmount()
+    // A blank label is not a label: t() before load hands over '' (d13).
+    const blank = mountWith({ totalLabel: '  ' })
+    expect(blank.find('.ns-order-summary-totals__total dt').text()).toBe('Total')
+    blank.unmount()
   })
 })
 
@@ -139,11 +147,28 @@ describe('NsOrderSummaryTotals — the discount code form', () => {
     // Controlled: the prop still says ABC until the parent writes it back.
     expect(controlled.findComponent(NsInput).props('modelValue')).toBe('ABC')
     await controlled.setProps({ discountCode: undefined })
-    // Released: the last controlled value carries over.
-    expect(controlled.findComponent(NsInput).props('modelValue')).toBe('ABC')
+    // Released: CLEARED, as a native input would show — review measured the
+    // first draft carrying ABC over while the parent said empty, and a second
+    // Enter applying it again.
+    expect(controlled.findComponent(NsInput).props('modelValue')).toBe('')
+    await controlled.find('form').trigger('submit')
+    expect(controlled.emitted('apply')).toBeUndefined()
     await controlled.findComponent(NsInput).vm.$emit('update:modelValue', 'XYZ')
     expect(controlled.findComponent(NsInput).props('modelValue')).toBe('XYZ')
     controlled.unmount()
+  })
+
+  it('a parent resetting to undefined after apply gets an empty field, not a second apply', async () => {
+    const w = mountWith({ discountCode: undefined, discounts: [] })
+    await w.findComponent(NsInput).vm.$emit('update:modelValue', 'ABC')
+    await w.setProps({ discountCode: 'ABC' })
+    await w.find('form').trigger('submit')
+    expect(w.emitted('apply')).toEqual([['ABC']])
+    await w.setProps({ discountCode: undefined })
+    expect(w.findComponent(NsInput).props('modelValue')).toBe('')
+    await w.find('form').trigger('submit')
+    expect(w.emitted('apply')).toEqual([['ABC']])
+    w.unmount()
   })
 
   it('hands an error to the field (INFERRED) and hides the bottom space otherwise', async () => {
@@ -154,10 +179,18 @@ describe('NsOrderSummaryTotals — the discount code form', () => {
     w.unmount()
   })
 
+  it('renders no first list at all without lines or discounts — no phantom gap', () => {
+    const w = mountWith({ lines: [], discounts: [] })
+    expect(w.findAll('dl').length).toBe(1)
+    w.unmount()
+  })
+
   it('has no form at all when codes are not allowed', () => {
     const w = mountWith({ allowDiscountCode: false })
     expect(w.find('form').exists()).toBe(false)
-    expect(pairs(w).length).toBe(4)
+    expect(pairs(w).length).toBe(5)
+    // A receipt's chips are not removable either.
+    expect(w.findComponent(NsChip).props('removable')).toBe(false)
     w.unmount()
   })
 
@@ -177,8 +210,14 @@ describe('NsOrderSummaryTotals — applied discounts', () => {
     expect(chip.props('removable')).toBe(true)
     const remove = chip.find('[role="button"]')
     expect(remove.attributes('aria-label')).toBe('Remove discount code SUMMER20')
-    await chip.vm.$emit('remove')
-    expect(w.emitted('remove')).toEqual([[filled.discounts[0]]])
+    // Two applied codes, two rows, two removes told apart by the code.
+    const chips = w.findAllComponents(NsChip)
+    expect(chips.length).toBe(2)
+    expect(chips[1].find('[role="button"]').attributes('aria-label')).toBe(
+      'Remove discount code FREESHIP',
+    )
+    await chips[1].vm.$emit('remove')
+    expect(w.emitted('remove')).toEqual([[filled.discounts[1]]])
     w.unmount()
   })
 
