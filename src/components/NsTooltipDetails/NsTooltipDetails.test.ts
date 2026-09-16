@@ -79,6 +79,60 @@ describe('NsTooltipDetails', () => {
       await nextTick()
       expect(w.emitted('update:modelValue')).toEqual([[false]])
     })
+
+    // The review's finding (componentLibrary-605): with NO v-model the first
+    // draft's bare emit reached nobody and the X did nothing — Escape closed
+    // it, the button the pointer user needs did not. The X now calls QMenu's
+    // own hide() through NsMenu, so it closes on every path.
+    it('closes an UNCONTROLLED panel (no v-model bound) too', async () => {
+      const w = mount(NsTooltipDetails, {
+        attrs: { 'no-parent-event': true },
+        slots: { default: 'Self-managed.' },
+        attachTo: document.body,
+      })
+      wrapper = w
+      w.findComponent(QMenu).vm.show()
+      await nextTick()
+      await nextTick()
+      expect(panel(), 'opened by QMenu itself').not.toBeNull()
+
+      closeButton()!.click()
+      await nextTick()
+      await nextTick()
+      expect(panel(), 'the X must close it without a consumer listening').toBeNull()
+    })
+  })
+
+  describe('role', () => {
+    it('is a non-modal dialog named from the locale and described by its text', async () => {
+      mountOpen()
+      await nextTick()
+      await nextTick()
+      const popup = panel()!.closest('.q-menu')!
+      expect(popup.getAttribute('role')).toBe('dialog')
+      expect(popup.getAttribute('aria-label')).toBe('Details')
+      const text = panel()!.querySelector('.ns-tooltip-details__text')!
+      expect(text.id).not.toBe('')
+      expect(popup.getAttribute('aria-describedby')).toBe(text.id)
+    })
+
+    it('is named in French under fr-CA', async () => {
+      mountOpen({ global: { provide: { [NsLocaleKey as symbol]: nsLocaleFrCA } } })
+      await nextTick()
+      await nextTick()
+      expect(panel()!.closest('.q-menu')!.getAttribute('aria-label')).toBe('Détails')
+    })
+
+    it('lets a consumer name it and change the role through attrs', async () => {
+      mountOpen({
+        attrs: { 'no-parent-event': true, role: 'note', 'aria-label': 'Postal code help' },
+      })
+      await nextTick()
+      await nextTick()
+      const popup = panel()!.closest('.q-menu')!
+      expect(popup.getAttribute('role')).toBe('note')
+      expect(popup.getAttribute('aria-label')).toBe('Postal code help')
+    })
   })
 
   describe('attrs', () => {
@@ -95,11 +149,11 @@ describe('NsTooltipDetails', () => {
       expect(narrow.findComponent(QMenu).props('maxWidth')).toBe('300px')
     })
 
-    it('forwards the rest to the popup (anchor, offset, aria)', async () => {
-      mountOpen({ attrs: { 'no-parent-event': true, 'aria-label': 'Postal code help' } })
+    it('forwards the rest to the popup (anchor, offset, data)', async () => {
+      mountOpen({ attrs: { 'no-parent-event': true, 'data-testid': 'help' } })
       await nextTick()
       await nextTick()
-      expect(panel()!.closest('.q-menu')!.getAttribute('aria-label')).toBe('Postal code help')
+      expect(panel()!.closest('.q-menu')!.getAttribute('data-testid')).toBe('help')
     })
   })
 })

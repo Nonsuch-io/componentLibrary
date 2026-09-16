@@ -1,19 +1,27 @@
 <template>
   <NsMenu
-    v-bind="{ maxWidth: '450px', ...$attrs }"
+    ref="menuRef"
+    v-bind="{
+      maxWidth: '450px',
+      role: 'dialog',
+      'aria-label': locale.common.details,
+      'aria-describedby': textId,
+      ...$attrs,
+    }"
     :model-value="modelValue"
     class="ns-tooltip-details"
     @update:model-value="$emit('update:modelValue', $event)"
   >
     <div class="ns-tooltip-details__panel">
-      <p class="ns-tooltip-details__text ns-body-md"><slot /></p>
+      <p :id="textId" class="ns-tooltip-details__text ns-body-md"><slot /></p>
+      <!-- QMenu's own hide(), not a bare emit: the emit reaches nobody when the panel is uncontrolled. -->
       <NsButton
         variant="tertiary"
         size="sm"
         icon-only
         class="ns-tooltip-details__close"
         :aria-label="locale.common.close"
-        @click="$emit('update:modelValue', false)"
+        @click="menuRef?.hide($event)"
       >
         <PhX :size="16" weight="regular" />
       </NsButton>
@@ -45,10 +53,22 @@
  * click outside close it, and focus returns to the anchor on hide — the
  * "return path for focus" the bead asked for, measured in the story. The
  * panel adds the chrome and an explicit Close button, because a panel that
- * only closes on Escape is invisible to a pointer user. Anchoring, offsets
- * and the trigger are the consumer's, through NsMenu's attrs and NsButton;
- * the story shows the design's "What is this?" trigger.
+ * only closes on Escape is invisible to a pointer user. The Close calls
+ * QMenu's own `hide()` through NsMenu: review found a bare
+ * `update:modelValue` emit inert whenever nobody is bound (the uncontrolled
+ * mode the prop invites) — Escape kept working, the X did nothing. Now the
+ * emit is QMenu's, on every path. Anchoring, offsets and the trigger are
+ * the consumer's, through NsMenu's attrs and NsButton; the story shows the
+ * design's "What is this?" trigger.
+ *
+ * ROLE: a non-modal `dialog`, unlike NsMenu (roleless, nb7) — NsMenu hosts
+ * arbitrary content; this is one fixed shape, a message with a dismiss that
+ * takes focus and gives it back, which is what a screen reader user should
+ * hear on landing in it. Named "Details" from the locale and described by
+ * its own text; both default through attrs, so a consumer's `aria-label`
+ * or `role` wins.
  */
+import { ref, useId } from 'vue'
 import { PhX } from '@phosphor-icons/vue'
 import NsMenu from '../NsMenu/NsMenu.vue'
 import NsButton from '../NsButton/NsButton.vue'
@@ -68,6 +88,8 @@ defineEmits<{
 defineOptions({ inheritAttrs: false })
 
 const locale = useNsLocale()
+const textId = useId()
+const menuRef = ref<InstanceType<typeof NsMenu> | null>(null)
 </script>
 
 <style lang="scss">

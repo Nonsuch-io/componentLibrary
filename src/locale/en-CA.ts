@@ -20,6 +20,7 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     showMore: 'Show more',
     showLess: 'Show less',
     close: 'Close',
+    details: 'Details',
   },
 
   product: {

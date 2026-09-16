@@ -17,6 +17,7 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     showMore: 'Afficher plus',
     showLess: 'Afficher moins',
     close: 'Fermer',
+    details: 'Détails',
   },
 
   product: {

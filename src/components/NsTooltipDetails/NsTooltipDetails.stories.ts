@@ -62,6 +62,36 @@ const postalCode = () => ({
 export const BesideAField: Story = { render: postalCode }
 
 /**
+ * NO v-model: NsMenu opens it from its anchor and the X still closes it —
+ * review found the first draft's X inert here (a bare emit that reached
+ * nobody), while Escape kept working. The popup is a named non-modal dialog.
+ */
+export const Uncontrolled: Story = {
+  render: () => ({
+    components: { NsTooltipDetails, NsButton, PhInfo },
+    template: `
+      <NsButton variant="tertiary" size="xs" data-testid="trigger">
+        <PhInfo :size="16" weight="regular" aria-hidden="true" />
+        What is this?
+        <NsTooltipDetails>Enter the postal code for the card or bank account.</NsTooltipDetails>
+      </NsButton>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const trigger = canvasElement.querySelector('[data-testid="trigger"]') as HTMLElement
+    const panel = () => document.querySelector('.ns-tooltip-details__panel') as HTMLElement | null
+    await userEvent.click(trigger)
+    await waitFor(() => expect(panel()).not.toBeNull())
+    const popup = panel()!.closest('.q-menu') as HTMLElement
+    await expect(popup.getAttribute('role')).toBe('dialog')
+    await expect(popup.getAttribute('aria-label')).toBe('Details')
+    await userEvent.click(panel()!.querySelector('.ns-tooltip-details__close') as HTMLElement)
+    await waitFor(() => expect(panel(), 'the X closes it with no v-model').toBeNull())
+    await expect(trigger.getAttribute('aria-expanded')).toBe('false')
+  },
+}
+
+/**
  * THE ROUND TRIP, in a real browser: the trigger opens it, focus lands in
  * the panel, Escape closes it and focus RETURNS to the trigger; the X does
  * the same. The bead named the return path as the thing a dismissible
