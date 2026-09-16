@@ -4,6 +4,19 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.45.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.44.1...v0.45.0) (2026-09-16)
+
+
+### Features
+
+* **follow-up:** add NsFollowUpQuestion, the design's shop-category follow-up (componentLibrary-yst) ([95120f3](https://github.com/Nonsuch-io/componentLibrary/commit/95120f398db73924dae84edac1bcb3de0b2a839e))
+* **follow-up:** add NsFollowUpQuestion, the design's shop-category follow-up (componentLibrary-yst) ([0623ccd](https://github.com/Nonsuch-io/componentLibrary/commit/0623ccde58cb6a60b01ed90dd78f43c129028cae))
+
+
+### Bug Fixes
+
+* **follow-up:** focus token, honest mobile and badge numbers (componentLibrary-yst) ([ce77d1e](https://github.com/Nonsuch-io/componentLibrary/commit/ce77d1ed1606993135ed0e0d5996c89bd8b27bfa))
+
 ## [0.44.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.44.0...v0.44.1) (2026-09-16)
 
 
