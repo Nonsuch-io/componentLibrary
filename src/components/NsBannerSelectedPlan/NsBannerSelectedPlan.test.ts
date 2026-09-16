@@ -96,9 +96,12 @@ describe('NsBannerSelectedPlan — what a screen reader is told', () => {
     w.unmount()
   })
 
-  it('names the two lists from the locale', () => {
+  // Review (sonnet) caught the first draft naming this list "Included
+  // modules" — NsCombo's key — over "Billed monthly on the 13th | Cancel
+  // anytime": a true-sounding name that told a screen reader the wrong thing.
+  it('names the highlights "Billing terms", not the combo\'s "Included modules"', () => {
     const en = mountWith()
-    expect(en.findComponent(NsPlanHighlights).attributes('aria-label')).toBe('Included modules')
+    expect(en.findComponent(NsPlanHighlights).attributes('aria-label')).toBe('Billing terms')
     expect(en.findComponent(NsPlanFeatures).attributes('aria-label')).toBe('Included features')
     en.unmount()
 
@@ -107,8 +110,14 @@ describe('NsBannerSelectedPlan — what a screen reader is told', () => {
       global: { provide: { [NsLocaleKey as symbol]: nsLocaleFrCA } },
     })
     expect(fr.findComponent(NsPlanHighlights).attributes('aria-label')).toBe(
-      nsLocaleFrCA.plan.highlights,
+      'Modalités de facturation',
     )
     fr.unmount()
+  })
+
+  it('lets a consumer name the highlights list for other content', () => {
+    const w = mountWith({ highlights: ['Inventory', 'NFC Payments'], highlightsLabel: 'Modules' })
+    expect(w.findComponent(NsPlanHighlights).attributes('aria-label')).toBe('Modules')
+    w.unmount()
   })
 })

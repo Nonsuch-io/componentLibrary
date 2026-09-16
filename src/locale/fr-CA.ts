@@ -74,6 +74,7 @@ export const nsLocaleFrCA: NsLocaleMessages = {
 
   plan: {
     highlights: 'Modules inclus',
+    billingTerms: 'Modalités de facturation',
     features: 'Fonctionnalités incluses',
     chooseAddOns: 'Choisir des options',
     total: 'Votre total',

@@ -77,6 +77,7 @@ export const nsLocaleEnCA: NsLocaleMessages = {
 
   plan: {
     highlights: 'Included modules',
+    billingTerms: 'Billing terms',
     features: 'Included features',
     chooseAddOns: 'Choose Add-Ons',
     total: 'Your Total',

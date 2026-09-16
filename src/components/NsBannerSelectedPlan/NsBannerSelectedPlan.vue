@@ -15,7 +15,7 @@
         <NsPlanHighlights
           v-if="highlights.length"
           :highlights="highlights"
-          :label="locale.plan.highlights"
+          :label="highlightsLabel ?? locale.plan.billingTerms"
         />
 
         <NsPlanFeatures
@@ -65,7 +65,12 @@
  *
  * ACCESSIBILITY: an <article> named by the plan's name (a heading, `level`
  * 3 by default: it sits under the order summary's title), and the button is
- * described by it, as NsCombo's is.
+ * described by it, as NsCombo's is. The highlights list is named "Billing
+ * terms", NOT NsCombo's "Included modules": the design's copy here is
+ * "Billed monthly on the 13th | Cancel anytime", and review caught the
+ * first draft reusing the combo's key — every test green, axe green, and a
+ * screen reader calling the payment terms modules. `highlightsLabel`
+ * overrides it for a consumer whose highlights are something else.
  */
 import { useId } from 'vue'
 import NsBanner from '../NsBanner/NsBanner.vue'
@@ -84,6 +89,8 @@ export interface NsBannerSelectedPlanProps {
   period?: string
   /** "Billed monthly on the 13th", "Cancel anytime" — shown with pipes between. */
   highlights?: readonly string[]
+  /** The highlights list's accessible name; "Billing terms" from the locale by default. */
+  highlightsLabel?: string
   /** "butiq Base $99/mo", one per line with a check. */
   features?: readonly string[]
   /** "Change Plan"; omitted → no button. */
@@ -96,6 +103,7 @@ withDefaults(defineProps<NsBannerSelectedPlanProps>(), {
   price: undefined,
   period: undefined,
   highlights: () => [],
+  highlightsLabel: undefined,
   features: () => [],
   actionLabel: undefined,
   level: 3,
