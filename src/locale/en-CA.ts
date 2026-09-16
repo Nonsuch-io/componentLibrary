@@ -74,6 +74,10 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     total: 'Total',
   },
 
+  baseSummary: {
+    moreAbout: 'More about {feature}',
+  },
+
   followUp: {
     additionalOptions: 'Additional Options',
   },

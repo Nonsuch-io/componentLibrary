@@ -70,6 +70,11 @@
   --ns-color-text-on-bg-warning: #2d0b00;
   --ns-color-text-on-bg-negative: #2d0b00;
   --ns-color-text-on-bg-info: #2d0b00;
+  /* Ink for bg-primary-subtle, the brand tint: the design's brand orange in
+     light (3.08:1 — the design's pairing, componentLibrary-ek4); in dark the
+     tint itself becomes #a44700, where brand orange is 1.61:1, so the ink is
+     the LIGHT tint. Chosen by background lightness, as the four above. */
+  --ns-color-text-on-bg-primary-subtle: #d56307;
   --ns-color-bg-accent: #b8e4fa;
   --ns-color-bg-dark: #2d0b00;
   --ns-color-bg-dialog: #fef7ee;
@@ -308,6 +313,7 @@
   --ns-color-text-on-bg-warning: #2d0b00;
   --ns-color-text-on-bg-negative: #2d0b00;
   --ns-color-text-on-bg-info: #ffffff;
+  --ns-color-text-on-bg-primary-subtle: #fce5d2;
   --ns-color-bg-accent: #0069b4;
   --ns-color-bg-dark: #2d0b00;
   --ns-color-bg-dialog: #351d16;
@@ -464,6 +470,7 @@
     --ns-color-text-on-bg-warning: #2d0b00;
     --ns-color-text-on-bg-negative: #2d0b00;
     --ns-color-text-on-bg-info: #ffffff;
+    --ns-color-text-on-bg-primary-subtle: #fce5d2;
     --ns-color-bg-accent: #0069b4;
     --ns-color-bg-dark: #2d0b00;
     --ns-color-bg-dialog: #351d16;

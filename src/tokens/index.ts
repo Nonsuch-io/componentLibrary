@@ -36,6 +36,7 @@ export type NsToken =
   | '--ns-color-text-on-bg-warning'
   | '--ns-color-text-on-bg-negative'
   | '--ns-color-text-on-bg-info'
+  | '--ns-color-text-on-bg-primary-subtle'
   | '--ns-color-text-accent'
   | '--ns-color-text-on-accent'
   | '--ns-color-text-on-dark'

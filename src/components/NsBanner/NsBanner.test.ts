@@ -298,6 +298,7 @@ describe('NsBanner', () => {
         'info',
         'negative',
         'positive',
+        'promo',
         'warning',
       ])
     })

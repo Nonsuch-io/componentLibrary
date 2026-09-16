@@ -113,6 +113,12 @@ export interface NsLocaleMessages {
     total: string
   }
 
+  /** NsBaseSummary — the info tip beside a feature. */
+  baseSummary: {
+    /** `{feature}` — the accessible name of the tip's button. */
+    moreAbout: string
+  }
+
   /** NsFollowUpQuestion: the default badge text. */
   followUp: {
     additionalOptions: string
