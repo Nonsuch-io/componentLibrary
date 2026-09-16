@@ -11,7 +11,9 @@
         class="ns-plan-add-on__icon"
       />
       <div class="ns-plan-add-on__details">
-        <h4 :id="titleId" class="ns-plan-add-on__name ns-label-md">{{ category.name }}</h4>
+        <component :is="headingTag" :id="titleId" class="ns-plan-add-on__name ns-label-md">
+          {{ category.name }}
+        </component>
         <p v-if="category.description" class="ns-plan-add-on__description ns-body-sm">
           {{ category.description }}
         </p>
@@ -93,17 +95,24 @@
  * (The design draws it in text-negative; there is no tertiary-negative
  * variant in NsButton — componentLibrary-ksg.)
  */
-import { toRaw, useId } from 'vue'
+import { computed, toRaw, useId } from 'vue'
 import { PhCheck, PhX } from '@phosphor-icons/vue'
 import NsBadge from '../NsBadge/NsBadge.vue'
 import NsButton from '../NsButton/NsButton.vue'
 import { useNsLocale } from '../../composables/useNsLocale'
 import type { NsPlanAddOnCategory, NsPlanOption } from './types'
 
-defineProps<{
-  category: NsPlanAddOnCategory
-  buttonSize: 'md' | 'lg'
-}>()
+const props = withDefaults(
+  defineProps<{
+    category: NsPlanAddOnCategory
+    buttonSize: 'md' | 'lg'
+    /** The card name's heading level — two below the builder's title, clamped. */
+    level?: number
+  }>(),
+  { level: 4 },
+)
+
+const headingTag = computed(() => `h${Math.min(6, Math.max(1, Math.round(props.level)))}`)
 
 defineEmits<{
   add: [option: NsPlanOption]
