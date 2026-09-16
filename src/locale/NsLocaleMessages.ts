@@ -29,6 +29,8 @@ export interface NsLocaleMessages {
     noResults: string
     showMore: string
     showLess: string
+    /** Accessible name of a close (X) button; NsTooltipDetails. */
+    close: string
   }
 
   /** Product-related strings (NsProductCard, etc.) */

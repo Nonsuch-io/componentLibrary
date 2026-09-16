@@ -19,6 +19,7 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     noResults: 'No results found',
     showMore: 'Show more',
     showLess: 'Show less',
+    close: 'Close',
   },
 
   product: {
