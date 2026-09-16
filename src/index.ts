@@ -108,6 +108,11 @@ export { default as NsPlanHighlights } from './components/NsPlanHighlights/NsPla
 export type { NsPlanHighlightsProps } from './components/NsPlanHighlights/NsPlanHighlights.vue'
 export { default as NsPlanFeatures } from './components/NsPlanFeatures/NsPlanFeatures.vue'
 export type { NsPlanFeaturesProps } from './components/NsPlanFeatures/NsPlanFeatures.vue'
+export { default as NsFollowUpQuestion } from './components/NsFollowUpQuestion/NsFollowUpQuestion.vue'
+export type {
+  NsFollowUpOption,
+  NsFollowUpQuestionProps,
+} from './components/NsFollowUpQuestion/NsFollowUpQuestion.vue'
 export { default as NsPlanSelectionCard } from './components/NsPlanSelectionCard/NsPlanSelectionCard.vue'
 export type { NsPlanSelectionCardProps } from './components/NsPlanSelectionCard/NsPlanSelectionCard.vue'
 export { default as NsPlanBuilder } from './components/NsPlanBuilder/NsPlanBuilder.vue'

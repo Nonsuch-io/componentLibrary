@@ -98,6 +98,11 @@ export interface NsLocaleMessages {
     dismissTask: string
   }
 
+  /** NsFollowUpQuestion: the default badge text. */
+  followUp: {
+    additionalOptions: string
+  }
+
   /** NsOnboardingStepper: the nav's name and the completed-step suffix. */
   stepper: {
     progress: string
