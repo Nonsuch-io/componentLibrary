@@ -183,4 +183,12 @@ const ariaLive = computed(() => {
   &--accent
     background-color: var(--ns-color-bg-accent, #b8e4fa)
     color: var(--ns-color-text-on-accent, #2d0b00)
+
+  // QBanner ALWAYS renders its avatar column, slot or not, at
+  // `min-width: 1px !important` (QBanner.js:45, QBanner.sass:10) — a phantom
+  // pixel every banner's content lost. Measured on NsBannerSelectedPlan at
+  // 342: content 309 where 310 was due, enough to wrap the design's header
+  // row (componentLibrary-rbe.1). Gone when empty; an avatar slot still shows.
+  :deep(.q-banner__avatar:empty)
+    display: none
 </style>

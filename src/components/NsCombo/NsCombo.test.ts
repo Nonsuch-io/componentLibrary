@@ -163,4 +163,25 @@ describe('NsPlanHeader', () => {
     expect(w.attributes('id')).toBeUndefined()
     w.unmount()
   })
+
+  // `size` is a type ramp step (componentLibrary-rbe.1): lg is the combo
+  // card's row, md the selected-plan banner's. The colour rides on the CSS
+  // modifier, pinned in the NsBannerSelectedPlan story.
+  it('steps the ramp down one size for md, and defaults to lg', () => {
+    const lg = mount(NsPlanHeader, { props: { name: 'X', price: '$1', period: '/mo' } })
+    expect(lg.classes()).toContain('ns-plan-header--lg')
+    expect(lg.find('.ns-plan-header__name').classes()).toContain('ns-heading-lg')
+    expect(lg.find('.ns-plan-header__amount').classes()).toContain('ns-heading-xl')
+    expect(lg.find('.ns-plan-header__period').classes()).toContain('ns-heading-md-regular')
+    lg.unmount()
+
+    const md = mount(NsPlanHeader, {
+      props: { name: 'X', price: '$1', period: '/mo', size: 'md' },
+    })
+    expect(md.classes()).toContain('ns-plan-header--md')
+    expect(md.find('.ns-plan-header__name').classes()).toContain('ns-heading-md')
+    expect(md.find('.ns-plan-header__amount').classes()).toContain('ns-heading-lg')
+    expect(md.find('.ns-plan-header__period').classes()).toContain('ns-heading-sm-regular')
+    md.unmount()
+  })
 })
