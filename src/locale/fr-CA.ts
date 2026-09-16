@@ -63,6 +63,14 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     dismissTask: 'Ignorer : {title}',
   },
 
+  order: {
+    discountCode: 'Code promo',
+    apply: 'Appliquer',
+    codePlaceholder: 'VOTRECODE',
+    removeDiscount: 'Retirer le code promo {code}',
+    total: 'Total',
+  },
+
   followUp: {
     additionalOptions: 'Options supplémentaires',
   },

@@ -104,6 +104,13 @@ export { default as NsCombo } from './components/NsCombo/NsCombo.vue'
 export type { NsComboProps } from './components/NsCombo/NsCombo.vue'
 export { default as NsBannerSelectedPlan } from './components/NsBannerSelectedPlan/NsBannerSelectedPlan.vue'
 export type { NsBannerSelectedPlanProps } from './components/NsBannerSelectedPlan/NsBannerSelectedPlan.vue'
+export { default as NsOrderSummaryTotals } from './components/NsOrderSummaryTotals/NsOrderSummaryTotals.vue'
+export type { NsOrderSummaryTotalsProps } from './components/NsOrderSummaryTotals/NsOrderSummaryTotals.vue'
+export type {
+  NsOrderSummaryLine,
+  NsOrderSummaryDiscount,
+  NsOrderSummaryTotal,
+} from './components/NsOrderSummaryTotals/types'
 export { default as NsPlanHeader } from './components/NsPlanHeader/NsPlanHeader.vue'
 export type { NsPlanHeaderProps } from './components/NsPlanHeader/NsPlanHeader.vue'
 export { default as NsPlanHighlights } from './components/NsPlanHighlights/NsPlanHighlights.vue'
