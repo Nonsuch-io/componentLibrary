@@ -16,6 +16,8 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     noResults: 'Aucun résultat trouvé',
     showMore: 'Afficher plus',
     showLess: 'Afficher moins',
+    close: 'Fermer',
+    details: 'Détails',
   },
 
   product: {

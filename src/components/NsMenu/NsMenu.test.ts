@@ -20,6 +20,42 @@ describe('NsMenu', () => {
     expect(wrapper.findComponent(NsMenu).exists()).toBe(true)
   })
 
+  // QMenu's own show/hide/toggle, passed through so popup content can close
+  // its host without a v-model (componentLibrary-605).
+  describe('imperative api', () => {
+    let openWrapper: VueWrapper | undefined
+
+    afterEach(() => {
+      openWrapper?.unmount()
+      openWrapper = undefined
+    })
+
+    it('exposes show, hide and toggle that drive the popup', async () => {
+      openWrapper = mount(NsMenu, {
+        attrs: { 'no-parent-event': true },
+        slots: { default: 'Menu content' },
+        attachTo: document.body,
+      })
+      const vm = openWrapper.vm as unknown as { show(): void; hide(): void; toggle(): void }
+      const popup = () => document.querySelector('.q-menu')
+
+      vm.show()
+      await nextTick()
+      await nextTick()
+      expect(popup(), 'show').not.toBeNull()
+
+      vm.hide()
+      await nextTick()
+      await nextTick()
+      expect(popup(), 'hide').toBeNull()
+
+      vm.toggle()
+      await nextTick()
+      await nextTick()
+      expect(popup(), 'toggle').not.toBeNull()
+    })
+  })
+
   describe('accessibility', () => {
     it('forwards aria attributes', () => {
       const wrapper = mountMenu({ 'aria-label': 'Test menu' })

@@ -1,5 +1,5 @@
 <template>
-  <q-menu v-bind="$attrs" class="ns-menu">
+  <q-menu ref="menuRef" v-bind="$attrs" class="ns-menu">
     <slot />
   </q-menu>
 </template>
@@ -37,11 +37,29 @@
  * whether to write aria-haspopup on the anchor (QMenu.js:150-152) — but it is
  * not the way to make a menu. And either way, the keyboard navigation is yours
  * to build. See componentLibrary-nb7.
+ *
+ * `show()`, `hide()` and `toggle()` are QMenu's own, exposed so content INSIDE
+ * the popup can close it without a v-model: a bare `update:modelValue` emit
+ * from a child goes nowhere when nobody is bound, and only QMenu's own
+ * `hide()` drives its internal state — the path Escape and click-outside
+ * already use. Review found NsTooltipDetails' Close button inert that way
+ * (componentLibrary-605).
  */
+import { ref } from 'vue'
+import type { QMenu } from 'quasar'
+
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface NsMenuProps {}
 
 defineProps<NsMenuProps>()
+
+const menuRef = ref<QMenu | null>(null)
+
+defineExpose({
+  show: (evt?: Event) => menuRef.value?.show(evt),
+  hide: (evt?: Event) => menuRef.value?.hide(evt),
+  toggle: (evt?: Event) => menuRef.value?.toggle(evt),
+})
 </script>
 
 <style lang="sass">

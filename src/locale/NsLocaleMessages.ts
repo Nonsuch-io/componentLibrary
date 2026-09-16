@@ -29,6 +29,10 @@ export interface NsLocaleMessages {
     noResults: string
     showMore: string
     showLess: string
+    /** Accessible name of a close (X) button; NsTooltipDetails. */
+    close: string
+    /** A details panel's accessible name (NsTooltipDetails). */
+    details: string
   }
 
   /** Product-related strings (NsProductCard, etc.) */
