@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.48.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.47.0...v0.48.0) (2026-09-16)
+
+
+### Features
+
+* **selected-plan:** add NsBannerSelectedPlan, the chosen plan on a brand banner (componentLibrary-rbe.1) ([18fc21e](https://github.com/Nonsuch-io/componentLibrary/commit/18fc21e2f24d668f974b884bfb39ed31b8692053))
+
 ## [0.47.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.46.0...v0.47.0) (2026-09-16)
 
 
