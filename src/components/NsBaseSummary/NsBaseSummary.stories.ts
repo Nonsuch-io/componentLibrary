@@ -144,15 +144,16 @@ export const LayoutIsRealOnDesktop: Story = {
     await expect(pos.width).toBeCloseTo(283.33, 0)
     await expect(inventory.width).toBeCloseTo(566.67, 0)
     await expect(pos.height).toBe(inventory.height)
-    // The design's 180 is a fixed frame; the content would be a header, 12,
-    // and four 19.6 rows 8 apart inside 20 — 175.2 — except that the
-    // browser's Fixel Text 600 sets "Core POS & Check Out Tools" 212 wide
-    // where the design's frame fits it in 208, so at the design's own width
-    // the title wraps by under a pixel and the card is 196. Stated, not
-    // fudged; a narrower renderer gets 175.2.
+    // The design's 180 is a fixed frame; the content is 20 + a header (the
+    // 24px icon, or the title if taller) + 12 + four 19.6 rows 8 apart + 20
+    // — 178.4 — except that the browser's Fixel Text 600 sets "Core POS &
+    // Check Out Tools" 212 wide where the design's frame fits it in 208, so
+    // at the design's own width the title wraps by under a pixel (41.6) and
+    // the card is 196. Stated, not fudged; a narrower renderer gets 178.4.
     const posTitle = root.querySelector('.ns-feature-card__title') as HTMLElement
     await expect(getComputedStyle(posTitle).fontFamily).toMatch(/^"Fixel Text"/)
-    await expect(pos.height).toBeCloseTo(175.2 + posTitle.getBoundingClientRect().height - 20.8, 0)
+    const header = Math.max(24, posTitle.getBoundingClientRect().height)
+    await expect(pos.height).toBeCloseTo(20 + header + 12 + 102.4 + 20, 0)
     // The inventory card on its own is 178.4 (24px icon header, 3 | 4 balanced
     // list at 102.4) — the design's 180 — and stretches to the POS card.
 

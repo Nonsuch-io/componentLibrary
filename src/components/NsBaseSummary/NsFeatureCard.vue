@@ -29,9 +29,10 @@
           type="button"
           class="ns-feature-card__tip"
           :aria-label="fill(locale.baseSummary.moreAbout, { feature: feature.text })"
+          @click="tips.get(feature.id)?.toggle()"
         >
           <PhInfo :size="16" weight="regular" aria-hidden="true" />
-          <NsTooltip>{{ feature.tooltip }}</NsTooltip>
+          <NsTooltip :ref="(el) => setTip(feature.id, el)">{{ feature.tooltip }}</NsTooltip>
         </button>
       </li>
     </ul>
@@ -59,9 +60,12 @@
  *
  * The tip is a BUTTON so a keyboard reaches it; NsTooltip names it as the
  * button's description, shows on focus and hover, and hides on Escape. Its
- * accessible name is "More about {feature}" from the locale.
+ * accessible name is "More about {feature}" from the locale. A CLICK or
+ * TAP toggles it too: review read QTooltip's touch path as press-and-hold,
+ * so a tap on iOS (no focus, no hover) showed nothing — the button now
+ * drives the tooltip it holds.
  */
-import { computed, toRaw, useId } from 'vue'
+import { computed, toRaw, useId, type ComponentPublicInstance } from 'vue'
 import { PhInfo } from '@phosphor-icons/vue'
 import NsTooltip from '../NsTooltip/NsTooltip.vue'
 import { useNsLocale } from '../../composables/useNsLocale'
@@ -80,6 +84,14 @@ const props = withDefaults(
 const locale = useNsLocale()
 const titleId = useId()
 const columns = computed(() => (props.area.columns === 2 ? 2 : 1))
+
+// One tooltip instance per feature, by id (a v-for ref array is unordered).
+type TipInstance = { toggle: () => void }
+const tips = new Map<string, TipInstance>()
+function setTip(id: string, el: Element | ComponentPublicInstance | null) {
+  if (el && 'toggle' in el) tips.set(id, el as unknown as TipInstance)
+  else tips.delete(id)
+}
 const headingTag = computed(() => `h${Math.min(6, Math.max(1, Math.round(props.level)))}`)
 </script>
 
@@ -147,11 +159,13 @@ const headingTag = computed(() => `h${Math.min(6, Math.max(1, Math.round(props.l
     min-width: 0;
   }
 
+  // A 24px hit area around the 16px icon at no layout cost (2.5.8).
   &__tip {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
-    padding: 0;
+    padding: var(--ns-space-1);
+    margin: calc(-1 * var(--ns-space-1));
     border: 0;
     border-radius: var(--ns-radius-sm);
     background: transparent;

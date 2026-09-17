@@ -61,6 +61,18 @@ describe('NsBaseSummary — chrome only', () => {
     w.unmount()
   })
 
+  it('a click on a tip toggles its tooltip (a tap has no hover and no focus)', async () => {
+    const w = mount(NsBaseSummary, { props: base, attachTo: document.body })
+    const tip = w.find('.ns-feature-card__tip')
+    await tip.trigger('click')
+    await new Promise((r) => setTimeout(r, 0))
+    expect(document.querySelector('.ns-tooltip'), 'shown by the click').not.toBeNull()
+    await tip.trigger('click')
+    await new Promise((r) => setTimeout(r, 0))
+    expect(document.querySelector('.ns-tooltip'), 'hidden by the second').toBeNull()
+    w.unmount()
+  })
+
   it('renders each feature as a list item with its text, and a tip button only where there is a tooltip', () => {
     const w = mountWith()
     const pos = w.findAll('.ns-feature-card')[0]
@@ -93,7 +105,12 @@ describe('NsBaseSummary — chrome only', () => {
 
   it('puts the callout on the promo banner tone, and omits it — and the subtitle — when blank', () => {
     const w = mountWith()
-    expect(w.findComponent(NsBanner).props('type')).toBe('promo')
+    const banner = w.findComponent(NsBanner)
+    expect(banner.props('type')).toBe('promo')
+    // A surface, not a status: review deleted 'promo' from SURFACE_TYPES and
+    // the callout became role="status" aria-live="polite" with every test green.
+    expect(banner.attributes('role')).toBeUndefined()
+    expect(banner.attributes('aria-live')).toBeUndefined()
     expect(w.find('.ns-base-summary__alert-text').text()).toBe(base.alert)
     w.unmount()
     const bare = mountWith({ subtitle: '  ', alert: '', areas: [] })

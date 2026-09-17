@@ -98,6 +98,18 @@ function handleFocusIn() {
   tooltipRef.value?.show()
 }
 
+/**
+ * QTooltip's own show/hide/toggle, exposed so an anchor can drive the tip
+ * from a click or tap: a tap has no hover and no focus on iOS, and QTooltip's
+ * touch path is press-and-hold (300ms) — a bare button whose only job is
+ * this tooltip did nothing when activated (componentLibrary-lrw.9 review).
+ */
+defineExpose({
+  show: () => tooltipRef.value?.show(),
+  hide: () => tooltipRef.value?.hide(),
+  toggle: () => tooltipRef.value?.toggle(),
+})
+
 function handleFocusOut() {
   focusHideQueued = true
   queueMicrotask(() => {
