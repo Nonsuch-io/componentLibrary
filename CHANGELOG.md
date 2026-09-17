@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.50.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.50.0...v0.50.1) (2026-09-17)
+
+
+### Bug Fixes
+
+* **locale:** a blank prop falls back to the locale, everywhere (componentLibrary-d13) ([f717870](https://github.com/Nonsuch-io/componentLibrary/commit/f717870469afc529cbde07f3e76177bb5df4dd93))
+* **locale:** a blank prop falls back to the locale, everywhere (componentLibrary-d13) ([7cdb70e](https://github.com/Nonsuch-io/componentLibrary/commit/7cdb70e7701ac365d62a1db8a2e36cb202705b19))
+
 ## [0.50.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.49.0...v0.50.0) (2026-09-17)
 
 
