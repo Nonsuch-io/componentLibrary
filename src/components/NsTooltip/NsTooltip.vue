@@ -181,11 +181,22 @@ function handleOutsidePointerDown(event: PointerEvent) {
   hideTap()
 }
 
-/** Release the tap and take Quasar's timer slot with a hide, shown or pending. */
+/**
+ * Release the tap and hide. A SHOWN tooltip hides through hide(), whose
+ * leave transition owns Quasar's one timer slot until it finishes — the
+ * finisher tears down the portal, releases the scroll tracking and emits
+ * `hide`; a pointerleave re-dispatch here would take that slot and cancel
+ * it (review measured: `hide` never fired, a portal node and a global
+ * scroll subscription leaked for the life of the component). Only a
+ * PENDING show — nothing in the DOM yet — needs the slot taken, and then
+ * hide() is a no-op, so the pointerleave is what makes Quasar's delayHide
+ * replace it.
+ */
 function hideTap() {
   releaseTap()
+  const wasShowing = document.getElementById(tooltipId) !== null
   tooltipRef.value?.hide()
-  handleTooltipMouseLeave()
+  if (!wasShowing) handleTooltipMouseLeave()
 }
 
 function releaseTap() {

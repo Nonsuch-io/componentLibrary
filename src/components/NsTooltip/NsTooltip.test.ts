@@ -416,6 +416,42 @@ describe('NsTooltip on touch', () => {
     expect(tooltip(), 'the click did not toggle it off').not.toBeNull()
   })
 
+  it('a tap-hidden tooltip finishes hiding: `hide` fires and the portal is torn down', async () => {
+    const onHide = vi.fn()
+    wrapper = mount(ButtonHost, {
+      attachTo: document.body,
+      props: { delay: 0, onHide, transitionDuration: 50 },
+    })
+    await nextTick()
+    const anchor = wrapper.find('.anchor-btn').element as HTMLElement
+    const portals = () => document.querySelectorAll('[id^="q-portal--tooltip"]').length
+
+    tap(anchor)
+    await wait()
+    expect(tooltip()).not.toBeNull()
+    expect(portals()).toBe(1)
+
+    // Review measured the first draft re-dispatching pointerleave on a SHOWN
+    // tooltip: Quasar's one timer slot went to delayHide instead of the leave
+    // transition's finisher, so `hide` never fired and the portal node (and
+    // its global scroll subscription) stayed for the life of the component.
+    tap(anchor)
+    await wait(120)
+    expect(tooltip()).toBeNull()
+    expect(onHide, '`hide` emitted').toHaveBeenCalledTimes(1)
+    expect(portals(), 'portal torn down').toBe(0)
+
+    // The same through an outside tap on a shown tooltip.
+    tap(anchor)
+    await wait()
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { pointerType: 'touch', bubbles: true }),
+    )
+    await wait(120)
+    expect(onHide).toHaveBeenCalledTimes(2)
+    expect(portals()).toBe(0)
+  })
+
   it('a tap on the tooltip itself does not dismiss it', async () => {
     wrapper = mount(ButtonHost, { attachTo: document.body, props: { delay: 0 } })
     await nextTick()
