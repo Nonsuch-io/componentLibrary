@@ -99,10 +99,10 @@
       ]
     },
     {
-      "name": "single component: NsHoursOfOperation (largest in the sign-up flow; pulls NsSelect, NsCheckbox, NsButton, the en-CA locale) — 7.75 kB as of 2026-09-15: it pulls the whole en-CA object, so every new locale section lands here (7.53 after plan.*)",
+      "name": "single component: NsHoursOfOperation (largest in the sign-up flow; pulls NsSelect, NsCheckbox, NsButton, the en-CA locale) — 8 kB as of 2026-09-17: NsSelect naming its listbox (componentLibrary-2e7) took it 7.7 → 7.82; and the locale sections since (order, baseSummary). Before that, 7.75 kB as of 2026-09-15: it pulls the whole en-CA object, so every new locale section lands here (7.53 after plan.*)",
       "path": "dist/nonsuch-components.js",
       "import": "{ NsHoursOfOperation }",
-      "limit": "7.75 kB",
+      "limit": "8 kB",
       "gzip": true,
       "ignore": [
         "vue",
