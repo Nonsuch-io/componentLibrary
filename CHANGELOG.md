@@ -4,6 +4,17 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.50.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.49.0...v0.50.0) (2026-09-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **tokens:** --ns-radius-* is renamed to the design's scale — sm→xs (4px), md→sm (8px), lg→md (12px), xl→lg (16px); --ns-radius-xl no longer exists. A consumer using these by name gets the next size up until it renames. --ns-color-bg-primary-subtle and --ns-color-border-primary-subtle
+
+### Bug Fixes
+
+* **tokens:** match the design's radius names and primary-subtle tint (componentLibrary-56l) ([88be523](https://github.com/Nonsuch-io/componentLibrary/commit/88be52316aaef4a42d4c8de43cc270c6fbf0ae39))
+
 ## [0.49.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.48.0...v0.49.0) (2026-09-17)
 
 
