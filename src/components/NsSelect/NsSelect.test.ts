@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
 import NsSelect from './NsSelect.vue'
@@ -87,5 +88,41 @@ describe('NsSelect', () => {
     // If `disable` were not a declared prop, it would land in $attrs
     // instead of $props, and wrapper.props('disable') would be undefined.
     expect(wrapper.props('disable')).toBe(true)
+  })
+})
+
+// QSelect's popup teleports to document.body, so these mount attached and
+// read the live DOM.
+describe('NsSelect — the listbox is named (componentLibrary-2e7)', () => {
+  const open = async (props: Record<string, unknown>) => {
+    const w = mount(NsSelect, { props, attachTo: document.body })
+    const combobox = w.find('[role="combobox"]')
+    // QSelect opens on the combobox's click (a control click toggles the menu).
+    await w.find('.q-field__control').trigger('click')
+    await nextTick()
+    await nextTick()
+    const listbox = document.querySelector('[role="listbox"]')
+    return { w, combobox, listbox }
+  }
+
+  it('names the popup listbox as the combobox is named, from `label`', async () => {
+    const { w, combobox, listbox } = await open({ label: 'Shop Category', options: ['A', 'B'] })
+    expect(listbox, 'the popup is open').not.toBeNull()
+    expect(combobox.attributes('aria-controls')).toBe(listbox!.id)
+    expect(listbox!.getAttribute('aria-label')).toBe('Shop Category')
+    w.unmount()
+  })
+
+  it('falls back to a consumer aria-label, and leaves an already-named listbox alone', async () => {
+    const { w, listbox } = await open({ 'aria-label': 'Choose one', options: ['A'] })
+    expect(listbox!.getAttribute('aria-label')).toBe('Choose one')
+    w.unmount()
+  })
+
+  it('does nothing when there is no name to give', async () => {
+    const { w, listbox } = await open({ options: ['A'] })
+    expect(listbox).not.toBeNull()
+    expect(listbox!.hasAttribute('aria-label')).toBe(false)
+    w.unmount()
   })
 })

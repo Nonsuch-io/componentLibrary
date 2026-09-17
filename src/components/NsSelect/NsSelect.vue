@@ -1,5 +1,6 @@
 <template>
   <q-select
+    ref="root"
     v-bind="attrsWithoutDisabled"
     :model-value="modelValue"
     :label="label"
@@ -13,6 +14,7 @@
     :disable="resolvedDisable"
     class="ns-select"
     @update:model-value="$emit('update:modelValue', $event)"
+    @popup-show="nameListbox"
   >
     <template v-for="(_, name) in $slots" #[name]="slotData">
       <slot :name="name" v-bind="slotData ?? {}" />
@@ -21,6 +23,7 @@
 </template>
 
 <script setup lang="ts">
+import { nextTick, ref } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'
 /**
  * NsSelect — A styled select/dropdown wrapping Quasar's QSelect.
@@ -82,6 +85,35 @@ defineEmits<{
 defineOptions({ inheritAttrs: false })
 
 const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsSelect', () => props.disable)
+
+const root = ref<{ $el?: HTMLElement } | null>(null)
+
+/**
+ * NAME THE LISTBOX (componentLibrary-2e7). QSelect names its combobox with
+ * `label` but renders the popup's listbox with a role and an id and no name
+ * — axe's aria-input-field-name, on every NsSelect on every page, found by
+ * the gate while a story had a menu open. The combobox's `aria-controls`
+ * is that listbox's id (QSelect.js: `${targetUid}_lb`, set only while the
+ * popup shows), so on popup-show the listbox is looked up through it and
+ * named as the combobox is. Set on the element rather than through a prop
+ * because QSelect exposes none for it; the element persists while the
+ * popup is open, so a virtual-scroll re-render keeps the attribute.
+ */
+async function nameListbox() {
+  const name =
+    props.label?.trim() || (attrsWithoutDisabled.value['aria-label'] as string | undefined)
+  if (!name) return
+  // popup-show fires as the menu opens; the listbox and the combobox's
+  // aria-controls land on the next render.
+  await nextTick()
+  const combobox = root.value?.$el?.querySelector<HTMLElement>('[role="combobox"]')
+  const listboxId = combobox?.getAttribute('aria-controls')
+  if (!listboxId) return
+  const listbox = document.getElementById(listboxId)
+  if (listbox && !listbox.hasAttribute('aria-label') && !listbox.hasAttribute('aria-labelledby')) {
+    listbox.setAttribute('aria-label', name)
+  }
+}
 </script>
 
 <style lang="sass" scoped>
