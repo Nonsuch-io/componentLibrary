@@ -4,6 +4,20 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.49.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.48.0...v0.49.0) (2026-09-17)
+
+
+### Features
+
+* **base-summary:** add NsBaseSummary, the base plan's areas and callout (componentLibrary-lrw.9) ([0b0450d](https://github.com/Nonsuch-io/componentLibrary/commit/0b0450d60afe028ab978df7895661c56a4e19f8a))
+* **base-summary:** add NsBaseSummary, the base plan's areas and callout (componentLibrary-lrw.9) ([b4ecfe4](https://github.com/Nonsuch-io/componentLibrary/commit/b4ecfe454688a3d4560d2819f405149214337cad))
+
+
+### Bug Fixes
+
+* **base-summary:** the tip keeps NsTooltip's own touch path (componentLibrary-lrw.9) ([f6d36cc](https://github.com/Nonsuch-io/componentLibrary/commit/f6d36ccef8e1c034f39194bb025ac8646cee2bc1))
+* **base-summary:** tip button drives its tooltip; promo's no-role pinned (componentLibrary-lrw.9) ([c165d62](https://github.com/Nonsuch-io/componentLibrary/commit/c165d621d0d48358969c7e79a3ef16943fee9cf0))
+
 ## [0.48.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.47.0...v0.48.0) (2026-09-16)
 
 
