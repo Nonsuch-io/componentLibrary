@@ -346,11 +346,14 @@ describe('NsTooltip on touch', () => {
   const wait = (ms = 20) => new Promise((r) => setTimeout(r, ms))
   const tooltip = () => document.querySelector('.ns-tooltip')
 
+  // The order a real finger puts on the anchor: a non-hovering pointer's
+  // "leave" is finger-up, BEFORE touchend and click.
   function tap(el: HTMLElement) {
-    el.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'touch', isPrimary: true }))
-    el.dispatchEvent(
-      new PointerEvent('pointerdown', { pointerType: 'touch', isPrimary: true, bubbles: true }),
-    )
+    const touch = { pointerType: 'touch', isPrimary: true, bubbles: true }
+    el.dispatchEvent(new PointerEvent('pointerenter', touch))
+    el.dispatchEvent(new PointerEvent('pointerdown', touch))
+    el.dispatchEvent(new PointerEvent('pointerup', touch))
+    el.dispatchEvent(new PointerEvent('pointerleave', touch))
     el.dispatchEvent(new Event('touchend', { bubbles: true }))
     el.dispatchEvent(new PointerEvent('click', { pointerType: 'touch', bubbles: true }))
   }
@@ -413,15 +416,63 @@ describe('NsTooltip on touch', () => {
     expect(tooltip(), 'the click did not toggle it off').not.toBeNull()
   })
 
+  it('a tap on the tooltip itself does not dismiss it', async () => {
+    wrapper = mount(ButtonHost, { attachTo: document.body, props: { delay: 0 } })
+    await nextTick()
+    const anchor = wrapper.find('.anchor-btn').element as HTMLElement
+    tap(anchor)
+    await wait()
+    const tip = tooltip() as HTMLElement
+    expect(tip).not.toBeNull()
+    // Review measured the first draft checking `$el`, the portal's text
+    // anchor, which contains nothing — a touch on the text to steady it hid it.
+    tip.dispatchEvent(new PointerEvent('pointerdown', { pointerType: 'touch', bubbles: true }))
+    await wait()
+    expect(tooltip(), 'still shown').not.toBeNull()
+  })
+
+  it('a tap elsewhere INSIDE the delay window cancels the pending show', async () => {
+    wrapper = mount(ButtonHost, { attachTo: document.body, props: { delay: 100 } })
+    await nextTick()
+    const anchor = wrapper.find('.anchor-btn').element as HTMLElement
+    tap(anchor)
+    await wait()
+    expect(tooltip(), 'not yet — the delay').toBeNull()
+    // A scroll started elsewhere before the tooltip appeared. Review measured
+    // the first draft's hide() as a no-op here (nothing showing), leaving
+    // Quasar's pending show to fire into a pinned tooltip nobody saw appear.
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { pointerType: 'touch', bubbles: true }),
+    )
+    await wait(200)
+    expect(tooltip(), 'never appeared').toBeNull()
+    // …and the tap state is released: a hover-shown tooltip survives an outside tap.
+    anchor.dispatchEvent(new PointerEvent('pointerenter'))
+    await wait(150)
+    expect(tooltip()).not.toBeNull()
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { pointerType: 'touch', bubbles: true }),
+    )
+    await wait()
+    expect(tooltip()).not.toBeNull()
+  })
+
   it("a pointer's focus does not show it; keyboard focus does", async () => {
     wrapper = mount(ButtonHost, { attachTo: document.body, props: { delay: 0 } })
     await nextTick()
     const anchor = wrapper.find('.anchor-btn').element as HTMLElement
-    // happy-dom reports a focused element as :focus-visible, so the gate's
-    // pointer branch is exercised by the Chromium story; here the keyboard
-    // branch — a real focus shows.
+    // The browser decides what `:focus-visible` means; here it is stubbed
+    // per focus. Review measured the gate removable with every test green.
+    const matches = vi.spyOn(anchor, 'matches')
+    matches.mockImplementation((sel: string) => sel !== ':focus-visible')
     anchor.focus()
     await wait()
-    expect(tooltip()).not.toBeNull()
+    expect(tooltip(), "a pointer's focus (not :focus-visible) shows nothing").toBeNull()
+    anchor.blur()
+    matches.mockImplementation((sel: string) => sel === ':focus-visible')
+    anchor.focus()
+    await wait()
+    expect(tooltip(), 'keyboard focus (:focus-visible) shows it').not.toBeNull()
+    matches.mockRestore()
   })
 })

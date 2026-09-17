@@ -221,19 +221,27 @@ export const TapToShow: Story = {
     const elsewhere = canvasElement.querySelector('[data-testid="elsewhere"]') as HTMLElement
     const tip = () => document.querySelector('.ns-tooltip')
     const touch = { pointerType: 'touch', isPrimary: true, bubbles: true } as const
+    // Chromium's order for a finger: a non-hovering pointer's "leave" is
+    // finger-up, before touchend and click.
     const tap = (el: HTMLElement) => {
       el.dispatchEvent(new PointerEvent('pointerenter', touch))
       el.dispatchEvent(new PointerEvent('pointerdown', touch))
       el.dispatchEvent(new Event('touchstart', { bubbles: true }))
-      el.dispatchEvent(new Event('touchend', { bubbles: true }))
       el.dispatchEvent(new PointerEvent('pointerup', touch))
+      el.dispatchEvent(new PointerEvent('pointerleave', touch))
+      el.dispatchEvent(new Event('touchend', { bubbles: true }))
       el.dispatchEvent(new PointerEvent('click', touch))
     }
 
     tap(anchor)
     await waitFor(() => expect(tip(), 'shown by the tap').not.toBeNull())
     await new Promise((r) => setTimeout(r, 400))
-    await expect(tip(), 'stays: touch has no pointerleave').not.toBeNull()
+    await expect(tip(), 'stays: the tap-driven show was the last thing Quasar saw').not.toBeNull()
+
+    // A touch on the tooltip's own text does not dismiss it.
+    ;(tip() as HTMLElement).dispatchEvent(new PointerEvent('pointerdown', touch))
+    await new Promise((r) => setTimeout(r, 100))
+    await expect(tip(), 'a tap on the tooltip keeps it').not.toBeNull()
 
     tap(anchor)
     await waitFor(() => expect(tip(), 'hidden by the second tap').toBeNull())
@@ -242,6 +250,12 @@ export const TapToShow: Story = {
     await waitFor(() => expect(tip()).not.toBeNull())
     elsewhere.dispatchEvent(new PointerEvent('pointerdown', touch))
     await waitFor(() => expect(tip(), 'hidden by a tap elsewhere').toBeNull())
+
+    // NOT asserted here: that a mouse click's FOCUS shows nothing. Chromium's
+    // :focus-visible heuristic counts only trusted input, and user-event's
+    // events are not — a script focus() after a synthetic mousedown reads as
+    // keyboard. The gate's pointer branch is pinned in the unit test with
+    // `matches` stubbed; the mouse regression below is the observable half.
 
     // A mouse: hover shows, and the click that follows leaves it shown — the
     // regression two earlier attempts had.
