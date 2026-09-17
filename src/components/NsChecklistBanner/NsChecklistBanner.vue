@@ -260,10 +260,9 @@ const badgeText = computed(() => {
   // padding 20 the task rows measured 1176 against the design's 1178.
   padding: calc(var(--ns-space-5) - 1px);
   border: 1px solid var(--ns-color-border-primary-subtle);
-  // The design says `radius-sm` and means 8px; the library's --ns-radius-sm
-  // is 4px and its --ns-radius-md is 8 (the names are one step apart between
-  // Figma and the tokens — componentLibrary-56l). 8 is what is rendered.
-  border-radius: var(--ns-radius-md);
+  // The design's radius-sm, 8 — the library's scale carries the design's
+  // names since componentLibrary-56l.
+  border-radius: var(--ns-radius-sm);
   background: var(--ns-color-bg-subtle);
   color: var(--ns-color-text-primary);
 
@@ -301,7 +300,7 @@ const badgeText = computed(() => {
     align-items: center;
     gap: var(--ns-space-1);
     padding: var(--ns-space-0) var(--ns-space-2);
-    border-radius: var(--ns-radius-sm);
+    border-radius: var(--ns-radius-xs);
     background: var(--ns-color-bg-warning);
     color: var(--ns-color-text-on-bg-warning);
     font-size: 0.75rem;
@@ -334,7 +333,7 @@ const badgeText = computed(() => {
     // wide (measured 60 and 1176 with the padding at face value).
     padding: calc(var(--ns-space-2) - 1px) calc(var(--ns-space-5) - 1px);
     border: 1px solid var(--ns-color-border-default);
-    border-radius: var(--ns-radius-md); // 8, see the container
+    border-radius: var(--ns-radius-sm); // 8, see the container
     background: var(--ns-color-bg-surface);
   }
 

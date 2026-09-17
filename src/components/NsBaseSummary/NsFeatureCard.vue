@@ -99,7 +99,7 @@ const headingTag = computed(() => `h${Math.min(6, Math.max(1, Math.round(props.l
   // 19 + the 1px border = the design's 20 inset (the stroke takes no space in Figma).
   padding: calc(var(--ns-space-5) - 1px);
   border: 1px solid var(--ns-color-border-primary);
-  border-radius: var(--ns-radius-md);
+  border-radius: var(--ns-radius-sm);
   color: var(--ns-color-text-primary);
 
   &__header {
@@ -161,7 +161,7 @@ const headingTag = computed(() => `h${Math.min(6, Math.max(1, Math.round(props.l
     padding: var(--ns-space-1);
     margin: calc(-1 * var(--ns-space-1));
     border: 0;
-    border-radius: var(--ns-radius-sm);
+    border-radius: var(--ns-radius-xs);
     background: transparent;
     color: var(--ns-color-text-primary);
     cursor: help;

@@ -355,5 +355,5 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
     &:focus-visible
       outline: 2px solid var(--ns-color-border-focus, currentColor)
       outline-offset: 2px
-      border-radius: var(--ns-radius-sm)
+      border-radius: var(--ns-radius-xs)
 </style>

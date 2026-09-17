@@ -262,9 +262,34 @@ describe('tokens.css', () => {
   /* -- Border radius tokens -- */
 
   it('defines border radius tokens', () => {
-    for (const r of ['none', 'sm', 'md', 'lg', 'xl', 'full']) {
+    for (const r of ['none', 'xs', 'sm', 'md', 'lg', 'full']) {
       expect(allTokens).toContain(`--ns-radius-${r}`)
     }
+  })
+
+  // The design's scale BY THE DESIGN'S NAMES (Figma radius-xs 4 / sm 8 / md
+  // 12, read on NsButton 2438:43290). The library carried the same values one
+  // name apart (sm/md/lg) until componentLibrary-56l, and every component
+  // translated in a comment; this pins the values to the names.
+  it('names the radius scale as the design does: xs 4, sm 8, md 12', () => {
+    for (const [name, value] of [
+      ['xs', '0.25rem'],
+      ['sm', '0.5rem'],
+      ['md', '0.75rem'],
+      ['lg', '1rem'],
+    ]) {
+      expect(css).toMatch(new RegExp(`--ns-radius-${name}:\\s*${value};`))
+    }
+  })
+
+  // The brand tint, as the design has it: color-bg-primary-subtle and
+  // color-border-primary-subtle are both #fdf0e3 in Figma (206:29274,
+  // 185:10186, 166:6346); the library had #fce5d2 for both (56l).
+  it("keeps the primary-subtle tint at the design's value in light", () => {
+    const end = css.indexOf(':root.dark')
+    const light = end > -1 ? css.slice(0, end) : css
+    expect(light).toMatch(/--ns-color-bg-primary-subtle:\s*#fdf0e3;/)
+    expect(light).toMatch(/--ns-color-border-primary-subtle:\s*#fdf0e3;/)
   })
 
   /* -- Shadow tokens -- */

@@ -52,7 +52,7 @@ const headerId = `ns-card-header-${useId()}`
 
 <style lang="sass" scoped>
 .ns-card
-  border-radius: var(--ns-radius-lg)
+  border-radius: var(--ns-radius-md)
   box-shadow: var(--ns-shadow-sm)
   font-family: var(--ns-font-family-text)
   transition: box-shadow var(--ns-duration-normal) var(--ns-easing-default)

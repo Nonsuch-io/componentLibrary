@@ -178,10 +178,10 @@ export type NsToken =
   | '--ns-touch-target'
   // Border radius
   | '--ns-radius-none'
+  | '--ns-radius-xs'
   | '--ns-radius-sm'
   | '--ns-radius-md'
   | '--ns-radius-lg'
-  | '--ns-radius-xl'
   | '--ns-radius-full'
   // Shadows
   | '--ns-shadow-sm'

@@ -131,7 +131,7 @@ const titleId = useId()
   // 19 + 1px border = the design's 20 inset (the stroke takes no space in Figma).
   padding: calc(var(--ns-space-5) - 1px);
   border: 1px solid var(--ns-color-border-default);
-  border-radius: var(--ns-radius-md);
+  border-radius: var(--ns-radius-sm);
   background: var(--ns-color-bg-surface-alt);
   color: var(--ns-color-text-primary);
 
@@ -203,7 +203,7 @@ const titleId = useId()
     align-items: center;
     gap: var(--ns-space-1);
     padding: var(--ns-space-0) var(--ns-space-2);
-    border-radius: var(--ns-radius-md);
+    border-radius: var(--ns-radius-sm);
     background: var(--ns-color-bg-positive);
     color: var(--ns-color-text-on-bg-positive);
     font-size: 0.75rem;

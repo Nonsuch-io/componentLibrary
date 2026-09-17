@@ -137,7 +137,7 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
 
 <style lang="sass" scoped>
 .ns-dialog__card
-  border-radius: var(--ns-radius-lg)
+  border-radius: var(--ns-radius-md)
   font-family: var(--ns-font-family-text)
   min-width: 320px
 

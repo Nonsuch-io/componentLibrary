@@ -254,6 +254,6 @@ onBeforeUnmount(() => {
   pointer-events: auto !important
   font-family: var(--ns-font-family-text)
   font-size: var(--ns-font-size-sm, 0.875rem)
-  border-radius: var(--ns-radius-sm)
+  border-radius: var(--ns-radius-xs)
   padding: var(--ns-space-1, 4px) var(--ns-space-2, 8px)
 </style>

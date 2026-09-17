@@ -105,7 +105,7 @@ const areasStyle = computed(() => ({
   // 19 + the 1px border = the design's 20 inset (the stroke takes no space in Figma).
   padding: calc(var(--ns-space-5) - 1px);
   border: 1px solid var(--ns-color-border-default);
-  border-radius: var(--ns-radius-md);
+  border-radius: var(--ns-radius-sm);
   background: var(--ns-color-bg-surface-alt);
   color: var(--ns-color-text-primary);
 

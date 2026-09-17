@@ -92,5 +92,5 @@ const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsSelect', () =
     font-family: var(--ns-font-family-text)
 
   :deep(.q-field__control)
-    border-radius: var(--ns-radius-md)
+    border-radius: var(--ns-radius-sm)
 </style>

@@ -449,11 +449,12 @@ const KNOWN_EXCEPTIONS: KnownException[] = [
     bg: '--ns-color-bg-primary-subtle',
     blocks: ['light'],
     belowLarge: false,
-    ratios: { light: 3.0842 },
+    ratios: { light: 3.34 },
     bead: 'componentLibrary-ek4',
     note:
       ".ns-banner--promo — the design's brand orange on its brand tint, 16/600 (not large text). " +
-      "Passes AA Large only. Dark uses the light tint as ink and passes; the fix for light is the design's.",
+      "Passes AA Large only (3.34 on the design's #fdf0e3 since 56l; 3.08 on the old #fce5d2). " +
+      "Dark uses the light tint as ink and passes; the fix for light is the design's.",
   },
   // --- componentLibrary-7jc: ~25 button combinations below AA ---
   {

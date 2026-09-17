@@ -111,7 +111,7 @@ const menuRef = ref<InstanceType<typeof NsMenu> | null>(null)
 .q-menu.ns-tooltip-details {
   // QMenu's own surface: the panel below carries the design's; the popup
   // keeps only its positioning; QMenu's shadow is replaced by the token.
-  border-radius: var(--ns-radius-md);
+  border-radius: var(--ns-radius-sm);
   box-shadow: var(--ns-shadow-md);
   // The 450 cap is QMenu's own `max-width` prop (an inline style that beats
   // CSS), defaulted above and overridable through attrs.
