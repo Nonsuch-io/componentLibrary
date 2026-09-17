@@ -46,7 +46,7 @@
  * Which combos exist, what they cost and what selecting one does are butiq's.
  *
  * MEASURED: a surface-alt card with a 1px default border, radius 8 (the
- * design's `radius-sm`, the library's --ns-radius-md — componentLibrary-56l),
+ * design's `radius-sm`, --ns-radius-sm since 56l aligned the names),
  * 20px padding INCLUDING the stroke (so 19 + 1 here), 12px between parts.
  * Parts, top to bottom: overline ("Overline label small", 12/500/18, brand,
  * uppercase — the ramp's `.ns-overline`, corrected to this node);
@@ -115,7 +115,7 @@ const isDesktop = useNsIsDesktop()
   // against 1178 with the padding at face value).
   padding: calc(var(--ns-space-5) - 1px);
   border: 1px solid var(--ns-color-border-default);
-  border-radius: var(--ns-radius-md);
+  border-radius: var(--ns-radius-sm);
   background: var(--ns-color-bg-surface-alt);
   color: var(--ns-color-text-primary);
 

@@ -333,7 +333,7 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
     font-family: var(--ns-font-family-text)
 
   :deep(.q-field__control)
-    border-radius: var(--ns-radius-md)
+    border-radius: var(--ns-radius-sm)
 
   // SIZES ARE OPT-IN, AND `default` IS NOT WHAT AN UNSIZED INPUT RENDERS.
   //

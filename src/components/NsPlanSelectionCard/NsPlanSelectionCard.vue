@@ -22,8 +22,8 @@
  * card with an NsCombo in the slot (componentLibrary-lrw.6.3).
  *
  * MEASURED (get_variable_defs on both, 2026-09-15): bg-surface, 1px
- * color-border-subtle, radius-md = 12 (the library's --ns-radius-lg; the
- * radius names are one step apart, componentLibrary-56l), padding 20
+ * color-border-subtle, radius-md = 12 (--ns-radius-md, since 56l aligned
+ * the names with the design's), padding 20
  * including the stroke, 12px between the heading and the contents; the
  * heading is "Medium heading regular" 20/400/25. 910 wide at desktop with
  * 870 inside; 350 at mobile with 310 inside.
@@ -54,7 +54,7 @@ const headingTag = computed(() => {
   // 19 + the 1px border = the design's 20 inset (a Figma stroke takes no layout space).
   padding: calc(var(--ns-space-5) - 1px);
   border: 1px solid var(--ns-color-border-subtle);
-  border-radius: var(--ns-radius-lg);
+  border-radius: var(--ns-radius-md);
   background: var(--ns-color-bg-surface);
   color: var(--ns-color-text-primary);
 

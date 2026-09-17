@@ -53,7 +53,7 @@
   --ns-color-bg-app-header: #fdf4e7;
   --ns-color-bg-transparent: rgba(253, 244, 231, 0.75);
   --ns-color-bg-primary: #d56307;
-  --ns-color-bg-primary-subtle: #fce5d2;
+  --ns-color-bg-primary-subtle: #fdf0e3;
   --ns-color-bg-primary-hover: #f66b00;
   --ns-color-bg-primary-active: #c05400;
   --ns-color-bg-disabled: #e0e0e0;
@@ -96,7 +96,7 @@
   --ns-color-border-focus: #93dbff;
   --ns-color-border-disabled: #d1d5db;
   --ns-color-border-primary: #d56307;
-  --ns-color-border-primary-subtle: #fce5d2;
+  --ns-color-border-primary-subtle: #fdf0e3;
   --ns-color-border-positive: #919500;
   --ns-color-border-warning: #f7bc2b;
   --ns-color-border-negative: #c7151c;
@@ -222,12 +222,16 @@
   --ns-dialog-width-default: 650px;
   --ns-dialog-width-large: 820px;
 
-  /* — Border radius — */
+  /* — Border radius — the design's scale, by the design's names (Figma
+     variables radius-xs 4 / radius-sm 8 / radius-md 12 / radius-full, read
+     on NsButton 2438:43290). Until 2026-09-17 these were sm/md/lg/xl for the
+     same values, one name apart from every Figma read, and each component
+     carried a translating comment (componentLibrary-56l). */
   --ns-radius-none: 0;
-  --ns-radius-sm: 0.25rem;
-  --ns-radius-md: 0.5rem;
-  --ns-radius-lg: 0.75rem;
-  --ns-radius-xl: 1rem;
+  --ns-radius-xs: 0.25rem;
+  --ns-radius-sm: 0.5rem;
+  --ns-radius-md: 0.75rem;
+  --ns-radius-lg: 1rem;
   --ns-radius-full: 9999px;
 
   /* — Shadows / elevation — */
@@ -313,7 +317,7 @@
   --ns-color-text-on-bg-warning: #2d0b00;
   --ns-color-text-on-bg-negative: #2d0b00;
   --ns-color-text-on-bg-info: #ffffff;
-  --ns-color-text-on-bg-primary-subtle: #fce5d2;
+  --ns-color-text-on-bg-primary-subtle: #fdf0e3;
   --ns-color-bg-accent: #0069b4;
   --ns-color-bg-dark: #2d0b00;
   --ns-color-bg-dialog: #351d16;
@@ -470,7 +474,7 @@
     --ns-color-text-on-bg-warning: #2d0b00;
     --ns-color-text-on-bg-negative: #2d0b00;
     --ns-color-text-on-bg-info: #ffffff;
-    --ns-color-text-on-bg-primary-subtle: #fce5d2;
+    --ns-color-text-on-bg-primary-subtle: #fdf0e3;
     --ns-color-bg-accent: #0069b4;
     --ns-color-bg-dark: #2d0b00;
     --ns-color-bg-dialog: #351d16;

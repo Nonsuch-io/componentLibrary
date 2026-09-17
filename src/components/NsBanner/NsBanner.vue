@@ -137,7 +137,7 @@ const ariaLive = computed(() => {
 <style lang="sass" scoped>
 .ns-banner
   font-family: var(--ns-font-family-text)
-  border-radius: var(--ns-radius-md)
+  border-radius: var(--ns-radius-sm)
 
   // INK IS text-on-bg-*, NOT text-*. `--ns-color-text-X` is a coloured text token
   // for a NEUTRAL surface; putting it on `--ns-color-bg-X` gave 1.36:1 warning
@@ -173,7 +173,7 @@ const ariaLive = computed(() => {
   // brand = bg-app-header with a 1px primary-subtle border (the base-plan
   // panel, 2361:191348); accent = bg-accent, no border (the total panel,
   // 2361:191733). Both 16px all round; radius 8 is the base rule's
-  // --ns-radius-md already (the design's radius-sm, componentLibrary-56l).
+  // --ns-radius-sm already (the design's radius-sm).
   // The padding is set on the QBanner root, where Quasar's 8px/16px lives.
   &--brand,
   &--accent,
@@ -188,7 +188,7 @@ const ariaLive = computed(() => {
   &--brand
     background-color: var(--ns-color-bg-app-header, #fdf4e7)
     color: var(--ns-color-text-primary, #2d0b00)
-    border: 1px solid var(--ns-color-border-primary-subtle, #fce5d2)
+    border: 1px solid var(--ns-color-border-primary-subtle, #fdf0e3)
   &--accent
     background-color: var(--ns-color-bg-accent, #b8e4fa)
     color: var(--ns-color-text-on-accent, #2d0b00)
@@ -197,7 +197,7 @@ const ariaLive = computed(() => {
   // ink is its own token: brand in light (the design's 3.08:1 pairing,
   // componentLibrary-ek4), the light tint in dark where brand was 1.61:1.
   &--promo
-    background-color: var(--ns-color-bg-primary-subtle, #fce5d2)
+    background-color: var(--ns-color-bg-primary-subtle, #fdf0e3)
     color: var(--ns-color-text-on-bg-primary-subtle, #d56307)
     border: 1px solid var(--ns-color-border-primary, #d56307)
 

@@ -222,7 +222,7 @@ All tokens use the `--ns-` prefix and support light/dark mode automatically. Cur
 
 ```css
 .my-card {
-  border-radius: var(--ns-radius-md);
+  border-radius: var(--ns-radius-sm);
   box-shadow: var(--ns-shadow-sm);
   padding: var(--ns-space-4);
 }

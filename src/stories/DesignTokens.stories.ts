@@ -63,7 +63,7 @@ const background: Token[] = [
   { name: '--ns-color-bg-subtle', fallback: '#fef7ee' },
   { name: '--ns-color-bg-app-header', fallback: '#fdf4e7' },
   { name: '--ns-color-bg-primary', fallback: '#d56307' },
-  { name: '--ns-color-bg-primary-subtle', fallback: '#fce5d2' },
+  { name: '--ns-color-bg-primary-subtle', fallback: '#fdf0e3' },
   { name: '--ns-color-bg-primary-hover', fallback: '#f66b00' },
   { name: '--ns-color-bg-primary-active', fallback: '#c05400' },
   { name: '--ns-color-bg-disabled', fallback: '#e0e0e0' },
@@ -85,7 +85,7 @@ const border: Token[] = [
   { name: '--ns-color-border-focus', fallback: '#93dbff' },
   { name: '--ns-color-border-disabled', fallback: '#d1d5db' },
   { name: '--ns-color-border-primary', fallback: '#d56307' },
-  { name: '--ns-color-border-primary-subtle', fallback: '#fce5d2' },
+  { name: '--ns-color-border-primary-subtle', fallback: '#fdf0e3' },
   { name: '--ns-color-border-positive', fallback: '#919500' },
   { name: '--ns-color-border-warning', fallback: '#f7bc2b' },
   { name: '--ns-color-border-negative', fallback: '#c7151c' },
@@ -172,10 +172,10 @@ const spacings: Token[] = [
 
 const radii: Token[] = [
   { name: '--ns-radius-none', fallback: '0' },
-  { name: '--ns-radius-sm', fallback: '0.25rem' },
-  { name: '--ns-radius-md', fallback: '0.5rem' },
-  { name: '--ns-radius-lg', fallback: '0.75rem' },
-  { name: '--ns-radius-xl', fallback: '1rem' },
+  { name: '--ns-radius-xs', fallback: '0.25rem' },
+  { name: '--ns-radius-sm', fallback: '0.5rem' },
+  { name: '--ns-radius-md', fallback: '0.75rem' },
+  { name: '--ns-radius-lg', fallback: '1rem' },
   { name: '--ns-radius-full', fallback: '9999px' },
 ]
 
@@ -227,7 +227,7 @@ function tokenLabel(name: string) {
 function colourSwatch(token: Token) {
   return h('div', { style: 'text-align: center; min-width: 90px' }, [
     h('div', {
-      style: `width: 64px; height: 64px; border-radius: var(--ns-radius-md); background: var(${token.name}); border: 1px solid var(--ns-color-border-default); margin: 0 auto`,
+      style: `width: 64px; height: 64px; border-radius: var(--ns-radius-sm); background: var(${token.name}); border: 1px solid var(--ns-color-border-default); margin: 0 auto`,
     }),
     tokenLabel(token.name.replace('--ns-color-', '')),
   ])
@@ -279,7 +279,7 @@ const DesignTokensPage = defineComponent({
               {
                 onClick: toggleDark,
                 style:
-                  'padding: 0.5rem 1rem; border-radius: var(--ns-radius-md); border: 1px solid var(--ns-color-border-default); background: var(--ns-color-bg-surface); color: var(--ns-color-text-primary); cursor: pointer; font-family: var(--ns-font-family-text)',
+                  'padding: 0.5rem 1rem; border-radius: var(--ns-radius-sm); border: 1px solid var(--ns-color-border-default); background: var(--ns-color-bg-surface); color: var(--ns-color-text-primary); cursor: pointer; font-family: var(--ns-font-family-text)',
               },
               isDark.value ? '☀️  Switch to Light' : '🌙  Switch to Dark',
             ),
@@ -352,7 +352,7 @@ const DesignTokensPage = defineComponent({
               ...spacings.map((t) =>
                 h('div', { style: 'display: flex; align-items: center; gap: 1rem' }, [
                   h('div', {
-                    style: `width: var(${t.name}); height: 24px; background: var(--ns-color-bg-brand-active); border-radius: var(--ns-radius-sm)`,
+                    style: `width: var(${t.name}); height: 24px; background: var(--ns-color-bg-brand-active); border-radius: var(--ns-radius-xs)`,
                   }),
                   tokenLabel(`${t.name.replace('--ns-', '')} (${t.fallback})`),
                 ]),
@@ -383,7 +383,7 @@ const DesignTokensPage = defineComponent({
             ...shadows.map((t) =>
               h('div', { style: 'text-align: center' }, [
                 h('div', {
-                  style: `width: 96px; height: 64px; border-radius: var(--ns-radius-md); background: var(--ns-color-bg-surface); box-shadow: var(${t.name}); margin: 0 auto`,
+                  style: `width: 96px; height: 64px; border-radius: var(--ns-radius-sm); background: var(--ns-color-bg-surface); box-shadow: var(${t.name}); margin: 0 auto`,
                 }),
                 tokenLabel(t.name.replace('--ns-', '')),
               ]),

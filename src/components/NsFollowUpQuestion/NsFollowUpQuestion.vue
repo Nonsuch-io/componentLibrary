@@ -141,7 +141,7 @@ defineExpose({ focus })
   // 19 + the 1px border = the design's 20 inset (a Figma stroke takes no layout space).
   padding: calc(var(--ns-space-5) - 1px);
   border: 1px solid var(--ns-color-border-default);
-  border-radius: var(--ns-radius-md);
+  border-radius: var(--ns-radius-sm);
   background: var(--ns-color-bg-surface-alt);
   color: var(--ns-color-text-primary);
 
@@ -170,7 +170,7 @@ defineExpose({ focus })
     gap: var(--ns-space-1);
     align-self: flex-start;
     padding: var(--ns-space-0) var(--ns-space-2);
-    border-radius: var(--ns-radius-md);
+    border-radius: var(--ns-radius-sm);
     // The design fills the badge with `color-text-info` (#0069b4) — a TEXT
     // token used as a surface. In dark that token becomes a pale blue meant
     // for text on dark and white on it is 2.53:1 (the contrast gate caught

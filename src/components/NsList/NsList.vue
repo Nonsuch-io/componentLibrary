@@ -42,5 +42,5 @@ withDefaults(defineProps<NsListProps>(), {
 <style lang="sass" scoped>
 .ns-list
   font-family: var(--ns-font-family-text)
-  border-radius: var(--ns-radius-md)
+  border-radius: var(--ns-radius-sm)
 </style>
