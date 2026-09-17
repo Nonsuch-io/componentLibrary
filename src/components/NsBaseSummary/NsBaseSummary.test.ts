@@ -61,18 +61,6 @@ describe('NsBaseSummary — chrome only', () => {
     w.unmount()
   })
 
-  it('a click on a tip toggles its tooltip (a tap has no hover and no focus)', async () => {
-    const w = mount(NsBaseSummary, { props: base, attachTo: document.body })
-    const tip = w.find('.ns-feature-card__tip')
-    await tip.trigger('click')
-    await new Promise((r) => setTimeout(r, 0))
-    expect(document.querySelector('.ns-tooltip'), 'shown by the click').not.toBeNull()
-    await tip.trigger('click')
-    await new Promise((r) => setTimeout(r, 0))
-    expect(document.querySelector('.ns-tooltip'), 'hidden by the second').toBeNull()
-    w.unmount()
-  })
-
   it('renders each feature as a list item with its text, and a tip button only where there is a tooltip', () => {
     const w = mountWith()
     const pos = w.findAll('.ns-feature-card')[0]

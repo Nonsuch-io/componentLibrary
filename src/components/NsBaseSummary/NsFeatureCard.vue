@@ -29,10 +29,9 @@
           type="button"
           class="ns-feature-card__tip"
           :aria-label="fill(locale.baseSummary.moreAbout, { feature: feature.text })"
-          @click="tips.get(feature.id)?.toggle()"
         >
           <PhInfo :size="16" weight="regular" aria-hidden="true" />
-          <NsTooltip :ref="(el) => setTip(feature.id, el)">{{ feature.tooltip }}</NsTooltip>
+          <NsTooltip>{{ feature.tooltip }}</NsTooltip>
         </button>
       </li>
     </ul>
@@ -60,12 +59,15 @@
  *
  * The tip is a BUTTON so a keyboard reaches it; NsTooltip names it as the
  * button's description, shows on focus and hover, and hides on Escape. Its
- * accessible name is "More about {feature}" from the locale. A CLICK or
- * TAP toggles it too: review read QTooltip's touch path as press-and-hold,
- * so a tap on iOS (no focus, no hover) showed nothing — the button now
- * drives the tooltip it holds.
+ * accessible name is "More about {feature}" from the locale. On TOUCH it is
+ * press-and-hold, QTooltip's UX for every tooltip in the library: a tap
+ * shows nothing. Two reviews measured the alternatives — a click that
+ * toggles hid the tip a mouse click's focus had just shown (mousedown
+ * focuses, focusin shows, click toggles off), and a click that shows loses
+ * to the touchend hide timer — so the tap path is NsTooltip's question, not
+ * this button's: componentLibrary-ewc.
  */
-import { computed, toRaw, useId, type ComponentPublicInstance } from 'vue'
+import { computed, toRaw, useId } from 'vue'
 import { PhInfo } from '@phosphor-icons/vue'
 import NsTooltip from '../NsTooltip/NsTooltip.vue'
 import { useNsLocale } from '../../composables/useNsLocale'
@@ -84,14 +86,6 @@ const props = withDefaults(
 const locale = useNsLocale()
 const titleId = useId()
 const columns = computed(() => (props.area.columns === 2 ? 2 : 1))
-
-// One tooltip instance per feature, by id (a v-for ref array is unordered).
-type TipInstance = { toggle: () => void }
-const tips = new Map<string, TipInstance>()
-function setTip(id: string, el: Element | ComponentPublicInstance | null) {
-  if (el && 'toggle' in el) tips.set(id, el as unknown as TipInstance)
-  else tips.delete(id)
-}
 const headingTag = computed(() => `h${Math.min(6, Math.max(1, Math.round(props.level)))}`)
 </script>
 
