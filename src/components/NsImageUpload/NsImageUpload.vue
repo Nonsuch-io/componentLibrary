@@ -452,8 +452,10 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   // a leading dot to endsWith, which a base name with "/" never satisfies —
   // every drop rejected, silently); and an extension may carry "-" or "_"
   // (".a-b" was flagged as matching no file, but endsWith matches photo.a-b,
-  // as the browser's own accept does).
-  const RULE = /^(\.[a-z0-9_-]+(\.[a-z0-9_-]+)*|[a-z0-9][a-z0-9.+-]*\/(\*|[a-z0-9][a-z0-9.+-]*))$/i
+  // as the browser's own accept does). So the extension branch is exactly
+  // what isAccepted() matches: a dot, then anything without a "/" — the HTML
+  // accept token is "a string whose first character is U+002E", no more.
+  const RULE = /^(\.[^/]+|[a-z0-9][a-z0-9.+-]*\/(\*|[a-z0-9][a-z0-9.+-]*))$/i
   watch(
     () => props.accept,
     (accept) => {

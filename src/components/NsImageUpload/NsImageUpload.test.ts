@@ -464,12 +464,14 @@ describe('NsImageUpload', () => {
     // it to endsWith, which no base name with a "/" satisfies — every drop
     // rejected and the guard silent, the exact case it exists for.
     it.each(['./x', '.a/b', '../x', 'image/.png'])(
-      'warns about %j, a MIME-shaped rule isAccepted() can never match',
+      'warns about %j, which no picker-produced file can match',
       (rule) => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
         const wrapper = mountEmpty({ accept: rule })
         expect(warn).toHaveBeenCalledWith(expect.stringContaining(`accept contains "${rule}"`))
-        // …and it really matches nothing: a picker's base name has no "/".
+        // …and a drop IS refused by this rule: a picker's base name has no "/",
+        // and no picker gives a file the type "image/.png" (a constructed File
+        // could; review checked that the refusal below comes from the rule).
         return wrapper
           .find('.ns-image-upload__surface')
           .trigger('drop', {
@@ -481,12 +483,12 @@ describe('NsImageUpload', () => {
 
     // Conversely an extension with "-" or "_" DOES match (endsWith, as the
     // browser's own accept does), so the guard must not call it unmatchable.
-    it.each(['.a-b', '.a_b', '.tar-gz'])(
+    it.each(['.a-b', '.a_b', '.tar-gz', '.c++', '.ünï'])(
       'stays silent for %j, which endsWith matches',
       async (rule) => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
         const wrapper = mountEmpty({ accept: rule })
-        expect(warn).not.toHaveBeenCalled()
+        expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('accept contains'))
         await wrapper.find('.ns-image-upload__surface').trigger('drop', {
           dataTransfer: { files: [new File(['x'], 'photo' + rule, { type: '' })] },
         })
