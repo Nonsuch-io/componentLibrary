@@ -443,6 +443,18 @@ interface KnownException {
 }
 
 const KNOWN_EXCEPTIONS: KnownException[] = [
+  // --- componentLibrary-ek4: the design's promo callout ---
+  {
+    fg: '--ns-color-text-on-bg-primary-subtle',
+    bg: '--ns-color-bg-primary-subtle',
+    blocks: ['light'],
+    belowLarge: false,
+    ratios: { light: 3.0842 },
+    bead: 'componentLibrary-ek4',
+    note:
+      ".ns-banner--promo — the design's brand orange on its brand tint, 16/600 (not large text). " +
+      "Passes AA Large only. Dark uses the light tint as ink and passes; the fix for light is the design's.",
+  },
   // --- componentLibrary-7jc: ~25 button combinations below AA ---
   {
     fg: '--ns-color-text-on-brand',

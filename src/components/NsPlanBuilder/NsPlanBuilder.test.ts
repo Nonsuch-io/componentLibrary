@@ -262,8 +262,8 @@ describe('NsPlanBuilder — what a screen reader is told', () => {
 })
 
 describe('NsBanner — surface tones', () => {
-  it('brand and accent carry no role or aria-live; the message types still do', () => {
-    for (const type of ['brand', 'accent'] as const) {
+  it('brand, accent and promo carry no role or aria-live; the message types still do', () => {
+    for (const type of ['brand', 'accent', 'promo'] as const) {
       const w = mount(NsBanner, { props: { type }, slots: { default: 'x' } })
       expect(w.classes()).toContain(`ns-banner--${type}`)
       expect(w.attributes('role')).toBeUndefined()

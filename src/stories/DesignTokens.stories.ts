@@ -50,6 +50,7 @@ const text: Token[] = [
   { name: '--ns-color-text-on-bg-warning', fallback: '#2d0b00' },
   { name: '--ns-color-text-on-bg-negative', fallback: '#2d0b00' },
   { name: '--ns-color-text-on-bg-info', fallback: '#2d0b00' },
+  { name: '--ns-color-text-on-bg-primary-subtle', fallback: '#d56307' },
   { name: '--ns-color-text-accent', fallback: '#64cbff' },
   { name: '--ns-color-text-on-accent', fallback: '#2d0b00' },
   { name: '--ns-color-text-on-dark', fallback: '#fef7ee' },
