@@ -67,6 +67,21 @@ describe('NsMarketingEmailCapture', () => {
       expect(wrapper.find('input').attributes('aria-label')).toBe('Email address')
     })
 
+    // A blank aria-label is no name, and a blank placeholder no hint: `t(key)`
+    // before translations load hands over '' (componentLibrary-d13, the bead
+    // this component was filed under).
+    it('falls back to the locale for a BLANK aria-label and placeholder, not to ""', () => {
+      for (const blank of ['', '   ']) {
+        const wrapper = mount(NsMarketingEmailCapture, {
+          props: { ariaLabel: blank, placeholder: blank },
+        })
+        expect(wrapper.find('input').attributes('aria-label')).toBe('Email address')
+        expect(wrapper.find('input').attributes('placeholder')).toBe(
+          nsLocaleEnCA.marketing.emailPlaceholder,
+        )
+      }
+    })
+
     it('should use a custom aria-label when provided via prop', () => {
       const wrapper = mount(NsMarketingEmailCapture, {
         props: { ariaLabel: 'Newsletter signup email' },

@@ -1,5 +1,6 @@
 <template>
-  <nav class="ns-onboarding-stepper" :aria-label="label ?? locale.stepper.progress">
+  <nav class="ns-onboarding-stepper" :aria-label="label?.trim() || locale.stepper.progress">
+    <!-- `?.trim() ||` on the name: a blank landmark name is no name; t() before load hands over '' (componentLibrary-d13). -->
     <!--
       role="list" restated: WebKit drops list semantics from a list-style:
       none <ol>, and "2 of 6" is the whole point of a stepper. Same rule and
@@ -70,7 +71,7 @@ export interface NsOnboardingStepperProps {
   steps: readonly NsOnboardingStep[]
   /** The id of the current step. Unknown or omitted → no step is current. */
   current?: string
-  /** Accessible name of the nav; "Progress" by default. */
+  /** Accessible name of the nav; blank or omitted → "Progress" from the locale. */
   label?: string
 }
 

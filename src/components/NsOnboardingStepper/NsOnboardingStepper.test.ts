@@ -105,6 +105,16 @@ describe('NsOnboardingStepper — what a screen reader is told', () => {
     w.unmount()
   })
 
+  // A blank label is no landmark name: `:label="t(key)"` before translations
+  // load hands over '' (componentLibrary-d13).
+  it('falls back to the locale name for a blank label, not to aria-label=""', () => {
+    for (const blank of ['', '   ']) {
+      const w = mountWith({ label: blank })
+      expect(w.attributes('aria-label')).toBe('Progress')
+      w.unmount()
+    }
+  })
+
   it('takes a custom nav name and speaks the injected locale', () => {
     expect(mountWith({ label: 'Sign-up progress' }).attributes('aria-label')).toBe(
       'Sign-up progress',

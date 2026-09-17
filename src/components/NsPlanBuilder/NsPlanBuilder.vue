@@ -21,8 +21,9 @@
 
     <NsSeparator />
 
+    <!-- `?.trim() ||`: a blank heading is no heading (componentLibrary-d13). -->
     <component :is="subheadingTag" class="ns-plan-builder__add-ons-title ns-heading-sm">
-      {{ addOnsLabel ?? locale.plan.chooseAddOns }}
+      {{ addOnsLabel?.trim() || locale.plan.chooseAddOns }}
     </component>
 
     <div class="ns-plan-builder__add-ons">
@@ -142,7 +143,7 @@ export interface NsPlanBuilderProps {
    */
   category?: string
   total: NsPlanTotal
-  /** "Choose Add-Ons"; from the locale by default. */
+  /** "Choose Add-Ons"; blank or omitted → from the locale. */
   addOnsLabel?: string
   /** "Continue With This Plan"; omitted → no button. */
   actionLabel?: string
