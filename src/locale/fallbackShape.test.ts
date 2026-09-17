@@ -31,12 +31,20 @@ function vueFiles(dir: string): string[] {
 describe('locale fallbacks treat blank as absent (componentLibrary-d13)', () => {
   it('no component uses `?? locale.` — blank would beat the locale', () => {
     const root = resolve(__dirname, '../components')
+    // Whole-file, not per-line: prettier at 100 columns breaks a long fallback
+    // as `… ??` / `locale.…` on the next line, and lint-staged runs it on every
+    // commit — review reproduced a reintroduction sailing through a per-line
+    // scan. `\s` spans the newline; the opt-out may sit on either line.
     const offenders = vueFiles(root).flatMap((file) => {
-      const lines = readFileSync(file, 'utf8').split('\n')
-      return lines
-        .map((line, i) => ({ line, n: i + 1 }))
-        .filter(({ line }) => /\?\?\s*locale\./.test(line) && !/d13: blank is a value/.test(line))
-        .map(({ line, n }) => `${file.slice(root.length + 1)}:${n}: ${line.trim()}`)
+      const source = readFileSync(file, 'utf8')
+      const lines = source.split('\n')
+      return [...source.matchAll(/\?\?\s*locale\./g)].flatMap((m) => {
+        const start = source.slice(0, m.index).split('\n').length
+        const end = start + m[0].split('\n').length - 1
+        const window = lines.slice(start - 1, end)
+        if (window.some((line) => /d13: blank is a value/.test(line))) return []
+        return [`${file.slice(root.length + 1)}:${start}: ${window.map((l) => l.trim()).join(' ')}`]
+      })
     })
     expect(offenders, 'use `?.trim() || locale.…`, or say why blank is a value').toEqual([])
   })
