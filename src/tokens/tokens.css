@@ -71,7 +71,7 @@
   --ns-color-text-on-bg-negative: #2d0b00;
   --ns-color-text-on-bg-info: #2d0b00;
   /* Ink for bg-primary-subtle, the brand tint: the design's brand orange in
-     light (3.08:1 — the design's pairing, componentLibrary-ek4); in dark the
+     light (3.34:1 on the design's #fdf0e3 — its own pairing, componentLibrary-ek4); in dark the
      tint itself becomes #a44700, where brand orange is 1.61:1, so the ink is
      the LIGHT tint. Chosen by background lightness, as the four above. */
   --ns-color-text-on-bg-primary-subtle: #d56307;

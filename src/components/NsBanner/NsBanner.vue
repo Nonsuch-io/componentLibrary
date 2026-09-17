@@ -194,7 +194,7 @@ const ariaLive = computed(() => {
     color: var(--ns-color-text-on-accent, #2d0b00)
   // promo (I166:6346;6260:9234, measured 2026-09-16): primary-subtle fill,
   // the PRIMARY border, brand text; 16 inset including the 1px stroke. The
-  // ink is its own token: brand in light (the design's 3.08:1 pairing,
+  // ink is its own token: brand in light (the design's 3.34:1 pairing,
   // componentLibrary-ek4), the light tint in dark where brand was 1.61:1.
   &--promo
     background-color: var(--ns-color-bg-primary-subtle, #fdf0e3)

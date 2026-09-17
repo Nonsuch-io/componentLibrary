@@ -286,8 +286,10 @@ describe('tokens.css', () => {
   // color-border-primary-subtle are both #fdf0e3 in Figma (206:29274,
   // 185:10186, 166:6346); the library had #fce5d2 for both (56l).
   it("keeps the primary-subtle tint at the design's value in light", () => {
-    expect(css).toMatch(/--ns-color-bg-primary-subtle:\s*#fdf0e3;/)
-    expect(css).toMatch(/--ns-color-border-primary-subtle:\s*#fdf0e3;/)
+    const end = css.indexOf(':root.dark')
+    const light = end > -1 ? css.slice(0, end) : css
+    expect(light).toMatch(/--ns-color-bg-primary-subtle:\s*#fdf0e3;/)
+    expect(light).toMatch(/--ns-color-border-primary-subtle:\s*#fdf0e3;/)
   })
 
   /* -- Shadow tokens -- */
