@@ -4,6 +4,20 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.51.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.50.1...v0.51.0) (2026-09-17)
+
+
+### Features
+
+* **tooltip:** tap to show, tap again or elsewhere to hide (componentLibrary-ewc) ([54cf89c](https://github.com/Nonsuch-io/componentLibrary/commit/54cf89c67643f13bb49884d661221582e6f8ff91))
+* **tooltip:** tap to show, tap again or elsewhere to hide (componentLibrary-ewc) ([61c83b0](https://github.com/Nonsuch-io/componentLibrary/commit/61c83b0f561d12e1e30dbeaa95ee78f603a82db3))
+
+
+### Bug Fixes
+
+* **tooltip:** a shown tooltip's hide keeps its own transition finisher (componentLibrary-ewc) ([cf633e2](https://github.com/Nonsuch-io/componentLibrary/commit/cf633e21dc9e749093007cb1bfb482760d976e35))
+* **tooltip:** tap on the tip keeps it; tap elsewhere cancels a pending show (componentLibrary-ewc) ([d0546c7](https://github.com/Nonsuch-io/componentLibrary/commit/d0546c79c23af7182d9baa437310f6cdb7484dac))
+
 ## [0.50.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.50.0...v0.50.1) (2026-09-17)
 
 
