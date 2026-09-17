@@ -12,6 +12,7 @@
     @mouseleave="handleTooltipMouseLeave"
     @focus="handleTooltipMouseEnter"
     @blur="handleTooltipMouseLeave"
+    @before-hide="handleHidden"
   >
     <slot />
   </q-tooltip>
@@ -40,6 +41,20 @@ declare const process: { env: { NODE_ENV?: string } } | undefined
  *    parent, same resolution Quasar uses internally) pointing at the
  *    tooltip's own id, and removes it again on unmount
  *  - Escape hides the tooltip without moving focus (WCAG 2.1 SC 1.4.13)
+ *  - a TAP shows it, a second tap or a tap outside hides it
+ *    (componentLibrary-ewc). QTooltip's own touch UX is press-and-hold:
+ *    finger-down schedules a show, finger-up schedules a hide in the same
+ *    timer slot, so a tap shows nothing — and a tap has no hover and, on
+ *    iOS, no focus. Two attempts from OUTSIDE this component failed under
+ *    review: a click that toggles hid what a mouse click's own focus had
+ *    just shown, and a click that shows lost to the finger-up hide timer.
+ *    Here, after a touch-driven click, a synthetic non-touch `pointerenter`
+ *    drives Quasar's delayShow, which REPLACES the pending hide in that
+ *    shared slot — the same lever the hover-onto-tooltip fix uses below.
+ *    (The tap's pointerleave has already fired: a finger's "leave" is
+ *    finger-up. The re-dispatch simply arrives last.)
+ *    Keyboard focus is gated on `:focus-visible` (as Quasar's own focus
+ *    handler is), so a tap's or click's focus no longer races the pointer.
  */
 
 export type NsTooltipAnchor =
@@ -93,9 +108,105 @@ let anchorEl: HTMLElement | null = null
  */
 let focusHideQueued = false
 
-function handleFocusIn() {
+function handleFocusIn(event: FocusEvent) {
   focusHideQueued = false
+  // Keyboard focus only, as Quasar's own onFocusin: a pointer's focus (a
+  // mouse click's on Chromium/Firefox, a tap's on Android) used to show the
+  // tooltip a beat before the pointer path hid it again. `:focus-visible`
+  // is what the browser says about the focus's origin; a selector engine
+  // without it (older jsdom) treats focus as visible, as before.
+  const el = event.target as HTMLElement | null
+  if (el && !matchesFocusVisible(el)) return
   tooltipRef.value?.show()
+}
+
+function matchesFocusVisible(el: HTMLElement): boolean {
+  try {
+    return el.matches(':focus-visible')
+  } catch {
+    return true
+  }
+}
+
+/**
+ * TAP TO SHOW. A touch-driven click (a tap) arrives after QTooltip has
+ * already seen the finger's pointerenter, pointerleave and touchend, the
+ * last of which scheduled a hide in its one timer slot. Re-dispatching a
+ * non-touch pointerenter on the anchor — with the tap's coordinates, so a
+ * consumer's `cursor-position` lands at the finger rather than (0,0) —
+ * makes Quasar's delayShow take that slot, so the tooltip shows after
+ * `delay` and stays: it is the last event Quasar sees. A second tap hides
+ * it; so does a tap anywhere else, through a capture listener that lives
+ * only while a tap holds it open. Both release the tap state THEMSELVES and
+ * re-dispatch pointerleave so Quasar's delayHide takes the slot: a tap
+ * elsewhere inside the delay window used to leave the pending show to fire
+ * into a pinned tooltip nobody saw appear (review measured it). Any other
+ * hide (Escape, blur) releases it via `before-hide` — `hide` fires after
+ * the leave transition, and a test caught the listener alive in that window.
+ */
+let lastPointerType = ''
+let tapShown = false
+
+function handlePointerDown(event: PointerEvent) {
+  lastPointerType = event.pointerType
+}
+
+function handlePointerCancel() {
+  lastPointerType = ''
+}
+
+function handleClick(event: MouseEvent) {
+  const pointerType = (event as PointerEvent).pointerType || lastPointerType
+  lastPointerType = ''
+  if (pointerType !== 'touch') return
+  if (tapShown) {
+    hideTap()
+    return
+  }
+  tapShown = true
+  document.addEventListener('pointerdown', handleOutsidePointerDown, true)
+  const at = { clientX: event.clientX, clientY: event.clientY }
+  anchorEl?.dispatchEvent(new PointerEvent('pointerenter', at))
+  anchorEl?.dispatchEvent(new MouseEvent('mouseenter', at))
+}
+
+function handleOutsidePointerDown(event: PointerEvent) {
+  const target = event.target as Node | null
+  if (!target) return
+  if (anchorEl?.contains(target)) return
+  // The tooltip's own element is `contentEl` (Quasar's portal injects it);
+  // `$el` is the portal fragment's text anchor and contains nothing — a tap
+  // on the tooltip's text used to dismiss it.
+  if (document.getElementById(tooltipId)?.contains(target)) return
+  hideTap()
+}
+
+/**
+ * Release the tap and hide. A SHOWN tooltip hides through hide(), whose
+ * leave transition owns Quasar's one timer slot until it finishes — the
+ * finisher tears down the portal, releases the scroll tracking and emits
+ * `hide`; a pointerleave re-dispatch here would take that slot and cancel
+ * it (review measured: `hide` never fired, a portal node and a global
+ * scroll subscription leaked for the life of the component). Only a
+ * PENDING show — nothing in the DOM yet — needs the slot taken, and then
+ * hide() is a no-op, so the pointerleave is what makes Quasar's delayHide
+ * replace it.
+ */
+function hideTap() {
+  releaseTap()
+  const wasShowing = document.getElementById(tooltipId) !== null
+  tooltipRef.value?.hide()
+  if (!wasShowing) handleTooltipMouseLeave()
+}
+
+function releaseTap() {
+  if (!tapShown) return
+  tapShown = false
+  document.removeEventListener('pointerdown', handleOutsidePointerDown, true)
+}
+
+function handleHidden() {
+  releaseTap()
 }
 
 function handleFocusOut() {
@@ -188,6 +299,9 @@ onMounted(() => {
   addDescribedBy(el)
   el.addEventListener('focusin', handleFocusIn)
   el.addEventListener('focusout', handleFocusOut)
+  el.addEventListener('pointerdown', handlePointerDown, { passive: true })
+  el.addEventListener('pointercancel', handlePointerCancel, { passive: true })
+  el.addEventListener('click', handleClick)
   document.addEventListener('keydown', handleKeydown)
 
   // QTooltip's `target` prop redirects which element Quasar anchors to
@@ -224,8 +338,13 @@ onBeforeUnmount(() => {
   removeDescribedBy(el)
   el.removeEventListener('focusin', handleFocusIn)
   el.removeEventListener('focusout', handleFocusOut)
+  el.removeEventListener('pointerdown', handlePointerDown)
+  el.removeEventListener('pointercancel', handlePointerCancel)
+  el.removeEventListener('click', handleClick)
   document.removeEventListener('keydown', handleKeydown)
+  document.removeEventListener('pointerdown', handleOutsidePointerDown, true)
   focusHideQueued = false
+  tapShown = false
   anchorEl = null
 })
 </script>

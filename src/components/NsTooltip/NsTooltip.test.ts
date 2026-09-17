@@ -218,7 +218,9 @@ describe('NsTooltip accessibility', () => {
 
     // Show the tooltip and confirm the id it points at is the id the
     // tooltip actually renders with — not just any non-empty string.
-    await wrapper.find('.anchor-btn').trigger('focusin')
+    // A real focus, not a bare focusin: the wrapper shows on KEYBOARD focus
+    // (`:focus-visible`), and happy-dom reports a focused element as such.
+    ;(wrapper.find('.anchor-btn').element as HTMLElement).focus()
     await nextTick()
     await nextTick()
 
@@ -236,7 +238,7 @@ describe('NsTooltip accessibility', () => {
 
     expect(document.getElementById(describedBy as string)).toBeNull()
 
-    await anchorWrapper.trigger('focusin')
+    ;(anchorWrapper.element as HTMLElement).focus()
     await nextTick()
     await nextTick()
 
@@ -252,7 +254,7 @@ describe('NsTooltip accessibility', () => {
     const describedBy = anchorEl.getAttribute('aria-describedby')
 
     anchorEl.focus()
-    await anchorWrapper.trigger('focusin')
+    ;(anchorWrapper.element as HTMLElement).focus()
     await nextTick()
     await nextTick()
     expect(document.getElementById(describedBy as string)).not.toBeNull()
@@ -325,5 +327,188 @@ describe('NsTooltip accessibility', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+})
+
+/**
+ * TAP TO SHOW (componentLibrary-ewc). Quasar's touch UX is press-and-hold:
+ * pointerenter(touch) schedules the show, touchend schedules the hide in the
+ * same slot, so a tap shows nothing. The sequence below is what a real tap
+ * puts on the anchor, in order; the assertions are what the wrapper adds.
+ */
+describe('NsTooltip on touch', () => {
+  let wrapper: VueWrapper
+
+  afterEach(() => {
+    wrapper?.unmount()
+  })
+
+  const wait = (ms = 20) => new Promise((r) => setTimeout(r, ms))
+  const tooltip = () => document.querySelector('.ns-tooltip')
+
+  // The order a real finger puts on the anchor: a non-hovering pointer's
+  // "leave" is finger-up, BEFORE touchend and click.
+  function tap(el: HTMLElement) {
+    const touch = { pointerType: 'touch', isPrimary: true, bubbles: true }
+    el.dispatchEvent(new PointerEvent('pointerenter', touch))
+    el.dispatchEvent(new PointerEvent('pointerdown', touch))
+    el.dispatchEvent(new PointerEvent('pointerup', touch))
+    el.dispatchEvent(new PointerEvent('pointerleave', touch))
+    el.dispatchEvent(new Event('touchend', { bubbles: true }))
+    el.dispatchEvent(new PointerEvent('click', { pointerType: 'touch', bubbles: true }))
+  }
+
+  it('a tap shows the tooltip and it stays; a second tap hides it', async () => {
+    wrapper = mount(ButtonHost, { attachTo: document.body, props: { delay: 0 } })
+    await nextTick()
+    const anchor = wrapper.find('.anchor-btn').element as HTMLElement
+
+    tap(anchor)
+    await wait()
+    expect(tooltip(), 'shown by the tap').not.toBeNull()
+    await wait(50)
+    expect(tooltip(), 'still shown — touch has no pointerleave').not.toBeNull()
+
+    tap(anchor)
+    await wait()
+    expect(tooltip(), 'hidden by the second tap').toBeNull()
+  })
+
+  it('a tap elsewhere hides a tap-shown tooltip, and the outside listener goes with it', async () => {
+    wrapper = mount(ButtonHost, { attachTo: document.body, props: { delay: 0 } })
+    await nextTick()
+    const anchor = wrapper.find('.anchor-btn').element as HTMLElement
+
+    tap(anchor)
+    await wait()
+    expect(tooltip()).not.toBeNull()
+
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { pointerType: 'touch', bubbles: true }),
+    )
+    await wait()
+    expect(tooltip(), 'hidden by the tap outside').toBeNull()
+
+    // Shown again by hover: an outside tap must NOT hide a hover-shown tooltip.
+    anchor.dispatchEvent(new PointerEvent('pointerenter'))
+    await wait()
+    expect(tooltip(), 'shown by hover').not.toBeNull()
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { pointerType: 'touch', bubbles: true }),
+    )
+    await wait()
+    expect(tooltip(), "a hover-shown tooltip is not the tap listener's to hide").not.toBeNull()
+  })
+
+  it('a mouse click is not a tap: hover shows, the click leaves it alone', async () => {
+    wrapper = mount(ButtonHost, { attachTo: document.body, props: { delay: 0 } })
+    await nextTick()
+    const anchor = wrapper.find('.anchor-btn').element as HTMLElement
+
+    anchor.dispatchEvent(new PointerEvent('pointerenter', { pointerType: 'mouse' }))
+    await wait()
+    expect(tooltip()).not.toBeNull()
+    anchor.dispatchEvent(
+      new PointerEvent('pointerdown', { pointerType: 'mouse', isPrimary: true, bubbles: true }),
+    )
+    anchor.dispatchEvent(new PointerEvent('click', { pointerType: 'mouse', bubbles: true }))
+    await wait()
+    expect(tooltip(), 'the click did not toggle it off').not.toBeNull()
+  })
+
+  it('a tap-hidden tooltip finishes hiding: `hide` fires and the portal is torn down', async () => {
+    const onHide = vi.fn()
+    wrapper = mount(ButtonHost, {
+      attachTo: document.body,
+      props: { delay: 0, onHide, transitionDuration: 50 },
+    })
+    await nextTick()
+    const anchor = wrapper.find('.anchor-btn').element as HTMLElement
+    const portals = () => document.querySelectorAll('[id^="q-portal--tooltip"]').length
+
+    tap(anchor)
+    await wait()
+    expect(tooltip()).not.toBeNull()
+    expect(portals()).toBe(1)
+
+    // Review measured the first draft re-dispatching pointerleave on a SHOWN
+    // tooltip: Quasar's one timer slot went to delayHide instead of the leave
+    // transition's finisher, so `hide` never fired and the portal node (and
+    // its global scroll subscription) stayed for the life of the component.
+    tap(anchor)
+    await wait(120)
+    expect(tooltip()).toBeNull()
+    expect(onHide, '`hide` emitted').toHaveBeenCalledTimes(1)
+    expect(portals(), 'portal torn down').toBe(0)
+
+    // The same through an outside tap on a shown tooltip.
+    tap(anchor)
+    await wait()
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { pointerType: 'touch', bubbles: true }),
+    )
+    await wait(120)
+    expect(onHide).toHaveBeenCalledTimes(2)
+    expect(portals()).toBe(0)
+  })
+
+  it('a tap on the tooltip itself does not dismiss it', async () => {
+    wrapper = mount(ButtonHost, { attachTo: document.body, props: { delay: 0 } })
+    await nextTick()
+    const anchor = wrapper.find('.anchor-btn').element as HTMLElement
+    tap(anchor)
+    await wait()
+    const tip = tooltip() as HTMLElement
+    expect(tip).not.toBeNull()
+    // Review measured the first draft checking `$el`, the portal's text
+    // anchor, which contains nothing — a touch on the text to steady it hid it.
+    tip.dispatchEvent(new PointerEvent('pointerdown', { pointerType: 'touch', bubbles: true }))
+    await wait()
+    expect(tooltip(), 'still shown').not.toBeNull()
+  })
+
+  it('a tap elsewhere INSIDE the delay window cancels the pending show', async () => {
+    wrapper = mount(ButtonHost, { attachTo: document.body, props: { delay: 100 } })
+    await nextTick()
+    const anchor = wrapper.find('.anchor-btn').element as HTMLElement
+    tap(anchor)
+    await wait()
+    expect(tooltip(), 'not yet — the delay').toBeNull()
+    // A scroll started elsewhere before the tooltip appeared. Review measured
+    // the first draft's hide() as a no-op here (nothing showing), leaving
+    // Quasar's pending show to fire into a pinned tooltip nobody saw appear.
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { pointerType: 'touch', bubbles: true }),
+    )
+    await wait(200)
+    expect(tooltip(), 'never appeared').toBeNull()
+    // …and the tap state is released: a hover-shown tooltip survives an outside tap.
+    anchor.dispatchEvent(new PointerEvent('pointerenter'))
+    await wait(150)
+    expect(tooltip()).not.toBeNull()
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { pointerType: 'touch', bubbles: true }),
+    )
+    await wait()
+    expect(tooltip()).not.toBeNull()
+  })
+
+  it("a pointer's focus does not show it; keyboard focus does", async () => {
+    wrapper = mount(ButtonHost, { attachTo: document.body, props: { delay: 0 } })
+    await nextTick()
+    const anchor = wrapper.find('.anchor-btn').element as HTMLElement
+    // The browser decides what `:focus-visible` means; here it is stubbed
+    // per focus. Review measured the gate removable with every test green.
+    const matches = vi.spyOn(anchor, 'matches')
+    matches.mockImplementation((sel: string) => sel !== ':focus-visible')
+    anchor.focus()
+    await wait()
+    expect(tooltip(), "a pointer's focus (not :focus-visible) shows nothing").toBeNull()
+    anchor.blur()
+    matches.mockImplementation((sel: string) => sel === ':focus-visible')
+    anchor.focus()
+    await wait()
+    expect(tooltip(), 'keyboard focus (:focus-visible) shows it').not.toBeNull()
+    matches.mockRestore()
   })
 })

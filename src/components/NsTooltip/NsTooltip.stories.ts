@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
-import { expect, userEvent } from 'storybook/test'
+import { expect, userEvent, waitFor } from 'storybook/test'
 import NsTooltip from './NsTooltip.vue'
 
 const meta: Meta<typeof NsTooltip> = {
@@ -189,5 +189,83 @@ export const HoverOntoTooltipKeepsItOpen: Story = {
       document.querySelector('.ns-tooltip'),
       'tooltip closed while the pointer was on it — the hoverable half of SC 1.4.13',
     ).not.toBeNull()
+  },
+}
+
+/**
+ * TAP TO SHOW, in a real browser (componentLibrary-ewc). A tap is the
+ * event sequence Chromium puts on a touched button, dispatched here with
+ * pointerType "touch" so Quasar takes its touch path (finger-down schedules
+ * a show, finger-up a hide in the same slot — the press-and-hold UX that
+ * showed nothing for a tap). The wrapper's click handler then takes that
+ * slot back. A second tap hides; a tap elsewhere hides; a MOUSE click does
+ * not toggle what hover has shown.
+ */
+export const TapToShow: Story = {
+  args: { delay: 0 },
+  render: (args) => ({
+    components: { NsTooltip },
+    setup: () => ({ args }),
+    template: `
+      <div style="padding: 60px">
+        <button data-testid="anchor" type="button" style="padding: 8px 16px">
+          Tap me
+          <NsTooltip v-bind="args">Shown by a tap</NsTooltip>
+        </button>
+        <p data-testid="elsewhere" style="margin-top: 40px">Somewhere else</p>
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    const anchor = canvasElement.querySelector('[data-testid="anchor"]') as HTMLElement
+    const elsewhere = canvasElement.querySelector('[data-testid="elsewhere"]') as HTMLElement
+    const tip = () => document.querySelector('.ns-tooltip')
+    const touch = { pointerType: 'touch', isPrimary: true, bubbles: true } as const
+    // Chromium's order for a finger: a non-hovering pointer's "leave" is
+    // finger-up, before touchend and click.
+    const tap = (el: HTMLElement) => {
+      el.dispatchEvent(new PointerEvent('pointerenter', touch))
+      el.dispatchEvent(new PointerEvent('pointerdown', touch))
+      el.dispatchEvent(new Event('touchstart', { bubbles: true }))
+      el.dispatchEvent(new PointerEvent('pointerup', touch))
+      el.dispatchEvent(new PointerEvent('pointerleave', touch))
+      el.dispatchEvent(new Event('touchend', { bubbles: true }))
+      el.dispatchEvent(new PointerEvent('click', touch))
+    }
+
+    tap(anchor)
+    await waitFor(() => expect(tip(), 'shown by the tap').not.toBeNull())
+    await new Promise((r) => setTimeout(r, 400))
+    await expect(tip(), 'stays: the tap-driven show was the last thing Quasar saw').not.toBeNull()
+
+    // A touch on the tooltip's own text does not dismiss it.
+    ;(tip() as HTMLElement).dispatchEvent(new PointerEvent('pointerdown', touch))
+    await new Promise((r) => setTimeout(r, 100))
+    await expect(tip(), 'a tap on the tooltip keeps it').not.toBeNull()
+
+    tap(anchor)
+    await waitFor(() => expect(tip(), 'hidden by the second tap').toBeNull())
+
+    tap(anchor)
+    await waitFor(() => expect(tip()).not.toBeNull())
+    elsewhere.dispatchEvent(new PointerEvent('pointerdown', touch))
+    await waitFor(() => expect(tip(), 'hidden by a tap elsewhere').toBeNull())
+
+    // NOT asserted here: that a mouse click's FOCUS shows nothing. Chromium's
+    // :focus-visible heuristic counts only trusted input, and user-event's
+    // events are not — a script focus() after a synthetic mousedown reads as
+    // keyboard. The gate's pointer branch is pinned in the unit test with
+    // `matches` stubbed; the mouse regression below is the observable half.
+
+    // A mouse: hover shows, and the click that follows leaves it shown — the
+    // regression two earlier attempts had.
+    await userEvent.hover(anchor)
+    await waitFor(() => expect(tip(), 'shown by hover').not.toBeNull())
+    await userEvent.click(anchor)
+    await new Promise((r) => setTimeout(r, 200))
+    await expect(tip(), 'a mouse click did not toggle it off').not.toBeNull()
+    await userEvent.unhover(anchor)
+    await userEvent.keyboard('{Escape}')
+    await waitFor(() => expect(tip()).toBeNull())
   },
 }
