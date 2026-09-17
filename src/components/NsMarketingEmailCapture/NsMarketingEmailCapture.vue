@@ -41,9 +41,9 @@ import { useNsLocale } from '../../composables/useNsLocale'
 
 export interface NsMarketingEmailCaptureProps {
   modelValue?: string
-  /** Visible placeholder text. Falls back to the injected locale's marketing.emailPlaceholder, then en-CA. */
+  /** Visible placeholder text. Blank or omitted → the locale's marketing.emailPlaceholder. */
   placeholder?: string
-  /** Accessible name for the input. Falls back to the injected locale's marketing.emailAddress, then en-CA. */
+  /** Accessible name for the input. Blank or omitted → the locale's marketing.emailAddress. */
   ariaLabel?: string
 }
 
@@ -60,8 +60,15 @@ defineEmits<{
 const locale = useNsLocale()
 const isFocused = ref(false)
 
-const resolvedPlaceholder = computed(() => props.placeholder ?? locale.marketing.emailPlaceholder)
-const resolvedAriaLabel = computed(() => props.ariaLabel ?? locale.marketing.emailAddress)
+// `?.trim() ||`, not `??`: a blank is "I did not supply one", not a value —
+// `:placeholder="t(key)"` resolves to '' before translations load, and the
+// aria-label is the input's only accessible name (componentLibrary-d13).
+// Nobody has asked to suppress the placeholder; if someone does, that is a
+// prop, not an empty string.
+const resolvedPlaceholder = computed(
+  () => props.placeholder?.trim() || locale.marketing.emailPlaceholder,
+)
+const resolvedAriaLabel = computed(() => props.ariaLabel?.trim() || locale.marketing.emailAddress)
 </script>
 
 <style lang="scss" scoped>

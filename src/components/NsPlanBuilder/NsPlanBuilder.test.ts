@@ -259,6 +259,15 @@ describe('NsPlanBuilder — what a screen reader is told', () => {
     expect(fr.find('.ns-plan-add-on__added').text()).toBe('Ajoutée')
     fr.unmount()
   })
+
+  // A blank heading is no heading (componentLibrary-d13).
+  it('falls back to the locale heading for a blank addOnsLabel', () => {
+    for (const blank of ['', '   ']) {
+      const w = mountWith({ addOnsLabel: blank })
+      expect(w.find('.ns-plan-builder__add-ons-title').text()).toBe('Choose Add-Ons')
+      w.unmount()
+    }
+  })
 })
 
 describe('NsBanner — surface tones', () => {
