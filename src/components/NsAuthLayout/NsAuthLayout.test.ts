@@ -52,6 +52,40 @@ describe('NsAuthLayout', () => {
     expect(wrapper.find('.ns-card').exists()).toBe(true)
   })
 
+  // componentLibrary-grj.2: the sign-up shell — content straight on the canvas.
+  describe('surface="canvas"', () => {
+    it('renders the slot with NO card, and marks the layout', () => {
+      const wrapper = mount(NsAuthLayout, {
+        props: { surface: 'canvas', maxWidth: '910px' },
+        slots: { default: '<section class="my-section">Profile</section>' },
+      })
+      expect(wrapper.classes()).toContain('ns-auth-layout--canvas')
+      expect(wrapper.find('.ns-card').exists()).toBe(false)
+      expect(wrapper.find('.ns-auth-layout__card').exists()).toBe(false)
+      // The slot lands directly in the container, so the consumer's section
+      // cards sit on the page as the frame draws them.
+      expect(wrapper.find('.ns-auth-layout__container > .my-section').exists()).toBe(true)
+      expect(
+        (wrapper.find('.ns-auth-layout__container').element as HTMLElement).style.maxWidth,
+      ).toBe('910px')
+    })
+
+    it('keeps the branding slot above the content', () => {
+      const wrapper = mount(NsAuthLayout, {
+        props: { surface: 'canvas' },
+        slots: { default: 'Content', branding: '<h1>butiq</h1>' },
+      })
+      const container = wrapper.find('.ns-auth-layout__container')
+      expect(container.element.children[0].className).toContain('ns-auth-layout__branding')
+    })
+
+    it('is the card by default — login, 2FA and reset do not move', () => {
+      const wrapper = mount(NsAuthLayout, { slots: { default: 'Content' } })
+      expect(wrapper.classes()).toContain('ns-auth-layout--card')
+      expect(wrapper.find('.ns-card').exists()).toBe(true)
+    })
+  })
+
   it('uses full width container for mobile-first layout', () => {
     const wrapper = mount(NsAuthLayout, {
       slots: { default: 'Content' },
