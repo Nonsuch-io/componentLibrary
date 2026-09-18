@@ -4,6 +4,19 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.52.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.51.2...v0.52.0) (2026-09-18)
+
+
+### Features
+
+* **button:** add the design's x and tertiary-negative variants (componentLibrary-ksg) ([a395b43](https://github.com/Nonsuch-io/componentLibrary/commit/a395b430a91bbff315ff81fa52b7df282f4f71c4))
+* **button:** add the design's x and tertiary-negative variants (componentLibrary-ksg) ([dd697df](https://github.com/Nonsuch-io/componentLibrary/commit/dd697df3d7384c472b9222ff92911c38dd25b07a))
+
+
+### Bug Fixes
+
+* **button:** drop the inert line-height on x; honest warning and docs (componentLibrary-ksg) ([2857743](https://github.com/Nonsuch-io/componentLibrary/commit/2857743d6fd27e7adbc1394172ff8789f6943611))
+
 ## [0.51.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.51.1...v0.51.2) (2026-09-18)
 
 
