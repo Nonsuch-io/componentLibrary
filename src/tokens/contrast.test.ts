@@ -24,7 +24,9 @@ import * as sass from 'sass-embedded'
 /**
  * KNOWN GAPS — what this file CANNOT see, so its green is read correctly.
  *
- * 21 of 90 evaluations (23%) resolve to `ratio: null` and are skipped: a
+ * 30 of 150 evaluations (20%, measured 2026-09-18 — the numbers move with
+ * every variant; the floor test below is what holds) resolve to `ratio:
+ * null` and are skipped: a
  * `linear-gradient(...)` background has no single colour to sample, and
  * `transparent` composites with whatever renders behind it. Both are refusals to
  * guess, not oversights.
@@ -768,9 +770,10 @@ describe('token contrast (componentLibrary-gbb)', () => {
     // acceptable reason — dishonest to keep as a name and pointless as a
     // check.
     //
-    // MEASURED TODAY: 69 resolved of 90 (76.7%). The floor requires 69, so there
-    // is ZERO headroom — the next unresolvable pair trips it, which is the point,
-    // but "comfortably below" was never true and is now provably not.
+    // MEASURED 2026-09-18: 120 resolved of 150 (80%); the floor is 113, so
+    // seven evaluations (about two transparent-background variants) of
+    // headroom. Earlier: 69 of 90 with ZERO headroom — the next unresolvable
+    // pair tripped it, which is the point; "comfortably below" was never true.
     // (historical note, stale: 66/84 =
     // 78.6%), leaving room for the two documented gaps above to grow a
     // little without failing every unrelated PR, while still being high

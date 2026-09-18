@@ -436,6 +436,8 @@ export const XAndTertiaryNegative: Story = {
       await expect(svg.left - r.left).toBe(4)
     }
     await expect(getComputedStyle(el('x-md')).backgroundColor).toBe('rgba(0, 0, 0, 0)')
+    // 8 at xl too, where the generic icon-only rule would give 12.
+    await expect(getComputedStyle(el('x-xl')).borderRadius).toBe('8px')
     await expect(getComputedStyle(el('x-md')).color).toBe(rgb(token('--ns-color-text-primary')))
     await expect(el('x-md').getAttribute('aria-label')).toBe('Close')
     await expect(getComputedStyle(el('x-disabled')).color).toBe(

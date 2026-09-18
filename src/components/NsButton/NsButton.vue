@@ -39,7 +39,9 @@ declare const process: { env: { NODE_ENV?: string } } | undefined
  * negative inks — a destructive text button, the plan builder's Remove.
  * `x` is the design's close affordance: ICON-ONLY by nature, no fill, 4px
  * around a 16/20/24/36/44 icon at xs–xl (24/28/32/44/52 square), in
- * text-primary, text-secondary on hover, text-disabled disabled.
+ * text-primary, text-secondary on hover, text-disabled disabled. The X
+ * sizes its own icon — a Phosphor `:size` inside it is overridden — and
+ * takes no label: text in an X is not a supported layout.
  */
 export type NsButtonVariant =
   | 'primary'
@@ -122,7 +124,7 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
       return
     warnedUnnamed = true
     console.warn(
-      '[NsButton] `iconOnly` is set but the button has no accessible name, so it ' +
+      '[NsButton] this button is icon-only (`iconOnly`, or `variant="x"`) but has no accessible name, so it ' +
         'announces as "button" with no description. Add aria-label (or ' +
         'aria-labelledby / title), or put visually-hidden text in the default ' +
         'slot. Name the ACTION, not the icon — "Delete item", not "trash".',
@@ -379,10 +381,14 @@ const buttonPadding = computed(() => {
 
 // ---- X (Figma "X", 2438:43589…44081) ----
 // The close affordance: no fill, 4px around the icon, square. The icon is
-// the whole button — 16/20/24/36/44 at xs–xl (measured 24/28/32/44/52) —
-// so the per-size line boxes above do not apply here. Colours are the
-// icon's own fills in the design: text-primary, text-secondary on hover,
-// text-primary pressed, text-disabled disabled.
+// the whole button — 16/20/24/36/44 at xs–xl (measured 24/28/32/44/52).
+// The geometry comes from the `padding` prop (which also zeroes QBtn's
+// min-height) and `.q-btn__content` being a flex row that blockifies the
+// svg — NOT from a line box; review measured the per-size line-heights
+// inert here and a `line-height: 0` turning text-in-an-X into an 8px
+// button. Colours are the icon's own fills in the design: text-primary,
+// text-secondary on hover, text-primary pressed, text-disabled disabled.
+// The X sizes its icon: a Phosphor `:size` inside it is overridden.
 .ns-btn--x {
   background: transparent;
   color: var(--ns-color-text-primary);
@@ -430,8 +436,7 @@ const buttonPadding = computed(() => {
     height: 44px;
   }
 
-  // The line box is the icon: no text, so no per-size line-height applies.
-  line-height: 0;
+  // 8 at every size — xl's icon-only rule above would round it to 12.
   &.ns-btn--icon-only {
     border-radius: 8px;
   }
