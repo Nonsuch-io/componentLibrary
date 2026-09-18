@@ -4,6 +4,15 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.51.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.51.0...v0.51.1) (2026-09-18)
+
+
+### Bug Fixes
+
+* **image-upload:** the accept guard and isAccepted() say the same thing (componentLibrary-3bm) ([2f741df](https://github.com/Nonsuch-io/componentLibrary/commit/2f741df294e1b6e5ba75463344bc35d3bbd52fa5))
+* **image-upload:** the accept guard and isAccepted() say the same thing (componentLibrary-3bm) ([cd5085f](https://github.com/Nonsuch-io/componentLibrary/commit/cd5085f439cfdaa63a88ce1f9be53a282967a91f))
+* **image-upload:** the extension branch is exactly what endsWith matches (componentLibrary-3bm) ([506b7d1](https://github.com/Nonsuch-io/componentLibrary/commit/506b7d18655c0c4428f6b22c6c54251a5ddb358f))
+
 ## [0.51.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.50.1...v0.51.0) (2026-09-17)
 
 
