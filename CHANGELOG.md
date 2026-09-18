@@ -4,6 +4,13 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.51.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.51.1...v0.51.2) (2026-09-18)
+
+
+### Bug Fixes
+
+* **select:** name the popup listbox (and dialog) as the combobox is named (componentLibrary-2e7) ([dde67cc](https://github.com/Nonsuch-io/componentLibrary/commit/dde67cc612c24099a348805a42fdf33425c7bc92))
+
 ## [0.51.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.51.0...v0.51.1) (2026-09-18)
 
 
