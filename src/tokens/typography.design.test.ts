@@ -20,7 +20,7 @@ import { resolve } from 'node:path'
  * away from gone.
  *
  * Only MEASURED styles are here. Ramp entries with no design sample yet
- * (label-xs, overline-lg, overline-md-bold, heading-sm,
+ * (label-xs, overline-lg, overline-md-bold,
  * heading-lg-regular, heading-xl-regular, heading-2xl*, display) are not
  * asserted, deliberately — pinning an unmeasured value would be pinning a
  * guess. Add a row when you measure one.
@@ -64,6 +64,14 @@ const MEASURED: ReadonlyArray<{
     weight: 400,
     lineHeightPx: 25,
     nodes: '265:30901 185:10182',
+  },
+  {
+    design: 'Small heading',
+    cls: 'heading-sm',
+    px: 16,
+    weight: 600,
+    lineHeightPx: 20.8,
+    nodes: '2438:43290 166:6346 (read 2026-09-16/17, componentLibrary-63k)',
   },
   {
     design: 'Small heading regular',

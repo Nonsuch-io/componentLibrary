@@ -445,7 +445,17 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   // token and isAccepted() handles it with endsWith. The first regex allowed
   // one segment only and cried wolf on it: a false warning on a valid config
   // is worse than no warning, because it teaches people to ignore the real one.
-  const RULE = /^(\.[a-z0-9]+(\.[a-z0-9]+)*|[a-z0-9.+-]+\/(\*|[a-z0-9.+-]+))$/i
+  //
+  // THIS REGEX AND isAccepted() ARE TWO VIEWS OF ONE RULE, and review
+  // (componentLibrary-3bm) found them disagreeing at the edges: a MIME
+  // token may not begin with "." ("./x" passed here, but isAccepted() routes
+  // a leading dot to endsWith, which a base name with "/" never satisfies —
+  // every drop rejected, silently); and an extension may carry "-" or "_"
+  // (".a-b" was flagged as matching no file, but endsWith matches photo.a-b,
+  // as the browser's own accept does). So the extension branch is exactly
+  // what isAccepted() matches: a dot, then anything without a "/" — the HTML
+  // accept token is "a string whose first character is U+002E", no more.
+  const RULE = /^(\.[^/]+|[a-z0-9][a-z0-9.+-]*\/(\*|[a-z0-9][a-z0-9.+-]*))$/i
   watch(
     () => props.accept,
     (accept) => {
