@@ -1,11 +1,12 @@
 <template>
   <div v-if="isLabelAbove" :class="['ns-select__field', attrs.class]" :style="attrs.style">
-    <label v-if="label" class="ns-select__label" :for="fieldId">{{ label }}</label>
+    <label v-if="label" :id="labelId" class="ns-select__label" :for="fieldId">{{ label }}</label>
     <q-select
       ref="root"
       v-bind="fieldBindings"
       :model-value="modelValue"
       :for="fieldId"
+      :aria-labelledby="label ? labelId : undefined"
       class="ns-select"
       @update:model-value="$emit('update:modelValue', $event)"
       @popup-show="nameListbox"
@@ -58,7 +59,9 @@ export interface NsSelectProps {
    * the combobox's id (use-field.js), so the <label> names the combobox and the
    * popup listbox takes the same name. The sign-up frame (264:26835) has three
    * selects beside label-above inputs; a form with mixed placements was worse
-   * than one on floating labels, so butiq waited for this.
+   * than one on floating labels, so butiq waited for this. `above` renders
+   * the label as text: a `#label` slot is not rendered in this placement
+   * (Quasar only renders it when given a label).
    */
   labelPlacement?: NsSelectLabelPlacement
   /** v-model value */
@@ -121,6 +124,15 @@ const isLabelAbove = computed(() => props.labelPlacement === 'above')
 const generatedId = useId()
 // `||`, not `??`: for="" would name nothing (NsInput's note, componentLibrary-3sy/knw).
 const fieldId = computed(() => (attrs.for as string | undefined) || generatedId)
+// QField's ROOT is itself a <label for=fieldId>, so in `above` the combobox has
+// TWO associated labels — ours and Quasar's wrapper, whose content includes the
+// selected value's text once picked. Review raised it; measured in Chromium
+// (dom-accessibility-api): the name still computes to the label alone, because
+// the control embedded in Quasar's label counts as the control, not as text.
+// aria-labelledby names it by construction regardless of that subtlety, and
+// it goes to the native input through Quasar's attr split. NsInput's `above`
+// has the same two labels (componentLibrary-2z7).
+const labelId = useId()
 const consumerFor = computed(() => attrs.for as string | undefined)
 
 // mergeProps so a consumer's `class` combines with ours; in `above` the
