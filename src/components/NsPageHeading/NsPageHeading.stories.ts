@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import NsPageHeading from './NsPageHeading.vue'
 import NsButton from '../NsButton/NsButton.vue'
+import { expect } from 'storybook/test'
+import { PhArrowLeft } from '@phosphor-icons/vue'
 
 const meta: Meta<typeof NsPageHeading> = {
   title: 'Components/NsPageHeading',
@@ -112,4 +114,45 @@ export const InsideAMainLandmark: Story = {
       </main>
     `,
   }),
+}
+
+/**
+ * THE SIGN-UP HEADING (componentLibrary-grj.1) — Figma 264:26835: a
+ * "Back to Pricing" tertiary control on the left, and the title CENTRED
+ * in the 910 column beneath it. `align="center"` moves the title block
+ * only; the controls row stays where the design draws it.
+ */
+export const CenteredTitleWithControls: Story = {
+  args: { title: 'Create your butiq shop.', align: 'center' },
+  render: (args) => ({
+    components: { NsPageHeading, NsButton, PhArrowLeft },
+    setup: () => ({ args }),
+    template: `
+      <div style="width: 910px">
+        <NsPageHeading v-bind="args">
+          <template #controls>
+            <NsButton variant="tertiary" size="md" data-testid="back">
+              <PhArrowLeft :size="20" weight="regular" aria-hidden="true" />
+              Back to Pricing
+            </NsButton>
+          </template>
+        </NsPageHeading>
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready
+    const header = canvasElement.querySelector('.ns-page-heading') as HTMLElement
+    const h = header.getBoundingClientRect()
+    const back = canvasElement.querySelector('[data-testid="back"]')!.getBoundingClientRect()
+    const title = canvasElement.querySelector('.ns-page-title__title') as HTMLElement
+    const t = title.getBoundingClientRect()
+    // Controls stay left; the title's centre is the column's centre.
+    await expect(back.left - h.left).toBe(0)
+    await expect(Math.abs((t.left + t.right) / 2 - (h.left + h.right) / 2)).toBeLessThan(1)
+    await expect(t.width).toBeLessThan(h.width) // centred as a block, not stretched
+    await expect(getComputedStyle(canvasElement.querySelector('.ns-page-title')!).textAlign).toBe(
+      'center',
+    )
+  },
 }
