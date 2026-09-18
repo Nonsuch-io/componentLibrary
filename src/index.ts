@@ -46,7 +46,11 @@ export { default as NsCard } from './components/NsCard/NsCard.vue'
 export type { NsCardProps } from './components/NsCard/NsCard.vue'
 
 export { default as NsSelect } from './components/NsSelect/NsSelect.vue'
-export type { NsSelectProps, NsSelectOption } from './components/NsSelect/NsSelect.vue'
+export type {
+  NsSelectProps,
+  NsSelectLabelPlacement,
+  NsSelectOption,
+} from './components/NsSelect/NsSelect.vue'
 
 export { default as NsCheckbox } from './components/NsCheckbox/NsCheckbox.vue'
 export type { NsCheckboxProps } from './components/NsCheckbox/NsCheckbox.vue'

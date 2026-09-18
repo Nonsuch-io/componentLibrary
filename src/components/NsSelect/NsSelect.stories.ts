@@ -96,3 +96,38 @@ export const OpenDialogListboxIsNamed: Story = {
     )
   },
 }
+
+/**
+ * LABEL ABOVE (componentLibrary-grj.3) — NsInput's contract mirrored, so the
+ * sign-up form's three selects sit beside its label-above inputs. The name
+ * comes from the LABEL by for/id (Quasar is given none, so no floating
+ * label and no padding for one); the popup listbox takes the same name.
+ * Ends with the menu OPEN so the a11y addon scans the named listbox.
+ */
+export const LabelAbove: Story = {
+  args: {
+    label: 'Province / Territory',
+    labelPlacement: 'above',
+    options: ['Alberta', 'British Columbia', 'Saskatchewan'],
+  },
+  play: async ({ canvasElement }) => {
+    const label = canvasElement.querySelector('label.ns-select__label') as HTMLElement
+    const combobox = canvasElement.querySelector('[role="combobox"]') as HTMLInputElement
+    await expect(combobox.labels?.[0]).toBe(label)
+    await expect(label.getAttribute('for')).toBe(combobox.id)
+    await expect(combobox.id).not.toBe('')
+    await expect(canvasElement.querySelector('.q-field__label')).toBeNull()
+    await expect(getComputedStyle(label).fontSize).toBe('14px')
+    // 6px between the label and the box, the design's gap.
+    const control = canvasElement.querySelector('.q-field__control') as HTMLElement
+    await expect(control.getBoundingClientRect().top - label.getBoundingClientRect().bottom).toBe(6)
+
+    await userEvent.click(control)
+    const listbox = await waitFor(() => {
+      const el = document.querySelector('[role="listbox"]') as HTMLElement
+      expect(el).not.toBeNull()
+      return el
+    })
+    await expect(listbox.getAttribute('aria-label')).toBe('Province / Territory')
+  },
+}

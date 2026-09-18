@@ -1,17 +1,27 @@
 <template>
+  <div v-if="isLabelAbove" :class="['ns-select__field', attrs.class]" :style="attrs.style">
+    <label v-if="label" class="ns-select__label" :for="fieldId">{{ label }}</label>
+    <q-select
+      ref="root"
+      v-bind="fieldBindings"
+      :model-value="modelValue"
+      :for="fieldId"
+      class="ns-select"
+      @update:model-value="$emit('update:modelValue', $event)"
+      @popup-show="nameListbox"
+    >
+      <template v-for="(_, name) in $slots" #[name]="slotData">
+        <slot :name="name" v-bind="slotData ?? {}" />
+      </template>
+    </q-select>
+  </div>
   <q-select
+    v-else
     ref="root"
-    v-bind="attrsWithoutDisabled"
+    v-bind="fieldBindings"
     :model-value="modelValue"
     :label="label"
-    :options="options"
-    :outlined="outlined"
-    :dense="dense"
-    :rules="rules"
-    :multiple="multiple"
-    :emit-value="emitValue"
-    :map-options="mapOptions"
-    :disable="resolvedDisable"
+    :for="consumerFor"
     class="ns-select"
     @update:model-value="$emit('update:modelValue', $event)"
     @popup-show="nameListbox"
@@ -23,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, ref } from 'vue'
+import { computed, mergeProps, nextTick, ref, useAttrs, useId } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'
 /**
  * NsSelect — A styled select/dropdown wrapping Quasar's QSelect.
@@ -36,9 +46,21 @@ import type { ValidationRule } from 'quasar'
 
 export type NsSelectOption = string | { label: string; value: unknown; [key: string]: unknown }
 
+export type NsSelectLabelPlacement = 'inside' | 'above'
+
 export interface NsSelectProps {
   /** Select label text */
   label?: string
+  /**
+   * Where the label sits — NsInput's contract, mirrored (componentLibrary-grj.3).
+   * `inside` (default) is Quasar's floating label. `above` renders the design's
+   * 14px label over a clean box, associated by for/id: Quasar's `for` becomes
+   * the combobox's id (use-field.js), so the <label> names the combobox and the
+   * popup listbox takes the same name. The sign-up frame (264:26835) has three
+   * selects beside label-above inputs; a form with mixed placements was worse
+   * than one on floating labels, so butiq waited for this.
+   */
+  labelPlacement?: NsSelectLabelPlacement
   /** v-model value */
   modelValue?: unknown
   /** Dropdown options */
@@ -70,6 +92,7 @@ const props = withDefaults(defineProps<NsSelectProps>(), {
   mapOptions: false,
   rules: undefined,
   disable: false,
+  labelPlacement: 'inside',
 })
 
 defineEmits<{
@@ -87,6 +110,38 @@ defineOptions({ inheritAttrs: false })
 const { resolvedDisable, attrsWithoutDisabled } = useNsDisabled('NsSelect', () => props.disable)
 
 const root = ref<{ $el?: HTMLElement } | null>(null)
+const attrs = useAttrs()
+
+// The template is a v-if/v-else chain with NO comment before it: a sibling
+// label OR a leading HTML comment makes the root a fragment, and a consumer's
+// scoped rule on <ns-select> stops matching (NsInput's lesson, componentLibrary-eag;
+// this file's own tests read wrapper.classes()). In `above` the wrapper carries
+// the consumer's class/style and the label; the field gets the rest of the attrs.
+const isLabelAbove = computed(() => props.labelPlacement === 'above')
+const generatedId = useId()
+// `||`, not `??`: for="" would name nothing (NsInput's note, componentLibrary-3sy/knw).
+const fieldId = computed(() => (attrs.for as string | undefined) || generatedId)
+const consumerFor = computed(() => attrs.for as string | undefined)
+
+// mergeProps so a consumer's `class` combines with ours; in `above` the
+// consumer's class/style go on the wrapper instead, with the scope id.
+const fieldBindings = computed(() =>
+  mergeProps(
+    isLabelAbove.value
+      ? { ...attrsWithoutDisabled.value, class: undefined, style: undefined }
+      : attrsWithoutDisabled.value,
+    {
+      options: props.options,
+      outlined: props.outlined,
+      dense: props.dense,
+      rules: props.rules,
+      multiple: props.multiple,
+      emitValue: props.emitValue,
+      mapOptions: props.mapOptions,
+      disable: resolvedDisable.value,
+    },
+  ),
+)
 
 /**
  * NAME THE LISTBOX (componentLibrary-2e7). QSelect names its combobox
@@ -116,7 +171,12 @@ async function nameListbox() {
   const combobox =
     root.value?.$el?.querySelector<HTMLElement>('[role="combobox"]') ??
     document.querySelector<HTMLElement>('.q-select__dialog [role="combobox"]')
-  const name = combobox?.getAttribute('aria-label')?.trim()
+  // The combobox's own name: Quasar's aria-label from `label`, or a
+  // consumer's; with the label ABOVE, QSelect is given no label and the
+  // <label for> names the combobox instead, so the same text is used here.
+  const name =
+    combobox?.getAttribute('aria-label')?.trim() ||
+    (isLabelAbove.value ? props.label?.trim() : undefined)
   const listboxId = combobox?.getAttribute('aria-controls')
   if (!name || !listboxId) return
   nameIfUnnamed(document.getElementById(listboxId), name)
@@ -134,6 +194,15 @@ function nameIfUnnamed(el: Element | null | undefined, name: string) {
 </script>
 
 <style lang="sass" scoped>
+// The label above the box — NsInput's rule, verbatim (6px is the design's
+// label-to-box gap, between space-1 and space-2; left literal on purpose).
+.ns-select__label
+  display: block
+  margin-bottom: 6px
+  font-family: var(--ns-font-family-text)
+  font-size: var(--ns-font-size-sm, 0.875rem)
+  color: var(--ns-color-text-primary)
+
 .ns-select
   font-family: var(--ns-font-family-text)
 
