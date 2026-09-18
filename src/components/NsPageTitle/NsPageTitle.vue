@@ -75,11 +75,12 @@ export interface NsPageTitleProps {
    */
   level?: 1 | 2 | 3 | 4 | 5 | 6
   /**
-   * `start` (default) — the app pages; `center` — the sign-up and
-   * verify-email frames (Figma 264:26835 "Sign Up Form (FULL) [Desktop]",
-   * read 2026-09-18: the title row is justify-center inside the 910 column
-   * while the page-controls row above it stays left). Centres the title
-   * and the subtitle; NsPageHeading forwards it and keeps its controls left.
+   * `start` (default) — the app pages; `center` — the sign-up frame (Figma
+   * 264:26835 "Sign Up Form (FULL) [Desktop]", read 2026-09-18: the title
+   * row is justify-center inside the 910 column while the page-controls row
+   * above it stays left; the verify-email and mobile frames were NOT read —
+   * butiq reports they centre too). Centres the title and the subtitle;
+   * NsPageHeading forwards it and keeps its controls left.
    */
   align?: 'start' | 'center'
 }
@@ -215,6 +216,7 @@ const headingTag = computed<(typeof HEADING_TAGS)[number]>(() => {
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   let warnedNoTitle = false
   let warnedBadLevel = false
+  let warnedBadAlign = false
 
   const check = () => {
     if (!titleRendered) {
@@ -244,6 +246,21 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
       }
     } else {
       warnedBadLevel = false
+    }
+
+    // `align` compiles to a bare String at runtime, so "left", "right" or
+    // "centre" render silently as start with nothing in the console to say
+    // why (review, componentLibrary-grj.1). Same once-per-transition shape.
+    if (props.align !== 'start' && props.align !== 'center') {
+      if (!warnedBadAlign) {
+        warnedBadAlign = true
+        console.warn(
+          `[NsPageTitle] align="${props.align}" is not "start" | "center", so it was ` +
+            'rendered as start.',
+        )
+      }
+    } else {
+      warnedBadAlign = false
     }
   }
 
