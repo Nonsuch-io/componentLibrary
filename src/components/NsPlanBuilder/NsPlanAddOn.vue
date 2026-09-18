@@ -50,7 +50,7 @@
         <div class="ns-plan-add-on__action">
           <NsButton
             v-if="option.added"
-            variant="tertiary"
+            variant="tertiary-negative"
             :size="buttonSize"
             class="ns-plan-add-on__remove"
             :aria-describedby="`${titleId}-${option.id}`"
@@ -92,8 +92,8 @@
  * The design's instance carries placeholder copy for names and the remove
  * button ("Click Me", "Small label"), so those are chrome decisions here:
  * the remove is a tertiary button with an X and "Remove" from the locale.
- * (The design draws it in text-negative; there is no tertiary-negative
- * variant in NsButton — componentLibrary-ksg.)
+ * The design draws it in text-negative: NsButton's `tertiary-negative`,
+ * added for it (componentLibrary-ksg).
  */
 import { computed, toRaw, useId } from 'vue'
 import { PhCheck, PhX } from '@phosphor-icons/vue'

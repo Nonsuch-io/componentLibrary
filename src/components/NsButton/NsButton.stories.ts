@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import { expect } from 'storybook/test'
+import { PhX } from '@phosphor-icons/vue'
 import NsButton from './NsButton.vue'
 import imgButtonArrow from '../../assets/marketing/icon-arrow-button.svg?url'
 import imgDoodleCheck from '../../assets/marketing/icon-checkmark.svg?url'
@@ -51,6 +52,7 @@ export const Variants: Story = {
         <NsButton variant="primary">Primary</NsButton>
         <NsButton variant="secondary">Secondary</NsButton>
         <NsButton variant="tertiary">Tertiary</NsButton>
+        <NsButton variant="tertiary-negative">Remove</NsButton>
         <NsButton variant="accent">Accent</NsButton>
         <NsButton variant="positive">Positive</NsButton>
         <NsButton variant="negative">Negative</NsButton>
@@ -383,4 +385,74 @@ export const MarketingCTA: Story = {
       </div>
     `,
   }),
+}
+
+/**
+ * THE DESIGN'S TWO VARIANTS THE CODE LACKED (componentLibrary-ksg, Figma
+ * NsButton 2438:43290 read 2026-09-18). `x` is the close affordance —
+ * icon-only by nature, 4px around a 16/20/24/36/44 icon, so 24/28/32/44/52
+ * square at xs–xl (2438:43589, 43709, 43829, 43951, 44069) — in
+ * text-primary, text-secondary on hover, text-disabled disabled.
+ * `tertiary-negative` is tertiary in the negative inks: text-negative,
+ * negative-hover on hover, text-disabled disabled (2438:43773/43845/43849).
+ */
+export const XAndTertiaryNegative: Story = {
+  render: () => ({
+    components: { NsButton, PhX },
+    template: `
+      <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap;">
+        <NsButton v-for="size in ['xs', 'sm', 'md', 'lg', 'xl']" :key="size" variant="x" :size="size" :data-testid="'x-' + size" aria-label="Close">
+          <PhX weight="regular" />
+        </NsButton>
+        <NsButton variant="x" size="md" disable aria-label="Close" data-testid="x-disabled"><PhX weight="regular" /></NsButton>
+        <NsButton variant="tertiary-negative" size="md" data-testid="tn">Remove</NsButton>
+        <NsButton variant="tertiary-negative" size="md" disable data-testid="tn-disabled">Remove</NsButton>
+      </div>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready
+    const el = (id: string) => canvasElement.querySelector(`[data-testid="${id}"]`) as HTMLElement
+    const token = (name: string) =>
+      getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+    const rgb = (hex: string) => {
+      const n = parseInt(hex.slice(1), 16)
+      return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`
+    }
+
+    // X: square at the design's sizes, the icon filling all but 4px each side.
+    for (const [size, side, icon] of [
+      ['xs', 24, 16],
+      ['sm', 28, 20],
+      ['md', 32, 24],
+      ['lg', 44, 36],
+      ['xl', 52, 44],
+    ] as const) {
+      const r = el(`x-${size}`).getBoundingClientRect()
+      await expect(r.width, `x ${size} width`).toBe(side)
+      await expect(r.height, `x ${size} height`).toBe(side)
+      const svg = el(`x-${size}`).querySelector('svg')!.getBoundingClientRect()
+      await expect(svg.width, `x ${size} icon`).toBe(icon)
+      await expect(svg.left - r.left).toBe(4)
+    }
+    await expect(getComputedStyle(el('x-md')).backgroundColor).toBe('rgba(0, 0, 0, 0)')
+    // 8 at xl too, where the generic icon-only rule would give 12.
+    await expect(getComputedStyle(el('x-xl')).borderRadius).toBe('8px')
+    await expect(getComputedStyle(el('x-md')).color).toBe(rgb(token('--ns-color-text-primary')))
+    await expect(el('x-md').getAttribute('aria-label')).toBe('Close')
+    await expect(getComputedStyle(el('x-disabled')).color).toBe(
+      rgb(token('--ns-color-text-disabled')),
+    )
+    // Hover colours are not asserted: `:hover` needs a trusted pointer and
+    // user-event's is synthetic, so the computed colour never changes here.
+
+    // tertiary-negative: tertiary's geometry (36 at md), the negative inks.
+    const tn = el('tn')
+    await expect(tn.getBoundingClientRect().height).toBe(36)
+    await expect(getComputedStyle(tn).backgroundColor).toBe('rgba(0, 0, 0, 0)')
+    await expect(getComputedStyle(tn).color).toBe(rgb(token('--ns-color-text-negative')))
+    await expect(getComputedStyle(el('tn-disabled')).color).toBe(
+      rgb(token('--ns-color-text-disabled')),
+    )
+  },
 }

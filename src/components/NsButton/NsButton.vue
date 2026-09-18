@@ -8,7 +8,12 @@
     :padding="buttonPadding"
     :aria-busy="loading"
     :disable="resolvedDisable"
-    :class="['ns-btn', `ns-btn--${variant}`, `ns-btn--${size}`, { 'ns-btn--icon-only': iconOnly }]"
+    :class="[
+      'ns-btn',
+      `ns-btn--${variant}`,
+      `ns-btn--${size}`,
+      { 'ns-btn--icon-only': isIconOnly },
+    ]"
   >
     <slot />
     <template #loading>
@@ -27,14 +32,27 @@ import { useNsDisabled } from '../../composables/useNsDisabled'
 
 declare const process: { env: { NODE_ENV?: string } } | undefined
 
+/**
+ * The design's variants (Figma NsButton 2438:43290, read 2026-09-18 —
+ * componentLibrary-ksg) plus the code-only marketing pair Kale kept.
+ * `tertiary-negative` (Figma "tertiary negative") is tertiary in the
+ * negative inks — a destructive text button, the plan builder's Remove.
+ * `x` is the design's close affordance: ICON-ONLY by nature, no fill, 4px
+ * around a 16/20/24/36/44 icon at xs–xl (24/28/32/44/52 square), in
+ * text-primary, text-secondary on hover, text-disabled disabled. The X
+ * sizes its own icon — a Phosphor `:size` inside it is overridden — and
+ * takes no label: text in an X is not a supported layout.
+ */
 export type NsButtonVariant =
   | 'primary'
   | 'secondary'
   | 'tertiary'
+  | 'tertiary-negative'
   | 'accent'
   | 'positive'
   | 'negative'
   | 'warning'
+  | 'x'
   | 'marketing'
   | 'marketing-pushed'
 
@@ -43,7 +61,7 @@ export type NsButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'
 export interface NsButtonProps {
   variant?: NsButtonVariant
   size?: NsButtonSize
-  /** Square icon-only layout — use when no label slot is provided */
+  /** Square icon-only layout — use when no label slot is provided. `x` implies it. */
   iconOnly?: boolean
   loading?: boolean
   /** Disable the button */
@@ -57,6 +75,10 @@ const props = withDefaults(defineProps<NsButtonProps>(), {
   loading: false,
   disable: false,
 })
+
+// `x` is icon-only whether or not the prop says so: it has no label in the
+// design and gets the same unnamed-button warning as any icon-only button.
+const isIconOnly = computed(() => props.iconOnly || props.variant === 'x')
 
 // QBtn renders a real <button>, so the `disabled` spelling natively disables
 // it already — but without this it misses Quasar's `.disabled` class and
@@ -91,7 +113,7 @@ const slots = useSlots()
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   let warnedUnnamed = false
   watchEffect(() => {
-    if (warnedUnnamed || !props.iconOnly) return
+    if (warnedUnnamed || !isIconOnly.value) return
     const hasText = (v: unknown) => typeof v === 'string' && v.trim() !== ''
     if (
       hasText(attrs['aria-label']) ||
@@ -102,7 +124,7 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
       return
     warnedUnnamed = true
     console.warn(
-      '[NsButton] `iconOnly` is set but the button has no accessible name, so it ' +
+      '[NsButton] this button is icon-only (`iconOnly`, or `variant="x"`) but has no accessible name, so it ' +
         'announces as "button" with no description. Add aria-label (or ' +
         'aria-labelledby / title), or put visually-hidden text in the default ' +
         'slot. Name the ACTION, not the icon — "Delete item", not "trash".',
@@ -151,8 +173,10 @@ const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = 
 
 const buttonPadding = computed(() => {
   if (props.variant === 'marketing' || props.variant === 'marketing-pushed')
-    return props.iconOnly ? '12px' : '16px 20px'
-  return paddingMap[props.size][props.iconOnly ? 'iconOnly' : 'default']
+    return isIconOnly.value ? '12px' : '16px 20px'
+  // The design's X: space-1 around the icon at every size (2438:43829 etc.).
+  if (props.variant === 'x') return '4px'
+  return paddingMap[props.size][isIconOnly.value ? 'iconOnly' : 'default']
 })
 </script>
 
@@ -329,6 +353,92 @@ const buttonPadding = computed(() => {
 
   &.disabled {
     color: var(--ns-color-bg-disabled);
+  }
+}
+
+// ---- Tertiary negative (Figma "tertiary negative", 2438:43773/43845/43777/43849) ----
+// Tertiary's geometry in the negative inks: text-negative, negative-hover on
+// hover, text-negative pressed, text-disabled disabled. The design draws it
+// 28 tall at md (4px padding) where the library's tertiary is 36 — the same
+// open question as tertiary's own padding (componentLibrary-ksg), not
+// answered by this variant alone.
+.ns-btn--tertiary-negative {
+  background: transparent;
+  color: var(--ns-color-text-negative);
+
+  &:hover:not(.disabled) {
+    color: var(--ns-color-negative-hover);
+  }
+
+  &:active:not(.disabled) {
+    color: var(--ns-color-text-negative);
+  }
+
+  &.disabled {
+    color: var(--ns-color-text-disabled);
+  }
+}
+
+// ---- X (Figma "X", 2438:43589…44081) ----
+// The close affordance: no fill, 4px around the icon, square. The icon is
+// the whole button — 16/20/24/36/44 at xs–xl (measured 24/28/32/44/52).
+// The geometry comes from the `padding` prop (which also zeroes QBtn's
+// min-height) and `.q-btn__content` being a flex row that blockifies the
+// svg — NOT from a line box; review measured the per-size line-heights
+// inert here and a `line-height: 0` turning text-in-an-X into an 8px
+// button. Colours are the icon's own fills in the design: text-primary,
+// text-secondary on hover, text-primary pressed, text-disabled disabled.
+// The X sizes its icon: a Phosphor `:size` inside it is overridden.
+.ns-btn--x {
+  background: transparent;
+  color: var(--ns-color-text-primary);
+
+  &:hover:not(.disabled) {
+    color: var(--ns-color-text-secondary);
+  }
+
+  &:active:not(.disabled) {
+    color: var(--ns-color-text-primary);
+  }
+
+  &.disabled {
+    color: var(--ns-color-text-disabled);
+  }
+
+  &.ns-btn--xs :deep(.q-icon),
+  &.ns-btn--xs :deep(svg) {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+  &.ns-btn--sm :deep(.q-icon),
+  &.ns-btn--sm :deep(svg) {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+  &.ns-btn--md :deep(.q-icon),
+  &.ns-btn--md :deep(svg) {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+  &.ns-btn--lg :deep(.q-icon),
+  &.ns-btn--lg :deep(svg) {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
+  &.ns-btn--xl :deep(.q-icon),
+  &.ns-btn--xl :deep(svg) {
+    font-size: 44px;
+    width: 44px;
+    height: 44px;
+  }
+
+  // 8 at every size — xl's icon-only rule above would round it to 12.
+  &.ns-btn--icon-only {
+    border-radius: 8px;
   }
 }
 

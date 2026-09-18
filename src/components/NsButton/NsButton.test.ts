@@ -51,6 +51,30 @@ describe('NsButton', () => {
     expect(wrapper.find('.ns-btn--icon-only').exists()).toBe(true)
   })
 
+  // The design's two variants the code lacked (componentLibrary-ksg).
+  it('renders tertiary-negative as its own variant class', () => {
+    const wrapper = mount(NsButton, {
+      props: { variant: 'tertiary-negative' },
+      slots: { default: 'Remove' },
+    })
+    expect(wrapper.find('.ns-btn--tertiary-negative').exists()).toBe(true)
+    expect(wrapper.find('.ns-btn--icon-only').exists()).toBe(false)
+  })
+
+  it('x is icon-only by nature: the class, 4px padding, and the unnamed warning', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const named = mount(NsButton, { props: { variant: 'x' }, attrs: { 'aria-label': 'Close' } })
+    expect(named.find('.ns-btn--x').exists()).toBe(true)
+    expect(named.find('.ns-btn--icon-only').exists()).toBe(true)
+    expect(named.findComponent({ name: 'QBtn' }).props('padding')).toBe('4px')
+    expect(warn.mock.calls.flat().join(' ')).not.toContain('no accessible name')
+    warn.mockClear()
+    __resetAttrConflictWarnings()
+    mount(NsButton, { props: { variant: 'x' } })
+    expect(warn.mock.calls.flat().join(' ')).toContain('no accessible name')
+    warn.mockRestore()
+  })
+
   it('passes through additional QBtn attributes', () => {
     const wrapper = mountButton({ disable: true })
     expect(wrapper.find('.q-btn').classes()).toContain('disabled')
