@@ -179,13 +179,17 @@ describe('NsSelect labelPlacement="above"', () => {
       attachTo: document.body,
     })
 
-  it('renders a real <label> above the box, associated to the combobox by for/id', () => {
+  it('renders a real <label> above the box, associated to the combobox by for/id and aria-labelledby', () => {
     const w = mountAbove()
     const label = w.find('label.ns-select__label')
     const combobox = w.find('[role="combobox"]')
     expect(label.text()).toBe('Province / Territory')
     expect(label.attributes('for')).toBeTruthy()
     expect(combobox.attributes('id')).toBe(label.attributes('for'))
+    // QField's root is a <label> too; aria-labelledby names the combobox by
+    // OUR label alone, whatever the two-label computation does.
+    expect(combobox.attributes('aria-labelledby')).toBe(label.attributes('id'))
+    expect(label.attributes('id')).toBeTruthy()
     // Quasar is given no label: no floating label inside the box.
     expect(w.find('.q-field__label').exists()).toBe(false)
     w.unmount()
@@ -237,6 +241,14 @@ describe('NsSelect labelPlacement="above"', () => {
     expect(document.querySelector('[role="listbox"]')!.getAttribute('aria-label')).toBe(
       'Pick a province',
     )
+    w.unmount()
+  })
+
+  // NsInput's own test for the same trap: `:for` after v-bind bound to
+  // undefined would DELETE a consumer's for. Verified for the default here too.
+  it('passes a consumer `for` through in the default placement', () => {
+    const w = mount(NsSelect, { props: { label: 'Role', options: ['A'] }, attrs: { for: 'role' } })
+    expect(w.find('[role="combobox"]').attributes('id')).toBe('role')
     w.unmount()
   })
 
