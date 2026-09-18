@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
 import NsSelect from './NsSelect.vue'
@@ -87,5 +88,79 @@ describe('NsSelect', () => {
     // If `disable` were not a declared prop, it would land in $attrs
     // instead of $props, and wrapper.props('disable') would be undefined.
     expect(wrapper.props('disable')).toBe(true)
+  })
+})
+
+// QSelect's popup teleports to document.body, so these mount attached and
+// read the live DOM.
+describe('NsSelect — the listbox is named (componentLibrary-2e7)', () => {
+  const open = async (props: Record<string, unknown>) => {
+    const w = mount(NsSelect, { props, attachTo: document.body })
+    const combobox = w.find('[role="combobox"]')
+    // QSelect opens on the combobox's click (a control click toggles the menu).
+    await w.find('.q-field__control').trigger('click')
+    await nextTick()
+    await nextTick()
+    const listbox = document.querySelector('[role="listbox"]')
+    return { w, combobox, listbox }
+  }
+
+  it('names the popup listbox as the combobox is named, from `label`', async () => {
+    const { w, combobox, listbox } = await open({ label: 'Shop Category', options: ['A', 'B'] })
+    expect(listbox, 'the popup is open').not.toBeNull()
+    expect(combobox.attributes('aria-controls')).toBe(listbox!.id)
+    expect(listbox!.getAttribute('aria-label')).toBe('Shop Category')
+    w.unmount()
+  })
+
+  it('names it from a consumer aria-label when there is no label', async () => {
+    const { w, listbox } = await open({ 'aria-label': 'Choose one', options: ['A'] })
+    expect(listbox!.getAttribute('aria-label')).toBe('Choose one')
+    w.unmount()
+  })
+
+  // Quasar lets a consumer's aria-label beat `label` on the combobox; the
+  // listbox takes the COMBOBOX's name, so they cannot disagree (review
+  // measured a first draft naming them differently).
+  it("takes the combobox's own name, so label and aria-label never disagree", async () => {
+    const { w, combobox, listbox } = await open({
+      label: 'Shop Category',
+      'aria-label': 'Pick a category',
+      options: ['A'],
+    })
+    expect(combobox.attributes('aria-label')).toBe('Pick a category')
+    expect(listbox!.getAttribute('aria-label')).toBe('Pick a category')
+    w.unmount()
+  })
+
+  // On a phone or tablet QSelect opens a DIALOG, not a menu, and moves the
+  // combobox into it: nothing under the root has the role any more. Review
+  // measured a first draft returning silently there — the original gap
+  // intact for every mobile user, invisible to every desktop-mode test.
+  it("names it in dialog mode too (Quasar's default on mobile)", async () => {
+    const w = mount(NsSelect, {
+      props: { label: 'Shop Category', options: ['A', 'B'], behavior: 'dialog' },
+      attachTo: document.body,
+    })
+    await w.find('.q-field__control').trigger('click')
+    await nextTick()
+    await nextTick()
+    const dialog = document.querySelector('.q-select__dialog')
+    expect(dialog, 'the dialog opened').not.toBeNull()
+    expect(w.element.querySelector('[role="combobox"]'), 'nothing under the root').toBeNull()
+    const combobox = dialog!.querySelector('[role="combobox"]')!
+    const listbox = document.querySelector('[role="listbox"]')!
+    expect(combobox.getAttribute('aria-controls')).toBe(listbox.id)
+    expect(listbox.getAttribute('aria-label')).toBe('Shop Category')
+    // …and the dialog, which Quasar also leaves unnamed (axe aria-dialog-name).
+    expect(combobox.closest('[role="dialog"]')!.getAttribute('aria-label')).toBe('Shop Category')
+    w.unmount()
+  })
+
+  it('does nothing when there is no name to give', async () => {
+    const { w, listbox } = await open({ options: ['A'] })
+    expect(listbox).not.toBeNull()
+    expect(listbox!.hasAttribute('aria-label')).toBe(false)
+    w.unmount()
   })
 })

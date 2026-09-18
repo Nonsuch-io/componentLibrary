@@ -87,9 +87,9 @@ export const RevealedByASelect: Story = {
       return el!
     })
     await userEvent.click(option)
-    // The menu leaves the DOM after a transition; axe runs when the play
-    // returns and QSelect's listbox has no accessible name (its own gap,
-    // componentLibrary-2e7), so wait for it to be gone.
+    // The menu leaves the DOM after a transition; wait for it so the card
+    // below is what the play measures. (NsSelect names its listbox now —
+    // componentLibrary-2e7 — so the gate no longer needs this to be gone.)
     await waitFor(() => expect(document.querySelector('[role="listbox"]')).toBeNull())
     const card = await waitFor(() => {
       const el = canvasElement.querySelector('.ns-follow-up-question') as HTMLElement

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/vue3-vite'
+import { expect, userEvent, waitFor } from 'storybook/test'
 import NsSelect from './NsSelect.vue'
 
 const meta: Meta<typeof NsSelect> = {
@@ -47,5 +48,51 @@ export const ObjectOptions: Story = {
     ],
     emitValue: true,
     mapOptions: true,
+  },
+}
+
+/**
+ * ENDS OPEN ON PURPOSE. The a11y addon runs axe after play, and QSelect's
+ * listbox had no accessible name (aria-input-field-name — every NsSelect on
+ * every page, componentLibrary-2e7). NsSelect names it from `label` on
+ * popup-show; this story leaves the menu open so the gate sees it.
+ */
+export const OpenListboxIsNamed: Story = {
+  args: { label: 'Shop Category', options: ['Clothing', 'Food', 'Services'] },
+  play: async ({ canvasElement }) => {
+    const combobox = canvasElement.querySelector('[role="combobox"]') as HTMLElement
+    await userEvent.click(combobox)
+    const listbox = await waitFor(() => {
+      const el = document.querySelector('[role="listbox"]') as HTMLElement
+      expect(el).not.toBeNull()
+      return el
+    })
+    await expect(combobox.getAttribute('aria-controls')).toBe(listbox.id)
+    await expect(listbox.getAttribute('aria-label')).toBe('Shop Category')
+  },
+}
+
+/**
+ * DIALOG MODE, ENDS OPEN — Quasar's default on a phone or tablet, and
+ * `behavior="dialog"` anywhere: the combobox moves into a teleported dialog
+ * and nothing under the root has the role. The listbox is named there too
+ * (componentLibrary-2e7's first draft was not, and no desktop-mode test
+ * could see it).
+ */
+export const OpenDialogListboxIsNamed: Story = {
+  args: { label: 'Shop Category', options: ['Clothing', 'Food', 'Services'], behavior: 'dialog' },
+  play: async ({ canvasElement }) => {
+    await userEvent.click(canvasElement.querySelector('.q-field__control') as HTMLElement)
+    const listbox = await waitFor(() => {
+      const el = document.querySelector('.q-select__dialog [role="listbox"]') as HTMLElement
+      expect(el).not.toBeNull()
+      return el
+    })
+    const combobox = document.querySelector('.q-select__dialog [role="combobox"]') as HTMLElement
+    await expect(combobox.getAttribute('aria-controls')).toBe(listbox.id)
+    await expect(listbox.getAttribute('aria-label')).toBe('Shop Category')
+    await expect(listbox.closest('[role="dialog"]')!.getAttribute('aria-label')).toBe(
+      'Shop Category',
+    )
   },
 }
