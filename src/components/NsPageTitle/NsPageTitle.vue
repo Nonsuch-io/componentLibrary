@@ -1,5 +1,5 @@
 <template>
-  <div class="ns-page-title">
+  <div class="ns-page-title" :class="{ 'ns-page-title--center': align === 'center' }">
     <NsText v-if="hasTitle()" :as="headingTag" variant="heading-xl" class="ns-page-title__title">
       <slot>{{ props.title }}</slot>
     </NsText>
@@ -74,12 +74,21 @@ export interface NsPageTitleProps {
    * sits inside a shell that already has one.
    */
   level?: 1 | 2 | 3 | 4 | 5 | 6
+  /**
+   * `start` (default) — the app pages; `center` — the sign-up and
+   * verify-email frames (Figma 264:26835 "Sign Up Form (FULL) [Desktop]",
+   * read 2026-09-18: the title row is justify-center inside the 910 column
+   * while the page-controls row above it stays left). Centres the title
+   * and the subtitle; NsPageHeading forwards it and keeps its controls left.
+   */
+  align?: 'start' | 'center'
 }
 
 const props = withDefaults(defineProps<NsPageTitleProps>(), {
   title: undefined,
   subtitle: undefined,
   level: 1,
+  align: 'start',
 })
 
 defineSlots<{
@@ -272,6 +281,13 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   // without fighting an inline style. Confirm when Figma is reachable.
   &__subtitle {
     color: var(--ns-color-text-secondary);
+  }
+
+  // The sign-up frames centre the title block (264:26835); the column is a
+  // flex column, so both the items and the wrapped text lines move.
+  &--center {
+    align-items: center;
+    text-align: center;
   }
 }
 </style>

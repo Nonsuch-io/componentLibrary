@@ -8,7 +8,13 @@
     >
       <slot name="controls" />
     </div>
-    <NsPageTitle class="ns-page-heading__title" :title="title" :subtitle="subtitle" :level="level">
+    <NsPageTitle
+      class="ns-page-heading__title"
+      :title="title"
+      :subtitle="subtitle"
+      :level="level"
+      :align="align"
+    >
       <template v-if="$slots.default" #default><slot /></template>
       <template v-if="$slots.subtitle" #subtitle><slot name="subtitle" /></template>
     </NsPageTitle>
@@ -80,6 +86,8 @@ export interface NsPageHeadingProps {
   subtitle?: string
   /** Which heading element to render, 1-6. Forwarded; clamped by NsPageTitle. */
   level?: 1 | 2 | 3 | 4 | 5 | 6
+  /** `start` | `center`. Forwarded to the title block; the controls row stays left (264:26835). */
+  align?: 'start' | 'center'
   /**
    * Accessible name for the controls group. Defaults to the locale's
    * `navigation.pageActions`. NOT forwarded to NsPageTitle — it belongs to this

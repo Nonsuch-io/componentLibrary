@@ -297,3 +297,15 @@ describe('NsPageTitle', () => {
     )
   })
 })
+
+// componentLibrary-grj.1: the sign-up frames centre the title block.
+describe('NsPageTitle align', () => {
+  it('is start by default and centres on request, title and subtitle together', () => {
+    const start = mount(NsPageTitle, { props: { title: 'T', subtitle: 'S' } })
+    expect(start.classes()).not.toContain('ns-page-title--center')
+    start.unmount()
+    const center = mount(NsPageTitle, { props: { title: 'T', subtitle: 'S', align: 'center' } })
+    expect(center.classes()).toContain('ns-page-title--center')
+    center.unmount()
+  })
+})
