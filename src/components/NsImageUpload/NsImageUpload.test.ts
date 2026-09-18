@@ -459,6 +459,43 @@ describe('NsImageUpload', () => {
       expect(warn).toHaveBeenCalledWith(expect.stringContaining('accept contains "image/"'))
     })
 
+    // componentLibrary-3bm: the guard and isAccepted() must say the same thing.
+    // A MIME token beginning with "." passed the guard but isAccepted() routes
+    // it to endsWith, which no base name with a "/" satisfies — every drop
+    // rejected and the guard silent, the exact case it exists for.
+    it.each(['./x', '.a/b', '../x', 'image/.png'])(
+      'warns about %j, which no picker-produced file can match',
+      (rule) => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+        const wrapper = mountEmpty({ accept: rule })
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining(`accept contains "${rule}"`))
+        // …and a drop IS refused by this rule: a picker's base name has no "/",
+        // and no picker gives a file the type "image/.png" (a constructed File
+        // could; review checked that the refusal below comes from the rule).
+        return wrapper
+          .find('.ns-image-upload__surface')
+          .trigger('drop', {
+            dataTransfer: { files: [new File(['x'], 'photo.png', { type: 'image/png' })] },
+          })
+          .then(() => expect(wrapper.emitted('update:modelValue')).toBeUndefined())
+      },
+    )
+
+    // Conversely an extension with "-" or "_" DOES match (endsWith, as the
+    // browser's own accept does), so the guard must not call it unmatchable.
+    it.each(['.a-b', '.a_b', '.tar-gz', '.c++', '.ünï'])(
+      'stays silent for %j, which endsWith matches',
+      async (rule) => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+        const wrapper = mountEmpty({ accept: rule })
+        expect(warn).not.toHaveBeenCalledWith(expect.stringContaining('accept contains'))
+        await wrapper.find('.ns-image-upload__surface').trigger('drop', {
+          dataTransfer: { files: [new File(['x'], 'photo' + rule, { type: '' })] },
+        })
+        expect(wrapper.emitted('update:modelValue')).toBeDefined()
+      },
+    )
+
     it.each([
       'image/*',
       'image/png',
