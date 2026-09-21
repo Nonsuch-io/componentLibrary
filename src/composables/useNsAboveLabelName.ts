@@ -43,6 +43,12 @@ export function useNsAboveLabelName(options: {
 }) {
   const labelId = useId()
   const hintId = useId()
+  // Whether this instance has ever written: an inactive field that never did
+  // has nothing of ours to take back, and skips the DOM lookups altogether —
+  // `root` sits on the default-placement branch too, and review (sonnet)
+  // measured every inside-placement select paying two querySelectors per
+  // re-render for guaranteed no-ops.
+  let wrote = false
 
   /**
    * `control` is for the caller that already found it — NsSelect's dialog mode
@@ -51,6 +57,8 @@ export function useNsAboveLabelName(options: {
    * (componentLibrary-w0c) and a document-wide query would name someone else's.
    */
   function applyAboveLabelName(control?: HTMLElement | null) {
+    const active = options.active()
+    if (!active && !wrote) return
     const host = options.root.value?.$el
     if (!(host instanceof Element)) return
     const el =
@@ -59,7 +67,7 @@ export function useNsAboveLabelName(options: {
         '[role="combobox"], input.q-field__native, textarea.q-field__native',
       )
     if (!el) return
-    const active = options.active()
+    wrote = wrote || active
 
     // Ours to set, and ours to take back when the label goes: a dangling IDREF
     // fails axe and accname falls back to the polluted two-label computation.
@@ -86,15 +94,18 @@ export function useNsAboveLabelName(options: {
     }
   }
 
+  // Observed only while active: the source is undefined for an inside
+  // placement, so the common case creates no observer at all. A runtime flip
+  // of the placement swaps the host (v-if/v-else) or clears it, and either way
+  // the old observer goes and one apply takes our attributes back.
   let observer: MutationObserver | undefined
   watch(
-    () => options.root.value?.$el,
+    () => (options.active() ? options.root.value?.$el : undefined),
     (host) => {
       observer?.disconnect()
       observer = undefined
-      if (!(host instanceof Element)) return
       applyAboveLabelName()
-      if (typeof MutationObserver === 'undefined') return
+      if (!(host instanceof Element) || typeof MutationObserver === 'undefined') return
       observer = new MutationObserver(() => applyAboveLabelName())
       observer.observe(host, { childList: true, subtree: true })
     },

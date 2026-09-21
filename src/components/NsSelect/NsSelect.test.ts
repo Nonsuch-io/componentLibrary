@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
@@ -239,6 +239,41 @@ describe('NsSelect labelPlacement="above"', () => {
     expect(combobox.attributes('aria-label')).toBe('Province')
     expect(combobox.attributes('aria-labelledby')).toBeUndefined()
     expect(combobox.attributes('aria-describedby')).toBeUndefined()
+    w.unmount()
+  })
+
+  // Review (sonnet, 2026-09-21) measured an observer on every inside-placement
+  // select. None now; and a runtime flip to `above` gets one, back to `inside`
+  // takes the attributes away again.
+  it('creates no MutationObserver for inside placement, and follows a runtime placement flip', async () => {
+    const observe = vi.spyOn(MutationObserver.prototype, 'observe')
+    const query = vi.spyOn(Element.prototype, 'querySelector')
+    const w = mount(NsSelect, {
+      props: { label: 'Province', options: ['AB'] },
+      attrs: { hint: 'h' },
+      attachTo: document.body,
+    })
+    await w.setProps({ modelValue: 'AB' })
+    await nextTick()
+    expect(observe).not.toHaveBeenCalled()
+    // Nor the lookups: an inactive field that never wrote has nothing to undo.
+    const ours = query.mock.calls.filter(([sel]) => String(sel).includes('q-field__native'))
+    expect(ours).toHaveLength(0)
+    query.mockRestore()
+    await w.setProps({ labelPlacement: 'above' })
+    await nextTick()
+    expect(observe).toHaveBeenCalledTimes(1)
+    const combobox = w.find('[role="combobox"]')
+    expect(combobox.attributes('aria-labelledby')).toBe(
+      w.find('label.ns-select__label').attributes('id'),
+    )
+    expect(combobox.attributes('aria-describedby')).toBeTruthy()
+    await w.setProps({ labelPlacement: 'inside' })
+    await nextTick()
+    await nextTick()
+    expect(w.find('[role="combobox"]').attributes('aria-labelledby')).toBeUndefined()
+    expect(w.find('[role="combobox"]').attributes('aria-describedby')).toBeUndefined()
+    observe.mockRestore()
     w.unmount()
   })
 
