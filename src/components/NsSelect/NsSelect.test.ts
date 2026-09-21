@@ -226,6 +226,41 @@ describe('NsSelect labelPlacement="above"', () => {
     w.unmount()
   })
 
+  // Review mutants (fable, 2026-09-21): the `active` guard — every
+  // default-placement select has ref="root" too, and without the guard all
+  // of them would point aria-labelledby at an id that does not exist.
+  it('inside placement: the combobox keeps Quasar aria-label and gets no aria-labelledby', () => {
+    const w = mount(NsSelect, {
+      props: { label: 'Province', options: ['AB'] },
+      attrs: { hint: 'h' },
+      attachTo: document.body,
+    })
+    const combobox = w.find('[role="combobox"]')
+    expect(combobox.attributes('aria-label')).toBe('Province')
+    expect(combobox.attributes('aria-labelledby')).toBeUndefined()
+    expect(combobox.attributes('aria-describedby')).toBeUndefined()
+    w.unmount()
+  })
+
+  it('dialog mode: the combobox inside the teleported dialog is named by the label', async () => {
+    const w = mountAbove(
+      { behavior: 'dialog', options: ['AB', 'BC'] },
+      { hint: 'Where the shop is registered.' },
+    )
+    const label = w.find('label.ns-select__label')
+    await w.find('.q-field__control').trigger('click')
+    await nextTick()
+    await new Promise((r) => setTimeout(r, 50))
+    await nextTick()
+    const dialogCombobox = document.querySelector('.q-select__dialog [role="combobox"]')
+    expect(dialogCombobox, 'dialog did not open').not.toBeNull()
+    expect(dialogCombobox?.getAttribute('aria-labelledby')).toBe(label.attributes('id'))
+    const hintId = w.find('.q-field__messages').attributes('id')
+    expect(hintId).toBeTruthy()
+    expect(dialogCombobox?.getAttribute('aria-describedby')).toBe(hintId)
+    w.unmount()
+  })
+
   it('is a single root (no fragment): the wrapper carries the consumer class, the field keeps ns-select', () => {
     const w = mountAbove({}, { class: 'mine', 'data-x': '1' })
     expect(w.element.tagName).toBe('DIV')

@@ -1,4 +1,4 @@
-import { onMounted, onUpdated, useId, type Ref } from 'vue'
+import { onBeforeUnmount, onMounted, onUpdated, useId, watch, type Ref } from 'vue'
 
 /**
  * Names a QField-based control from a label rendered ABOVE the box, and
@@ -22,6 +22,19 @@ import { onMounted, onUpdated, useId, type Ref } from 'vue'
  * would reach a screen reader nowhere. It gets an id and rides in
  * aria-describedby while the messages block is ours — when Quasar puts its own
  * error id on the block, the block is Quasar's and the hint token is dropped.
+ *
+ * Why a MutationObserver and not only the wrapper's lifecycle hooks: Quasar
+ * validates on `debounce(validate, 0)`, so an error appears and clears in a
+ * macrotask AFTER our onUpdated. When it clears, 2.32 re-creates the messages
+ * block without an id and its vnode patch removes the control's
+ * aria-describedby outright — review (fable) reproduced the hint description
+ * silently gone on the most ordinary path, submit → error → user fixes it.
+ * The observer sees the block change and re-applies. It watches childList
+ * ONLY: every case that needs a re-apply re-creates or adds the block in the
+ * same render that drops the attribute, and an observer that also watched
+ * attributes would be re-triggered by our own writes — a mutant without the
+ * token filter livelocked the unit suite for 26 minutes in a microtask storm
+ * no test timeout could interrupt. Writes are still change-guarded.
  */
 export function useNsAboveLabelName(options: {
   root: Ref<{ $el?: unknown } | null | undefined>
@@ -38,7 +51,6 @@ export function useNsAboveLabelName(options: {
    * (componentLibrary-w0c) and a document-wide query would name someone else's.
    */
   function applyAboveLabelName(control?: HTMLElement | null) {
-    if (!options.active()) return
     const host = options.root.value?.$el
     if (!(host instanceof Element)) return
     const el =
@@ -47,24 +59,53 @@ export function useNsAboveLabelName(options: {
         '[role="combobox"], input.q-field__native, textarea.q-field__native',
       )
     if (!el) return
+    const active = options.active()
 
-    if (options.label()?.trim()) el.setAttribute('aria-labelledby', labelId)
+    // Ours to set, and ours to take back when the label goes: a dangling IDREF
+    // fails axe and accname falls back to the polluted two-label computation.
+    if (active && options.label()?.trim()) {
+      if (el.getAttribute('aria-labelledby') !== labelId)
+        el.setAttribute('aria-labelledby', labelId)
+    } else if (el.getAttribute('aria-labelledby') === labelId) {
+      el.removeAttribute('aria-labelledby')
+    }
 
     // With a hint (prop or #hint slot) the block has text; with only `rules`
     // it exists and is empty until an error shows.
     const messages = host.querySelector<HTMLElement>('.q-field__messages')
-    if (messages && !messages.id && messages.textContent?.trim()) messages.id = hintId
-    const describedByHint = messages?.id === hintId
+    if (active && messages && !messages.id && messages.textContent?.trim()) messages.id = hintId
+    const describedByHint = active && messages?.id === hintId
     const tokens = (el.getAttribute('aria-describedby') ?? '')
       .split(/\s+/)
       .filter((t) => t && t !== hintId)
     if (describedByHint) tokens.push(hintId)
-    if (tokens.length > 0) el.setAttribute('aria-describedby', tokens.join(' '))
-    else el.removeAttribute('aria-describedby')
+    const next = tokens.join(' ')
+    if (next !== (el.getAttribute('aria-describedby') ?? '')) {
+      if (next) el.setAttribute('aria-describedby', next)
+      else el.removeAttribute('aria-describedby')
+    }
   }
 
+  let observer: MutationObserver | undefined
+  watch(
+    () => options.root.value?.$el,
+    (host) => {
+      observer?.disconnect()
+      observer = undefined
+      if (!(host instanceof Element)) return
+      applyAboveLabelName()
+      if (typeof MutationObserver === 'undefined') return
+      observer = new MutationObserver(() => applyAboveLabelName())
+      observer.observe(host, { childList: true, subtree: true })
+    },
+    { immediate: true, flush: 'post' },
+  )
+  // Mounted: named before the first paint, not a post-flush later. Updated:
+  // the label lives OUTSIDE the field root (a sibling in the wrapper), so its
+  // coming and going is only visible from our own render.
   onMounted(() => applyAboveLabelName())
   onUpdated(() => applyAboveLabelName())
+  onBeforeUnmount(() => observer?.disconnect())
 
   return { labelId, applyAboveLabelName }
 }

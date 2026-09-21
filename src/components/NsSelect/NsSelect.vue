@@ -9,7 +9,6 @@
       class="ns-select"
       @update:model-value="$emit('update:modelValue', $event)"
       @popup-show="nameListbox"
-      @popup-hide="onPopupHide"
     >
       <template v-for="(_, name) in $slots" #[name]="slotData">
         <slot :name="name" v-bind="slotData ?? {}" />
@@ -194,8 +193,10 @@ async function nameListbox() {
   const name =
     combobox?.getAttribute('aria-label')?.trim() ||
     (isLabelAbove.value ? props.label?.trim() : undefined)
-  // Dialog mode re-creates the combobox inside the teleported dialog, where
-  // the mounted/updated pass cannot see it.
+  // Dialog mode re-creates the combobox inside the teleported dialog, outside
+  // the field root the composable observes. The in-field element keeps its
+  // attributes across the round trip: Vue never owned them, so the
+  // target/non-target patch leaves them alone (review measured it).
   applyAboveLabelName(combobox)
   const listboxId = combobox?.getAttribute('aria-controls')
   if (!name || !listboxId) return
@@ -204,12 +205,6 @@ async function nameListbox() {
   // unnamed too (axe aria-dialog-name — found the moment a story ended
   // with the dialog open). Same name: it is the same control.
   nameIfUnnamed(combobox?.closest('[role="dialog"]'), name)
-}
-
-// The target comes back into the field when the dialog closes.
-async function onPopupHide() {
-  await nextTick()
-  applyAboveLabelName()
 }
 
 function nameIfUnnamed(el: Element | null | undefined, name: string) {
