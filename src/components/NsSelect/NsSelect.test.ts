@@ -195,6 +195,37 @@ describe('NsSelect labelPlacement="above"', () => {
     w.unmount()
   })
 
+  // componentLibrary-0og: butiq measured combobox "Language English (Canada)"
+  // and combobox "Shop Category We'll use this to help you…" on quasar 2.18.6 —
+  // QField's root <label> wraps the hint and the selected value, and 2.18.6
+  // routes a bound aria-labelledby to the .q-field__native DIV, not the input.
+  // The attributes are written onto the combobox element itself, so this test
+  // passes on 2.18.6 and 2.32.2 alike (run on both, 2026-09-21).
+  it('names the combobox by the label ALONE and describes it by the hint, on the element itself', async () => {
+    const w = mountAbove(
+      { options: [{ label: 'English (Canada)', value: 'en' }], modelValue: 'en' },
+      { hint: 'Pick the language your customers see.' },
+    )
+    await nextTick()
+    const label = w.find('label.ns-select__label')
+    const combobox = w.find('[role="combobox"]')
+    expect(combobox.attributes('aria-labelledby')).toBe(label.attributes('id'))
+    expect(combobox.attributes('aria-label')).toBeUndefined()
+    const hint = w.find('.q-field__messages')
+    expect(hint.text()).toBe('Pick the language your customers see.')
+    expect(hint.attributes('id')).toBeTruthy()
+    expect(combobox.attributes('aria-describedby')).toBe(hint.attributes('id'))
+    // No other element claims the label id (2.18.6 put it on the native div).
+    expect(w.findAll('[aria-labelledby]')).toHaveLength(1)
+    w.unmount()
+  })
+
+  it('has no aria-describedby without a hint', () => {
+    const w = mountAbove()
+    expect(w.find('[role="combobox"]').attributes('aria-describedby')).toBeUndefined()
+    w.unmount()
+  })
+
   it('is a single root (no fragment): the wrapper carries the consumer class, the field keeps ns-select', () => {
     const w = mountAbove({}, { class: 'mine', 'data-x': '1' })
     expect(w.element.tagName).toBe('DIV')

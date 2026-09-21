@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 import NsInput from './NsInput.vue'
 
 describe('NsInput', () => {
@@ -103,6 +103,33 @@ describe('external label (componentLibrary-eag)', () => {
 
     expect(forAttr, 'label has no for').toBeTruthy()
     expect(input.attributes('id'), 'for/id do not match — association is broken').toBe(forAttr)
+  })
+
+  // componentLibrary-2z7: QField's root is a <label> too, wrapping the hint.
+  // butiq measured textbox "Business Name The name customers will see…" on
+  // quasar 2.18.6. Pinned on the input element (same composable as NsSelect,
+  // componentLibrary-0og); run on 2.18.6 and 2.32.2 alike, 2026-09-21.
+  it('names the input by the label ALONE and describes it by the hint', async () => {
+    const wrapper = mount(NsInput, {
+      props: { label: 'Business Name', labelPlacement: 'above', modelValue: 'Acme' },
+      attrs: { hint: 'The name customers will see.' },
+    })
+    await nextTick()
+    const label = wrapper.find('label.ns-input__label')
+    const input = wrapper.find('input')
+    expect(label.attributes('id')).toBeTruthy()
+    expect(input.attributes('aria-labelledby')).toBe(label.attributes('id'))
+    const hint = wrapper.find('.q-field__messages')
+    expect(hint.text()).toBe('The name customers will see.')
+    expect(input.attributes('aria-describedby')).toBe(hint.attributes('id'))
+    expect(hint.attributes('id')).toBeTruthy()
+  })
+
+  it('has no aria-describedby without a hint, and no aria-labelledby inside', () => {
+    const above = mount(NsInput, { props: { label: 'Email', labelPlacement: 'above' } })
+    expect(above.find('input').attributes('aria-describedby')).toBeUndefined()
+    const inside = mount(NsInput, { props: { label: 'Email' } })
+    expect(inside.find('input').attributes('aria-labelledby')).toBeUndefined()
   })
 
   it('lets a consumer supply their own id', () => {

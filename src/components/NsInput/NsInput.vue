@@ -11,8 +11,9 @@
     Story: componentLibrary-eag.
   -->
   <div v-if="isLabelAbove" :class="['ns-input__field', attrs.class]" :style="attrs.style">
-    <label v-if="label" class="ns-input__label" :for="fieldId">{{ label }}</label>
+    <label v-if="label" :id="labelId" class="ns-input__label" :for="fieldId">{{ label }}</label>
     <q-input
+      ref="root"
       v-bind="fieldBindings"
       :model-value="modelValue"
       :for="fieldId"
@@ -38,8 +39,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, mergeProps, useAttrs, useId, watchEffect } from 'vue'
+import { computed, mergeProps, ref, useAttrs, useId, watchEffect } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'
+import { useNsAboveLabelName } from '../../composables/useNsAboveLabelName'
 
 declare const process: { env: { NODE_ENV?: string } } | undefined
 /**
@@ -165,6 +167,17 @@ const generatedId = useId()
 // Realistic trigger: :for="row.id" bound before the row loads.
 // Third instance of this class here after componentLibrary-3sy and -knw.
 const fieldId = computed(() => (attrs.for as string | undefined) || generatedId)
+
+// QField's root is a <label> too, wrapping the hint: on quasar 2.18.6 butiq
+// measured textbox "Business Name The name customers will see…" — the hint in
+// the NAME. aria-labelledby on the input pins the name to our label and the
+// hint moves to aria-describedby (componentLibrary-2z7; NsSelect's twin -0og).
+const root = ref<InstanceType<typeof QInput> | null>(null)
+const { labelId } = useNsAboveLabelName({
+  root,
+  active: () => isLabelAbove.value,
+  label: () => props.label,
+})
 
 // Everything the field needs in both branches, so the two <q-input>s below stay
 // one line each rather than duplicating twelve bindings.

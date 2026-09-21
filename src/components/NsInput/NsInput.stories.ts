@@ -213,6 +213,11 @@ export const HeightsAreReal: Story = {
  * accessible name, so a broken association would still look named. happy-dom
  * also has no layout, so the 50px box and 14px label can only be checked here.
  * Story: componentLibrary-eag.
+ *
+ * With a HINT and a VALUE (componentLibrary-2z7): QField's root <label> wraps
+ * both, and butiq measured textbox "Business Name The name customers will
+ * see…" on quasar 2.18.6. The name must compute to the label alone, the hint
+ * as the description.
  */
 export const LabelAbove: Story = {
   // size="default" is EXPLICIT, and that is the design talking. `size` is
@@ -224,6 +229,8 @@ export const LabelAbove: Story = {
     labelPlacement: 'above',
     size: 'default',
     placeholder: 'your@email.ca',
+    modelValue: 'kale@example.ca',
+    hint: 'We only use it to sign you in.',
   },
   play: async ({ canvasElement }) => {
     const input = canvasElement.querySelector('input') as HTMLInputElement
@@ -232,6 +239,8 @@ export const LabelAbove: Story = {
 
     // The name comes from the LABEL, not the placeholder. If the association
     // broke, the placeholder would silently take over as the accessible name.
+    await expect(input).toHaveAccessibleName('Email address')
+    await expect(input).toHaveAccessibleDescription('We only use it to sign you in.')
     await expect(input.labels?.[0]).toBe(label)
     await expect(label.getAttribute('for')).toBe(input.id)
     await expect(input.id).not.toBe('')
