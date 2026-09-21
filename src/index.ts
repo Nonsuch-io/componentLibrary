@@ -327,7 +327,10 @@ export type {
 } from './components/NsAppShell/types'
 
 export { default as NsAuthLayout } from './components/NsAuthLayout/NsAuthLayout.vue'
-export type { NsAuthLayoutProps } from './components/NsAuthLayout/NsAuthLayout.vue'
+export type {
+  NsAuthLayoutProps,
+  NsAuthLayoutSurface,
+} from './components/NsAuthLayout/NsAuthLayout.vue'
 
 export { default as NsLandingLayout } from './components/NsLandingLayout/NsLandingLayout.vue'
 

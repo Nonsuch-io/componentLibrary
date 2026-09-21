@@ -1,5 +1,5 @@
 <template>
-  <div class="ns-page-title">
+  <div class="ns-page-title" :class="{ 'ns-page-title--center': align === 'center' }">
     <NsText v-if="hasTitle()" :as="headingTag" variant="heading-xl" class="ns-page-title__title">
       <slot>{{ props.title }}</slot>
     </NsText>
@@ -74,12 +74,22 @@ export interface NsPageTitleProps {
    * sits inside a shell that already has one.
    */
   level?: 1 | 2 | 3 | 4 | 5 | 6
+  /**
+   * `start` (default) — the app pages; `center` — the sign-up frame (Figma
+   * 264:26835 "Sign Up Form (FULL) [Desktop]", read 2026-09-18: the title
+   * row is justify-center inside the 910 column while the page-controls row
+   * above it stays left; the verify-email and mobile frames were NOT read —
+   * butiq reports they centre too). Centres the title and the subtitle;
+   * NsPageHeading forwards it and keeps its controls left.
+   */
+  align?: 'start' | 'center'
 }
 
 const props = withDefaults(defineProps<NsPageTitleProps>(), {
   title: undefined,
   subtitle: undefined,
   level: 1,
+  align: 'start',
 })
 
 defineSlots<{
@@ -206,6 +216,7 @@ const headingTag = computed<(typeof HEADING_TAGS)[number]>(() => {
 if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   let warnedNoTitle = false
   let warnedBadLevel = false
+  let warnedBadAlign = false
 
   const check = () => {
     if (!titleRendered) {
@@ -235,6 +246,21 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
       }
     } else {
       warnedBadLevel = false
+    }
+
+    // `align` compiles to a bare String at runtime, so "left", "right" or
+    // "centre" render silently as start with nothing in the console to say
+    // why (review, componentLibrary-grj.1). Same once-per-transition shape.
+    if (props.align !== 'start' && props.align !== 'center') {
+      if (!warnedBadAlign) {
+        warnedBadAlign = true
+        console.warn(
+          `[NsPageTitle] align="${props.align}" is not "start" | "center", so it was ` +
+            'rendered as start.',
+        )
+      }
+    } else {
+      warnedBadAlign = false
     }
   }
 
@@ -272,6 +298,13 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
   // without fighting an inline style. Confirm when Figma is reachable.
   &__subtitle {
     color: var(--ns-color-text-secondary);
+  }
+
+  // The sign-up frames centre the title block (264:26835); the column is a
+  // flex column, so both the items and the wrapped text lines move.
+  &--center {
+    align-items: center;
+    text-align: center;
   }
 }
 </style>

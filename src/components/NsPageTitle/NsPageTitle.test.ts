@@ -297,3 +297,24 @@ describe('NsPageTitle', () => {
     )
   })
 })
+
+// componentLibrary-grj.1: the sign-up frames centre the title block.
+describe('NsPageTitle align', () => {
+  it('warns once in dev for an align outside start | center, and renders start', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const w = mount(NsPageTitle, { props: { title: 'T', align: 'centre' as never } })
+    expect(w.classes()).not.toContain('ns-page-title--center')
+    expect(warn.mock.calls.flat().join(' ')).toContain('align="centre" is not "start" | "center"')
+    warn.mockRestore()
+    w.unmount()
+  })
+
+  it('is start by default and centres on request, title and subtitle together', () => {
+    const start = mount(NsPageTitle, { props: { title: 'T', subtitle: 'S' } })
+    expect(start.classes()).not.toContain('ns-page-title--center')
+    start.unmount()
+    const center = mount(NsPageTitle, { props: { title: 'T', subtitle: 'S', align: 'center' } })
+    expect(center.classes()).toContain('ns-page-title--center')
+    center.unmount()
+  })
+})
