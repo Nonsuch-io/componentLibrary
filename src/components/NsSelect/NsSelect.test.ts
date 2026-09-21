@@ -243,9 +243,11 @@ describe('NsSelect labelPlacement="above"', () => {
   })
 
   // Review (sonnet, 2026-09-21) measured an observer on every inside-placement
-  // select. None now; and a runtime flip to `above` gets one, back to `inside`
-  // takes the attributes away again.
-  it('creates no MutationObserver for inside placement, and follows a runtime placement flip', async () => {
+  // select. None now, and no lookups; a runtime flip to `above` gets exactly
+  // one. The flip back RECREATES the field (v-if/v-else), so the new control
+  // carrying none of our attributes is Vue's doing, not a cleanup path — a
+  // cleanup path existed briefly and review (fable) proved it unreachable.
+  it('creates no MutationObserver and does no lookups for inside placement; one observer on a flip to above', async () => {
     const observe = vi.spyOn(MutationObserver.prototype, 'observe')
     const query = vi.spyOn(Element.prototype, 'querySelector')
     const w = mount(NsSelect, {
@@ -253,28 +255,29 @@ describe('NsSelect labelPlacement="above"', () => {
       attrs: { hint: 'h' },
       attachTo: document.body,
     })
-    await w.setProps({ modelValue: 'AB' })
-    await nextTick()
-    expect(observe).not.toHaveBeenCalled()
-    // Nor the lookups: an inactive field that never wrote has nothing to undo.
-    const ours = query.mock.calls.filter(([sel]) => String(sel).includes('q-field__native'))
-    expect(ours).toHaveLength(0)
-    query.mockRestore()
-    await w.setProps({ labelPlacement: 'above' })
-    await nextTick()
-    expect(observe).toHaveBeenCalledTimes(1)
-    const combobox = w.find('[role="combobox"]')
-    expect(combobox.attributes('aria-labelledby')).toBe(
-      w.find('label.ns-select__label').attributes('id'),
-    )
-    expect(combobox.attributes('aria-describedby')).toBeTruthy()
-    await w.setProps({ labelPlacement: 'inside' })
-    await nextTick()
-    await nextTick()
-    expect(w.find('[role="combobox"]').attributes('aria-labelledby')).toBeUndefined()
-    expect(w.find('[role="combobox"]').attributes('aria-describedby')).toBeUndefined()
-    observe.mockRestore()
-    w.unmount()
+    try {
+      await w.setProps({ modelValue: 'AB' })
+      await nextTick()
+      expect(observe).not.toHaveBeenCalled()
+      // The composable's own control selector, exactly (Quasar's refocus
+      // lookup also mentions q-field__native — not on this path, but do not
+      // let a future Quasar bump fail this with the blame on the composable).
+      const ours = query.mock.calls.filter(([sel]) => String(sel).includes('[role="combobox"]'))
+      expect(ours).toHaveLength(0)
+      query.mockRestore()
+      await w.setProps({ labelPlacement: 'above' })
+      await nextTick()
+      expect(observe).toHaveBeenCalledTimes(1)
+      const combobox = w.find('[role="combobox"]')
+      expect(combobox.attributes('aria-labelledby')).toBe(
+        w.find('label.ns-select__label').attributes('id'),
+      )
+      expect(combobox.attributes('aria-describedby')).toBeTruthy()
+    } finally {
+      observe.mockRestore()
+      query.mockRestore()
+      w.unmount()
+    }
   })
 
   it('dialog mode: the combobox inside the teleported dialog is named by the label', async () => {

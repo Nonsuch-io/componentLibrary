@@ -43,12 +43,6 @@ export function useNsAboveLabelName(options: {
 }) {
   const labelId = useId()
   const hintId = useId()
-  // Whether this instance has ever written: an inactive field that never did
-  // has nothing of ours to take back, and skips the DOM lookups altogether —
-  // `root` sits on the default-placement branch too, and review (sonnet)
-  // measured every inside-placement select paying two querySelectors per
-  // re-render for guaranteed no-ops.
-  let wrote = false
 
   /**
    * `control` is for the caller that already found it — NsSelect's dialog mode
@@ -57,8 +51,13 @@ export function useNsAboveLabelName(options: {
    * (componentLibrary-w0c) and a document-wide query would name someone else's.
    */
   function applyAboveLabelName(control?: HTMLElement | null) {
-    const active = options.active()
-    if (!active && !wrote) return
+    // Inactive: nothing to do, not even the lookups — `root` sits on the
+    // default-placement branch too, and review (sonnet) measured every
+    // inside-placement select paying two querySelectors per re-render for
+    // no-ops. Nothing of ours to take back either: both consumers render the
+    // placements as v-if/v-else, so a flip recreates the field and the new
+    // control carries none of our attributes (review, fable, measured).
+    if (!options.active()) return
     const host = options.root.value?.$el
     if (!(host instanceof Element)) return
     const el =
@@ -67,11 +66,10 @@ export function useNsAboveLabelName(options: {
         '[role="combobox"], input.q-field__native, textarea.q-field__native',
       )
     if (!el) return
-    wrote = wrote || active
 
     // Ours to set, and ours to take back when the label goes: a dangling IDREF
     // fails axe and accname falls back to the polluted two-label computation.
-    if (active && options.label()?.trim()) {
+    if (options.label()?.trim()) {
       if (el.getAttribute('aria-labelledby') !== labelId)
         el.setAttribute('aria-labelledby', labelId)
     } else if (el.getAttribute('aria-labelledby') === labelId) {
@@ -81,8 +79,8 @@ export function useNsAboveLabelName(options: {
     // With a hint (prop or #hint slot) the block has text; with only `rules`
     // it exists and is empty until an error shows.
     const messages = host.querySelector<HTMLElement>('.q-field__messages')
-    if (active && messages && !messages.id && messages.textContent?.trim()) messages.id = hintId
-    const describedByHint = active && messages?.id === hintId
+    if (messages && !messages.id && messages.textContent?.trim()) messages.id = hintId
+    const describedByHint = messages?.id === hintId
     const tokens = (el.getAttribute('aria-describedby') ?? '')
       .split(/\s+/)
       .filter((t) => t && t !== hintId)
@@ -96,16 +94,17 @@ export function useNsAboveLabelName(options: {
 
   // Observed only while active: the source is undefined for an inside
   // placement, so the common case creates no observer at all. A runtime flip
-  // of the placement swaps the host (v-if/v-else) or clears it, and either way
-  // the old observer goes and one apply takes our attributes back.
+  // of the placement swaps the host (v-if/v-else); the old observer goes with
+  // the old element.
   let observer: MutationObserver | undefined
   watch(
     () => (options.active() ? options.root.value?.$el : undefined),
     (host) => {
       observer?.disconnect()
       observer = undefined
+      if (!(host instanceof Element)) return
       applyAboveLabelName()
-      if (!(host instanceof Element) || typeof MutationObserver === 'undefined') return
+      if (typeof MutationObserver === 'undefined') return
       observer = new MutationObserver(() => applyAboveLabelName())
       observer.observe(host, { childList: true, subtree: true })
     },
