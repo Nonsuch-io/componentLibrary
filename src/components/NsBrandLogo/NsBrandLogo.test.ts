@@ -47,11 +47,12 @@ describe('NsBrandLogo', () => {
     })
 
     it('should reserve a box matching the given ratio rather than QImg 16:9 default', () => {
-      // 100 / 2.62 = 38.16% — the wordmark's true box. Without `ratio` QImg
-      // reserves 56.25% (16:9) and letterboxes the logo in dead space.
+      // 2.62 is the wordmark's true box. Without `ratio` QImg reserves 16:9
+      // (1.7778) and letterboxes the logo in dead space. Since quasar 2.32.0
+      // the ratio is CSS `aspect-ratio` on the component root, not a
+      // padding-bottom filler div (use-ratio.js; the filler is gone).
       const wrapper = mount(NsBrandLogo, { props: sized })
-      const filler = wrapper.find('[role="img"] > div:first-child')
-      expect(filler.attributes('style')).toContain('padding-bottom: 38.1')
+      expect(wrapper.find('[role="img"]').attributes('style')).toContain('aspect-ratio: 2.62')
     })
   })
 
@@ -381,8 +382,7 @@ describe('NsBrandLogo', () => {
     it('should reserve the 16:9 box for a zero ratio, which is what makes it worth warning about', () => {
       vi.spyOn(console, 'warn').mockImplementation(() => {})
       const wrapper = mount(NsBrandLogo, { props: { src: SRC, alt: 'Acme', ratio: 0 } })
-      const filler = wrapper.find('[role="img"] > div:first-child')
-      expect(filler.attributes('style')).toContain('padding-bottom: 56.2')
+      expect(wrapper.find('[role="img"]').attributes('style')).toContain('aspect-ratio: 1.7778')
     })
 
     it('should accept a valid ratio passed as a string', () => {
