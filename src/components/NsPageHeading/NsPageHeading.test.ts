@@ -64,6 +64,7 @@ describe('NsPageHeading', () => {
       title: 'a title',
       subtitle: 'a subtitle',
       level: 3,
+      align: 'center',
     }
 
     const propsOf = (component: unknown) =>

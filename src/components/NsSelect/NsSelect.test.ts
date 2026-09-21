@@ -164,3 +164,99 @@ describe('NsSelect — the listbox is named (componentLibrary-2e7)', () => {
     w.unmount()
   })
 })
+
+// componentLibrary-grj.3: NsInput's labelPlacement contract, mirrored.
+describe('NsSelect labelPlacement="above"', () => {
+  const mountAbove = (props: Record<string, unknown> = {}, attrs: Record<string, unknown> = {}) =>
+    mount(NsSelect, {
+      props: {
+        label: 'Province / Territory',
+        options: ['AB', 'BC'],
+        labelPlacement: 'above',
+        ...props,
+      },
+      attrs,
+      attachTo: document.body,
+    })
+
+  it('renders a real <label> above the box, associated to the combobox by for/id and aria-labelledby', () => {
+    const w = mountAbove()
+    const label = w.find('label.ns-select__label')
+    const combobox = w.find('[role="combobox"]')
+    expect(label.text()).toBe('Province / Territory')
+    expect(label.attributes('for')).toBeTruthy()
+    expect(combobox.attributes('id')).toBe(label.attributes('for'))
+    // QField's root is a <label> too; aria-labelledby names the combobox by
+    // OUR label alone, whatever the two-label computation does.
+    expect(combobox.attributes('aria-labelledby')).toBe(label.attributes('id'))
+    expect(label.attributes('id')).toBeTruthy()
+    // Quasar is given no label: no floating label inside the box.
+    expect(w.find('.q-field__label').exists()).toBe(false)
+    w.unmount()
+  })
+
+  it('is a single root (no fragment): the wrapper carries the consumer class, the field keeps ns-select', () => {
+    const w = mountAbove({}, { class: 'mine', 'data-x': '1' })
+    expect(w.element.tagName).toBe('DIV')
+    expect(w.classes()).toContain('ns-select__field')
+    expect(w.classes()).toContain('mine')
+    expect(w.find('.ns-select').exists()).toBe(true)
+    expect(w.find('.ns-select').classes()).not.toContain('mine')
+    // Other attrs still reach the field (Quasar puts them on the combobox input).
+    expect(w.find('.ns-select [data-x="1"]').exists()).toBe(true)
+    expect(w.attributes('data-x')).toBeUndefined()
+    w.unmount()
+  })
+
+  it('honours a consumer-supplied `for` as the id, and never an empty one', () => {
+    const w = mountAbove({}, { for: 'province' })
+    expect(w.find('label').attributes('for')).toBe('province')
+    expect(w.find('[role="combobox"]').attributes('id')).toBe('province')
+    w.unmount()
+    const empty = mountAbove({}, { for: '' })
+    expect(empty.find('label').attributes('for')).toBeTruthy()
+    expect(empty.find('[role="combobox"]').attributes('id')).toBe(
+      empty.find('label').attributes('for'),
+    )
+    empty.unmount()
+  })
+
+  it('still names the popup listbox — from the label text, since QSelect has no aria-label here', async () => {
+    const w = mountAbove()
+    await w.find('.q-field__control').trigger('click')
+    await nextTick()
+    await nextTick()
+    const listbox = document.querySelector('[role="listbox"]')
+    expect(listbox, 'the popup is open').not.toBeNull()
+    expect(w.find('[role="combobox"]').attributes('aria-label')).toBeUndefined()
+    expect(listbox!.getAttribute('aria-label')).toBe('Province / Territory')
+    w.unmount()
+  })
+
+  it('a consumer aria-label still wins for the listbox name', async () => {
+    const w = mountAbove({}, { 'aria-label': 'Pick a province' })
+    await w.find('.q-field__control').trigger('click')
+    await nextTick()
+    await nextTick()
+    expect(document.querySelector('[role="listbox"]')!.getAttribute('aria-label')).toBe(
+      'Pick a province',
+    )
+    w.unmount()
+  })
+
+  // NsInput's own test for the same trap: `:for` after v-bind bound to
+  // undefined would DELETE a consumer's for. Verified for the default here too.
+  it('passes a consumer `for` through in the default placement', () => {
+    const w = mount(NsSelect, { props: { label: 'Role', options: ['A'] }, attrs: { for: 'role' } })
+    expect(w.find('[role="combobox"]').attributes('id')).toBe('role')
+    w.unmount()
+  })
+
+  it('inside (the default) is unchanged: the floating label, no wrapper', () => {
+    const w = mount(NsSelect, { props: { label: 'Role', options: ['A'] } })
+    expect(w.element.classList.contains('ns-select')).toBe(true)
+    expect(w.find('.ns-select__field').exists()).toBe(false)
+    expect(w.find('.q-field__label').exists()).toBe(true)
+    w.unmount()
+  })
+})
