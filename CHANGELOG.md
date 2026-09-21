@@ -4,6 +4,24 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.53.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.52.0...v0.53.0) (2026-09-21)
+
+
+### Features
+
+* **auth-layout:** surface="canvas" puts the content on the canvas, no card (componentLibrary-grj.2) ([2b3b9c7](https://github.com/Nonsuch-io/componentLibrary/commit/2b3b9c71df80279aaa53d302c5fdddad495944cd))
+* **auth-layout:** surface="canvas" puts the content on the canvas, no card (componentLibrary-grj.2) ([9aa0425](https://github.com/Nonsuch-io/componentLibrary/commit/9aa042536237d635f17640acd13a57d5cfa33655))
+* **page-title:** align 'start' | 'center', forwarded by NsPageHeading (componentLibrary-grj.1) ([bbbb63f](https://github.com/Nonsuch-io/componentLibrary/commit/bbbb63f3cbf3bed6a1eece344dc7485c829e9168))
+* **page-title:** align 'start' | 'center', forwarded by NsPageHeading (componentLibrary-grj.1) ([aad3159](https://github.com/Nonsuch-io/componentLibrary/commit/aad31595a879f43b5b405ff3a541c97b6403f495))
+* **select:** labelPlacement 'inside' | 'above', NsInput's contract mirrored (componentLibrary-grj.3) ([f73ae2c](https://github.com/Nonsuch-io/componentLibrary/commit/f73ae2cab96dcc533001b86cbceac40d5049a177))
+* **select:** labelPlacement inside | above, NsInput's contract mirrored (componentLibrary-grj.3) ([000dd5c](https://github.com/Nonsuch-io/componentLibrary/commit/000dd5c5145e7d028cc25a3d5d36f736cd9cee0c))
+
+
+### Bug Fixes
+
+* **page-title:** warn in dev for an align outside start | center (componentLibrary-grj.1) ([dd02cbc](https://github.com/Nonsuch-io/componentLibrary/commit/dd02cbc66f89dd156730028a2a34faab5a0065d9))
+* **select:** aria-labelledby names the above-label combobox (componentLibrary-grj.3) ([acaa7ef](https://github.com/Nonsuch-io/componentLibrary/commit/acaa7ef32c1c59107f0f215f4be97d50cc45a9c0))
+
 ## [0.52.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.51.2...v0.52.0) (2026-09-18)
 
 
