@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import NsAuthLayout from './NsAuthLayout.vue'
 import NsButton from '../NsButton/NsButton.vue'
 import NsInput from '../NsInput/NsInput.vue'
+import NsFormSection from '../NsFormSection/NsFormSection.vue'
+import NsPageHeading from '../NsPageHeading/NsPageHeading.vue'
+import { expect } from 'storybook/test'
 
 const meta: Meta<typeof NsAuthLayout> = {
   title: 'Templates/NsAuthLayout',
@@ -102,4 +105,56 @@ export const Mobile: Story = {
       </NsAuthLayout>
     `,
   }),
+}
+
+/**
+ * THE SIGN-UP SHELL (componentLibrary-grj.2) — Figma 264:26835 "Sign Up
+ * Form (FULL) [Desktop]": the page heading and three NsFormSection cards
+ * sit DIRECTLY on the canvas fill, 910 wide, top-aligned, 40 above and 32
+ * at the sides; no card around them. Before `surface="canvas"` a sign-up
+ * page in this layout was a card inside a card on a white body. Login and
+ * friends keep the card.
+ */
+export const SignUpOnTheCanvas: Story = {
+  args: { surface: 'canvas', maxWidth: '910px' },
+  render: (args) => ({
+    components: { NsAuthLayout, NsFormSection, NsInput, NsPageHeading },
+    setup: () => ({ args }),
+    template: `
+      <NsAuthLayout v-bind="args">
+        <div style="display: flex; flex-direction: column; gap: 20px">
+          <NsPageHeading title="Create your butiq shop." />
+          <NsFormSection title="Profile" description="Who is setting up this shop?">
+            <NsInput label="First name" label-placement="above" />
+          </NsFormSection>
+          <NsFormSection title="Account">
+            <NsInput label="Email" label-placement="above" type="email" />
+          </NsFormSection>
+          <NsFormSection title="Business Details">
+            <NsInput label="Shop name" label-placement="above" />
+          </NsFormSection>
+        </div>
+      </NsAuthLayout>
+    `,
+  }),
+  play: async ({ canvasElement }) => {
+    await document.fonts.ready
+    const page = canvasElement.querySelector('.ns-auth-layout__page') as HTMLElement
+    const container = canvasElement.querySelector('.ns-auth-layout__container') as HTMLElement
+    const token = (name: string) =>
+      getComputedStyle(document.documentElement).getPropertyValue(name).trim()
+    const rgb = (hex: string) => {
+      const n = parseInt(hex.slice(1), 16)
+      return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`
+    }
+    // The canvas fill, no card, the column at the frame's 910.
+    await expect(getComputedStyle(page).backgroundColor).toBe(rgb(token('--ns-color-bg-canvas')))
+    await expect(canvasElement.querySelector('.ns-auth-layout__card')).toBeNull()
+    await expect(container.getBoundingClientRect().width).toBeLessThanOrEqual(910)
+    // Top-aligned with the design's 40 above (desktop), not floated to the middle.
+    const pageRect = page.getBoundingClientRect()
+    await expect(container.getBoundingClientRect().top - pageRect.top).toBe(40)
+    // The section cards are direct children of the column's flow, on the canvas.
+    await expect(canvasElement.querySelectorAll('.ns-form-section').length).toBe(3)
+  },
 }
