@@ -21,6 +21,7 @@ import { describe, it, expect } from 'vitest'
 import { createSSRApp, defineComponent, h, ref } from 'vue'
 import { renderToString } from 'vue/server-renderer'
 import { useNsAboveLabelName } from './composables/useNsAboveLabelName'
+import { getToken } from './tokens/index'
 
 describe('server rendering (componentLibrary-2cp)', () => {
   it('has no DOM globals — the condition the regression needs', () => {
@@ -28,6 +29,18 @@ describe('server rendering (componentLibrary-2cp)', () => {
     expect(typeof document).toBe('undefined')
     expect(typeof window).toBe('undefined')
     expect(typeof MutationObserver).toBe('undefined')
+  })
+
+  // Public API a consumer can call from a computed or a plugin install, which
+  // both run on the server. Its default parameter WAS
+  // `el = document.documentElement`, and a default is evaluated in the
+  // caller's environment — review (sonnet) found it while checking whether the
+  // 2cp fix was complete. No computed styles exist on a server, so '' is the
+  // honest answer rather than a throw.
+  it('getToken() returns empty rather than throwing, with and without an element', () => {
+    expect(() => getToken('--ns-color-bg-brand' as never)).not.toThrow()
+    expect(getToken('--ns-color-bg-brand' as never)).toBe('')
+    expect(getToken('--ns-color-bg-brand' as never, {} as never)).toBe('')
   })
 
   // `active: true` on purpose: the inactive path returns before touching
