@@ -56,6 +56,12 @@ jobs:
       - name: Test
         run: pnpm test
 
+      # Node, no DOM globals: the only environment that catches a bare
+      # `Element`/`window` reference, which 500s a consumer's whole SSR site
+      # while the DOM suites stay green (componentLibrary-2cp).
+      - name: SSR tests
+        run: pnpm test:ssr
+
       - name: Storybook tests
         run: pnpm test:storybook
 

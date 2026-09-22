@@ -36,6 +36,18 @@ import { onBeforeUnmount, onMounted, onUpdated, useId, watch, type Ref } from 'v
  * token filter livelocked the unit suite for 26 minutes in a microtask storm
  * no test timeout could interrupt. Writes are still change-guarded.
  */
+/**
+ * `instanceof Element` THROWS on a server, it does not return false: `Element`
+ * is not a binding there at all, so the reference itself is a ReferenceError.
+ * 0.53.1 shipped the bare form and 500'd butiq's Nuxt homepage on EVERY route
+ * — the watch below is `immediate`, so it runs during setup, on the server too
+ * (componentLibrary-2cp). The DOM globals this composable needs must all
+ * be reached through `typeof`, the way MutationObserver already was.
+ */
+function isElement(value: unknown): value is Element {
+  return typeof Element !== 'undefined' && value instanceof Element
+}
+
 export function useNsAboveLabelName(options: {
   root: Ref<{ $el?: unknown } | null | undefined>
   active: () => boolean
@@ -59,7 +71,7 @@ export function useNsAboveLabelName(options: {
     // control carries none of our attributes (review, fable, measured).
     if (!options.active()) return
     const host = options.root.value?.$el
-    if (!(host instanceof Element)) return
+    if (!isElement(host)) return
     const el =
       control ??
       host.querySelector<HTMLElement>(
@@ -102,7 +114,7 @@ export function useNsAboveLabelName(options: {
     (host) => {
       observer?.disconnect()
       observer = undefined
-      if (!(host instanceof Element)) return
+      if (!isElement(host)) return
       applyAboveLabelName()
       if (typeof MutationObserver === 'undefined') return
       observer = new MutationObserver(() => applyAboveLabelName())

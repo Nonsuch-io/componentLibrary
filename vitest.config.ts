@@ -67,6 +67,28 @@ export default defineConfig({
         },
       },
       {
+        // SSR: node, NO DOM globals, no happy-dom setup file. The only place a
+        // bare `Element`/`document`/`window` reference shows up as the
+        // ReferenceError it is on a server — 0.53.1 shipped one and 500'd
+        // butiq's Nuxt homepage on every route with 1554 unit tests green
+        // (componentLibrary-2cp). Quasar is left EXTERNAL on purpose:
+        // node's own resolution then picks its `node` export condition
+        // (quasar.server.prod), exactly as a Nitro server does. Inlining it
+        // sends it through Vite's client pipeline and loads the client bundle,
+        // which touches `window` at module scope.
+        extends: true,
+        // The `node` export condition, so `quasar` resolves to
+        // quasar.server.prod.js the way a real SSR build does — its `import`
+        // entry is the CLIENT bundle and touches `window` at module scope.
+        resolve: { conditions: ['node', 'module', 'default'] },
+        test: {
+          name: 'ssr',
+          globals: true,
+          environment: 'node',
+          include: ['src/**/*.ssr-test.ts'],
+        },
+      },
+      {
         extends: true,
         plugins: [
           // The plugin will run tests for the stories defined in your Storybook config

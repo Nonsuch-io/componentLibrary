@@ -207,7 +207,18 @@ export type NsToken =
  * const brand = getToken('--ns-color-bg-brand')
  * // → '#d56307'
  * ```
+ *
+ * SSR-SAFE, and it has to be said out loud: the default used to be
+ * `el: Element = document.documentElement`, and a default parameter is
+ * evaluated in the caller's environment — on a server that is a
+ * ReferenceError, not a falsy value, and it takes the whole request down.
+ * Same class as componentLibrary-2cp, found by that review in public API with
+ * no internal caller. There are no computed styles on a server, so the honest
+ * answer there is the empty string, which is also what a browser returns for
+ * a property that is not set.
  */
-export function getToken(name: NsToken, el: Element = document.documentElement): string {
-  return getComputedStyle(el).getPropertyValue(name).trim()
+export function getToken(name: NsToken, el?: Element): string {
+  const target = el ?? (typeof document === 'undefined' ? undefined : document.documentElement)
+  if (target === undefined || typeof getComputedStyle === 'undefined') return ''
+  return getComputedStyle(target).getPropertyValue(name).trim()
 }
