@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
+import { getToken } from './index'
 
 const css = readFileSync(resolve(__dirname, 'tokens.css'), 'utf-8')
 
@@ -403,5 +404,32 @@ describe('tokens.css', () => {
         `token ${token} has different values in :root.dark vs @media (prefers-color-scheme: dark)`,
       ).toBe(rootValue)
     }
+  })
+})
+
+/**
+ * getToken()'s BROWSER path. Its SSR cases all assert '', so an always-''
+ * regression — a flipped guard polarity, a dropped fallback — passed every
+ * test in the repo until this block existed; review (fable) named it while
+ * reviewing the commit that rewrote the body (componentLibrary-2cp), and this
+ * repo has shipped a post-review guard flip before (#232).
+ */
+describe('getToken (componentLibrary-2cp)', () => {
+  it('reads a custom property from the element given, and from documentElement by default', () => {
+    const el = document.createElement('div')
+    document.body.appendChild(el)
+    el.style.setProperty('--ns-color-bg-brand', '#d56307')
+    document.documentElement.style.setProperty('--ns-color-bg-brand', '#123456')
+    try {
+      expect(getToken('--ns-color-bg-brand' as never, el)).toBe('#d56307')
+      expect(getToken('--ns-color-bg-brand' as never)).toBe('#123456')
+    } finally {
+      el.remove()
+      document.documentElement.style.removeProperty('--ns-color-bg-brand')
+    }
+  })
+
+  it('returns the empty string for a property that is not set', () => {
+    expect(getToken('--ns-not-a-token' as never)).toBe('')
   })
 })

@@ -29,20 +29,23 @@ import { resolve } from 'node:path'
  *     componentLibrary-zfw.
  *   - Anything a dependency evaluates at import time.
  *
- * A LEGITIMATE client-only `instanceof` goes behind `typeof X === 'undefined'`
- * in the same statement. If a new pattern is genuinely safe and this fails,
- * widen it deliberately and say why — do not delete the global from the list.
+ * WRITE THE GUARD AS ONE EXPRESSION:
+ *
+ *     typeof X !== 'undefined' && value instanceof X
+ *
+ * An early return (`if (typeof X === 'undefined') return`) or an `if (…) { }`
+ * block is a DIFFERENT STATEMENT, and this check rejects it on purpose — a
+ * guard in a neighbouring statement is exactly the masking case above, and
+ * nothing here can tell yours from a stranger's. Review (fable) measured five
+ * such shapes being flagged; that is the intended side to err on, since a
+ * false positive blocks a release and a false negative is a consumer's whole
+ * site. It also cannot see polarity: `typeof X === 'undefined' && v
+ * instanceof X` passes this and still throws — `src/ssr.ssr-test.ts` is the
+ * backstop for that. If a new pattern is genuinely safe and this fails, widen
+ * it deliberately and say why — do not delete the global from the list.
  */
 const BUNDLE = resolve(process.cwd(), 'dist/nonsuch-components.js')
 const built = existsSync(resolve(process.cwd(), 'dist/index.d.ts'))
-
-/**
- * Skipping is fine locally (no build, nothing to read) but NOT in CI, where a
- * silent skip is a gate that cannot fail — review (sonnet) measured this file
- * reporting "1 skipped", exit 0, after a partial build. CI builds first, so if
- * dist is missing there, something is wrong and this should say so.
- */
-const inCI = typeof process !== 'undefined' && process.env.CI === 'true'
 
 /** Globals a Nitro/Node server does not define. */
 const DOM_GLOBALS = [
@@ -58,11 +61,7 @@ const DOM_GLOBALS = [
   'localStorage',
 ]
 
-describe.skipIf(!built && !inCI)('the bundle is safe to import on a server', () => {
-  it('has a build to check (CI must never skip this file silently)', () => {
-    expect(built, 'dist/index.d.ts is missing — run `pnpm build` before this suite').toBe(true)
-  })
-
+describe.skipIf(!built)('the bundle is safe to import on a server', () => {
   const js = built && existsSync(BUNDLE) ? readFileSync(BUNDLE, 'utf-8') : ''
 
   it('emits the bundle at all', () => {
@@ -95,5 +94,15 @@ describe.skipIf(!built && !inCI)('the bundle is safe to import on a server', () 
           `statement — this throws on a server. Context: ...${window160.slice(-90)}${use[0]}`,
       ).toBe(true)
     }
+  })
+})
+
+// The siblings' pattern (package-exports, quasarConfig, useNsDisabled): a skip
+// must never read as a pass in the gate. Running the main block in CI instead
+// would have given two real failures beside ten vacuous passes against an
+// empty string — review (fable) pointed at the existing convention.
+describe.skipIf(built)('bundle not built', () => {
+  it('fails in CI, skips locally — a skip must never read as a pass in the gate', () => {
+    expect(process.env.CI, 'dist/ absent in CI: build must run before tests').toBeFalsy()
   })
 })
