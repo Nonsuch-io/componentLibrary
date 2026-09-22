@@ -15,6 +15,12 @@ const meta: Meta<typeof NsImageUpload> = {
 export default meta
 type Story = StoryObj<typeof meta>
 
+/** #rrggbb → the `rgb(r, g, b)` shape getComputedStyle returns. */
+const toRgb = (hex: string) => {
+  const n = parseInt(hex.replace('#', ''), 16)
+  return `rgb(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255})`
+}
+
 const controlled = (initial: File | null = null) => ({
   components: { NsImageUpload },
   setup: () => ({ file: ref<File | null>(initial) }),
@@ -42,8 +48,15 @@ export const WithSelection: Story = {
     await expect(document.activeElement).toBe(input)
     // The tile is rendered in BOTH states now (the card, componentLibrary-af2),
     // so there is one ring target instead of two to keep in sync.
+    // `outlineWidth > 0` would be VACUOUS: Chromium reports the UA default
+    // width (3px) even with outline-style: none, so it passes with no ring at
+    // all. Assert the rule's own value (review, fable).
     await expect(getComputedStyle(tile).outlineStyle).not.toBe('none')
-    await expect(parseFloat(getComputedStyle(tile).outlineWidth)).toBeGreaterThan(0)
+    await expect(getComputedStyle(tile).outlineWidth).toBe('2px')
+    // Filled: the image covers the tile and the dashed edge goes solid.
+    await expect(getComputedStyle(tile).borderTopStyle).toBe('solid')
+    const thumb = canvasElement.querySelector('.ns-image-upload__thumb') as HTMLImageElement
+    await expect(Math.round(thumb.getBoundingClientRect().width)).toBe(98)
   },
 }
 
@@ -134,6 +147,23 @@ export const TheCardAsDrawn: Story = {
     const plus = canvasElement.querySelector('.ns-image-upload__plus') as SVGElement
     await expect(plus.getBoundingClientRect().width).toBe(32)
 
+    // The three colours the frame names, not just the geometry: without these
+    // the story passes with the tile on surface-alt or a border-default dash.
+    await expect(cardStyle.backgroundColor).toBe('rgb(253, 253, 249)') // bg-surface-alt
+    await expect(tileStyle.backgroundColor).toBe('rgb(255, 255, 255)') // bg-surface
+    await expect(tileStyle.borderTopColor).toBe('rgb(213, 99, 7)') // border-primary
+    // The tips take --ns-color-text-secondary, which is what the frame names.
+    // They render #757575 and the frame draws #535353 — that gap is the TOKEN's
+    // (componentLibrary-dyk: our text-secondary is the design's text-TERTIARY),
+    // not this component's, so assert the component resolves the token rather
+    // than pinning a hex this file cannot fix. When dyk lands, this still
+    // passes and the colour moves with it.
+    const tokenSecondary = getComputedStyle(document.documentElement)
+      .getPropertyValue('--ns-color-text-secondary')
+      .trim()
+    await expect(tokenSecondary).toBeTruthy()
+    await expect(getComputedStyle(tips[0] as HTMLElement).color).toBe(toRgb(tokenSecondary))
+
     // The badge sits at the card's right edge; the title takes the rest.
     await expect(Math.round(badge.getBoundingClientRect().right)).toBe(
       Math.round(header.getBoundingClientRect().right),
@@ -152,6 +182,13 @@ export const TheCardAsDrawn: Story = {
     ).toBe(12)
     await expect(getComputedStyle(tips[0] as HTMLElement).fontSize).toBe('14px')
     await expect(getComputedStyle(label).fontSize).toBe('16px')
+
+    // The frame's card is 229 high at 870 wide. Ours lands within 2px (the
+    // badge's 21px line vs the label's 20.8, plus 2px of border) — assert the
+    // WHOLE, so a future gap or line-height change cannot drift unnoticed
+    // while every individual number still passes.
+    const height = card.getBoundingClientRect().height
+    await expect(Math.abs(height - 229)).toBeLessThanOrEqual(2)
   },
 }
 
@@ -181,7 +218,7 @@ export const KeyboardReachesTheInput: Story = {
     // And the RING draws on the zone the user can see, not on the 1px input.
     // Keyboard focus is what makes :focus-visible match; a mouse click would not.
     await expect(getComputedStyle(zone).outlineStyle).not.toBe('none')
-    await expect(parseFloat(getComputedStyle(zone).outlineWidth)).toBeGreaterThan(0)
+    await expect(getComputedStyle(zone).outlineWidth).toBe('2px')
   },
 }
 

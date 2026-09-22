@@ -54,18 +54,32 @@
         </div>
       </div>
 
-      <div v-if="hasTips()" class="ns-image-upload__tips">
-        <slot name="tips">
+      <div v-if="hasTips()" :id="tipsId" class="ns-image-upload__tips">
+        <!--
+          ONE predicate, not two: `renders()` treats a whitespace-only slot as
+          nothing while Vue's own fallback logic treats it as something, so
+          `<slot><fallback/></slot>` can render an empty block AND skip the
+          prop. Reachable from a render-function slot; the SFC compiler drops
+          whitespace-only slot templates, which is why it hid.
+        -->
+        <slot v-if="slotRenders(slots.tips)" name="tips" />
+        <template v-else>
+          <!--
+            `${i}:${tip}`, not `tip`: two identical tip strings are legal (a
+            repeated line in two locales), and a duplicate key makes Vue's
+            keyed diff warn and mis-patch on REORDER. Review measured the
+            warning with plain `tip`.
+          -->
           <NsText
-            v-for="tip in tips"
-            :key="tip"
+            v-for="(tip, i) in tips"
+            :key="`${i}:${tip}`"
             as="p"
             variant="body-md"
             class="ns-image-upload__tip"
           >
             {{ tip }}
           </NsText>
-        </slot>
+        </template>
       </div>
 
       <div class="ns-image-upload__row">
@@ -87,6 +101,7 @@
           <NsButton
             variant="tertiary"
             size="sm"
+            :disable="resolvedDisable"
             class="ns-image-upload__remove"
             :aria-label="`${locale.media.uploadRemove}: ${modelValue.name}`"
             @click="clear"
@@ -153,26 +168,28 @@ declare const process: { env: { NODE_ENV?: string } } | undefined
  *
  *   - The input is VISUALLY hidden, never `display: none`: display none removes
  *     it from the tab order and from the accessibility tree. The clip pattern
- *     keeps it focusable and announced while the drop zone draws.
- *   - The drop zone is a `<label for>` the input, not a button, so clicking
- *     it opens the picker through the input. The input's NAME is `aria-label`
- *     from the `label` prop — not the label element — because the label
- *     element disappears once a file is selected, and the input does not:
- *     Tab, Enter, pick is how a user REPLACES an image. The first version
- *     named it from the element and axe failed the selected state with "Form
- *     elements must have labels". The prop is required so a name always
- *     exists, and the `label` slot is for formatting the same text, not
- *     different text — otherwise the visible label and the name drift
- *     (WCAG 2.5.3).
- *   - The focus ring is drawn on the drop zone when the INPUT has focus, via
- *     `:focus-visible + label`. Tab reaches the input; the user sees the zone.
+ *     keeps it focusable and announced while the tile draws.
+ *   - The TILE is a `<label for>` the input, not a button, so clicking it opens
+ *     the picker through the input — in BOTH states, so a click on a chosen
+ *     image REPLACES it. The input's NAME is `aria-label` from the `label`
+ *     prop, not the label element, because the tile holds an icon and no
+ *     words; axe failed the selected state until the name moved to the input.
+ *     The prop is required so a name always exists, and the `label` slot is
+ *     for formatting the same text, not different text — otherwise the visible
+ *     heading and the name drift (WCAG 2.5.3).
+ *   - The focus ring is drawn on the TILE when the INPUT has focus, via
+ *     `:focus-visible ~ .row .tile`. Tab reaches the input; the user sees the
+ *     tile. A general sibling selector, not `+`: the input's next sibling is
+ *     the heading row. One ring target in both states, so unlike the old
+ *     markup there is no second element to keep in sync.
  *   - Selection and removal are announced through a polite live region, since
- *     replacing the drop zone with a preview is a DOM change a screen reader
- *     would otherwise not narrate.
- *   - A warning is tied to the input with `aria-describedby` and `aria-invalid`,
- *     so it is read with the control rather than being loose text nearby.
+ *     the tile's CONTENTS change without any text changing on screen.
+ *   - The tips and any warning are tied to the input with `aria-describedby`,
+ *     so the accepted formats are read WITH the control rather than being
+ *     loose text above it; a warning also sets `aria-invalid`.
  *   - Remove is a real `<button>`, named with the filename so "Remove image"
- *     is not ambiguous on a form with several of these.
+ *     is not ambiguous on a form with several of these, and it honours
+ *     `disable` in the component rather than through pointer-events.
  *
  * DRAG AND DROP IS AN ENHANCEMENT, not the path. It has no keyboard equivalent
  * by nature; the input is the equivalent. A dropped file goes through the same
@@ -272,7 +289,7 @@ const emit = defineEmits<{
 
 defineSlots<{
   /**
-   * The drop zone heading. For FORMATTING the `label` text, not replacing it —
+   * The card's heading. For FORMATTING the `label` text, not replacing it —
    * the input is named from the prop, and a slot showing different words would
    * put a visible label outside its control's accessible name.
    */
@@ -294,6 +311,7 @@ const locale = useNsLocale()
 const slots = useSlots()
 const inputId = useId()
 const warningId = useId()
+const tipsId = useId()
 const liveId = useId()
 const inputEl = ref<HTMLInputElement | null>(null)
 const labelEl = ref<ComponentPublicInstance | null>(null)
@@ -342,8 +360,15 @@ function hasTips(): boolean {
   return slotRenders(slots.tips) || props.tips.length > 0
 }
 
+/**
+ * The tips are the library's own text now (file types, minimum size), so they
+ * have to reach the control rather than sit near it: review (fable) called
+ * this the dropped-aria class, on surface this component did not have before
+ * the card. Warning last, so the newest thing is read last.
+ */
 function describedBy(): string | undefined {
-  return hasWarning() ? warningId : undefined
+  const ids = [hasTips() ? tipsId : null, hasWarning() ? warningId : null].filter(Boolean)
+  return ids.length > 0 ? ids.join(' ') : undefined
 }
 
 /**
@@ -431,6 +456,19 @@ function select(file: File) {
   emit('update:modelValue', file)
 }
 
+/**
+ * No `resolvedDisable` guard here, deliberately, unlike select(): the Remove
+ * button takes `:disable`, and QBtn then blocks the click twice — the native
+ * attribute and its own handler — so a guard in this function is UNREACHABLE.
+ * Measured: deleting it left all tests green even with the attribute stripped
+ * from the element by hand, which is the same untestable-branch shape a review
+ * rejected on the previous PR. The defence that does the work is the `:disable`
+ * binding, and a test asserts the button carries `disabled`.
+ *
+ * What this replaced: `pointer-events: none` on the preview element, a SINGLE
+ * CSS layer, which the card structure deleted along with the element — review
+ * (fable) then measured a disabled control clearing its own v-model on click.
+ */
 function clear() {
   internalWarning.value = null
   emit('update:modelValue', null)
@@ -664,6 +702,12 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
     opacity: 0.6;
     cursor: not-allowed;
     pointer-events: none;
+  }
+
+  // The filename and Remove dim with the tile: the button is disabled at the
+  // component level, so without this a disabled card still looks half-live.
+  &--disabled &__file {
+    opacity: 0.6;
   }
 
   // Filled: the image covers the tile and the dashed edge goes, as drawn.

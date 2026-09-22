@@ -87,6 +87,31 @@ describe('NsImageUpload', () => {
 
   // The card as drawn (componentLibrary-af2), measured from the frame's own
   // NsImageUpload instance on 2026-09-22.
+  // Review (fable) measured a DISABLED control clearing its own v-model on a
+  // click: the old markup blocked the mouse path with `pointer-events: none`
+  // on the preview, the card dropped that element, and the keyboard path was
+  // never covered by CSS at all.
+  describe('disable stops removal, not just picking', () => {
+    it('does not emit on a Remove click, and the button says it is disabled', async () => {
+      const wrapper = mount(NsImageUpload, {
+        props: { modelValue: png(), label: 'L', disable: true },
+      })
+      // The `disabled` attribute IS the defence — QBtn blocks the click on it
+      // and on its own handler, which is why no guard inside clear() can be
+      // reached or tested. Assert the binding, not a branch that cannot run.
+      const button = wrapper.find('button')
+      expect(button.attributes('disabled')).toBeDefined()
+      await button.trigger('click')
+      expect(wrapper.emitted('update:modelValue')).toBeUndefined()
+    })
+
+    it('still emits null on Remove when enabled', async () => {
+      const wrapper = mount(NsImageUpload, { props: { modelValue: png(), label: 'L' } })
+      await wrapper.find('button').trigger('click')
+      expect(wrapper.emitted('update:modelValue')).toEqual([[null]])
+    })
+  })
+
   describe('the card: heading row, badge, tips', () => {
     it('puts the badge slot in the heading row beside the label, and nothing when unused', () => {
       const withBadge = mount(NsImageUpload, {
@@ -122,6 +147,74 @@ describe('NsImageUpload', () => {
       expect(tips[1].text()).toBe('For best results, at least 512 x 512.')
       expect(mountEmpty().find('.ns-image-upload__tips').exists()).toBe(false)
       expect(mountEmpty({ tips: [] }).find('.ns-image-upload__tips').exists()).toBe(false)
+    })
+
+    it('describes the input by the tips, and by the warning when there is one', async () => {
+      const wrapper = mountEmpty({ tips: ['File types allowed: PNG, JPEG'] })
+      const input = wrapper.find('input')
+      const tipsId = wrapper.find('.ns-image-upload__tips').attributes('id')
+      expect(tipsId).toBeTruthy()
+      expect(input.attributes('aria-describedby')).toBe(tipsId)
+
+      // A rejected drop adds the warning; the tips stay described.
+      await wrapper
+        .find('.ns-image-upload__surface')
+        .trigger('drop', { dataTransfer: { files: [pdf()] } })
+      const tokens = wrapper.find('input').attributes('aria-describedby')?.split(' ')
+      expect(tokens).toContain(tipsId)
+      expect(tokens).toContain(wrapper.find('.ns-image-upload__warning').attributes('id'))
+      expect(tokens).toHaveLength(2)
+    })
+
+    it('has no aria-describedby with neither tips nor warning', () => {
+      expect(mountEmpty().find('input').attributes('aria-describedby')).toBeUndefined()
+    })
+
+    it('renders duplicate tip strings without a duplicate-key warning, on REORDER', async () => {
+      // The transition matters. Review (sonnet) proved the first version of
+      // this test could never fail: mount-then-APPEND stays in Vue's prefix
+      // matching, which consumes both duplicates positionally and never builds
+      // the keyToNewIndexMap the warning comes from. A REORDER forces the
+      // keyed diff branch, and there `:key="tip"` warns and mis-patches.
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+      const wrapper = mountEmpty({ tips: ['x', 'same', 'same', 'y'] })
+      await wrapper.setProps({ tips: ['y', 'same', 'same', 'x'] })
+      await nextTick()
+      const duplicates = warn.mock.calls.filter((c) => String(c[0]).includes('Duplicate keys'))
+      expect(duplicates, `Vue warned: ${JSON.stringify(duplicates[0] ?? '')}`).toHaveLength(0)
+      expect(wrapper.findAll('.ns-image-upload__tip').map((t) => t.text())).toEqual([
+        'y',
+        'same',
+        'same',
+        'x',
+      ])
+      warn.mockRestore()
+    })
+
+    it('falls back to the tips prop when the slot renders only whitespace', async () => {
+      // `renders()` treats whitespace as nothing; Vue's own <slot><fallback/>>
+      // logic treats it as something. With both predicates in play the block
+      // rendered EMPTY and skipped the prop. One predicate, so the prop wins.
+      // Reachable only from a render-function slot — the SFC compiler drops
+      // whitespace-only slot templates, which is why this hid.
+      const wrapper = mount(NsImageUpload, {
+        props: { modelValue: null, label: 'L', tips: ['from the prop'] },
+        slots: { tips: () => [' '] },
+      })
+      await nextTick()
+      const tips = wrapper.findAll('.ns-image-upload__tip')
+      expect(tips).toHaveLength(1)
+      expect(tips[0].text()).toBe('from the prop')
+    })
+
+    it('renders no tips block at all when the slot is whitespace and there is no prop', async () => {
+      const wrapper = mount(NsImageUpload, {
+        props: { modelValue: null, label: 'L' },
+        slots: { tips: () => [' '] },
+      })
+      await nextTick()
+      expect(wrapper.find('.ns-image-upload__tips').exists()).toBe(false)
+      expect(wrapper.find('input').attributes('aria-describedby')).toBeUndefined()
     })
 
     it('lets the tips slot replace the prop', () => {
