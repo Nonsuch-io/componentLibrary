@@ -4,6 +4,20 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.53.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.53.0...v0.53.1) (2026-09-22)
+
+
+### Bug Fixes
+
+* **a11y:** name above-label fields by the label alone, on the element (componentLibrary-0og) ([a7cc23c](https://github.com/Nonsuch-io/componentLibrary/commit/a7cc23c4c4d78102b9612d75ea7851f271046e13))
+* **a11y:** name above-label fields by the label alone, on the element (componentLibrary-0og) ([07b2bb9](https://github.com/Nonsuch-io/componentLibrary/commit/07b2bb92708e864b5f36c6a7200342844eb4e515))
+* **a11y:** re-apply the above-label name after Quasar's own re-renders (componentLibrary-0og) ([1f8710d](https://github.com/Nonsuch-io/componentLibrary/commit/1f8710d907cb84f45b482d2f75bd03a5cbd95f8c))
+
+
+### Performance Improvements
+
+* **a11y:** observe the field only while the label is above (componentLibrary-0og) ([6783c00](https://github.com/Nonsuch-io/componentLibrary/commit/6783c0024c07702542f4cc2cdce92275a0ca053a))
+
 ## [0.53.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.52.0...v0.53.0) (2026-09-21)
 
 
