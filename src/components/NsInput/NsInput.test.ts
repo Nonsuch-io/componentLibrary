@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { defineComponent, h } from 'vue'
+import { defineComponent, h, nextTick } from 'vue'
 import NsInput from './NsInput.vue'
 
 describe('NsInput', () => {
@@ -103,6 +103,119 @@ describe('external label (componentLibrary-eag)', () => {
 
     expect(forAttr, 'label has no for').toBeTruthy()
     expect(input.attributes('id'), 'for/id do not match — association is broken').toBe(forAttr)
+  })
+
+  // componentLibrary-2z7: QField's root is a <label> too, wrapping the hint.
+  // butiq measured textbox "Business Name The name customers will see…" on
+  // quasar 2.18.6. Pinned on the input element (same composable as NsSelect,
+  // componentLibrary-0og); run on 2.18.6 and 2.32.2 alike, 2026-09-21.
+  it('names the input by the label ALONE and describes it by the hint', async () => {
+    const wrapper = mount(NsInput, {
+      props: { label: 'Business Name', labelPlacement: 'above', modelValue: 'Acme' },
+      attrs: { hint: 'The name customers will see.' },
+    })
+    await nextTick()
+    const label = wrapper.find('label.ns-input__label')
+    const input = wrapper.find('input')
+    expect(label.attributes('id')).toBeTruthy()
+    expect(input.attributes('aria-labelledby')).toBe(label.attributes('id'))
+    const hint = wrapper.find('.q-field__messages')
+    expect(hint.text()).toBe('The name customers will see.')
+    expect(input.attributes('aria-describedby')).toBe(hint.attributes('id'))
+    expect(hint.attributes('id')).toBeTruthy()
+  })
+
+  it('has no aria-describedby without a hint, and no aria-labelledby inside', () => {
+    const above = mount(NsInput, { props: { label: 'Email', labelPlacement: 'above' } })
+    expect(above.find('input').attributes('aria-describedby')).toBeUndefined()
+    const inside = mount(NsInput, { props: { label: 'Email' } })
+    expect(inside.find('input').attributes('aria-labelledby')).toBeUndefined()
+  })
+
+  // Review (fable, 2026-09-21) ran 9 mutants of useNsAboveLabelName against
+  // the suite and all survived. Each test below kills a named one; the
+  // "settle" waits out Quasar's debounce(validate, 0) and the observer.
+  const settle = async () => {
+    await new Promise((r) => setTimeout(r, 10))
+    await nextTick()
+  }
+  const required = (v: string) => !!v || 'Required'
+
+  it('restores the hint description after a rules error clears (Quasar validates a macrotask later)', async () => {
+    const wrapper = mount(NsInput, {
+      props: { label: 'Name', labelPlacement: 'above', modelValue: 'ok', rules: [required] },
+      attrs: { hint: 'The hint.' },
+    })
+    await settle()
+    const input = wrapper.find('input')
+    const hintId = wrapper.find('.q-field__messages').attributes('id')
+    expect(hintId).toBeTruthy()
+    expect(input.attributes('aria-describedby')).toBe(hintId)
+    await wrapper.setProps({ modelValue: '' })
+    await settle()
+    // While the error shows the block is Quasar's: its id, its token, ours gone.
+    const errorId = wrapper.find('.q-field__messages').attributes('id')
+    expect(wrapper.find('.q-field__messages').text()).toBe('Required')
+    expect(errorId).not.toBe(hintId)
+    expect(input.attributes('aria-describedby')).toBe(errorId)
+    await wrapper.setProps({ modelValue: 'fixed' })
+    await settle()
+    expect(wrapper.find('.q-field__messages').text()).toBe('The hint.')
+    // Both truthy AND equal: without the observer both are undefined here,
+    // and `undefined === undefined` passed this test once (mutant m10).
+    const restoredId = wrapper.find('.q-field__messages').attributes('id')
+    expect(restoredId).toBeTruthy()
+    expect(input.attributes('aria-describedby')).toBe(restoredId)
+  })
+
+  it('removes the description when the hint goes, and never stacks the token', async () => {
+    const wrapper = mount(NsInput, {
+      props: { label: 'Name', labelPlacement: 'above' },
+      attrs: { hint: 'h1' },
+    })
+    await settle()
+    const input = wrapper.find('input')
+    const id = input.attributes('aria-describedby')
+    expect(id).toBeTruthy()
+    await wrapper.setProps({ modelValue: 'a' })
+    await wrapper.setProps({ modelValue: 'b' })
+    await settle()
+    expect(input.attributes('aria-describedby')).toBe(id)
+    await wrapper.setProps({ hint: undefined } as never)
+    await settle()
+    expect(input.attributes('aria-describedby')).toBeUndefined()
+  })
+
+  it('keeps a consumer aria-describedby beside the hint token', async () => {
+    const wrapper = mount(NsInput, {
+      props: { label: 'Name', labelPlacement: 'above' },
+      attrs: { hint: 'h', 'aria-describedby': 'mine' },
+    })
+    await settle()
+    const tokens = wrapper.find('input').attributes('aria-describedby')?.split(' ')
+    expect(tokens).toContain('mine')
+    expect(tokens).toHaveLength(2)
+  })
+
+  it('describes nothing by an empty rules-only block, even after a re-render', async () => {
+    const wrapper = mount(NsInput, {
+      props: { label: 'Name', labelPlacement: 'above', modelValue: 'ok', rules: [required] },
+    })
+    await wrapper.setProps({ modelValue: 'still ok' })
+    await settle()
+    expect(wrapper.find('.q-field__messages').exists()).toBe(true)
+    expect(wrapper.find('input').attributes('aria-describedby')).toBeUndefined()
+  })
+
+  it('takes aria-labelledby back when the label is unset, or when there is none', async () => {
+    const wrapper = mount(NsInput, { props: { label: 'Email', labelPlacement: 'above' } })
+    expect(wrapper.find('input').attributes('aria-labelledby')).toBeTruthy()
+    await wrapper.setProps({ label: undefined })
+    await settle()
+    expect(wrapper.find('label.ns-input__label').exists()).toBe(false)
+    expect(wrapper.find('input').attributes('aria-labelledby')).toBeUndefined()
+    const none = mount(NsInput, { props: { labelPlacement: 'above' } })
+    expect(none.find('input').attributes('aria-labelledby')).toBeUndefined()
   })
 
   it('lets a consumer supply their own id', () => {

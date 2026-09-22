@@ -103,16 +103,25 @@ export const OpenDialogListboxIsNamed: Story = {
  * comes from the LABEL by for/id (Quasar is given none, so no floating
  * label and no padding for one); the popup listbox takes the same name.
  * Ends with the menu OPEN so the a11y addon scans the named listbox.
+ *
+ * With a HINT and a SELECTED VALUE on purpose (componentLibrary-0og): QField's
+ * root <label> wraps both, and butiq measured combobox "Language English
+ * (Canada)" on quasar 2.18.6. The computed name must be the label alone and
+ * the hint its description.
  */
 export const LabelAbove: Story = {
   args: {
     label: 'Province / Territory',
     labelPlacement: 'above',
     options: ['Alberta', 'British Columbia', 'Saskatchewan'],
+    modelValue: 'Alberta',
+    hint: 'Where the shop is registered.',
   },
   play: async ({ canvasElement }) => {
     const label = canvasElement.querySelector('label.ns-select__label') as HTMLElement
     const combobox = canvasElement.querySelector('[role="combobox"]') as HTMLInputElement
+    await expect(combobox).toHaveAccessibleName('Province / Territory')
+    await expect(combobox).toHaveAccessibleDescription('Where the shop is registered.')
     await expect(combobox.labels?.[0]).toBe(label)
     await expect(label.getAttribute('for')).toBe(combobox.id)
     await expect(combobox.id).not.toBe('')

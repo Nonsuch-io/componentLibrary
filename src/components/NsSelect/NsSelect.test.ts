@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { nextTick } from 'vue'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h } from 'vue'
@@ -192,6 +192,110 @@ describe('NsSelect labelPlacement="above"', () => {
     expect(label.attributes('id')).toBeTruthy()
     // Quasar is given no label: no floating label inside the box.
     expect(w.find('.q-field__label').exists()).toBe(false)
+    w.unmount()
+  })
+
+  // componentLibrary-0og: butiq measured combobox "Language English (Canada)"
+  // and combobox "Shop Category We'll use this to help you…" on quasar 2.18.6 —
+  // QField's root <label> wraps the hint and the selected value, and 2.18.6
+  // routes a bound aria-labelledby to the .q-field__native DIV, not the input.
+  // The attributes are written onto the combobox element itself, so this test
+  // passes on 2.18.6 and 2.32.2 alike (run on both, 2026-09-21).
+  it('names the combobox by the label ALONE and describes it by the hint, on the element itself', async () => {
+    const w = mountAbove(
+      { options: [{ label: 'English (Canada)', value: 'en' }], modelValue: 'en' },
+      { hint: 'Pick the language your customers see.' },
+    )
+    await nextTick()
+    const label = w.find('label.ns-select__label')
+    const combobox = w.find('[role="combobox"]')
+    expect(combobox.attributes('aria-labelledby')).toBe(label.attributes('id'))
+    expect(combobox.attributes('aria-label')).toBeUndefined()
+    const hint = w.find('.q-field__messages')
+    expect(hint.text()).toBe('Pick the language your customers see.')
+    expect(hint.attributes('id')).toBeTruthy()
+    expect(combobox.attributes('aria-describedby')).toBe(hint.attributes('id'))
+    // No other element claims the label id (2.18.6 put it on the native div).
+    expect(w.findAll('[aria-labelledby]')).toHaveLength(1)
+    w.unmount()
+  })
+
+  it('has no aria-describedby without a hint', () => {
+    const w = mountAbove()
+    expect(w.find('[role="combobox"]').attributes('aria-describedby')).toBeUndefined()
+    w.unmount()
+  })
+
+  // Review mutants (fable, 2026-09-21): the `active` guard — every
+  // default-placement select has ref="root" too, and without the guard all
+  // of them would point aria-labelledby at an id that does not exist.
+  it('inside placement: the combobox keeps Quasar aria-label and gets no aria-labelledby', () => {
+    const w = mount(NsSelect, {
+      props: { label: 'Province', options: ['AB'] },
+      attrs: { hint: 'h' },
+      attachTo: document.body,
+    })
+    const combobox = w.find('[role="combobox"]')
+    expect(combobox.attributes('aria-label')).toBe('Province')
+    expect(combobox.attributes('aria-labelledby')).toBeUndefined()
+    expect(combobox.attributes('aria-describedby')).toBeUndefined()
+    w.unmount()
+  })
+
+  // Review (sonnet, 2026-09-21) measured an observer on every inside-placement
+  // select. None now, and no lookups; a runtime flip to `above` gets exactly
+  // one. The flip back RECREATES the field (v-if/v-else), so the new control
+  // carrying none of our attributes is Vue's doing, not a cleanup path — a
+  // cleanup path existed briefly and review (fable) proved it unreachable.
+  it('creates no MutationObserver and does no lookups for inside placement; one observer on a flip to above', async () => {
+    const observe = vi.spyOn(MutationObserver.prototype, 'observe')
+    const query = vi.spyOn(Element.prototype, 'querySelector')
+    const w = mount(NsSelect, {
+      props: { label: 'Province', options: ['AB'] },
+      attrs: { hint: 'h' },
+      attachTo: document.body,
+    })
+    try {
+      await w.setProps({ modelValue: 'AB' })
+      await nextTick()
+      expect(observe).not.toHaveBeenCalled()
+      // The composable's own control selector, exactly (Quasar's refocus
+      // lookup also mentions q-field__native — not on this path, but do not
+      // let a future Quasar bump fail this with the blame on the composable).
+      const ours = query.mock.calls.filter(([sel]) => String(sel).includes('[role="combobox"]'))
+      expect(ours).toHaveLength(0)
+      query.mockRestore()
+      await w.setProps({ labelPlacement: 'above' })
+      await nextTick()
+      expect(observe).toHaveBeenCalledTimes(1)
+      const combobox = w.find('[role="combobox"]')
+      expect(combobox.attributes('aria-labelledby')).toBe(
+        w.find('label.ns-select__label').attributes('id'),
+      )
+      expect(combobox.attributes('aria-describedby')).toBeTruthy()
+    } finally {
+      observe.mockRestore()
+      query.mockRestore()
+      w.unmount()
+    }
+  })
+
+  it('dialog mode: the combobox inside the teleported dialog is named by the label', async () => {
+    const w = mountAbove(
+      { behavior: 'dialog', options: ['AB', 'BC'] },
+      { hint: 'Where the shop is registered.' },
+    )
+    const label = w.find('label.ns-select__label')
+    await w.find('.q-field__control').trigger('click')
+    await nextTick()
+    await new Promise((r) => setTimeout(r, 50))
+    await nextTick()
+    const dialogCombobox = document.querySelector('.q-select__dialog [role="combobox"]')
+    expect(dialogCombobox, 'dialog did not open').not.toBeNull()
+    expect(dialogCombobox?.getAttribute('aria-labelledby')).toBe(label.attributes('id'))
+    const hintId = w.find('.q-field__messages').attributes('id')
+    expect(hintId).toBeTruthy()
+    expect(dialogCombobox?.getAttribute('aria-describedby')).toBe(hintId)
     w.unmount()
   })
 

@@ -6,7 +6,6 @@
       v-bind="fieldBindings"
       :model-value="modelValue"
       :for="fieldId"
-      :aria-labelledby="label ? labelId : undefined"
       class="ns-select"
       @update:model-value="$emit('update:modelValue', $event)"
       @popup-show="nameListbox"
@@ -36,6 +35,7 @@
 <script setup lang="ts">
 import { computed, mergeProps, nextTick, ref, useAttrs, useId } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'
+import { useNsAboveLabelName } from '../../composables/useNsAboveLabelName'
 /**
  * NsSelect — A styled select/dropdown wrapping Quasar's QSelect.
  *
@@ -126,13 +126,17 @@ const generatedId = useId()
 const fieldId = computed(() => (attrs.for as string | undefined) || generatedId)
 // QField's ROOT is itself a <label for=fieldId>, so in `above` the combobox has
 // TWO associated labels — ours and Quasar's wrapper, whose content includes the
-// selected value's text once picked. Review raised it; measured in Chromium
-// (dom-accessibility-api): the name still computes to the label alone, because
-// the control embedded in Quasar's label counts as the control, not as text.
-// aria-labelledby names it by construction regardless of that subtlety, and
-// it goes to the native input through Quasar's attr split. NsInput's `above`
-// has the same two labels (componentLibrary-2z7).
-const labelId = useId()
+// hint and the selected value's text once picked. Measured in Chromium on
+// quasar 2.32 the name still computed to the label alone; butiq measured on
+// 2.18.6 that it does NOT: combobox "Language English (Canada)". The
+// aria-labelledby that pins it is written onto the combobox ELEMENT, not bound
+// on <q-select> — on 2.18.6 a bound attr lands on the .q-field__native div
+// (componentLibrary-0og; NsInput's twin is -2z7). Same composable, same fix.
+const { labelId, applyAboveLabelName } = useNsAboveLabelName({
+  root,
+  active: () => isLabelAbove.value,
+  label: () => props.label,
+})
 const consumerFor = computed(() => attrs.for as string | undefined)
 
 // mergeProps so a consumer's `class` combines with ours; in `above` the
@@ -189,6 +193,11 @@ async function nameListbox() {
   const name =
     combobox?.getAttribute('aria-label')?.trim() ||
     (isLabelAbove.value ? props.label?.trim() : undefined)
+  // Dialog mode re-creates the combobox inside the teleported dialog, outside
+  // the field root the composable observes. The in-field element keeps its
+  // attributes across the round trip: Vue never owned them, so the
+  // target/non-target patch leaves them alone (review measured it).
+  applyAboveLabelName(combobox)
   const listboxId = combobox?.getAttribute('aria-controls')
   if (!name || !listboxId) return
   nameIfUnnamed(document.getElementById(listboxId), name)
