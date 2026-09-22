@@ -55,6 +55,7 @@
     "test:watch": "vitest --project unit",
     "test:coverage": "vitest run --project unit --coverage",
     "test:storybook": "vitest run --project storybook",
+    "test:ssr": "vitest run --project ssr",
     "preview": "vite preview",
     "prepublishOnly": "pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "prepare": "husky",
