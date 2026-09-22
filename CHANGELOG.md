@@ -4,6 +4,15 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.53.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.53.1...v0.53.2) (2026-09-22)
+
+
+### Bug Fixes
+
+* **ssr:** guard Element with typeof — 0.53.1 500s every SSR route (componentLibrary-2cp) ([16168a8](https://github.com/Nonsuch-io/componentLibrary/commit/16168a81fd740a9eefa1d118f39ef556cb56430a))
+* **ssr:** guard Element with typeof — 0.53.1 500s every SSR route (componentLibrary-2cp) ([f04cf6b](https://github.com/Nonsuch-io/componentLibrary/commit/f04cf6ba09b4a9bf3ac6afc02d688daffedc4762))
+* **ssr:** make getToken() server-safe, and tighten the guard (componentLibrary-2cp) ([0a6fea7](https://github.com/Nonsuch-io/componentLibrary/commit/0a6fea741823ec957f0ca2b6fc1eed9b08189746))
+
 ## [0.53.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.53.0...v0.53.1) (2026-09-22)
 
 
