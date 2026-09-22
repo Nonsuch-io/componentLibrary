@@ -45,30 +45,55 @@
         @change="onChange"
       />
 
-      <label v-if="!modelValue" :for="inputId" class="ns-image-upload__dropzone">
+      <div class="ns-image-upload__header">
         <NsText ref="labelEl" as="span" variant="heading-sm-regular" class="ns-image-upload__label">
           <slot name="label">{{ label }}</slot>
         </NsText>
-        <NsText as="span" variant="body-md" class="ns-image-upload__prompt">
-          {{ locale.media.uploadPrompt }}
-          <span class="ns-image-upload__browse">{{ locale.media.uploadBrowse }}</span>
-        </NsText>
-      </label>
+        <div v-if="slotRenders(slots.badge)" class="ns-image-upload__badge">
+          <slot name="badge" />
+        </div>
+      </div>
 
-      <div v-else class="ns-image-upload__preview">
-        <img v-if="previewUrl" :src="previewUrl" alt="" class="ns-image-upload__thumb" />
-        <NsText as="span" variant="label-sm" class="ns-image-upload__filename">
-          {{ modelValue.name }}
-        </NsText>
-        <NsButton
-          variant="tertiary"
-          size="sm"
-          class="ns-image-upload__remove"
-          :aria-label="`${locale.media.uploadRemove}: ${modelValue.name}`"
-          @click="clear"
-        >
-          {{ locale.media.uploadRemove }}
-        </NsButton>
+      <div v-if="hasTips()" class="ns-image-upload__tips">
+        <slot name="tips">
+          <NsText
+            v-for="tip in tips"
+            :key="tip"
+            as="p"
+            variant="body-md"
+            class="ns-image-upload__tip"
+          >
+            {{ tip }}
+          </NsText>
+        </slot>
+      </div>
+
+      <div class="ns-image-upload__row">
+        <!--
+          The TILE is the label for the input, in both states: click opens the
+          picker, and with a file chosen the same click REPLACES it. The old
+          markup swapped the label out for a preview div, which cost the
+          keyboard path its visible target (see the focus-ring rule below).
+        -->
+        <label :for="inputId" class="ns-image-upload__tile">
+          <img v-if="previewUrl" :src="previewUrl" alt="" class="ns-image-upload__thumb" />
+          <PhPlus v-else :size="32" weight="regular" class="ns-image-upload__plus" />
+        </label>
+
+        <div v-if="modelValue" class="ns-image-upload__file">
+          <NsText as="span" variant="label-sm" class="ns-image-upload__filename">
+            {{ modelValue.name }}
+          </NsText>
+          <NsButton
+            variant="tertiary"
+            size="sm"
+            class="ns-image-upload__remove"
+            :aria-label="`${locale.media.uploadRemove}: ${modelValue.name}`"
+            @click="clear"
+          >
+            {{ locale.media.uploadRemove }}
+          </NsButton>
+        </div>
       </div>
 
       <NsText
@@ -105,6 +130,7 @@ import {
   type VNode,
 } from 'vue'
 import { Comment, Fragment } from 'vue'
+import { PhPlus } from '@phosphor-icons/vue'
 import NsText from '../NsText/NsText.vue'
 import NsButton from '../NsButton/NsButton.vue'
 import { useNsLocale } from '../../composables/useNsLocale'
@@ -161,21 +187,36 @@ declare const process: { env: { NODE_ENV?: string } } | undefined
  * until revoked; a form that swaps images leaks one per swap otherwise.
  * Revoked on every change and on unmount.
  *
- * DESIGN GEOMETRY IS NOT YET MEASURED. The Figma MCP server would not return
- * the instance internals this session (design_context and screenshot both
- * timed out; metadata shows the instance as a leaf). What IS measured, from
- * get_variable_defs on 194:15745: a warning state (bg-warning +
- * text-on-warning), a brand border (border-primary), a surface-alt
- * background, radius-md, and the type styles "Small heading regular", "Medium
- * body text" and "Small label". Layout, spacing and the 229px height are
- * built to those tokens and FLAGGED FOR MEASUREMENT on the bead.
+ * DESIGN GEOMETRY IS MEASURED (2026-09-22, Kale selected the instance so the
+ * MCP could reach it: I165:10767;6259:19825 in frame 264:26835, 870x229).
+ * The frame's "NsImageUpload" is THE WHOLE CARD, not a drop zone — card
+ * (bg surface-alt, 1px border-default, radius-sm, padding 20, gap 12), a
+ * heading row with the title and a trailing badge, two guidance lines, and a
+ * 100x100 dashed tile in radius-MD. Kale's call, same day: the library owns
+ * the card, matching the design's own component boundary — so a consumer no
+ * longer wraps this in an NsFormSection to get a title and a badge
+ * (componentLibrary-af2; -3jh closed as not needed).
+ *
+ * The full-width "Drag and drop an image, or browse" zone this replaced was
+ * built to tokens with the geometry unmeasured, and is gone. Breaking for the
+ * one consumer (butiq's sign-up), which is changing here anyway for their #519.
  */
 
 export interface NsImageUploadProps {
   /** The selected file, or null. v-model. */
   modelValue: File | null
-  /** Visible heading inside the drop zone, and the input's accessible name. */
+  /**
+   * The card's visible heading AND the input's accessible name — one string on
+   * purpose, so the two can never drift (WCAG 2.5.3). Include any qualifier
+   * the design shows: the frame reads "Business Logo (Optional)".
+   */
   label: string
+  /**
+   * Guidance lines under the heading — file types, minimum size. Rendered as
+   * one <p> each, 14/19.6 secondary, the frame's two lines. Content is the
+   * consumer's: the library does not know a caller's accepted formats.
+   */
+  tips?: string[]
   /**
    * Accepted MIME types or extensions, as the native `accept` attribute takes
    * them: `image/*`, `image/png`, `.png`, comma-separated. Checked on DROP as
@@ -196,6 +237,7 @@ export interface NsImageUploadProps {
 }
 
 const props = withDefaults(defineProps<NsImageUploadProps>(), {
+  tips: () => [],
   accept: 'image/*',
   warning: undefined,
   disable: false,
@@ -237,6 +279,15 @@ defineSlots<{
   label?: () => unknown
   /** Warning content. Overrides `warning`. */
   warning?: () => unknown
+  /**
+   * Trailing content in the heading row, right-aligned — the frame puts an
+   * NsBadge there ("Logo Not Added" / "Logo Added"). A slot, not a `badge`
+   * prop: the state and its wording belong to the consumer's form, and the
+   * frame's own badge swaps tone with it.
+   */
+  badge?: () => unknown
+  /** The guidance lines. Overrides `tips`. */
+  tips?: () => unknown
 }>()
 
 const locale = useNsLocale()
@@ -285,6 +336,10 @@ function hasWarning(): boolean {
  */
 function warningText(): string | undefined {
   return internalWarning.value ?? props.warning
+}
+
+function hasTips(): boolean {
+  return slotRenders(slots.tips) || props.tips.length > 0
 }
 
 function describedBy(): string | undefined {
@@ -501,11 +556,21 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
 .ns-image-upload {
   width: 100%;
 
+  // THE CARD ITSELF. Measured on the frame's NsImageUpload instance
+  // (I165:10767;6259:19825, 870x229, Kale selected it 2026-09-22): bg
+  // surface-alt, 1px solid border-default, radius-sm, 20 padding, 12 gap.
+  // Styled here rather than wrapping NsCard: NsCard is radius-md with a
+  // shadow, which is not what the frame draws, and a component dependency
+  // would cost bytes for a border and a background.
   &__surface {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--ns-space-2);
+    gap: var(--ns-space-3);
+    padding: var(--ns-space-5);
+    border: 1px solid var(--ns-color-border-default);
+    border-radius: var(--ns-radius-sm);
+    background: var(--ns-color-bg-surface-alt);
   }
 
   // VISUALLY HIDDEN, NOT display:none. The input must stay in the tab order and
@@ -523,83 +588,105 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
     white-space: nowrap;
   }
 
-  // Tokens measured on 194:15745; geometry is not — see the doc comment.
-  &__dropzone {
+  // Heading row: title takes the space, the badge sits at the end. The title
+  // must be allowed to shrink or a long one pushes the badge off the card.
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: var(--ns-space-5);
+  }
+
+  &__label {
+    flex: 1;
+    min-width: 0;
+    color: var(--ns-color-text-primary);
+  }
+
+  &__badge {
+    flex-shrink: 0;
+  }
+
+  &__tips {
     display: flex;
     flex-direction: column;
+    gap: var(--ns-space-1);
+  }
+
+  &__tip {
+    margin: 0;
+    color: var(--ns-color-text-secondary);
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: var(--ns-space-5);
+  }
+
+  // The 100x100 dashed tile, measured: radius-MD (12) while the card is
+  // radius-sm (8) — the frame really does differ, so do not "tidy" them.
+  // Fixed size, so it never stretches in the row's align-items: center.
+  &__tile {
+    position: relative;
+    display: flex;
+    flex: 0 0 auto;
     align-items: center;
     justify-content: center;
-    gap: var(--ns-space-1);
-    min-height: 229px;
-    padding: var(--ns-space-5);
-    border: 1px dashed var(--ns-color-border-default);
-    border-radius: var(--ns-radius-sm);
-    background: var(--ns-color-bg-surface-alt);
-    text-align: center;
+    width: 100px;
+    height: 100px;
+    border: 1px dashed var(--ns-color-border-primary);
+    border-radius: var(--ns-radius-md);
+    background: var(--ns-color-bg-surface);
+    color: var(--ns-color-text-primary);
     cursor: pointer;
+    overflow: hidden;
     transition:
       border-color var(--ns-duration-normal) var(--ns-easing-default),
       background var(--ns-duration-normal) var(--ns-easing-default);
   }
 
-  // The FOCUS RING IS ON THE ZONE, driven by the INPUT'S focus. Tab lands on
-  // the input; the user sees the zone light up. `:focus-visible` so a mouse
-  // click on the label does not leave a ring behind.
-  // BOTH SIBLINGS. The input's next sibling is the drop zone before a file is
-  // chosen and the preview after. The first version rang only the drop zone —
-  // measured in Chromium: with a file selected, Tab landed on a 1px clipped
-  // input and nothing on screen changed. WCAG 2.4.7, in exactly the state the
-  // doc comment calls the replace path. axe cannot see this.
-  &__input:focus-visible + &__dropzone,
-  &__input:focus-visible + &__preview {
+  // THE FOCUS RING IS ON THE TILE, driven by the INPUT'S focus: Tab lands on
+  // the clipped input and the user must see something. A general sibling
+  // selector, not `+`: the input's next sibling is the heading row now. The
+  // tile is rendered in BOTH states, so unlike the old markup there is no
+  // second target to keep in sync (that omission was a real WCAG 2.4.7 bug).
+  &__input:focus-visible ~ &__row &__tile {
     outline: 2px solid var(--ns-color-border-focus);
     outline-offset: 2px;
   }
 
-  // Drop feedback in both states too: a drop over the preview REPLACES the
-  // file, so the preview is a live target and must say so.
-  &__dropzone:hover,
-  &--dragging &__dropzone,
-  &--dragging &__preview {
-    border-color: var(--ns-color-border-primary);
+  &__tile:hover,
+  &--dragging &__tile {
+    background: var(--ns-color-bg-surface-alt);
   }
 
-  &--disabled &__dropzone,
-  &--disabled &__preview {
+  &--disabled &__tile {
     opacity: 0.6;
     cursor: not-allowed;
     pointer-events: none;
   }
 
-  &__label {
-    color: var(--ns-color-text-primary);
+  // Filled: the image covers the tile and the dashed edge goes, as drawn.
+  &__thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
-  &__prompt {
-    color: var(--ns-color-text-secondary);
+  &__tile:has(&__thumb) {
+    border-style: solid;
+    border-color: var(--ns-color-border-default);
   }
 
-  &__browse {
-    color: var(--ns-color-text-link);
-    text-decoration: underline;
-  }
-
-  &__preview {
+  // INFERRED, not measured: the frame's row is named "image upload and label"
+  // and has a 20 gap with only the tile in it (empty state). The filename and
+  // remove button keep their pre-card behaviour, beside the tile.
+  &__file {
     display: flex;
+    flex: 1;
+    min-width: 0;
     align-items: center;
     gap: var(--ns-space-3);
-    padding: var(--ns-space-3);
-    border: 1px solid var(--ns-color-border-default);
-    border-radius: var(--ns-radius-sm);
-    background: var(--ns-color-bg-surface);
-  }
-
-  &__thumb {
-    width: 64px;
-    height: 64px;
-    object-fit: cover;
-    border-radius: var(--ns-radius-xs);
-    flex-shrink: 0;
   }
 
   &__filename {
@@ -611,7 +698,7 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
     color: var(--ns-color-text-primary);
   }
 
-  &--warning &__dropzone {
+  &--warning &__tile {
     border-color: var(--ns-color-border-warning);
   }
 

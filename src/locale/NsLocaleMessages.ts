@@ -158,8 +158,6 @@ export interface NsLocaleMessages {
      * NsImageUpload. The drop zone's prompt is split so the "browse" word can
      * be styled as the affordance while the whole sentence stays one label.
      */
-    uploadPrompt: string
-    uploadBrowse: string
     /** Accessible name of the remove button beside a selected image. */
     uploadRemove: string
     /** Live-region prefix announced when a file is selected. */

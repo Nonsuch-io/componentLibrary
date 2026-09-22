@@ -105,8 +105,6 @@ export const nsLocaleEnCA: NsLocaleMessages = {
     exitFullscreen: 'Exit fullscreen',
     previousImage: 'Previous image',
     nextImage: 'Next image',
-    uploadPrompt: 'Drag and drop an image, or',
-    uploadBrowse: 'browse',
     uploadRemove: 'Remove image',
     uploadSelected: 'Selected image',
     uploadCleared: 'Image removed',

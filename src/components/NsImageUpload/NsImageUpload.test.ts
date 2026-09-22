@@ -43,22 +43,35 @@ describe('NsImageUpload', () => {
     })
 
     it('names the input from the label prop in BOTH states', () => {
-      // The label ELEMENT disappears once a file is selected; the input does
-      // not, because Tab-Enter-pick is how a user replaces an image. axe failed
-      // the selected state until the name moved to the input itself.
+      // The name lives on the INPUT, not on the label element: axe failed the
+      // selected state until it moved there, and Tab-Enter-pick is how a user
+      // replaces an image.
       expect(mountEmpty().find('input').attributes('aria-label')).toBe('Shop photo')
       const filled = mount(NsImageUpload, { props: { modelValue: png(), label: 'Shop photo' } })
-      expect(filled.find('label').exists()).toBe(false)
       expect(filled.find('input').attributes('aria-label')).toBe('Shop photo')
     })
 
-    it('names the input from the visible label via for/id', () => {
+    it('keeps the tile a <label for> the input in BOTH states (the replace path)', () => {
+      // The card structure (componentLibrary-af2) renders the tile in both
+      // states, so a click REPLACES the image rather than the target vanishing.
+      for (const wrapper of [
+        mountEmpty(),
+        mount(NsImageUpload, { props: { modelValue: png(), label: 'Shop photo' } }),
+      ]) {
+        const input = wrapper.find('input[type="file"]')
+        const tile = wrapper.find('label.ns-image-upload__tile')
+        expect(tile.exists()).toBe(true)
+        expect(input.attributes('id')).toBeTruthy()
+        expect(tile.attributes('for')).toBe(input.attributes('id'))
+      }
+    })
+
+    it('renders the label prop as the visible heading', () => {
       const wrapper = mountEmpty()
-      const input = wrapper.find('input[type="file"]')
-      const label = wrapper.find('label')
-      expect(input.attributes('id')).toBeTruthy()
-      expect(label.attributes('for')).toBe(input.attributes('id'))
-      expect(label.text()).toContain('Shop photo')
+      expect(wrapper.find('.ns-image-upload__label').text()).toContain('Shop photo')
+      // The tile is an icon target, not a second copy of the words (WCAG 2.5.3
+      // is satisfied by one string serving both roles).
+      expect(wrapper.find('label.ns-image-upload__tile').text()).toBe('')
     })
 
     it('forwards accept to the input', () => {
@@ -69,6 +82,55 @@ describe('NsImageUpload', () => {
 
     it('defaults accept to image/*', () => {
       expect(mountEmpty().find('input').attributes('accept')).toBe('image/*')
+    })
+  })
+
+  // The card as drawn (componentLibrary-af2), measured from the frame's own
+  // NsImageUpload instance on 2026-09-22.
+  describe('the card: heading row, badge, tips', () => {
+    it('puts the badge slot in the heading row beside the label, and nothing when unused', () => {
+      const withBadge = mount(NsImageUpload, {
+        props: { modelValue: null, label: 'Business Logo (Optional)' },
+        slots: { badge: '<span class="mine">Logo Not Added</span>' },
+      })
+      const header = withBadge.find('.ns-image-upload__header')
+      expect(header.find('.mine').exists()).toBe(true)
+      expect(header.find('.ns-image-upload__label').text()).toBe('Business Logo (Optional)')
+      // Order matters: the badge trails the title in the frame.
+      const kids = Array.from(header.element.children)
+      expect(kids[0].className).toContain('ns-image-upload__label')
+      expect(kids[kids.length - 1].className).toContain('ns-image-upload__badge')
+      // No empty box when the slot is unused — the row would keep its gap.
+      expect(mountEmpty().find('.ns-image-upload__badge').exists()).toBe(false)
+    })
+
+    it('renders a comment-only badge slot as no badge (content, not presence)', () => {
+      const wrapper = mount(NsImageUpload, {
+        props: { modelValue: null, label: 'L' },
+        slots: { badge: '<!-- v-if was false -->' },
+      })
+      expect(wrapper.find('.ns-image-upload__badge').exists()).toBe(false)
+    })
+
+    it('renders each tip as its own paragraph, and no tips block without them', () => {
+      const wrapper = mountEmpty({
+        tips: ['File types allowed: PNG, JPEG', 'For best results, at least 512 x 512.'],
+      })
+      const tips = wrapper.findAll('.ns-image-upload__tip')
+      expect(tips).toHaveLength(2)
+      expect(tips[0].element.tagName).toBe('P')
+      expect(tips[1].text()).toBe('For best results, at least 512 x 512.')
+      expect(mountEmpty().find('.ns-image-upload__tips').exists()).toBe(false)
+      expect(mountEmpty({ tips: [] }).find('.ns-image-upload__tips').exists()).toBe(false)
+    })
+
+    it('lets the tips slot replace the prop', () => {
+      const wrapper = mount(NsImageUpload, {
+        props: { modelValue: null, label: 'L', tips: ['from the prop'] },
+        slots: { tips: '<p class="mine">from the slot</p>' },
+      })
+      expect(wrapper.find('.mine').exists()).toBe(true)
+      expect(wrapper.text()).not.toContain('from the prop')
     })
   })
 
@@ -186,9 +248,11 @@ describe('NsImageUpload', () => {
   })
 
   describe('with a file selected', () => {
-    it('shows a preview, the filename, and a remove button instead of the drop zone', () => {
+    it('shows the preview inside the tile, with the filename and a remove button', () => {
       const wrapper = mount(NsImageUpload, { props: { modelValue: png(), label: 'L' } })
-      expect(wrapper.find('label').exists()).toBe(false)
+      const img = wrapper.find('label.ns-image-upload__tile img')
+      expect(img.exists(), 'the preview belongs in the tile, not beside it').toBe(true)
+      expect(wrapper.find('.ns-image-upload__plus').exists(), 'no plus once filled').toBe(false)
       expect(wrapper.find('img').attributes('src')).toBe('blob:preview')
       expect(wrapper.find('.ns-image-upload__filename').text()).toBe('photo.png')
       expect(wrapper.find('button').exists()).toBe(true)
@@ -538,8 +602,6 @@ describe('NsImageUpload', () => {
         ...nsLocaleEnCA,
         media: {
           ...nsLocaleEnCA.media,
-          uploadPrompt: 'PROMPT',
-          uploadBrowse: 'BROWSE',
           uploadRemove: 'REMOVE',
           uploadSelected: 'SELECTED',
           uploadCleared: 'CLEARED',
@@ -548,8 +610,6 @@ describe('NsImageUpload', () => {
       }
       const global = { provide: { [NsLocaleKey as symbol]: fr } }
       const empty = mount(NsImageUpload, { props: { modelValue: null, label: 'L' }, global })
-      expect(empty.text()).toContain('PROMPT')
-      expect(empty.text()).toContain('BROWSE')
       await empty
         .find('.ns-image-upload__surface')
         .trigger('drop', { dataTransfer: { files: [pdf()] } })
