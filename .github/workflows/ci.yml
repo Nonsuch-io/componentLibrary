@@ -70,3 +70,61 @@ jobs:
 
       - name: Check bundle size
         run: pnpm size:check
+
+  peer-floor:
+    name: Peer floor (oldest quasar we promise)
+    # A SEPARATE job on purpose: it installs a different quasar, so it cannot be
+    # a step in the job above without poisoning everything after it.
+    #
+    # WHY IT EXISTS (componentLibrary-q5r). peerDependencies is a promise to
+    # consumers; `pnpm install` resolves the NEWEST match, so the promise was
+    # never exercised. `^2.17.0` stayed declared for months while nine
+    # assertions failed on it (componentLibrary-u5v), and a fix for a bug that
+    # only appears on older quasar could pass review green because CI resolved
+    # a version where Quasar did the work itself (componentLibrary-5ng).
+    #
+    # The version is READ FROM package.json rather than written here, so the
+    # gate cannot drift from the promise it is checking.
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Resolve the declared floor
+        id: floor
+        run: echo "version=$(node scripts/peer-floor.mjs quasar)" >> "$GITHUB_OUTPUT"
+
+      - name: Install quasar ${{ steps.floor.outputs.version }} exactly
+        # --save-exact so the resolved version IS the floor, not the newest
+        # release matching it — the whole point of the job.
+        run: pnpm add -D quasar@${{ steps.floor.outputs.version }} --save-exact
+
+      - name: Confirm the floor is what got installed
+        # Without this the job can silently test the wrong version and go green,
+        # which is the failure mode it exists to prevent.
+        run: |
+          installed=$(node -p "require('quasar/package.json').version")
+          echo "installed quasar: $installed (declared floor: ${{ steps.floor.outputs.version }})"
+          test "$installed" = "${{ steps.floor.outputs.version }}"
+
+      # dist tests and the size gate read dist/, so build before testing.
+      - name: Build
+        run: pnpm build
+
+      - name: Test
+        run: pnpm test
+
+      - name: SSR tests
+        run: pnpm test:ssr

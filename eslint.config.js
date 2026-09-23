@@ -55,6 +55,19 @@ export default ts.config(
     },
   },
 
+  // Node scripts CI runs directly (scripts/peer-floor.mjs). They are not part
+  // of the browser bundle and legitimately use `process` — without this eslint
+  // reports four no-undef errors for a file that runs correctly.
+  {
+    files: ['scripts/**/*.{js,mjs,cjs}'],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+      },
+    },
+  },
+
   // Project-specific rule overrides
   {
     rules: {
