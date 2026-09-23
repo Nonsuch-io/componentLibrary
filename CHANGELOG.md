@@ -4,6 +4,27 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.54.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.53.2...v0.54.0) (2026-09-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* **image-upload:** NsImageUpload renders the design's card (heading row, badge slot, tips, 100x100 tile) instead of the full-width drop zone. The "Drag and drop an image, or browse" affordance is gone, and with it the media.uploadPrompt and media.uploadBrowse locale strings. v-model, label, accept, warning, disable and the rejected emit are unchanged. A consumer wrapping this in an NsFormSection for a title and a badge should move both into the component.
+
+### Features
+
+* **image-upload:** the logo card as drawn (componentLibrary-af2) ([3b69343](https://github.com/Nonsuch-io/componentLibrary/commit/3b693431191c67afbab4ea6139ce416e7ee7da17))
+
+
+### Bug Fixes
+
+* **a11y:** consumer aria-label must reach the combobox (componentLibrary-5ng) ([5b59ba6](https://github.com/Nonsuch-io/componentLibrary/commit/5b59ba615cfab8c40caa80eb3facc2453aefee03))
+* **a11y:** consumer aria-label must reach the combobox (componentLibrary-5ng) ([ddc19f7](https://github.com/Nonsuch-io/componentLibrary/commit/ddc19f711b6fcdc0a0f8bd151bee0ca13e53f005))
+* **a11y:** re-derive the observer's state instead of driving it from a watch ([b8868a4](https://github.com/Nonsuch-io/componentLibrary/commit/b8868a40131ed55663ab04ebdb7c0fd9ed13851d))
+* **a11y:** restore the control's own name instead of deleting it ([566ad96](https://github.com/Nonsuch-io/componentLibrary/commit/566ad9663fdf9e2aa46994d3e72c76a9255d98bb))
+* **a11y:** take the consumer aria-label back, and name before reading it ([4337ecf](https://github.com/Nonsuch-io/componentLibrary/commit/4337ecf8504e773a1e4674f24c02079bb313e68b))
+* **image-upload:** honour disable on Remove, describe the input by the tips ([82f6d21](https://github.com/Nonsuch-io/componentLibrary/commit/82f6d218f3e92caa5c469fd7fbdf2bd5ee92b142))
+
 ## [0.53.2](https://github.com/Nonsuch-io/componentLibrary/compare/v0.53.1...v0.53.2) (2026-09-22)
 
 
