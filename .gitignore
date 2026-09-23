@@ -46,3 +46,6 @@ AGENTS.local.md
 
 # Agent review worktrees — transient, never committed
 .claude/worktrees/
+
+# Scratch probes: measurement scaffolding, never a gate (componentLibrary-u5v).
+src/__probe/

@@ -217,8 +217,10 @@ export const LayoutIsReal: Story = {
  * dist, against 13 for `.q-btn__content` in the same two directories as a
  * control that the search works. (An earlier version said 39 — that came from
  * a glob spanning three cached Quasar versions in the pnpm store, not from
- * 2.28.0.) Also checked in butiq's installed 2.18.6, the low end of our
- * `^2.17.0` peer range: same 0, and the same `minHeight` gate below.
+ * 2.28.0.) Also checked in butiq's installed 2.18.6, then the low end of our
+ * declared range: same 0, and the same `minHeight` gate below. The floor is
+ * `^2.32.0` since componentLibrary-u5v, so 2.18.6 is now below it — the datum
+ * stands, it just no longer describes a supported version.
  *
  * The reset is real, it is just not ours: QBtn's use-btn.js sets an INLINE
  * `min-width: 0; min-height: 0` whenever the `padding` prop is DEFINED — the
