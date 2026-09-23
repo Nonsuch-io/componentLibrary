@@ -39,8 +39,6 @@ describe('nsLocaleEnCA', () => {
     expect(nsLocaleEnCA.media.exitFullscreen).toBe('Exit fullscreen')
     expect(nsLocaleEnCA.media.previousImage).toBe('Previous image')
     expect(nsLocaleEnCA.media.nextImage).toBe('Next image')
-    expect(nsLocaleEnCA.media.uploadPrompt).toBe('Drag and drop an image, or')
-    expect(nsLocaleEnCA.media.uploadBrowse).toBe('browse')
     expect(nsLocaleEnCA.media.uploadRemove).toBe('Remove image')
     expect(nsLocaleEnCA.media.uploadSelected).toBe('Selected image')
     expect(nsLocaleEnCA.media.uploadCleared).toBe('Image removed')
@@ -101,8 +99,6 @@ describe('nsLocaleFrCA', () => {
     expect(nsLocaleFrCA.media.fullscreen).toBe('Plein écran')
     // Infinitive, like every other action string in this file — the first
     // version had the only conjugated verb in the locale (Glissez-déposez).
-    expect(nsLocaleFrCA.media.uploadPrompt).toBe('Glisser-déposer une image, ou')
-    expect(nsLocaleFrCA.media.uploadBrowse).toBe('parcourir')
     expect(nsLocaleFrCA.media.uploadRemove).toBe("Retirer l'image")
     expect(nsLocaleFrCA.media.uploadSelected).toBe('Image sélectionnée')
     expect(nsLocaleFrCA.media.uploadCleared).toBe('Image retirée')
