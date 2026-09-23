@@ -68,6 +68,12 @@ const PROPS = {
   NsPlanFeatures: { features: ['One'] },
   NsPlanHighlights: { highlights: ['One'] },
   NsTrustBar: { items: [{ label: 'One' }] },
+  // Not required props — these silence dev warnings that fire ONLY because a
+  // gate renders things bare. A green run should be quiet so a red one reads.
+  NsBrandLogo: { src: 'x.svg', ratio: 2.62 },
+  NsImage: { src: 'x.svg', alt: 'x' },
+  NsDialog: { title: 'T' },
+  NsRadioButtons: { label: 'L', options: [{ label: 'A', value: 'a' }] },
 }
 
 /**
@@ -92,9 +98,32 @@ const VARIANTS = {
   NsInput: [{ label: 'L', labelPlacement: 'above' }],
 }
 
-/** Components Quasar requires to be rendered inside a parent. */
+/**
+ * COMPONENTS QUASAR REFUSES TO RENDER WITHOUT A PARENT, wrapped so their setup
+ * actually runs. QHeader and friends `inject(layoutKey, emptyRenderFn)` and
+ * return an empty render when there is no QLayout above them, so these six
+ * rendered `<!---->` and the gate could not tell "this component is SSR-safe"
+ * from "Quasar declined to render it" — review (fable) dumped the HTML and
+ * found seven characters. The Ns wrapper's own setup did still run, so nothing
+ * library-owned was uncovered; what was uncovered is the Quasar-side setup,
+ * which is exactly what the peer-floor job exists to exercise on the oldest
+ * supported version.
+ *
+ * Not replaced by a blanket "must not render <!---->" assertion: NsDialog,
+ * NsMenu and NsTooltip legitimately render an empty comment while closed, and
+ * their setup IS exercised.
+ */
+const inLayout = (comp, props = {}) => h(lib.NsLayout, () => h(comp, props, () => 'x'))
+
 const PARENTS = {
   NsTab: (comp) => h(lib.NsTabs, { modelValue: 'a' }, () => h(comp, { name: 'a', label: 'A' })),
+  NsHeader: (comp) => inLayout(comp),
+  NsFooter: (comp) => inLayout(comp),
+  NsDrawer: (comp) => inLayout(comp, { modelValue: true }),
+  // QPage wants a QPageContainer, not merely a layout.
+  NsPage: (comp) => h(lib.NsLayout, () => h(lib.NsPageContainer, () => h(comp, {}, () => 'x'))),
+  NsPageContainer: (comp) => inLayout(comp),
+  NsTimelineEntry: (comp) => h(lib.NsTimeline, () => h(comp, { title: 'T' })),
 }
 
 async function renderOne(name, props) {
@@ -102,6 +131,12 @@ async function renderOne(name, props) {
   const node = PARENTS[name] ? PARENTS[name](comp) : h(comp, props)
   const app = createSSRApp({ render: () => node })
   app.use(Quasar, {}, ssrContext())
+  // THE PLUGIN EVERY SSR CONSUMER INSTALLS, on every request. Its `install`
+  // runs warnIfNsStylesheetMissing(), which guards `typeof document` today —
+  // but nothing exercised that path, so anything added to install() reaching
+  // the DOM unguarded would 500 every request BEFORE a component rendered,
+  // with this gate green (review, fable).
+  app.use(lib.createNonsuch())
   return renderToString(app)
 }
 
@@ -118,9 +153,8 @@ for (const name of names) {
   for (const [index, props] of propSets.entries()) {
     const label = index === 0 ? name : `${name} (variant ${index})`
     try {
-      const html = await renderOne(name, props)
+      await renderOne(name, props)
       renders++
-      if (typeof html !== 'string') failures.push([label, `rendered ${typeof html}, not a string`])
     } catch (error) {
       failures.push([label, `${error.constructor.name}: ${error.message}`])
     }
@@ -129,7 +163,8 @@ for (const name of names) {
 
 if (failures.length > 0) {
   console.error(
-    `\nssr-smoke: ${failures.length} of ${names.length} components failed to render on a server:\n`,
+    `\nssr-smoke: ${failures.length} of ${renders + failures.length} renders failed ` +
+      `(${new Set(failures.map(([l]) => l.split(' (')[0])).size} of ${names.length} components):\n`,
   )
   for (const [name, message] of failures) console.error(`  ${name}: ${message}`)
   console.error(
