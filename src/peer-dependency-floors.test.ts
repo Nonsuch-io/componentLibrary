@@ -115,13 +115,14 @@ describe('we build against something we actually support (componentLibrary-u5v)'
   const devDeps = pkg.devDependencies ?? {}
   const shared = Object.keys(peers).filter((name) => name in devDeps)
 
-  it.each([
+  const cases: Array<[string, string, boolean, string]> = [
     ['^2.32.0', '^2.9.0', true, 'a minor that sorts wrong as a string'],
     ['^2.32.10', '^2.32.9', true, 'a patch that sorts wrong as a string'],
     ['^2.9.0', '^2.32.0', false, 'genuinely below, across the same boundary'],
     ['^2.32.0', '^2.32.0', true, 'equal'],
     ['^3.0.0', '^2.99.99', true, 'a higher major'],
-  ] as const)('dev %s vs peer %s is %s — %s', (dev, peer, want) => {
+  ]
+  it.each(cases)('dev %s vs peer %s is %s — %s', (dev, peer, want) => {
     // Through the SAME function the real check uses. The first two cases are
     // the ones string coercion gets wrong; today's actual ranges do not
     // distinguish the two implementations, so without these the comparison
