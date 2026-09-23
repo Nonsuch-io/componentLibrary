@@ -41,7 +41,7 @@
 <script setup lang="ts">
 import { computed, mergeProps, ref, useAttrs, useId, watchEffect } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'
-import { useNsAboveLabelName } from '../../composables/useNsAboveLabelName'
+import { useNsControlName } from '../../composables/useNsControlName'
 
 declare const process: { env: { NODE_ENV?: string } } | undefined
 /**
@@ -173,9 +173,12 @@ const fieldId = computed(() => (attrs.for as string | undefined) || generatedId)
 // the NAME. aria-labelledby on the input pins the name to our label and the
 // hint moves to aria-describedby (componentLibrary-2z7; NsSelect's twin -0og).
 const root = ref<InstanceType<typeof QInput> | null>(null)
-const { labelId } = useNsAboveLabelName({
+// No `ariaLabel` here on purpose: QInput spreads consumer attrs onto the input
+// on 2.18.6 and 2.32 alike (measured), so passing one would be an untested
+// branch. NsSelect needs it — see componentLibrary-5ng.
+const { labelId } = useNsControlName({
   root,
-  active: () => isLabelAbove.value,
+  labelAbove: () => isLabelAbove.value,
   label: () => props.label,
 })
 

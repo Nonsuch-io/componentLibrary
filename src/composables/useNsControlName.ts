@@ -48,10 +48,22 @@ function isElement(value: unknown): value is Element {
   return typeof Element !== 'undefined' && value instanceof Element
 }
 
-export function useNsAboveLabelName(options: {
+export function useNsControlName(options: {
   root: Ref<{ $el?: unknown } | null | undefined>
-  active: () => boolean
+  /** True while the label is rendered ABOVE the box and must name the control. */
+  labelAbove: () => boolean
   label: () => string | undefined
+  /**
+   * A consumer's own `aria-label`, for components where Quasar does not
+   * reliably route it to the native control. QSelect on 2.18.6 spreads consumer
+   * attrs onto `.q-field__native` when `use-input` is false, so
+   * `<NsSelect aria-label="…">` with no `label` has NO accessible name there
+   * and, with both, the `label` wins although the documented contract is that
+   * a consumer's aria-label beats it (componentLibrary-5ng). QInput routes
+   * attrs to the input on both versions, so NsInput does not pass this — an
+   * unused option would be an untested branch.
+   */
+  ariaLabel?: () => string | undefined
 }) {
   const labelId = useId()
   const hintId = useId()
@@ -62,14 +74,19 @@ export function useNsAboveLabelName(options: {
    * Not looked up in the document here: a disabled QSelect renders no combobox
    * (componentLibrary-w0c) and a document-wide query would name someone else's.
    */
-  function applyAboveLabelName(control?: HTMLElement | null) {
+  /** Anything to write, in this placement or from the consumer's attrs. */
+  function active(): boolean {
+    return options.labelAbove() || (options.ariaLabel?.()?.trim() ?? '') !== ''
+  }
+
+  function applyControlName(control?: HTMLElement | null) {
     // Inactive: nothing to do, not even the lookups — `root` sits on the
     // default-placement branch too, and review (sonnet) measured every
     // inside-placement select paying two querySelectors per re-render for
     // no-ops. Nothing of ours to take back either: both consumers render the
     // placements as v-if/v-else, so a flip recreates the field and the new
     // control carries none of our attributes (review, fable, measured).
-    if (!options.active()) return
+    if (!active()) return
     const host = options.root.value?.$el
     if (!isElement(host)) return
     const el =
@@ -79,9 +96,21 @@ export function useNsAboveLabelName(options: {
       )
     if (!el) return
 
+    // The consumer's aria-label, written onto the ELEMENT for the same reason
+    // as the labelledby below: on 2.18.6 a bound attr lands on a role-less div.
+    // Quasar's own precedence has a consumer's aria-label beat `label`, and
+    // NsSelect's listbox naming reads the combobox's name back, so this must
+    // land BEFORE that read (componentLibrary-5ng).
+    const consumerLabel = options.ariaLabel?.()?.trim()
+    if (consumerLabel) {
+      if (el.getAttribute('aria-label') !== consumerLabel) {
+        el.setAttribute('aria-label', consumerLabel)
+      }
+    }
+
     // Ours to set, and ours to take back when the label goes: a dangling IDREF
     // fails axe and accname falls back to the polluted two-label computation.
-    if (options.label()?.trim()) {
+    if (options.labelAbove() && options.label()?.trim() && !consumerLabel) {
       if (el.getAttribute('aria-labelledby') !== labelId)
         el.setAttribute('aria-labelledby', labelId)
     } else if (el.getAttribute('aria-labelledby') === labelId) {
@@ -90,7 +119,9 @@ export function useNsAboveLabelName(options: {
 
     // With a hint (prop or #hint slot) the block has text; with only `rules`
     // it exists and is empty until an error shows.
-    const messages = host.querySelector<HTMLElement>('.q-field__messages')
+    const messages = options.labelAbove()
+      ? host.querySelector<HTMLElement>('.q-field__messages')
+      : null
     if (messages && !messages.id && messages.textContent?.trim()) messages.id = hintId
     const describedByHint = messages?.id === hintId
     const tokens = (el.getAttribute('aria-describedby') ?? '')
@@ -110,14 +141,14 @@ export function useNsAboveLabelName(options: {
   // the old element.
   let observer: MutationObserver | undefined
   watch(
-    () => (options.active() ? options.root.value?.$el : undefined),
+    () => (active() ? options.root.value?.$el : undefined),
     (host) => {
       observer?.disconnect()
       observer = undefined
       if (!isElement(host)) return
-      applyAboveLabelName()
+      applyControlName()
       if (typeof MutationObserver === 'undefined') return
-      observer = new MutationObserver(() => applyAboveLabelName())
+      observer = new MutationObserver(() => applyControlName())
       observer.observe(host, { childList: true, subtree: true })
     },
     { immediate: true, flush: 'post' },
@@ -125,9 +156,9 @@ export function useNsAboveLabelName(options: {
   // Mounted: named before the first paint, not a post-flush later. Updated:
   // the label lives OUTSIDE the field root (a sibling in the wrapper), so its
   // coming and going is only visible from our own render.
-  onMounted(() => applyAboveLabelName())
-  onUpdated(() => applyAboveLabelName())
+  onMounted(() => applyControlName())
+  onUpdated(() => applyControlName())
   onBeforeUnmount(() => observer?.disconnect())
 
-  return { labelId, applyAboveLabelName }
+  return { labelId, applyControlName }
 }

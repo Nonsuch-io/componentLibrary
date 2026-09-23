@@ -113,6 +113,43 @@ describe('NsSelect — the listbox is named (componentLibrary-2e7)', () => {
     w.unmount()
   })
 
+  // componentLibrary-5ng. These assert the COMBOBOX's own name, not the
+  // listbox's: on quasar 2.18.6 (our peer floor, and butiq's resolved version)
+  // QSelect spreads consumer attrs onto .q-field__native when use-input is
+  // false, so a consumer's aria-label never reached the control — no name at
+  // all without `label`, and `label` winning with it, against the documented
+  // precedence. The listbox tests below pass on 2.30+ for free and could not
+  // see that; these are the version-independent statement.
+  it('gives the COMBOBOX the consumer aria-label when there is no label', () => {
+    const w = mount(NsSelect, {
+      props: { options: ['A'] },
+      attrs: { 'aria-label': 'Choose one' },
+      attachTo: document.body,
+    })
+    expect(w.find('[role="combobox"]').attributes('aria-label')).toBe('Choose one')
+    w.unmount()
+  })
+
+  it('lets a consumer aria-label beat `label` on the COMBOBOX', () => {
+    const w = mount(NsSelect, {
+      props: { label: 'Shop Category', options: ['A'] },
+      attrs: { 'aria-label': 'Pick a category' },
+      attachTo: document.body,
+    })
+    expect(w.find('[role="combobox"]').attributes('aria-label')).toBe('Pick a category')
+    w.unmount()
+  })
+
+  it('leaves Quasar to name the combobox from `label` when no aria-label is given', () => {
+    const w = mount(NsSelect, {
+      props: { label: 'Shop Category', options: ['A'] },
+      attachTo: document.body,
+    })
+    expect(w.find('[role="combobox"]').attributes('aria-label')).toBe('Shop Category')
+    expect(w.find('[role="combobox"]').attributes('aria-labelledby')).toBeUndefined()
+    w.unmount()
+  })
+
   it('names it from a consumer aria-label when there is no label', async () => {
     const { w, listbox } = await open({ 'aria-label': 'Choose one', options: ['A'] })
     expect(listbox!.getAttribute('aria-label')).toBe('Choose one')
