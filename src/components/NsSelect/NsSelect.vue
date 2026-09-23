@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { computed, mergeProps, nextTick, ref, useAttrs, useId } from 'vue'
 import { useNsDisabled } from '../../composables/useNsDisabled'
-import { useNsAboveLabelName } from '../../composables/useNsAboveLabelName'
+import { useNsControlName } from '../../composables/useNsControlName'
 /**
  * NsSelect — A styled select/dropdown wrapping Quasar's QSelect.
  *
@@ -132,10 +132,15 @@ const fieldId = computed(() => (attrs.for as string | undefined) || generatedId)
 // aria-labelledby that pins it is written onto the combobox ELEMENT, not bound
 // on <q-select> — on 2.18.6 a bound attr lands on the .q-field__native div
 // (componentLibrary-0og; NsInput's twin is -2z7). Same composable, same fix.
-const { labelId, applyAboveLabelName } = useNsAboveLabelName({
+const { labelId, applyControlName } = useNsControlName({
   root,
-  active: () => isLabelAbove.value,
+  labelAbove: () => isLabelAbove.value,
   label: () => props.label,
+  // QSelect on 2.18.6 routes consumer attrs to .q-field__native, so a
+  // consumer's aria-label never reaches the combobox there — no name at all
+  // without `label`, and `label` winning against the documented precedence
+  // with it (componentLibrary-5ng).
+  ariaLabel: () => attrs['aria-label'] as string | undefined,
 })
 const consumerFor = computed(() => attrs.for as string | undefined)
 
@@ -187,17 +192,21 @@ async function nameListbox() {
   const combobox =
     root.value?.$el?.querySelector<HTMLElement>('[role="combobox"]') ??
     document.querySelector<HTMLElement>('.q-select__dialog [role="combobox"]')
+  // WRITE BEFORE READING. Dialog mode re-creates the combobox inside the
+  // teleported dialog, outside the field root the composable observes — an
+  // element nothing has named yet. Reading its aria-label first (as this did)
+  // would find nothing on the version this exists for, and the listbox would
+  // go unnamed in `inside` placement or take the LABEL's text in `above`,
+  // disagreeing with the combobox — the exact bug the file's own comments say
+  // a first draft made. Review (sonnet) reasoned it from the ordering; it is
+  // invisible on 2.32 because Quasar routes the attr itself there.
+  applyControlName(combobox)
   // The combobox's own name: Quasar's aria-label from `label`, or a
   // consumer's; with the label ABOVE, QSelect is given no label and the
   // <label for> names the combobox instead, so the same text is used here.
   const name =
     combobox?.getAttribute('aria-label')?.trim() ||
     (isLabelAbove.value ? props.label?.trim() : undefined)
-  // Dialog mode re-creates the combobox inside the teleported dialog, outside
-  // the field root the composable observes. The in-field element keeps its
-  // attributes across the round trip: Vue never owned them, so the
-  // target/non-target patch leaves them alone (review measured it).
-  applyAboveLabelName(combobox)
   const listboxId = combobox?.getAttribute('aria-controls')
   if (!name || !listboxId) return
   nameIfUnnamed(document.getElementById(listboxId), name)

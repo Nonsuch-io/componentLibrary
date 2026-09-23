@@ -132,7 +132,7 @@ describe('external label (componentLibrary-eag)', () => {
     expect(inside.find('input').attributes('aria-labelledby')).toBeUndefined()
   })
 
-  // Review (fable, 2026-09-21) ran 9 mutants of useNsAboveLabelName against
+  // Review (fable, 2026-09-21) ran 9 mutants of useNsControlName against
   // the suite and all survived. Each test below kills a named one; the
   // "settle" waits out Quasar's debounce(validate, 0) and the observer.
   const settle = async () => {

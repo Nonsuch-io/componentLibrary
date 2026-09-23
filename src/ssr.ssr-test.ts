@@ -20,7 +20,7 @@
 import { describe, it, expect } from 'vitest'
 import { createSSRApp, defineComponent, h, ref } from 'vue'
 import { renderToString } from 'vue/server-renderer'
-import { useNsAboveLabelName } from './composables/useNsAboveLabelName'
+import { useNsControlName } from './composables/useNsControlName'
 import { getToken } from './tokens/index'
 
 describe('server rendering (componentLibrary-2cp)', () => {
@@ -48,12 +48,12 @@ describe('server rendering (componentLibrary-2cp)', () => {
   it.each([
     ['a real host object', { $el: { nodeType: 1 } }],
     ['no host at all', null],
-  ])('useNsAboveLabelName renders with %s', async (_name, root) => {
+  ])('useNsControlName renders with %s', async (_name, root) => {
     const Host = defineComponent({
       setup() {
-        useNsAboveLabelName({
+        useNsControlName({
           root: ref(root) as never,
-          active: () => true,
+          labelAbove: () => true,
           label: () => 'Province',
         })
         return () => h('div', 'ok')
