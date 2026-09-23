@@ -74,9 +74,25 @@ export function useNsControlName(options: {
    * Not looked up in the document here: a disabled QSelect renders no combobox
    * (componentLibrary-w0c) and a document-wide query would name someone else's.
    */
-  /** Anything to write, in this placement or from the consumer's attrs. */
+  /**
+   * What we last wrote as `aria-label`, so it can be taken back. Unlike the
+   * unreachable flag a previous review rejected, this one is REACHABLE and
+   * tested: a consumer binding `:aria-label="err ? 'Fix this' : undefined"`
+   * leaves a stale, wrong NAME on the control forever otherwise, because
+   * `active()` goes false and nothing revisits the element. Review (sonnet)
+   * executed that. On 2.32 Vue's own attrs diffing happens to clear it for
+   * us — on 2.18.6 that diffing lands on `.q-field__native`, the wrong
+   * element, which is the entire reason this composable exists.
+   */
+  let appliedAriaLabel: string | null = null
+
+  /** Anything to write — or anything of ours still to take back. */
   function active(): boolean {
-    return options.labelAbove() || (options.ariaLabel?.()?.trim() ?? '') !== ''
+    return (
+      options.labelAbove() ||
+      (options.ariaLabel?.()?.trim() ?? '') !== '' ||
+      appliedAriaLabel !== null
+    )
   }
 
   function applyControlName(control?: HTMLElement | null) {
@@ -106,6 +122,11 @@ export function useNsControlName(options: {
       if (el.getAttribute('aria-label') !== consumerLabel) {
         el.setAttribute('aria-label', consumerLabel)
       }
+      appliedAriaLabel = consumerLabel
+    } else if (appliedAriaLabel !== null) {
+      // Only ours: a value someone else put there is not ours to remove.
+      if (el.getAttribute('aria-label') === appliedAriaLabel) el.removeAttribute('aria-label')
+      appliedAriaLabel = null
     }
 
     // Ours to set, and ours to take back when the label goes: a dangling IDREF

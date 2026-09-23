@@ -192,17 +192,21 @@ async function nameListbox() {
   const combobox =
     root.value?.$el?.querySelector<HTMLElement>('[role="combobox"]') ??
     document.querySelector<HTMLElement>('.q-select__dialog [role="combobox"]')
+  // WRITE BEFORE READING. Dialog mode re-creates the combobox inside the
+  // teleported dialog, outside the field root the composable observes — an
+  // element nothing has named yet. Reading its aria-label first (as this did)
+  // would find nothing on the version this exists for, and the listbox would
+  // go unnamed in `inside` placement or take the LABEL's text in `above`,
+  // disagreeing with the combobox — the exact bug the file's own comments say
+  // a first draft made. Review (sonnet) reasoned it from the ordering; it is
+  // invisible on 2.32 because Quasar routes the attr itself there.
+  applyControlName(combobox)
   // The combobox's own name: Quasar's aria-label from `label`, or a
   // consumer's; with the label ABOVE, QSelect is given no label and the
   // <label for> names the combobox instead, so the same text is used here.
   const name =
     combobox?.getAttribute('aria-label')?.trim() ||
     (isLabelAbove.value ? props.label?.trim() : undefined)
-  // Dialog mode re-creates the combobox inside the teleported dialog, outside
-  // the field root the composable observes. The in-field element keeps its
-  // attributes across the round trip: Vue never owned them, so the
-  // target/non-target patch leaves them alone (review measured it).
-  applyControlName(combobox)
   const listboxId = combobox?.getAttribute('aria-controls')
   if (!name || !listboxId) return
   nameIfUnnamed(document.getElementById(listboxId), name)

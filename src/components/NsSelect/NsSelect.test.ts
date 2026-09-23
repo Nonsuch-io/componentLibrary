@@ -140,6 +140,9 @@ describe('NsSelect — the listbox is named (componentLibrary-2e7)', () => {
     w.unmount()
   })
 
+  // BASELINE, not a regression guard: with no aria-label and inside placement
+  // the composable returns at its first line, so this asserts Quasar's own
+  // rendering. Kept because it pins the precedence the tests above move.
   it('leaves Quasar to name the combobox from `label` when no aria-label is given', () => {
     const w = mount(NsSelect, {
       props: { label: 'Shop Category', options: ['A'] },
@@ -371,6 +374,17 @@ describe('NsSelect labelPlacement="above"', () => {
     expect(listbox, 'the popup is open').not.toBeNull()
     expect(w.find('[role="combobox"]').attributes('aria-label')).toBeUndefined()
     expect(listbox!.getAttribute('aria-label')).toBe('Province / Territory')
+    w.unmount()
+  })
+
+  it('a consumer aria-label wins on the COMBOBOX in above placement too', () => {
+    // The highest-risk combination: the visible <label for> is still
+    // rendered, so the control has an implicit label AND an aria-label.
+    // Asserting the listbox alone (below) left this unstated.
+    const w = mountAbove({}, { 'aria-label': 'Pick a province' })
+    const combobox = w.find('[role="combobox"]')
+    expect(combobox.attributes('aria-label')).toBe('Pick a province')
+    expect(combobox.attributes('aria-labelledby')).toBeUndefined()
     w.unmount()
   })
 
