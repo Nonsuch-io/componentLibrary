@@ -77,10 +77,35 @@ describe('the quasar peer floor is the version we measured (componentLibrary-u5v
   })
 })
 
-/** [major, minor, patch] from a caret/plain range. */
+/**
+ * [major, minor, patch] from a caret/plain range.
+ *
+ * THROWS RATHER THAN SKIPS on anything else, and that is deliberate for the
+ * monorepo move: the day `devDependencies.quasar` becomes `catalog:`, a
+ * graceful skip would silently retire the only check here with teeth, which is
+ * the "a skip reads as a pass" failure mode this file already names below. A
+ * throw makes it a visible task — the real floor still exists, it just moves
+ * to pnpm-workspace.yaml. Review (fable) recommended keeping the throw.
+ *
+ * A PRERELEASE also throws. `2.32.0-beta.1` sorts BELOW `2.32.0` in semver,
+ * and dropping the tag would let a dev floor pinned to a beta pass a check
+ * whose whole purpose is "dev is not below peer". Quasar ships betas, so this
+ * is not theoretical.
+ */
 function versionOf(range: string): [number, number, number] {
-  const match = /(\d+)\.(\d+)\.(\d+)/.exec(range)
-  if (!match) throw new Error(`cannot parse a version out of range "${range}"`)
+  const match = /(\d+)\.(\d+)\.(\d+)(-[0-9A-Za-z.-]+)?/.exec(range)
+  if (!match) {
+    throw new Error(
+      `cannot parse a version out of range "${range}" — if this is a pnpm ` +
+        `catalog entry, resolve it from pnpm-workspace.yaml rather than skipping`,
+    )
+  }
+  if (match[4]) {
+    throw new Error(
+      `range "${range}" is a PRERELEASE, which sorts below its release — ` +
+        `this check will not reason about it`,
+    )
+  }
   return [Number(match[1]), Number(match[2]), Number(match[3])]
 }
 
@@ -122,6 +147,21 @@ describe('we build against something we actually support (componentLibrary-u5v)'
     ['^2.32.0', '^2.32.0', true, 'equal'],
     ['^3.0.0', '^2.99.99', true, 'a higher major'],
   ]
+  it('has shared peers to compare, so the cases below are not vacuous', () => {
+    // The 3kx describe guards the identical list; guarded here too so the two
+    // cannot drift apart silently (review, fable).
+    expect(shared.length).toBeGreaterThan(0)
+  })
+
+  it.each([
+    ['^2.32.0-beta.1', 'a prerelease dev floor'],
+    ['catalog:', 'a pnpm catalog entry'],
+    ['workspace:*', 'a workspace protocol range'],
+    ['*', 'an unbounded range'],
+  ])('refuses to reason about %s (%s)', (range) => {
+    expect(() => versionOf(range)).toThrow()
+  })
+
   it.each(cases)('dev %s vs peer %s is %s — %s', (dev, peer, want) => {
     // Through the SAME function the real check uses. The first two cases are
     // the ones string coercion gets wrong; today's actual ranges do not
