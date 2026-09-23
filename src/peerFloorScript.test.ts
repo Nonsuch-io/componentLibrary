@@ -50,10 +50,16 @@ describe('peerFloor', () => {
     expect(() => peerFloor({}, 'quasar')).toThrow(/not a peerDependency/)
   })
 
-  it('agrees with this package own manifest', () => {
+  it('resolves the floor of the NAMED peer from this package own manifest', () => {
     const pkg = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf-8'))
-    // Not a hard-coded number: whatever the declared floor is, the gate must
-    // install exactly that.
-    expect(peerFloor(pkg, 'quasar')).toMatch(/^\d+\.\d+\.\d+$/)
+    const declared = pkg.peerDependencies.quasar as string
+    const floor = peerFloor(pkg, 'quasar')
+    // Tied to the DECLARED RANGE, not to a shape. Review (sonnet) mutated
+    // peerFloor to ignore its `name` and always read `vue`, and the previous
+    // version of this test passed — vue's floor is also three dot-separated
+    // numbers. A wrong-key bug in the function CI actually invokes would have
+    // been invisible here, which is the one place it most needed to be seen.
+    expect(declared).toContain(floor)
+    expect(floor).not.toBe(peerFloor(pkg, 'vue'))
   })
 })

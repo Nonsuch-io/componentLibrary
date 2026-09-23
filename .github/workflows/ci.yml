@@ -106,18 +106,26 @@ jobs:
         id: floor
         run: echo "version=$(node scripts/peer-floor.mjs quasar)" >> "$GITHUB_OUTPUT"
 
-      - name: Install quasar ${{ steps.floor.outputs.version }} exactly
+      - name: Install the declared floor exactly
+        # Through `env:` rather than interpolating `${{ }}` into the shell.
+        # Safe today — floorOf can only return digits and dots — but that is an
+        # invariant of another file, and a future edit loosening it (build
+        # metadata, say) would silently turn this into shell injection.
+        env:
+          FLOOR: ${{ steps.floor.outputs.version }}
         # --save-exact so the resolved version IS the floor, not the newest
         # release matching it — the whole point of the job.
-        run: pnpm add -D quasar@${{ steps.floor.outputs.version }} --save-exact
+        run: pnpm add -D "quasar@$FLOOR" --save-exact
 
       - name: Confirm the floor is what got installed
         # Without this the job can silently test the wrong version and go green,
         # which is the failure mode it exists to prevent.
+        env:
+          FLOOR: ${{ steps.floor.outputs.version }}
         run: |
           installed=$(node -p "require('quasar/package.json').version")
-          echo "installed quasar: $installed (declared floor: ${{ steps.floor.outputs.version }})"
-          test "$installed" = "${{ steps.floor.outputs.version }}"
+          echo "installed quasar: $installed (declared floor: $FLOOR)"
+          test "$installed" = "$FLOOR"
 
       # dist tests and the size gate read dist/, so build before testing.
       - name: Build
