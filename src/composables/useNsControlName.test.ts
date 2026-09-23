@@ -42,10 +42,11 @@ const mountWith = (opts: {
 
   const labelAbove = opts.labelAbove ?? ref(false)
   const ariaLabel = opts.ariaLabel ?? ref<string | undefined>(undefined)
+  const root = ref<{ $el: Element }>({ $el: host })
   const Host = defineComponent({
     setup() {
       useNsControlName({
-        root: ref({ $el: host }),
+        root,
         labelAbove: () => labelAbove.value,
         label: () => opts.label,
         ariaLabel: () => ariaLabel.value,
@@ -55,7 +56,7 @@ const mountWith = (opts: {
     },
   })
   const wrapper = mount(Host)
-  return { wrapper, control, host, labelAbove, ariaLabel }
+  return { wrapper, control, host, labelAbove, ariaLabel, root }
 }
 
 describe('useNsControlName (componentLibrary-5ng)', () => {
@@ -150,6 +151,37 @@ describe('useNsControlName (componentLibrary-5ng)', () => {
     ariaLabel.value = 'Z'
     await wrapper.vm.$nextTick()
     expect(observe).toHaveBeenCalledTimes(1)
+  })
+
+  it('moves the observer to a NEW host, disconnecting the old one', async () => {
+    // The branch the watch exists for: NsSelect's v-if/v-else swaps the field
+    // when labelPlacement flips at runtime, with `active()` true throughout.
+    // Review (fable) showed TWO mutants of it passing the whole suite green —
+    // `if (observer) return` (the old host keeps the observer, the new one is
+    // never watched) and dropping the disconnect (the old observer leaks).
+    // Both are invisible to the idle-edge tests above, which is why my own
+    // "equivalent mutant" reading was wrong.
+    const observe = vi.spyOn(MutationObserver.prototype, 'observe')
+    const disconnect = vi.spyOn(MutationObserver.prototype, 'disconnect')
+    const { wrapper, root } = mountWith({ labelAbove: ref(true), label: 'L' })
+    expect(observe).toHaveBeenCalledTimes(1)
+
+    const next = document.createElement('div')
+    const nextControl = document.createElement('input')
+    nextControl.setAttribute('role', 'combobox')
+    next.appendChild(nextControl)
+    document.body.appendChild(next)
+    hosts.push(next)
+
+    root.value = { $el: next }
+    await wrapper.vm.$nextTick()
+    expect(disconnect, 'old observer not disconnected').toHaveBeenCalledTimes(1)
+    expect(observe).toHaveBeenCalledTimes(2)
+    expect(observe.mock.calls[1][0], 'the new host is not the one observed').toBe(next)
+
+    // And no churn on a further render of the same host.
+    await wrapper.vm.$nextTick()
+    expect(observe).toHaveBeenCalledTimes(2)
   })
 
   it('disconnects the observer once there is nothing left to do', async () => {
