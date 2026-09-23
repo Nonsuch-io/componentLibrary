@@ -105,7 +105,7 @@ export const Default: Story = {
           <span class="text-weight-bold text-subtitle1 q-ml-sm">Acme</span>
         </template>
         <template #header-actions>
-          <NsButton flat round dense aria-label="Notifications">
+          <NsButton variant="tertiary" size="sm" aria-label="Notifications">
             <NsIcon name="notifications" />
           </NsButton>
         </template>
@@ -231,9 +231,50 @@ export const WithBottomBarAbove: Story = {
   }),
 }
 
+/**
+ * THE HAMBURGER'S APPEARANCE IS PINNED HERE (componentLibrary-ydi), because it
+ * changed and nothing noticed.
+ *
+ * It used to be `flat round dense` — Quasar props the library's own dev
+ * warning tells consumers not to pass, and the shell was passing them. Measured
+ * on THIS button in THIS story: that combination rendered a SOLID BRAND-ORANGE
+ * button (bg rgb(213,99,7), white glyph) at 56x40 with 8px 16px padding,
+ * because NsButton's own variant styling applied underneath Quasar's `flat` —
+ * exactly the collision the warning predicts, in the library itself. `round`
+ * was inert: identical box, radius, padding and min-width with and without it,
+ * so the warning's "leave round in place for now" advice achieved nothing here.
+ *
+ * It is now `variant="tertiary" size="sm"`: transparent, brand-coloured glyph,
+ * 48x40 with 8px 12px padding. Width drops 8px, HEIGHT IS UNCHANGED, so there
+ * is no tap-target question either way — an earlier version of this comment
+ * said 41x36 -> 32x33, which came from a bare probe button containing the text
+ * "X" rather than this one's 24px icon. Review (sonnet) caught it; the numbers
+ * here are re-measured on the real button.
+ *
+ * All three header buttons are asserted, not just the hamburger: reverting any
+ * ONE of them must turn this story red.
+ */
 export const Mobile: Story = {
   parameters: {
     viewport: { defaultViewport: 'mobile1' },
+  },
+  play: async ({ canvasElement }) => {
+    const menu = canvasElement.querySelector('.ns-app-shell__menu-btn') as HTMLElement
+    await expect(menu, 'the hamburger renders on mobile').not.toBeNull()
+    // Every button the fix touched that is on this canvas, not just the first
+    // one: review reverted the SEARCH toggle alone and the whole suite stayed
+    // green, so three of the four call sites were unpinned.
+    for (const selector of [
+      '.ns-app-shell__menu-btn',
+      '.ns-app-shell__search-btn',
+      '.ns-app-shell__user-btn',
+    ]) {
+      const button = canvasElement.querySelector(selector) as HTMLElement
+      await expect(button, `${selector} renders on mobile`).not.toBeNull()
+      const style = getComputedStyle(button)
+      await expect(style.backgroundColor, `${selector} background`).toBe('rgba(0, 0, 0, 0)')
+      await expect(style.color, `${selector} glyph`).toBe('rgb(213, 99, 7)')
+    }
   },
   render: (args) => ({
     components: { NsAppShell, NsIcon, NsCard },

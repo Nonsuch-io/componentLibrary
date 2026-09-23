@@ -6,9 +6,8 @@
         <!-- Hamburger button: visible on mobile when drawer is off-canvas -->
         <NsButton
           v-if="!isDesktop"
-          flat
-          round
-          dense
+          variant="tertiary"
+          size="sm"
           :aria-label="drawerOpen ? locale.navigation.closeMenu : locale.navigation.openMenu"
           class="ns-app-shell__menu-btn"
           @click="toggleDrawer"
@@ -38,9 +37,8 @@
           </div>
           <NsButton
             v-else
-            flat
-            round
-            dense
+            variant="tertiary"
+            size="sm"
             aria-label="Search"
             class="ns-app-shell__search-btn"
             @click="searchExpanded = !searchExpanded"
@@ -54,9 +52,8 @@
         <!-- User avatar with dropdown menu -->
         <NsButton
           v-if="userInitials"
-          flat
-          round
-          dense
+          variant="tertiary"
+          size="sm"
           aria-label="User menu"
           class="ns-app-shell__user-btn"
         >
@@ -106,7 +103,12 @@
             <PhMagnifyingGlass :size="ICON_SIZE_INLINE" weight="regular" />
           </template>
           <template #append>
-            <NsButton flat round dense aria-label="Close search" @click="searchExpanded = false">
+            <NsButton
+              variant="tertiary"
+              size="sm"
+              aria-label="Close search"
+              @click="searchExpanded = false"
+            >
               <PhX :size="ICON_SIZE_BUTTON" weight="regular" />
             </NsButton>
           </template>
