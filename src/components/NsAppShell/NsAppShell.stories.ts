@@ -231,9 +231,32 @@ export const WithBottomBarAbove: Story = {
   }),
 }
 
+/**
+ * THE HAMBURGER'S APPEARANCE IS PINNED HERE (componentLibrary-ydi), because it
+ * changed and nothing noticed.
+ *
+ * It used to be `flat round dense` — Quasar props the library's own dev
+ * warning tells consumers not to pass, and the shell was passing them. Measured
+ * in Chromium: that combination rendered a SOLID BRAND-ORANGE button
+ * (rgb(213,99,7), white glyph), because NsButton's own variant styling applied
+ * underneath Quasar's `flat` — exactly the collision the warning predicts, in
+ * the library itself. `round` was inert: identical box, radius, padding and
+ * min-width with and without it, so the warning's "leave round in place for
+ * now" advice achieved nothing here.
+ *
+ * It is now `variant="tertiary" size="sm"`: transparent, brand-coloured glyph.
+ * Asserted so a silent drift back is a red test rather than a surprise.
+ */
 export const Mobile: Story = {
   parameters: {
     viewport: { defaultViewport: 'mobile1' },
+  },
+  play: async ({ canvasElement }) => {
+    const menu = canvasElement.querySelector('.ns-app-shell__menu-btn') as HTMLElement
+    await expect(menu, 'the hamburger renders on mobile').not.toBeNull()
+    const style = getComputedStyle(menu)
+    await expect(style.backgroundColor).toBe('rgba(0, 0, 0, 0)')
+    await expect(style.color).toBe('rgb(213, 99, 7)')
   },
   render: (args) => ({
     components: { NsAppShell, NsIcon, NsCard },
