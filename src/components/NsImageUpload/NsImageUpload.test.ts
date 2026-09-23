@@ -180,14 +180,17 @@ describe('NsImageUpload', () => {
       const wrapper = mountEmpty({ tips: ['x', 'same', 'same', 'y'] })
       await wrapper.setProps({ tips: ['y', 'same', 'same', 'x'] })
       await nextTick()
-      const duplicates = warn.mock.calls.filter((c) => String(c[0]).includes('Duplicate keys'))
-      expect(duplicates, `Vue warned: ${JSON.stringify(duplicates[0] ?? '')}`).toHaveLength(0)
+      // ORDER FIRST, then the warning: with the assertions the other way
+      // round a bad key fails on the warning and the order is never checked,
+      // so "mis-patches" would be a claim no test makes (review, fable).
       expect(wrapper.findAll('.ns-image-upload__tip').map((t) => t.text())).toEqual([
         'y',
         'same',
         'same',
         'x',
       ])
+      const duplicates = warn.mock.calls.filter((c) => String(c[0]).includes('Duplicate keys'))
+      expect(duplicates, `Vue warned: ${JSON.stringify(duplicates[0] ?? '')}`).toHaveLength(0)
       warn.mockRestore()
     })
 

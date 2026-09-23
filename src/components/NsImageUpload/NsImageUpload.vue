@@ -65,14 +65,18 @@
         <slot v-if="slotRenders(slots.tips)" name="tips" />
         <template v-else>
           <!--
-            `${i}:${tip}`, not `tip`: two identical tip strings are legal (a
-            repeated line in two locales), and a duplicate key makes Vue's
-            keyed diff warn and mis-patch on REORDER. Review measured the
-            warning with plain `tip`.
+            Keyed by INDEX, not by `tip`: two identical tip strings are legal
+            (a repeated line across locales) and a duplicate key makes Vue's
+            keyed diff warn on REORDER — measured. A composite `${i}:${tip}`
+            was the first fix and is worse: the text half remounts the node
+            when a tip changes at the same index, and review measured that
+            half doing nothing a plain index does not. Nothing here depends
+            on node identity (no transition, no focus; the id is on the
+            parent).
           -->
           <NsText
             v-for="(tip, i) in tips"
-            :key="`${i}:${tip}`"
+            :key="i"
             as="p"
             variant="body-md"
             class="ns-image-upload__tip"
