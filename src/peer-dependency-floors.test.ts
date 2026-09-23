@@ -34,25 +34,37 @@ function majorOf(range: string): number {
 /**
  * THE QUASAR FLOOR IS A MEASURED NUMBER, NOT A GUESS — and it was a lie for
  * months. `^2.17.0` was declared while the suite had not been run below the
- * newest release in as long as anyone could remember. Measured 2026-09-22 in
+ * newest release in as long as anyone could remember. Bisected 2026-09-22 in
  * isolated installs (`pnpm install --ignore-workspace`, quasar pinned, no
- * shared node_modules):
+ * shared node_modules, `CI=1` so the dist tests cannot skip):
  *
- *     2.17.0   9 assertions fail across 6 files
- *     2.18.6   the same 9      <- the version butiq shipped at the time
- *     2.32.0   passes, bar one dist-artefact test in a pinned install
- *     2.32.2   passes
+ *     2.17.0 – 2.24.0   9 assertions fail across 5 files
+ *     2.25.1            5 fail: NsBrandLogo ratio x2, NsTooltip tap x3
+ *     2.26.0 – 2.31.0   2 fail: NsBrandLogo's two ratio assertions ONLY
+ *     2.32.0            passes, dist tests included
  *
- * So `^2.32.0` is the oldest version this library is actually known to work
- * on. componentLibrary-u5v has the per-file triage; Kale's decision the same
- * day was that the consumer upgrades to 2.32 rather than the library chasing
- * 2.18 (componentLibrary-5l9 is the one thing the upgrade will NOT fix).
+ * READ THE MIDDLE ROW HONESTLY: from 2.26 the only failures are two
+ * NsBrandLogo assertions that check Quasar's MECHANISM, not the contract.
+ * `use-ratio.js` returns `{ paddingBottom }` through 2.31 and `{ aspectRatio }`
+ * from 2.32; the box is reserved either way, and the test asserts the 2.32
+ * shape. So 2.26–2.31 are very likely fine in practice, and an earlier draft
+ * of this comment claiming 2.32.0 is "the oldest version this library is known
+ * to work on" was false — review (fable) bisected it.
  *
- * This pin is deliberately tautological — it compares package.json to a number
- * written here. Its job is to make LOWERING the floor a deliberate act with a
- * re-measurement attached, rather than a one-character edit nobody reviews.
- * If you lower it, run the suite on that exact version first and put the
- * result above.
+ * `^2.32.0` IS STILL THE DECLARED FLOOR, for a reason that is about testing
+ * rather than behaviour: 2.32 is what we build against, what CI resolves, and
+ * what the only consumer is moving to (Kale's decision, 2026-09-22). Declaring
+ * a range we do not exercise is exactly how `^2.17.0` came to be wrong, and
+ * widening back to 2.26 would mean committing to test it — which is
+ * componentLibrary-q5r's job, not this bead's. If that job lands and someone
+ * wants the wider range, teach the two NsBrandLogo assertions to accept either
+ * mechanism and re-bisect.
+ *
+ * The pin below is deliberately tautological: it compares package.json to a
+ * number written here, so LOWERING the floor is an act with a re-measurement
+ * attached rather than a one-character edit. The dev-floor comparison further
+ * down is the check with teeth — it caught devDependencies sitting BELOW the
+ * peer floor on this very branch.
  */
 const MEASURED_QUASAR_FLOOR = '^2.32.0'
 
@@ -62,6 +74,35 @@ describe('the quasar peer floor is the version we measured (componentLibrary-u5v
       pkg.peerDependencies?.quasar,
       'peerDependencies.quasar changed without updating the measurement above it',
     ).toBe(MEASURED_QUASAR_FLOOR)
+  })
+})
+
+/** [major, minor, patch] from a caret/plain range, for ordered comparison. */
+function versionOf(range: string): [number, number, number] {
+  const match = /(\d+)\.(\d+)\.(\d+)/.exec(range)
+  if (!match) throw new Error(`cannot parse a version out of range "${range}"`)
+  return [Number(match[1]), Number(match[2]), Number(match[3])]
+}
+
+describe('we build against something we actually support (componentLibrary-u5v)', () => {
+  const peers = pkg.peerDependencies ?? {}
+  const devDeps = pkg.devDependencies ?? {}
+  const shared = Object.keys(peers).filter((name) => name in devDeps)
+
+  it.each(shared)('%s: the devDependency floor is not BELOW the peer floor', (name) => {
+    // Found by review on the branch that raised the peer floor: the peer said
+    // ^2.32.0 while devDependencies still said ^2.18.6 — we were telling
+    // consumers a version was unsupported while declaring ourselves happy to
+    // build on it. Only the lockfile kept the suite honest, and the majors-only
+    // check below cannot see it.
+    const peer = versionOf(peers[name])
+    const dev = versionOf(devDeps[name])
+    expect(
+      dev >= peer,
+      `devDependencies.${name} is "${devDeps[name]}" but peerDependencies.${name} ` +
+        `is "${peers[name]}" — we would be building against a version we tell ` +
+        `consumers not to use.`,
+    ).toBe(true)
   })
 })
 

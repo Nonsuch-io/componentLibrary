@@ -259,8 +259,13 @@ if (typeof process === 'undefined' || process?.env?.NODE_ENV !== 'production') {
 /**
  * QImg RESERVES A 16:9 BOX WHEN IT KNOWS NOTHING ELSE, AND NO LOCKUP IS 16:9.
  *
- * QImg sizes itself with a padding-bottom filler div derived from `ratio`, falling
- * back to `initialRatio` — 1.7778 (QImg.js: `const defaultRatio = 1.7778`). Measured
+ * QImg sizes itself from `ratio`, falling back to `initialRatio` — 1.7778
+ * (QImg.js: `const defaultRatio = 1.7778`). THE MECHANISM CHANGED UNDER US:
+ * `use-ratio.js` returned `{ paddingBottom }` and QImg pushed a filler div
+ * through 2.31, and returns `{ aspectRatio }` on the root from 2.32. Both
+ * reserve the same box; the measurement below is the filler-div era and the
+ * tests assert the 2.32 shape, which is why they fail on 2.26–2.31 without
+ * anything being broken (componentLibrary-u5v, bisected). Measured
  * with only `width: 72`: the box renders 72×40.5 with `padding-bottom: 56.25%`, so a
  * 72×27 wordmark floats in 13px of dead space and then snaps to its real height once
  * the asset loads. `loading="eager"` shortens that window; it does not close it.

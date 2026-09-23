@@ -247,7 +247,7 @@ function handleKeydown(event: KeyboardEvent) {
 // delay/hideDelay handling rather than reimplementing it.
 //
 // Old Quasar ignores the PointerEvent, new Quasar ignores the MouseEvent, so
-// dispatching both is correct across ^2.17.0 rather than only on the version we
+// dispatching both is correct across ^2.32.0 rather than only on the version we
 // happen to develop against. Quasar's delayShow explicitly tolerates synthetic
 // PointerEvents (isPrimary false, pointerType empty), with a comment saying it
 // is for everyone dispatching them, tests included. Story: componentLibrary-b6j.

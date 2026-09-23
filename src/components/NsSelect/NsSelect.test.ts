@@ -114,7 +114,8 @@ describe('NsSelect — the listbox is named (componentLibrary-2e7)', () => {
   })
 
   // componentLibrary-5ng. These assert the COMBOBOX's own name, not the
-  // listbox's: on quasar 2.18.6 (our peer floor, and butiq's resolved version)
+  // listbox's: on quasar 2.18.6 (butiq's resolved version at the time; below the peer
+  // floor since componentLibrary-u5v raised it to ^2.32.0)
   // QSelect spreads consumer attrs onto .q-field__native when use-input is
   // false, so a consumer's aria-label never reached the control — no name at
   // all without `label`, and `label` winning with it, against the documented
