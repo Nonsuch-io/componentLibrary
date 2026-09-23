@@ -6,7 +6,9 @@ import { onBeforeUnmount, onMounted, onUpdated, useId, watch, type Ref } from 'v
  * control element itself. Internal to NsInput/NsSelect `labelPlacement="above"`.
  *
  * Why the DOM and not a template binding: butiq measured on 0.53.0 (quasar
- * 2.18.6, inside our `^2.17.0` peer range) that `:aria-labelledby` bound on
+ * 2.18.6, then inside our peer range, since raised to `^2.32.0` once the old
+ * floor was measured and found false — componentLibrary-u5v) that
+ * `:aria-labelledby` bound on
  * <QSelect> lands on the `.q-field__native` DIV — in 2.18.6 a select without
  * `use-input` spreads the consumer's attrs there and gives the focus-target
  * input only its own combobox attrs; from 2.30 they land on the input, which is

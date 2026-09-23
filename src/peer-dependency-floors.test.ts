@@ -31,6 +31,40 @@ function majorOf(range: string): number {
   return Number(match[1])
 }
 
+/**
+ * THE QUASAR FLOOR IS A MEASURED NUMBER, NOT A GUESS — and it was a lie for
+ * months. `^2.17.0` was declared while the suite had not been run below the
+ * newest release in as long as anyone could remember. Measured 2026-09-22 in
+ * isolated installs (`pnpm install --ignore-workspace`, quasar pinned, no
+ * shared node_modules):
+ *
+ *     2.17.0   9 assertions fail across 6 files
+ *     2.18.6   the same 9      <- the version butiq shipped at the time
+ *     2.32.0   passes, bar one dist-artefact test in a pinned install
+ *     2.32.2   passes
+ *
+ * So `^2.32.0` is the oldest version this library is actually known to work
+ * on. componentLibrary-u5v has the per-file triage; Kale's decision the same
+ * day was that the consumer upgrades to 2.32 rather than the library chasing
+ * 2.18 (componentLibrary-5l9 is the one thing the upgrade will NOT fix).
+ *
+ * This pin is deliberately tautological — it compares package.json to a number
+ * written here. Its job is to make LOWERING the floor a deliberate act with a
+ * re-measurement attached, rather than a one-character edit nobody reviews.
+ * If you lower it, run the suite on that exact version first and put the
+ * result above.
+ */
+const MEASURED_QUASAR_FLOOR = '^2.32.0'
+
+describe('the quasar peer floor is the version we measured (componentLibrary-u5v)', () => {
+  it('matches the measured floor', () => {
+    expect(
+      pkg.peerDependencies?.quasar,
+      'peerDependencies.quasar changed without updating the measurement above it',
+    ).toBe(MEASURED_QUASAR_FLOOR)
+  })
+})
+
 describe('peerDependencies float on the same major as devDependencies (componentLibrary-3kx)', () => {
   const peers = pkg.peerDependencies ?? {}
   const devDeps = pkg.devDependencies ?? {}
