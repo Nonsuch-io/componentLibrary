@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { defineComponent, h, ref, type Ref } from 'vue'
 import { useNsControlName } from './useNsControlName'
@@ -18,16 +18,27 @@ import { useNsControlName } from './useNsControlName'
  * question entirely: these fail on every version if the write, the precedence
  * or the cleanup regress.
  */
+/** Hosts are appended to the body; take them back so the file is self-contained. */
+const hosts: HTMLElement[] = []
+afterEach(() => {
+  hosts.splice(0).forEach((h) => h.remove())
+  vi.restoreAllMocks()
+})
+
 const mountWith = (opts: {
   ariaLabel?: Ref<string | undefined>
   labelAbove?: Ref<boolean>
   label?: string
+  /** A name already on the control, as Quasar puts one there from `label`. */
+  seedAriaLabel?: string
 }) => {
   const host = document.createElement('div')
   const control = document.createElement('input')
   control.setAttribute('role', 'combobox')
   host.appendChild(control)
+  if (opts.seedAriaLabel) control.setAttribute('aria-label', opts.seedAriaLabel)
   document.body.appendChild(host)
+  hosts.push(host)
 
   const labelAbove = opts.labelAbove ?? ref(false)
   const ariaLabel = opts.ariaLabel ?? ref<string | undefined>(undefined)
@@ -73,6 +84,49 @@ describe('useNsControlName (componentLibrary-5ng)', () => {
     ariaLabel.value = 'Second'
     await wrapper.vm.$nextTick()
     expect(control.getAttribute('aria-label')).toBe('Second')
+  })
+
+  it('PUTS BACK the name the control would have had, rather than deleting', async () => {
+    // Quasar writes `aria-label = label` onto the focus-target input itself on
+    // 2.18.6, so the value the consumer's label displaced is QUASAR'S. Review
+    // (fable) measured a plain removal leaving the combobox unnamed and the
+    // listbox unnamed with it — the axe failure componentLibrary-2e7 fixed.
+    const ariaLabel = ref<string | undefined>('Pick one')
+    const { wrapper, control } = mountWith({
+      label: 'Shop Category',
+      seedAriaLabel: 'Shop Category',
+      ariaLabel,
+    })
+    expect(control.getAttribute('aria-label')).toBe('Pick one')
+    ariaLabel.value = undefined
+    await wrapper.vm.$nextTick()
+    expect(control.getAttribute('aria-label')).toBe('Shop Category')
+  })
+
+  it('restores from `label` even when the attribute was already cleared for us', async () => {
+    // On 2.32 Vue's patch removes the consumer's attribute before this runs,
+    // so a guard that only accepted our own value would skip and leave the
+    // newer version unnamed where the older one is named.
+    const ariaLabel = ref<string | undefined>('Pick one')
+    const { wrapper, control } = mountWith({ label: 'Shop Category', ariaLabel })
+    ariaLabel.value = undefined
+    control.removeAttribute('aria-label')
+    await wrapper.vm.$nextTick()
+    expect(control.getAttribute('aria-label')).toBe('Shop Category')
+  })
+
+  it('disconnects the observer once there is nothing left to do', async () => {
+    // active() keeps a pending cleanup reachable, but it reads a plain `let`,
+    // so the watch cannot see it go idle — review measured the observer
+    // outliving the cleanup, against the "inside placement creates no
+    // observer" invariant.
+    const disconnect = vi.spyOn(MutationObserver.prototype, 'disconnect')
+    const ariaLabel = ref<string | undefined>('X')
+    const { wrapper } = mountWith({ ariaLabel })
+    expect(disconnect).not.toHaveBeenCalled()
+    ariaLabel.value = undefined
+    await wrapper.vm.$nextTick()
+    expect(disconnect).toHaveBeenCalled()
   })
 
   it('does not remove an aria-label it did not write', async () => {

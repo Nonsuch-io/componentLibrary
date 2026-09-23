@@ -124,9 +124,32 @@ export function useNsControlName(options: {
       }
       appliedAriaLabel = consumerLabel
     } else if (appliedAriaLabel !== null) {
-      // Only ours: a value someone else put there is not ours to remove.
-      if (el.getAttribute('aria-label') === appliedAriaLabel) el.removeAttribute('aria-label')
-      appliedAriaLabel = null
+      // PUT BACK THE NAME THE CONTROL WOULD HAVE HAD, do not just delete.
+      // Review (fable) ran this on real 2.18.6: Quasar writes `aria-label =
+      // label` onto the focus-target input itself there (QSelect.js:294), so
+      // the value we overwrote was QUASAR'S, and removing it left the combobox
+      // with no name and the listbox unnamed again — the axe
+      // aria-input-field-name failure componentLibrary-2e7 fixed, back after
+      // one toggle. 2.32 ends up equally unnamed by a different route (an
+      // `undefined` in Quasar's attr spread overrides `label`), so this is not
+      // restoring parity with the newer version — it is fixing both.
+      //
+      // Read from `label` rather than remembering the displaced string: a
+      // remembered value goes stale the moment `label` changes while the
+      // consumer's own label is set.
+      const current = el.getAttribute('aria-label')
+      // `null` too: on 2.32 Vue's patch has already removed the consumer's
+      // attribute before this post-flush pass, so the guard would otherwise
+      // skip and leave the control unnamed on the newer version only.
+      if (current === appliedAriaLabel || current === null) {
+        const fallback = options.labelAbove() ? undefined : options.label()?.trim()
+        if (fallback) el.setAttribute('aria-label', fallback)
+        else el.removeAttribute('aria-label')
+        appliedAriaLabel = fallback ?? null
+      } else {
+        // Someone else owns it now; leave it and stop tracking.
+        appliedAriaLabel = null
+      }
     }
 
     // Ours to set, and ours to take back when the label goes: a dangling IDREF
@@ -161,6 +184,23 @@ export function useNsControlName(options: {
   // of the placement swaps the host (v-if/v-else); the old observer goes with
   // the old element.
   let observer: MutationObserver | undefined
+
+  /**
+   * `appliedAriaLabel` is a plain `let`, so clearing it cannot re-trigger the
+   * watch below — review (fable) measured the observer surviving a cleanup and
+   * living for the component's life, contradicting the "inside placement
+   * creates no observer" invariant an earlier review established. Dropped here
+   * instead of making the flag reactive: the watch's job is the HOST changing,
+   * and one explicit disconnect is cheaper to read than a second reactive
+   * source feeding it.
+   */
+  function disconnectIfIdle() {
+    if (!active() && observer) {
+      observer.disconnect()
+      observer = undefined
+    }
+  }
+
   watch(
     () => (active() ? options.root.value?.$el : undefined),
     (host) => {
@@ -177,8 +217,14 @@ export function useNsControlName(options: {
   // Mounted: named before the first paint, not a post-flush later. Updated:
   // the label lives OUTSIDE the field root (a sibling in the wrapper), so its
   // coming and going is only visible from our own render.
-  onMounted(() => applyControlName())
-  onUpdated(() => applyControlName())
+  onMounted(() => {
+    applyControlName()
+    disconnectIfIdle()
+  })
+  onUpdated(() => {
+    applyControlName()
+    disconnectIfIdle()
+  })
   onBeforeUnmount(() => observer?.disconnect())
 
   return { labelId, applyControlName }
