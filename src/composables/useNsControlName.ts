@@ -143,8 +143,9 @@ export function useNsControlName(options: {
       // skip and leave the control unnamed on the newer version only.
       if (current === appliedAriaLabel || current === null) {
         const fallback = options.labelAbove() ? undefined : options.label()?.trim()
-        if (fallback) el.setAttribute('aria-label', fallback)
-        else el.removeAttribute('aria-label')
+        if (fallback) {
+          if (current !== fallback) el.setAttribute('aria-label', fallback)
+        } else el.removeAttribute('aria-label')
         appliedAriaLabel = fallback ?? null
       } else {
         // Someone else owns it now; leave it and stop tracking.
@@ -185,45 +186,57 @@ export function useNsControlName(options: {
   // the old element.
   let observer: MutationObserver | undefined
 
-  /**
-   * `appliedAriaLabel` is a plain `let`, so clearing it cannot re-trigger the
-   * watch below — review (fable) measured the observer surviving a cleanup and
-   * living for the component's life, contradicting the "inside placement
-   * creates no observer" invariant an earlier review established. Dropped here
-   * instead of making the flag reactive: the watch's job is the HOST changing,
-   * and one explicit disconnect is cheaper to read than a second reactive
-   * source feeding it.
-   */
-  function disconnectIfIdle() {
-    if (!active() && observer) {
-      observer.disconnect()
-      observer = undefined
-    }
-  }
+  /** The host we are currently observing, so a re-run does not re-observe it. */
+  let observedHost: Element | undefined
 
-  watch(
-    () => (active() ? options.root.value?.$el : undefined),
-    (host) => {
+  /**
+   * OBSERVER STATE AS A FUNCTION OF THE WORLD, re-derived on every pass rather
+   * than driven by a watch. The watch could only see REACTIVE sources, and
+   * `appliedAriaLabel` is a plain `let`: review (sonnet) measured the observer
+   * disconnecting on the first idle transition and never coming BACK when the
+   * consumer re-added their aria-label, because the watch ran before
+   * onUpdated's cleanup and so never saw the idle edge at all. A previous
+   * round had already patched the disconnect side the same way; two halves of
+   * one condition living in different places is what made the asymmetry easy
+   * to miss, so both now happen here.
+   *
+   * The "inside placement creates no observer" invariant still holds: nothing
+   * is created while `active()` is false.
+   */
+  function syncObserver() {
+    const host = options.root.value?.$el
+    if (!active() || !isElement(host) || typeof MutationObserver === 'undefined') {
       observer?.disconnect()
       observer = undefined
-      if (!isElement(host)) return
+      observedHost = undefined
+      return
+    }
+    if (observer && observedHost === host) return
+    observer?.disconnect()
+    observer = new MutationObserver(() => applyControlName())
+    observer.observe(host, { childList: true, subtree: true })
+    observedHost = host
+  }
+
+  // Mounted: named before the first paint, not a post-flush later. Updated:
+  // the label lives OUTSIDE the field root (a sibling in the wrapper), so its
+  // coming and going is only visible from our own render. The host can also be
+  // swapped without either firing (NsSelect's v-if/v-else), hence the watch.
+  watch(
+    () => options.root.value?.$el,
+    () => {
       applyControlName()
-      if (typeof MutationObserver === 'undefined') return
-      observer = new MutationObserver(() => applyControlName())
-      observer.observe(host, { childList: true, subtree: true })
+      syncObserver()
     },
     { immediate: true, flush: 'post' },
   )
-  // Mounted: named before the first paint, not a post-flush later. Updated:
-  // the label lives OUTSIDE the field root (a sibling in the wrapper), so its
-  // coming and going is only visible from our own render.
   onMounted(() => {
     applyControlName()
-    disconnectIfIdle()
+    syncObserver()
   })
   onUpdated(() => {
     applyControlName()
-    disconnectIfIdle()
+    syncObserver()
   })
   onBeforeUnmount(() => observer?.disconnect())
 

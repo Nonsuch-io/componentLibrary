@@ -115,6 +115,43 @@ describe('useNsControlName (componentLibrary-5ng)', () => {
     expect(control.getAttribute('aria-label')).toBe('Shop Category')
   })
 
+  it('OBSERVES AGAIN when the consumer re-adds their label', async () => {
+    // The asymmetry review (sonnet) measured: the disconnect side was patched
+    // in onUpdated while the connect side lived in a watch that cannot see a
+    // plain `let`, so the observer went away on the first idle edge and never
+    // came back. Toggle twice; both edges must be honoured.
+    const observe = vi.spyOn(MutationObserver.prototype, 'observe')
+    const disconnect = vi.spyOn(MutationObserver.prototype, 'disconnect')
+    const ariaLabel = ref<string | undefined>('X')
+    const { wrapper, control } = mountWith({ ariaLabel })
+    expect(observe).toHaveBeenCalledTimes(1)
+
+    ariaLabel.value = undefined
+    await wrapper.vm.$nextTick()
+    expect(disconnect).toHaveBeenCalledTimes(1)
+    expect(observe).toHaveBeenCalledTimes(1)
+
+    ariaLabel.value = 'Y'
+    await wrapper.vm.$nextTick()
+    expect(observe, 'observer never came back').toHaveBeenCalledTimes(2)
+    expect(control.getAttribute('aria-label')).toBe('Y')
+
+    ariaLabel.value = undefined
+    await wrapper.vm.$nextTick()
+    expect(disconnect).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not re-observe the same host on every render', async () => {
+    const observe = vi.spyOn(MutationObserver.prototype, 'observe')
+    const ariaLabel = ref<string | undefined>('X')
+    const { wrapper } = mountWith({ ariaLabel })
+    ariaLabel.value = 'Y'
+    await wrapper.vm.$nextTick()
+    ariaLabel.value = 'Z'
+    await wrapper.vm.$nextTick()
+    expect(observe).toHaveBeenCalledTimes(1)
+  })
+
   it('disconnects the observer once there is nothing left to do', async () => {
     // active() keeps a pending cleanup reachable, but it reads a plain `let`,
     // so the watch cannot see it go idle — review measured the observer
