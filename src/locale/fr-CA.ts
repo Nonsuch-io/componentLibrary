@@ -102,8 +102,6 @@ export const nsLocaleFrCA: NsLocaleMessages = {
     exitFullscreen: 'Quitter le plein écran',
     previousImage: 'Image précédente',
     nextImage: 'Image suivante',
-    uploadPrompt: 'Glisser-déposer une image, ou',
-    uploadBrowse: 'parcourir',
     uploadRemove: "Retirer l'image",
     uploadSelected: 'Image sélectionnée',
     uploadCleared: 'Image retirée',
