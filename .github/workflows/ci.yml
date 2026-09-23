@@ -62,6 +62,12 @@ jobs:
       - name: SSR tests
         run: pnpm test:ssr
 
+      # Server-renders every exported component in plain node against the BUILT
+      # bundle — the half `pnpm test:ssr` cannot reach, because Vitest always
+      # loads quasar's client build (componentLibrary-zfw).
+      - name: SSR component smoke
+        run: pnpm test:ssr:components
+
       - name: Storybook tests
         run: pnpm test:storybook
 
@@ -136,3 +142,7 @@ jobs:
 
       - name: SSR tests
         run: pnpm test:ssr
+
+      # The floor is where a consumer's server actually runs, so render there too.
+      - name: SSR component smoke
+        run: pnpm test:ssr:components
