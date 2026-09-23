@@ -4,6 +4,20 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.55.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.54.0...v0.55.0) (2026-09-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* peerDependencies.quasar is now ^2.32.0. 2.17–2.24 fail nine assertions and 2.25–2.31 pass everything except a QImg mechanism check; the range is narrowed to what is tested, not to what works.
+* peerDependencies.quasar is now ^2.32.0. Installing against quasar 2.17–2.31 was already broken in nine measured places; it is now declared rather than discovered.
+
+### Bug Fixes
+
+* bisect the quasar floor, remove a committed probe (componentLibrary-u5v) ([c858904](https://github.com/Nonsuch-io/componentLibrary/commit/c8589042fdd6ff38a9b6dfb19676a43877aa3d32))
+* declare the quasar peer floor we actually support (componentLibrary-u5v) ([5617089](https://github.com/Nonsuch-io/componentLibrary/commit/561708967517e402a1a5c71ab10af5ada355afa6))
+* **test:** type the version-comparison cases ([f6a63cf](https://github.com/Nonsuch-io/componentLibrary/commit/f6a63cf725d3bb47c6804f2eb20c9369cfcd73d7))
+
 ## [0.54.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.53.2...v0.54.0) (2026-09-23)
 
 
