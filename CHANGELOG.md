@@ -4,6 +4,14 @@ All notable changes to `@nonsuch/component-library` will be documented in this f
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/).
 
+## [0.55.1](https://github.com/Nonsuch-io/componentLibrary/compare/v0.55.0...v0.55.1) (2026-09-23)
+
+
+### Bug Fixes
+
+* **app-shell:** stop passing Quasar styling props to NsButton (componentLibrary-ydi) ([41765bb](https://github.com/Nonsuch-io/componentLibrary/commit/41765bbc73bff39c88bb167d4ba51bf95b973f90))
+* **app-shell:** stop passing Quasar styling props to NsButton (componentLibrary-ydi) ([8bf7341](https://github.com/Nonsuch-io/componentLibrary/commit/8bf7341a5a5cc4553b9c09c5d61c0330e60614f9))
+
 ## [0.55.0](https://github.com/Nonsuch-io/componentLibrary/compare/v0.54.0...v0.55.0) (2026-09-23)
 
 
