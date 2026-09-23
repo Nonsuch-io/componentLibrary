@@ -77,11 +77,37 @@ describe('the quasar peer floor is the version we measured (componentLibrary-u5v
   })
 })
 
-/** [major, minor, patch] from a caret/plain range, for ordered comparison. */
+/** [major, minor, patch] from a caret/plain range. */
 function versionOf(range: string): [number, number, number] {
   const match = /(\d+)\.(\d+)\.(\d+)/.exec(range)
   if (!match) throw new Error(`cannot parse a version out of range "${range}"`)
   return [Number(match[1]), Number(match[2]), Number(match[3])]
+}
+
+/**
+ * Compare NUMERICALLY, field by field. `a >= b` on two arrays coerces both to
+ * STRINGS — `[2,32,0] >= [2,9,0]` is "2,32,0" >= "2,9,0", which is FALSE. The
+ * first version of this check did exactly that and happened to give the right
+ * answer for today's numbers, which is the worst kind of correct: it would
+ * have started lying the moment a minor crossed a digit boundary (2.9 vs 2.32,
+ * or 2.32.9 vs 2.32.10).
+ */
+function atLeast(a: [number, number, number], b: [number, number, number]): boolean {
+  for (let i = 0; i < 3; i++) {
+    if (a[i] !== b[i]) return a[i] > b[i]
+  }
+  return true
+}
+
+/**
+ * THE WHOLE CHECK, over two RANGES, so the synthetic cases below exercise the
+ * same path as the real one. Testing `atLeast` alone was not enough: swapping
+ * the call site back to `dev >= peer` left every test green, because the real
+ * values (^2.32.0 vs ^2.32.0) agree under string coercion. A helper can be
+ * correct and unused.
+ */
+function devFloorIsAtLeastPeer(devRange: string, peerRange: string): boolean {
+  return atLeast(versionOf(devRange), versionOf(peerRange))
 }
 
 describe('we build against something we actually support (componentLibrary-u5v)', () => {
@@ -89,16 +115,28 @@ describe('we build against something we actually support (componentLibrary-u5v)'
   const devDeps = pkg.devDependencies ?? {}
   const shared = Object.keys(peers).filter((name) => name in devDeps)
 
+  it.each([
+    ['^2.32.0', '^2.9.0', true, 'a minor that sorts wrong as a string'],
+    ['^2.32.10', '^2.32.9', true, 'a patch that sorts wrong as a string'],
+    ['^2.9.0', '^2.32.0', false, 'genuinely below, across the same boundary'],
+    ['^2.32.0', '^2.32.0', true, 'equal'],
+    ['^3.0.0', '^2.99.99', true, 'a higher major'],
+  ] as const)('dev %s vs peer %s is %s — %s', (dev, peer, want) => {
+    // Through the SAME function the real check uses. The first two cases are
+    // the ones string coercion gets wrong; today's actual ranges do not
+    // distinguish the two implementations, so without these the comparison
+    // could silently revert.
+    expect(devFloorIsAtLeastPeer(dev, peer)).toBe(want)
+  })
+
   it.each(shared)('%s: the devDependency floor is not BELOW the peer floor', (name) => {
     // Found by review on the branch that raised the peer floor: the peer said
     // ^2.32.0 while devDependencies still said ^2.18.6 — we were telling
     // consumers a version was unsupported while declaring ourselves happy to
     // build on it. Only the lockfile kept the suite honest, and the majors-only
     // check below cannot see it.
-    const peer = versionOf(peers[name])
-    const dev = versionOf(devDeps[name])
     expect(
-      dev >= peer,
+      devFloorIsAtLeastPeer(devDeps[name], peers[name]),
       `devDependencies.${name} is "${devDeps[name]}" but peerDependencies.${name} ` +
         `is "${peers[name]}" — we would be building against a version we tell ` +
         `consumers not to use.`,
