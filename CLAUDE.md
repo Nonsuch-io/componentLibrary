@@ -60,8 +60,12 @@ feat(a11y): turn the axe gate on (componentLibrary-057)
 ```
 
 Not `(057)`, not `[componentLibrary-057]`. The merge webhook auto-closes the bead by
-matching `\(({ID})\)` in the title, where `ID = [a-z][a-z0-9]*-[a-z0-9]+` — so a short
+matching `\(({ID})\)` in the title, where
+`ID = [a-z][a-z0-9]*-[a-z0-9]+(?:\.[a-z0-9]+)*` — so a short
 id has no prefix and no hyphen and matches nothing, and brackets are not parens.
+Dot-separated sub-ids (`componentLibrary-057.2`) **do** match and **do** close: the
+trailing group is easy to drop when quoting this pattern from memory, and dropping it
+inverts the advice — it makes a correct dotted title look broken.
 
 The failure is SILENT and looks like success: the PR merges, CI is green, and the bead
 just stays open — where the author closes it by hand at session-close and erases the

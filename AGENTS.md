@@ -367,15 +367,16 @@ feat(a11y): turn the axe gate on (componentLibrary-057)
 Not `(057)`, not `[componentLibrary-057]`, not `cl-057`.
 
 **The merge webhook auto-closes the bead by regex-matching the title**, and the pattern
-is `\(({ID}...)\)` where `ID = [a-z][a-z0-9]*-[a-z0-9]+`. Each rejected form fails for
+is `\(({ID}...)\)` where `ID = [a-z][a-z0-9]*-[a-z0-9]+(?:\.[a-z0-9]+)*`. Each rejected form fails for
 its own reason, which is why this is worth spelling out:
 
-| form                     | outcome                                                         |
-| ------------------------ | --------------------------------------------------------------- |
-| `(componentLibrary-057)` | closes                                                          |
-| `(057)`                  | **no match** — no prefix, no hyphen, and it starts with a digit |
-| `[componentLibrary-057]` | **no match** — the pattern requires literal parens              |
-| `(cl-057)`               | matches the regex, then the known-prefix filter **discards it** |
+| form                       | outcome                                                                                               |
+| -------------------------- | ----------------------------------------------------------------------------------------------------- |
+| `(componentLibrary-057)`   | closes                                                                                                |
+| `(057)`                    | **no match** — no prefix, no hyphen, and it starts with a digit                                       |
+| `[componentLibrary-057]`   | **no match** — the pattern requires literal parens                                                    |
+| `(cl-057)`                 | matches the regex, then the known-prefix filter **discards it**                                       |
+| `(componentLibrary-057.2)` | **closes**, as does any dot-separated sub-id — the trailing `(?:\.[a-z0-9]+)*` is part of the pattern |
 
 WHY THIS WENT UNNOTICED FOR FIVE PRs: the failure is silent and looks exactly like
 success. The PR merges, CI is green, and the only symptom is a bead that stays open —
