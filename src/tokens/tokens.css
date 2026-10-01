@@ -20,26 +20,26 @@
 :root {
   /* — Text — */
   --ns-color-text-primary: #2d0b00;
-  --ns-color-text-secondary: #757575;
-  --ns-color-text-tertiary: #9ca3af;
+  --ns-color-text-secondary: #535353;
+  --ns-color-text-tertiary: #757575;
   --ns-color-text-brand: #d56307;
   --ns-color-text-disabled: #909090;
   --ns-color-text-inverse: #fef7ee;
-  --ns-color-text-link: #64cbff;
-  --ns-color-text-link-hover: #b8e4fa;
+  --ns-color-text-link: #79caf3;
+  --ns-color-text-link-hover: #d1ecfa;
   --ns-color-text-on-primary: #ffffff;
   --ns-color-text-on-secondary: #d56307;
   --ns-color-text-on-tertiary: #d56307;
-  --ns-color-text-on-tertiary-hover: #f66b00;
+  --ns-color-text-on-tertiary-hover: #f8760d;
   --ns-color-text-positive: #919500;
   --ns-color-text-on-positive: #2d0b00;
-  --ns-color-text-warning: #f7bc2b;
+  --ns-color-text-warning: #eaa500;
   --ns-color-text-on-warning: #2d0b00;
   --ns-color-text-negative: #c7151c;
   --ns-color-text-on-negative: #ffffff;
   --ns-color-text-info: #0069b4;
   --ns-color-text-on-info: #ffffff;
-  --ns-color-text-accent: #64cbff;
+  --ns-color-text-accent: #79caf3;
   --ns-color-text-on-accent: #2d0b00;
   --ns-color-text-on-dark: #fef7ee;
   /* alias */
@@ -52,17 +52,20 @@
   --ns-color-bg-subtle: #fef7ee;
   --ns-color-bg-app-header: #fdf4e7;
   --ns-color-bg-transparent: rgba(253, 244, 231, 0.75);
+  --ns-color-bg-transparent-dark: rgba(45, 11, 0, 0.75);
   --ns-color-bg-primary: #d56307;
-  --ns-color-bg-primary-subtle: #fce5d2;
-  --ns-color-bg-primary-hover: #f66b00;
-  --ns-color-bg-primary-active: #c05400;
+  --ns-color-bg-primary-subtle: #fdf0e3;
+  --ns-color-bg-primary-hover: #f8760d;
+  --ns-color-bg-primary-active: #b24d00;
   --ns-color-bg-disabled: #e0e0e0;
+  --ns-color-bg-dark: #27140f;
   --ns-color-bg-positive: #f3f4d2;
   --ns-color-bg-warning: #f9e3ad;
   --ns-color-bg-negative: #fedee0;
   --ns-color-bg-info: #e0f1fa;
   --ns-color-bg-accent: #b8e4fa;
-  --ns-color-bg-dark: #2d0b00;
+  --ns-color-bg-accent-hover: #d1ecfa;
+  --ns-color-bg-accent-selected: #93dbff;
   --ns-color-bg-dialog: #fef7ee;
   --ns-color-bg-sidebar: #fef7ee;
   --ns-color-bg-input: #ffffff;
@@ -82,9 +85,9 @@
   --ns-color-border-focus: #93dbff;
   --ns-color-border-disabled: #d1d5db;
   --ns-color-border-primary: #d56307;
-  --ns-color-border-primary-subtle: #fce5d2;
+  --ns-color-border-primary-subtle: #fdf0e3;
   --ns-color-border-positive: #919500;
-  --ns-color-border-warning: #f7bc2b;
+  --ns-color-border-warning: #eaa500;
   --ns-color-border-negative: #c7151c;
   --ns-color-border-info: #0069b4;
   --ns-color-border-accent: #64cbff;
@@ -109,7 +112,7 @@
   --ns-color-info-hover: #15acf8;
   --ns-color-info-active: #004a7f;
   --ns-color-accent: #79caf3;
-  --ns-color-accent-hover: #b8e4fa;
+  --ns-color-accent-hover: #d1ecfa;
   --ns-color-accent-active: #79caf3;
   --ns-color-status-neutral: #e5e7eb;
   /* aliases for the old status-* names used in components */
@@ -131,11 +134,11 @@
 
   /* — Button — */
   --ns-color-btn-primary-bg: #d56307;
-  --ns-color-btn-primary-bg-hover: #f66b00;
-  --ns-color-btn-primary-bg-active: #c05400;
+  --ns-color-btn-primary-bg-hover: #f8760d;
+  --ns-color-btn-primary-bg-active: #b24d00;
   --ns-color-btn-secondary-bg: #fdf4e7;
-  --ns-color-btn-secondary-bg-hover: #ffffff;
-  --ns-color-btn-secondary-bg-active: #fdf4e7;
+  --ns-color-btn-secondary-bg-hover: rgba(253, 244, 231, 0.75);
+  --ns-color-btn-secondary-bg-active: #f9e6d3;
   --ns-color-btn-secondary-bg-border: #d56307;
   --ns-color-btn-tertiary-bg: transparent; /* ghost button — placeholder, mode-agnostic */
   --ns-color-btn-disabled-bg: #e0e0e0;
@@ -266,6 +269,7 @@
   --ns-color-bg-subtle: #351d16;
   --ns-color-bg-app-header: #21110c;
   --ns-color-bg-transparent: rgba(33, 17, 12, 0.75);
+  --ns-color-bg-transparent-dark: rgba(45, 11, 0, 0.75);
   --ns-color-bg-primary: #d56307;
   --ns-color-bg-primary-subtle: #a44700;
   --ns-color-bg-primary-hover: #c05400;
@@ -276,6 +280,8 @@
   --ns-color-bg-negative: #fd6d73;
   --ns-color-bg-info: #004a7f;
   --ns-color-bg-accent: #0069b4;
+  --ns-color-bg-accent-hover: #004a7f;
+  --ns-color-bg-accent-selected: #15acf8;
   --ns-color-bg-dark: #2d0b00;
   --ns-color-bg-dialog: #351d16;
   --ns-color-bg-sidebar: #351d16;
@@ -412,6 +418,7 @@
     --ns-color-bg-subtle: #351d16;
     --ns-color-bg-app-header: #21110c;
     --ns-color-bg-transparent: rgba(33, 17, 12, 0.75);
+    --ns-color-bg-transparent-dark: rgba(45, 11, 0, 0.75);
     --ns-color-bg-primary: #d56307;
     --ns-color-bg-primary-subtle: #a44700;
     --ns-color-bg-primary-hover: #c05400;
@@ -422,6 +429,8 @@
     --ns-color-bg-negative: #fd6d73;
     --ns-color-bg-info: #004a7f;
     --ns-color-bg-accent: #0069b4;
+    --ns-color-bg-accent-hover: #004a7f;
+    --ns-color-bg-accent-selected: #15acf8;
     --ns-color-bg-dark: #2d0b00;
     --ns-color-bg-dialog: #351d16;
     --ns-color-bg-sidebar: #351d16;

@@ -26,10 +26,12 @@ export type NsButtonVariant =
   | 'primary'
   | 'secondary'
   | 'tertiary'
+  | 'tertiary-negative'
   | 'accent'
   | 'positive'
   | 'negative'
   | 'warning'
+  | 'x'
   | 'marketing'
   | 'marketing-pushed'
 
@@ -51,11 +53,11 @@ const props = withDefaults(defineProps<NsButtonProps>(), {
 })
 
 const paddingMap: Record<NsButtonSize, { default: string; iconOnly: string }> = {
-  xs: { default: '4px 8px', iconOnly: '8px' },
+  xs: { default: '4px 8px', iconOnly: '4px' },
   sm: { default: '8px 12px', iconOnly: '8px' },
   md: { default: '8px 16px', iconOnly: '8px' },
   lg: { default: '12px 16px', iconOnly: '12px' },
-  xl: { default: '20px', iconOnly: '12px' },
+  xl: { default: '16px 20px', iconOnly: '12px' },
 }
 
 const buttonPadding = computed(() => {
@@ -72,9 +74,9 @@ const buttonPadding = computed(() => {
   font-weight: 600;
   border-radius: 8px;
   transition:
-    background 150ms ease,
-    color 150ms ease,
-    box-shadow 150ms ease;
+    background var(--ns-duration-fast) var(--ns-easing-default),
+    color var(--ns-duration-fast) var(--ns-easing-default),
+    box-shadow var(--ns-duration-fast) var(--ns-easing-default);
 
   :deep(.q-btn__wrapper) {
     min-height: unset; /* Quasar 2.x internal — revisit on major Quasar bump */
@@ -83,11 +85,22 @@ const buttonPadding = computed(() => {
   :deep(.q-btn__content) {
     gap: 4px; /* Quasar 2.x internal — revisit on major Quasar bump */
   }
+
+  /* Suppress Quasar's built-in hover overlay — our CSS owns all hover states */
+  :deep(.q-focus-helper) {
+    display: none;
+  }
+
+  /* Keyboard-only focus ring in place of the hidden focus helper */
+  &:focus-visible {
+    outline: 2px solid var(--ns-color-border-focus);
+    outline-offset: 2px;
+  }
 }
 
 // ---- Sizes ----
 .ns-btn--xs {
-  font-size: 12px;
+  font-size: 10px;
 }
 
 .ns-btn--sm {
@@ -123,11 +136,13 @@ const buttonPadding = computed(() => {
   background: var(--ns-color-bg-brand);
   color: var(--ns-color-text-on-brand);
 
-  &:hover:not(.disabled) {
+  &:hover:not(.disabled),
+  &.ns-btn--hover:not(.disabled) {
     background: var(--ns-color-bg-brand-hover);
   }
 
-  &:active:not(.disabled) {
+  &:active:not(.disabled),
+  &.ns-btn--active:not(.disabled) {
     background: var(--ns-color-bg-brand-active);
   }
 
@@ -139,20 +154,18 @@ const buttonPadding = computed(() => {
 
 // ---- Secondary ----
 .ns-btn--secondary {
-  background: var(--ns-color-bg-canvas);
-  color: var(--ns-color-text-brand);
-  box-shadow: inset 0 0 0 1px var(--ns-color-border-brand);
+  background: var(--ns-color-btn-secondary-bg);
+  color: var(--ns-color-text-on-secondary);
+  box-shadow: inset 0 0 0 1px var(--ns-color-text-on-secondary);
 
-  &:hover:not(.disabled) {
-    background: var(--ns-color-bg-surface);
-    color: var(--ns-color-bg-brand-hover);
-    box-shadow: inset 0 0 0 1px var(--ns-color-bg-brand-hover);
+  &:hover:not(.disabled),
+  &.ns-btn--hover:not(.disabled) {
+    background: var(--ns-color-btn-secondary-bg-hover);
   }
 
-  &:active:not(.disabled) {
-    background: var(--ns-color-bg-header);
-    color: var(--ns-color-bg-brand-active);
-    box-shadow: inset 0 0 0 1px var(--ns-color-bg-brand-active);
+  &:active:not(.disabled),
+  &.ns-btn--active:not(.disabled) {
+    background: var(--ns-color-btn-secondary-bg-active);
   }
 
   &.disabled {
@@ -167,31 +180,55 @@ const buttonPadding = computed(() => {
   background: transparent;
   color: var(--ns-color-text-brand);
 
-  &:hover:not(.disabled) {
+  &:hover:not(.disabled),
+  &.ns-btn--hover:not(.disabled) {
     color: var(--ns-color-bg-brand-hover);
   }
 
-  &:active:not(.disabled) {
+  &:active:not(.disabled),
+  &.ns-btn--active:not(.disabled) {
     color: var(--ns-color-text-brand);
   }
 
   &.disabled {
-    color: var(--ns-color-bg-disabled);
+    color: var(--ns-color-text-disabled);
+  }
+}
+
+// ---- Tertiary Negative ----
+.ns-btn--tertiary-negative {
+  background: transparent;
+  color: var(--ns-color-text-negative);
+
+  &:hover:not(.disabled),
+  &.ns-btn--hover:not(.disabled) {
+    color: var(--ns-color-negative-hover);
+  }
+
+  &:active:not(.disabled),
+  &.ns-btn--active:not(.disabled) {
+    color: var(--ns-color-negative-active);
+  }
+
+  &.disabled {
+    color: var(--ns-color-text-disabled);
   }
 }
 
 // ---- Accent ----
 .ns-btn--accent {
-  background: var(--ns-color-status-accent);
+  background: var(--ns-color-bg-accent);
   color: var(--ns-color-text-on-accent);
 
-  &:hover:not(.disabled) {
-    background: var(--ns-color-status-accent-hover);
+  &:hover:not(.disabled),
+  &.ns-btn--hover:not(.disabled) {
+    background: var(--ns-color-bg-accent-hover);
   }
 
-  &:active:not(.disabled) {
-    background: var(--ns-color-status-accent-active);
-    color: var(--ns-color-text-on-brand);
+  &:active:not(.disabled),
+  &.ns-btn--active:not(.disabled) {
+    background: var(--ns-color-accent-active);
+    color: var(--ns-color-text-on-accent);
   }
 
   &.disabled {
@@ -202,15 +239,17 @@ const buttonPadding = computed(() => {
 
 // ---- Positive ----
 .ns-btn--positive {
-  background: var(--ns-color-status-positive);
-  color: var(--ns-color-text-on-accent);
+  background: var(--ns-color-positive);
+  color: var(--ns-color-text-on-positive);
 
-  &:hover:not(.disabled) {
-    background: var(--ns-color-status-positive-hover);
+  &:hover:not(.disabled),
+  &.ns-btn--hover:not(.disabled) {
+    background: var(--ns-color-positive-hover);
   }
 
-  &:active:not(.disabled) {
-    background: var(--ns-color-status-positive-active);
+  &:active:not(.disabled),
+  &.ns-btn--active:not(.disabled) {
+    background: var(--ns-color-positive-active);
   }
 
   &.disabled {
@@ -221,15 +260,17 @@ const buttonPadding = computed(() => {
 
 // ---- Negative ----
 .ns-btn--negative {
-  background: var(--ns-color-status-negative);
-  color: var(--ns-color-text-on-brand);
+  background: var(--ns-color-negative);
+  color: var(--ns-color-text-on-negative);
 
-  &:hover:not(.disabled) {
-    background: var(--ns-color-status-negative-hover);
+  &:hover:not(.disabled),
+  &.ns-btn--hover:not(.disabled) {
+    background: var(--ns-color-negative-hover);
   }
 
-  &:active:not(.disabled) {
-    background: var(--ns-color-status-negative-active);
+  &:active:not(.disabled),
+  &.ns-btn--active:not(.disabled) {
+    background: var(--ns-color-negative-active);
   }
 
   &.disabled {
@@ -240,19 +281,41 @@ const buttonPadding = computed(() => {
 
 // ---- Warning ----
 .ns-btn--warning {
-  background: var(--ns-color-status-warning);
-  color: var(--ns-color-text-on-accent);
+  background: var(--ns-color-warning);
+  color: var(--ns-color-text-on-warning);
 
-  &:hover:not(.disabled) {
-    background: var(--ns-color-status-warning-hover);
+  &:hover:not(.disabled),
+  &.ns-btn--hover:not(.disabled) {
+    background: var(--ns-color-warning-hover);
   }
 
-  &:active:not(.disabled) {
-    background: var(--ns-color-status-warning-active);
+  &:active:not(.disabled),
+  &.ns-btn--active:not(.disabled) {
+    background: var(--ns-color-warning-active);
   }
 
   &.disabled {
     background: var(--ns-color-bg-disabled);
+    color: var(--ns-color-text-disabled);
+  }
+}
+
+// ---- X (icon-only close/dismiss) ----
+.ns-btn--x {
+  background: transparent;
+  color: var(--ns-color-text-primary);
+
+  &:hover:not(.disabled),
+  &.ns-btn--hover:not(.disabled) {
+    color: var(--ns-color-text-secondary);
+  }
+
+  &:active:not(.disabled),
+  &.ns-btn--active:not(.disabled) {
+    color: var(--ns-color-text-primary);
+  }
+
+  &.disabled {
     color: var(--ns-color-text-disabled);
   }
 }
