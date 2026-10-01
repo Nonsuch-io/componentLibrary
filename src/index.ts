@@ -70,6 +70,12 @@ export type { NsTooltipProps, NsTooltipAnchor } from './components/NsTooltip/NsT
 export { default as NsBadge } from './components/NsBadge/NsBadge.vue'
 export type { NsBadgeProps, NsBadgeVariant, NsBadgeSize } from './components/NsBadge/NsBadge.vue'
 
+export { default as NsNumberBadge } from './components/NsNumberBadge/NsNumberBadge.vue'
+export type {
+  NsNumberBadgeProps,
+  NsNumberBadgeSize,
+} from './components/NsNumberBadge/NsNumberBadge.vue'
+
 export { default as NsBreadcrumbs } from './components/NsBreadcrumbs/NsBreadcrumbs.vue'
 export type { NsBreadcrumbsProps } from './components/NsBreadcrumbs/NsBreadcrumbs.vue'
 
