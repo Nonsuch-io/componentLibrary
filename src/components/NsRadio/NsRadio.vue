@@ -8,6 +8,7 @@
         'ns-radio--selected': isSelected,
         'ns-radio--disabled': disable,
         'ns-radio--has-content': hasContent,
+        'ns-radio--card': card,
       },
     ]"
   >
@@ -22,21 +23,40 @@
       @change="onChange"
     />
 
-    <!-- Visual circle — aligns to top when content slot is used -->
+    <!-- Visual circle — aligns to top when content slot is used (non-card only) -->
     <span class="ns-radio__circle" aria-hidden="true" />
 
-    <!-- Label row + optional inline field + optional revealed content below -->
-    <span v-if="label || hasInline || hasContent" class="ns-radio__body">
+    <!-- Optional icon between circle and label (card variant) -->
+    <span v-if="hasIcon" class="ns-radio__icon" aria-hidden="true">
+      <slot name="icon" />
+    </span>
+
+    <!-- Body: label row + optional caption + optional revealed content (non-card) -->
+    <span v-if="label || hasInline || hasContent || hasCaption" class="ns-radio__body">
       <span
         :class="[
           'ns-radio__label-row',
-          { 'ns-radio__label-row--inline-left': inlinePosition === 'left' },
+          {
+            'ns-radio__label-row--inline-left': inlinePosition === 'left',
+            'ns-radio__label-row--wrap': hasCaption && captionLayout === 'inline',
+          },
         ]"
       >
         <slot v-if="inlinePosition === 'left'" name="inline" />
         <span v-if="label" class="ns-radio__label">{{ label }}</span>
         <slot v-if="inlinePosition !== 'left'" name="inline" />
+        <!-- Inline caption flows after the label in the same wrapping row -->
+        <span v-if="hasCaption && captionLayout === 'inline'" class="ns-radio__caption">
+          <slot name="caption" />
+        </span>
       </span>
+
+      <!-- Below caption: sits under the label row -->
+      <div v-if="hasCaption && captionLayout === 'below'" class="ns-radio__caption">
+        <slot name="caption" />
+      </div>
+
+      <!-- Revealed content: appears below the label in both simple and card modes -->
       <div v-if="hasContent" class="ns-radio__content">
         <slot />
       </div>
@@ -66,6 +86,10 @@ export interface NsRadioProps {
   inlinePosition?: 'left' | 'right'
   /** Disable this radio button */
   disable?: boolean
+  /** Render as a selectable card instead of a bare radio */
+  card?: boolean
+  /** Where the #caption slot content appears relative to the label */
+  captionLayout?: 'below' | 'inline'
 }
 
 const props = withDefaults(defineProps<NsRadioProps>(), {
@@ -74,6 +98,8 @@ const props = withDefaults(defineProps<NsRadioProps>(), {
   label: undefined,
   inlinePosition: 'right',
   disable: false,
+  card: false,
+  captionLayout: 'below',
 })
 
 const emit = defineEmits<{
@@ -86,6 +112,8 @@ const radioId = `ns-radio-${++_uid}`
 const isSelected = computed(() => props.modelValue === props.value)
 const hasContent = computed(() => !!slots.default)
 const hasInline = computed(() => !!slots.inline)
+const hasIcon = computed(() => !!slots.icon)
+const hasCaption = computed(() => !!slots.caption)
 
 function onChange() {
   emit('update:modelValue', props.value)
@@ -159,11 +187,13 @@ function onChange() {
   }
 }
 
-// ---- Body (label row + revealed content) ----
+// ---- Body (label row + caption + revealed content) ----
 .ns-radio__body {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
 
 // Label and inline field sit side by side in the same row
@@ -171,6 +201,20 @@ function onChange() {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  // Inline caption mode: switch to block so label + caption flow as one text run
+  &--wrap {
+    display: block;
+
+    .ns-radio__label {
+      display: inline;
+    }
+
+    .ns-radio__caption {
+      display: inline;
+      margin-left: 8px;
+    }
+  }
 }
 
 .ns-radio__label {
@@ -181,6 +225,20 @@ function onChange() {
   color: var(--ns-color-text-primary);
 }
 
+// ---- Caption ----
+.ns-radio__caption {
+  font-family: var(--ns-font-family-text);
+  font-size: 12px;
+  font-weight: var(--ns-font-weight-regular);
+  line-height: 18px;
+  color: var(--ns-color-text-secondary);
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+// ---- Revealed content (non-card) ----
 .ns-radio__content {
   // Content appears below the label, aligned with label text
 }
@@ -189,11 +247,59 @@ function onChange() {
   .ns-radio__label {
     color: var(--ns-color-text-disabled);
   }
+
+  .ns-radio__caption {
+    color: var(--ns-color-text-disabled);
+  }
 }
 
 // Keyboard focus ring
 .ns-radio__input:focus-visible ~ .ns-radio__circle {
   outline: 2px solid var(--ns-color-border-focus);
   outline-offset: 2px;
+}
+
+// ---- Card variant ----
+.ns-radio--card {
+  display: flex;
+  align-items: center;
+  gap: var(--ns-space-3);
+  padding: var(--ns-space-4);
+  background: var(--ns-color-bg-surface);
+  border: 1px solid var(--ns-color-border-default);
+  border-radius: var(--ns-radius-lg);
+  width: 100%;
+  cursor: pointer;
+  transition:
+    border-color var(--ns-duration-fast) var(--ns-easing-default),
+    box-shadow var(--ns-duration-fast) var(--ns-easing-default);
+
+  // Keep circle vertically centred even when content pushes the body taller
+  &.ns-radio--has-content {
+    align-items: center;
+  }
+
+  &.ns-radio--selected {
+    border-color: var(--ns-color-border-focus);
+    box-shadow: 0 0 0 1px var(--ns-color-border-focus);
+  }
+
+  &.ns-radio--disabled {
+    background: var(--ns-color-bg-disabled);
+    border-color: var(--ns-color-border-disabled);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  .ns-radio__icon {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    color: var(--ns-color-text-primary);
+  }
+
+  .ns-radio__label {
+    font-weight: var(--ns-font-weight-semibold);
+  }
 }
 </style>

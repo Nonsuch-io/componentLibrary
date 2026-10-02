@@ -20,13 +20,23 @@
         :label="option.label"
         :disable="disable || option.disable"
         :name="groupName"
+        :card="variant === 'card'"
+        :caption-layout="option.captionLayout"
         @update:model-value="$emit('update:modelValue', $event)"
-      />
+      >
+        <template v-if="option.icon" #icon>
+          <component :is="option.icon" :size="24" />
+        </template>
+        <template v-if="option.caption" #caption>
+          {{ option.caption }}
+        </template>
+      </NsRadio>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { type Component } from 'vue'
 import NsRadio from '../NsRadio/NsRadio.vue'
 import type { NsRadioValue } from '../NsRadio/NsRadio.vue'
 
@@ -41,6 +51,12 @@ export interface NsRadioOption {
   value: NsRadioValue
   label: string
   disable?: boolean
+  /** Icon component to display in card variant (e.g. a Phosphor icon) */
+  icon?: Component
+  /** Secondary text shown below (default) or inline with the label */
+  caption?: string
+  /** Whether caption appears below the label or inline in the same row */
+  captionLayout?: 'below' | 'inline'
 }
 
 export interface NsRadioButtonsProps {
@@ -54,7 +70,7 @@ export interface NsRadioButtonsProps {
   options: NsRadioOption[]
   /** Layout direction */
   orientation?: NsRadioButtonsOrientation
-  /** Visual style — 'card' variant TBD */
+  /** Visual style — 'card' renders each option as a bordered selectable card */
   variant?: NsRadioButtonsVariant
   /** Disable all options */
   disable?: boolean
@@ -118,5 +134,13 @@ const groupName = `ns-radio-group-${++_gid}`
 .ns-radio-buttons--vertical .ns-radio-buttons__options {
   flex-direction: column;
   align-items: flex-start;
+}
+
+.ns-radio-buttons--card {
+  display: flex;
+
+  &.ns-radio-buttons--vertical .ns-radio-buttons__options {
+    align-items: stretch;
+  }
 }
 </style>
