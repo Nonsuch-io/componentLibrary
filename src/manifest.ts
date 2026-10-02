@@ -9,7 +9,6 @@
 export const nsComponentManifest: Record<string, string> = {
   // Existing (fully styled) components
   QAvatar: 'NsAvatar',
-  QBanner: 'NsBanner',
   QBtn: 'NsButton',
   QCard: 'NsCard',
   QCheckbox: 'NsCheckbox',
