@@ -3,54 +3,98 @@ import { mount } from '@vue/test-utils'
 import NsToggle from './NsToggle.vue'
 
 describe('NsToggle', () => {
-  it('renders with default props', () => {
-    const wrapper = mount(NsToggle)
-    expect(wrapper.find('.ns-toggle').exists()).toBe(true)
+  describe('rendering', () => {
+    it('should render with ns-toggle class', () => {
+      const wrapper = mount(NsToggle)
+      expect(wrapper.find('.ns-toggle').exists()).toBe(true)
+    })
+
+    it('should render a label', () => {
+      const wrapper = mount(NsToggle, { props: { label: 'Notifications' } })
+      expect(wrapper.find('.ns-toggle__label').text()).toBe('Notifications')
+    })
+
+    it('should not render label element when no label prop', () => {
+      const wrapper = mount(NsToggle)
+      expect(wrapper.find('.ns-toggle__label').exists()).toBe(false)
+    })
+
+    it('should render a caption when provided', () => {
+      const wrapper = mount(NsToggle, {
+        props: { label: 'Notifications', caption: 'Receive email alerts' },
+      })
+      expect(wrapper.find('.ns-toggle__caption').text()).toBe('Receive email alerts')
+    })
+
+    it('should render a badge when badgeLabel is provided', () => {
+      const wrapper = mount(NsToggle, {
+        props: { label: 'New feature', badgeLabel: 'New' },
+      })
+      expect(wrapper.find('.ns-toggle__badge').exists()).toBe(true)
+    })
+
+    it('should render the visual track', () => {
+      const wrapper = mount(NsToggle)
+      expect(wrapper.find('.ns-toggle__track').exists()).toBe(true)
+    })
   })
 
-  it('renders a label', () => {
-    const wrapper = mount(NsToggle, { props: { label: 'Notifications' } })
-    expect(wrapper.text()).toContain('Notifications')
-  })
+  describe('states', () => {
+    it('should default to off state', () => {
+      const wrapper = mount(NsToggle)
+      const input = wrapper.find('input[type="checkbox"]')
+      expect((input.element as HTMLInputElement).checked).toBe(false)
+    })
 
-  it('applies ns-toggle class', () => {
-    const wrapper = mount(NsToggle)
-    expect(wrapper.classes()).toContain('ns-toggle')
-  })
+    it('should reflect on state when modelValue is true', () => {
+      const wrapper = mount(NsToggle, { props: { modelValue: true } })
+      expect(wrapper.find('.ns-toggle--on').exists()).toBe(true)
+      expect((wrapper.find('input').element as HTMLInputElement).checked).toBe(true)
+    })
 
-  it('supports dense mode', () => {
-    const wrapper = mount(NsToggle, { props: { dense: true } })
-    expect(wrapper.find('.q-toggle--dense').exists()).toBe(true)
-  })
+    it('should apply disabled class when disable is true', () => {
+      const wrapper = mount(NsToggle, { props: { disable: true } })
+      expect(wrapper.find('.ns-toggle--disabled').exists()).toBe(true)
+    })
 
-  it('can be disabled', () => {
-    const wrapper = mount(NsToggle, { props: { disable: true } })
-    expect(wrapper.find('.disabled').exists()).toBe(true)
-  })
-
-  it('emits update:modelValue on click', async () => {
-    const wrapper = mount(NsToggle, { props: { modelValue: false } })
-    await wrapper.find('.q-toggle__inner').trigger('click')
-    expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+    it('should disable the native input when disable is true', () => {
+      const wrapper = mount(NsToggle, { props: { disable: true } })
+      expect(wrapper.find('input').attributes('disabled')).toBeDefined()
+    })
   })
 
   describe('accessibility', () => {
-    it('has role="switch"', () => {
+    it('should have role="switch" on the input', () => {
       const wrapper = mount(NsToggle)
-      const toggle = wrapper.find('.q-toggle')
-      expect(toggle.attributes('role')).toBe('switch')
+      expect(wrapper.find('input').attributes('role')).toBe('switch')
     })
 
-    it('reflects aria-checked when on', () => {
+    it('should reflect aria-checked when on', () => {
       const wrapper = mount(NsToggle, { props: { modelValue: true } })
-      const toggle = wrapper.find('.q-toggle')
-      expect(toggle.attributes('aria-checked')).toBe('true')
+      expect(wrapper.find('input').attributes('aria-checked')).toBe('true')
     })
 
-    it('reflects aria-checked when off', () => {
+    it('should reflect aria-checked when off', () => {
       const wrapper = mount(NsToggle, { props: { modelValue: false } })
-      const toggle = wrapper.find('.q-toggle')
-      expect(toggle.attributes('aria-checked')).toBe('false')
+      expect(wrapper.find('input').attributes('aria-checked')).toBe('false')
+    })
+  })
+
+  describe('interaction', () => {
+    it('should emit update:modelValue on change', async () => {
+      const wrapper = mount(NsToggle, { props: { modelValue: false } })
+      const input = wrapper.find('input')
+      ;(input.element as HTMLInputElement).checked = true
+      await input.trigger('change')
+      expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+      expect(wrapper.emitted('update:modelValue')![0]).toEqual([true])
+    })
+  })
+
+  describe('passthrough', () => {
+    it('should forward attrs to the root label element', () => {
+      const wrapper = mount(NsToggle, { attrs: { 'data-testid': 'my-toggle' } })
+      expect(wrapper.find('.ns-toggle').attributes('data-testid')).toBe('my-toggle')
     })
   })
 })
