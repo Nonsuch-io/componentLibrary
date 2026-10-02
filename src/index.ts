@@ -40,6 +40,17 @@ export type { NsCheckboxProps } from './components/NsCheckbox/NsCheckbox.vue'
 export { default as NsToggle } from './components/NsToggle/NsToggle.vue'
 export type { NsToggleProps } from './components/NsToggle/NsToggle.vue'
 
+export { default as NsRadio } from './components/NsRadio/NsRadio.vue'
+export type { NsRadioProps, NsRadioValue } from './components/NsRadio/NsRadio.vue'
+
+export { default as NsRadioButtons } from './components/NsRadioButtons/NsRadioButtons.vue'
+export type {
+  NsRadioButtonsProps,
+  NsRadioOption,
+  NsRadioButtonsOrientation,
+  NsRadioButtonsVariant,
+} from './components/NsRadioButtons/NsRadioButtons.vue'
+
 export { default as NsForm } from './components/NsForm/NsForm.vue'
 export type { NsFormProps } from './components/NsForm/NsForm.vue'
 
