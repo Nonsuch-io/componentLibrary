@@ -26,7 +26,7 @@ importers:
         version: 2.1.0
       '@quasar/vite-plugin':
         specifier: ^2.0.0
-        version: 2.0.2(@vitejs/plugin-vue@6.0.9(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))(vue@3.5.43(typescript@6.0.3)))(quasar@2.33.0)(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))(vue@3.5.43(typescript@6.0.3))
+        version: 2.0.2(@vitejs/plugin-vue@6.0.9(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))(vue@3.5.43(typescript@6.0.3)))(quasar@2.33.2)(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))(vue@3.5.43(typescript@6.0.3))
       '@size-limit/preset-small-lib':
         specifier: ^12.1.0
         version: 12.1.0(size-limit@12.1.0(jiti@2.6.1))
@@ -86,7 +86,7 @@ importers:
         version: 3.9.9
       quasar:
         specifier: ^2.32.0
-        version: 2.33.0
+        version: 2.33.2
       sass-embedded:
         specifier: ^1.97.3
         version: 1.104.1
@@ -2279,8 +2279,8 @@ packages:
     resolution: {integrity: sha512-+Owyggi9IxT1ePKGafcI87ubSmxol6smwJ+RAHDQlx9+9cPwFWDiKFFCPuWhr9ignlGpZ9vDQLw67N4dcTVFEA==}
     engines: {node: '>=20'}
 
-  quasar@2.33.0:
-    resolution: {integrity: sha512-Vgt4C6Iy/0/AMkNaZaezQerRQB6DLrc9kIxvK4tObqTpl3nx38rmtAJHiGcRgsEPC1MMvcuZXsUqZO3oXrDLKQ==}
+  quasar@2.33.2:
+    resolution: {integrity: sha512-ZzskDpI34A7qo00VQuCo+zg6xyKzAIoTFDjYAdbY5R0udYl7KzwtojEDLRcrsybEcwe46GK0mPIA4oQWByKLiQ==}
     engines: {node: '>= 22.0.0'}
 
   react-dom@19.3.0:
@@ -3449,10 +3449,10 @@ snapshots:
 
   '@quasar/extras@2.1.0': {}
 
-  '@quasar/vite-plugin@2.0.2(@vitejs/plugin-vue@6.0.9(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))(vue@3.5.43(typescript@6.0.3)))(quasar@2.33.0)(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))(vue@3.5.43(typescript@6.0.3))':
+  '@quasar/vite-plugin@2.0.2(@vitejs/plugin-vue@6.0.9(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))(vue@3.5.43(typescript@6.0.3)))(quasar@2.33.2)(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))(vue@3.5.43(typescript@6.0.3))':
     dependencies:
       '@vitejs/plugin-vue': 6.0.9(vite@8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1))(vue@3.5.43(typescript@6.0.3))
-      quasar: 2.33.0
+      quasar: 2.33.2
       vite: 8.3.1(@types/node@26.6.2)(esbuild@0.28.2)(jiti@2.6.1)(sass-embedded@1.104.1)(sass@1.104.1)(yaml@2.9.1)
       vue: 3.5.43(typescript@6.0.3)
 
@@ -4936,7 +4936,7 @@ snapshots:
     dependencies:
       hookified: 2.2.0
 
-  quasar@2.33.0: {}
+  quasar@2.33.2: {}
 
   react-dom@19.3.0(react@19.3.0):
     dependencies:
