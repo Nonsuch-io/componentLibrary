@@ -71,6 +71,12 @@ All 12 open pull requests were closed, none merged:
 Their branches were deliberately left in place, so the commits stay readable after
 archiving.
 
+The issue backlog is in [ARCHIVE-BACKLOG.md](./ARCHIVE-BACKLOG.md) — 81 items that were
+open as of **2026-09-23**, including three at P1. Read its warning before trusting it: the
+beads database this repo used was unreachable when it was archived and automatic export had
+been failing for weeks, so that file is a three-week-stale snapshot rather than a final
+state. It is recorded because it was the only copy left, not because it is accurate.
+
 ## Credits
 
 ### Third-party assets & libraries
