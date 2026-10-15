@@ -1,384 +1,75 @@
-# @nonsuch/component-library
-
-A Vue 3 component library built on top of [Quasar](https://quasar.dev), providing customized components with opinionated defaults.
-
-**Quasar components you haven't customized are used directly** — this library only adds or overrides the ones with Nonsuch-specific styling and behavior. Tree-shaking is fully preserved.
-
-## Installation
-
-```bash
-# Install the library and its peer dependencies
-pnpm add @nonsuch/component-library
-pnpm add quasar @quasar/extras
-```
-
-### Quick Start (Recommended)
-
-#### Vite Configuration
-
-This library ships pre-built, tree-shaken JS — it does not require
-`@quasar/vite-plugin` to consume. If your own app also authors raw Quasar
-components directly (e.g. `<q-btn>` in your own templates, per the "used
-directly" note above), you'll want the plugin for that unrelated reason; add
-it as your own dependency and wire it in alongside this config:
-
-```ts
-import { quasar, transformAssetUrls } from '@quasar/vite-plugin'
-import vue from '@vitejs/plugin-vue'
-
-export default defineConfig({
-  plugins: [vue({ template: { transformAssetUrls } }), quasar()],
-})
-```
-
-#### App Entry
-
-```ts
-import { createApp } from 'vue'
-import { Quasar } from 'quasar'
-import { createNonsuch, createQuasarConfig } from '@nonsuch/component-library'
-import '@nonsuch/component-library/tokens.css'
-import 'quasar/src/css/index.sass'
-
-const app = createApp(App)
-app.use(Quasar, createQuasarConfig()) // Token-aligned Quasar brand colours
-app.use(createNonsuch()) // Locale + library setup
-app.mount('#app')
-```
-
-That's it — components, tokens, locale (defaults to `en-CA`), and Quasar brand colours are all wired up.
-
-#### Use Components
-
-```vue
-<script setup>
-import { NsButton, NsInput, NsCard } from '@nonsuch/component-library'
-</script>
-
-<template>
-  <NsCard title="Welcome">
-    <NsInput v-model="name" label="Your name" />
-    <template #actions>
-      <NsButton label="Submit" />
-    </template>
-  </NsCard>
-</template>
-```
-
-### Plugin Options
-
-`createNonsuch()` accepts options for locale:
-
-```ts
-import { createNonsuch, nsLocaleFrCA } from '@nonsuch/component-library'
-
-app.use(createNonsuch({ locale: nsLocaleFrCA }))
-```
-
-`createQuasarConfig()` accepts brand colour overrides and extra Quasar config:
-
-```ts
-import { createQuasarConfig } from '@nonsuch/component-library'
-
-app.use(
-  Quasar,
-  createQuasarConfig({
-    brand: { primary: '#1a73e8' },
-    plugins: { Notify: {} },
-  }),
-)
-```
-
-### Dark Mode
-
-```ts
-import { useNsDarkMode } from '@nonsuch/component-library'
-
-const { isDark, toggle, useSystem } = useNsDarkMode()
-```
-
-The composable persists the user's choice to `localStorage` and syncs with `prefers-color-scheme`. Design tokens switch automatically via the `dark` class on `<html>`.
-
-### NsThemeProvider
-
-For section-level locale overrides without a plugin:
-
-```vue
-<script setup>
-import { NsThemeProvider, nsLocaleFrCA } from '@nonsuch/component-library'
-</script>
-
-<template>
-  <NsThemeProvider :locale="nsLocaleFrCA">
-    <!-- All Ns components here use French strings -->
-  </NsThemeProvider>
-</template>
-```
-
-### Manual Setup (Advanced)
-
-### Fonts (Optional)
-
-The library ships [Fixel](https://fixel.macpaw.com/) as the Nonsuch brand font with Roboto as a fallback. Three integration options:
-
-**Option 1: Global CSS (recommended)** — makes Fixel the default for your entire app:
-
-```ts
-import '@nonsuch/component-library/fonts/global.css'
-```
-
-This loads all `@font-face` declarations and sets `Fixel Text` on `body` and `Fixel Display` on headings.
-
-**Option 2: Font faces only** — load the fonts without applying them globally, then use them where you choose:
-
-```ts
-import '@nonsuch/component-library/fonts.css'
-```
-
-```css
-.my-element {
-  font-family: 'Fixel Text', 'Roboto', sans-serif;
-}
-```
-
-**Option 3: Quasar Sass variables** — integrates with Quasar's typography system:
-
-```sass
-// src/quasar-variables.sass
-@use '@nonsuch/component-library/fonts/quasar-overrides' as *
-```
-
-```ts
-// vite.config.ts
-quasar({ sassVariables: 'src/quasar-variables.sass' })
-```
-
-Or use Quasar components directly — they aren't re-exported through this library, so you import them from `quasar` as normal:
-
-```ts
-import { QInput, QSelect } from 'quasar'
-```
-
-### Translations (i18n)
-
-The library ships its own locale system — **no dependency on vue-i18n**. Components that render user-visible text accept optional string props with built-in defaults from the active locale.
-
-**Built-in locales:** `en-CA` (default) and `fr-CA`.
-
-**Option 1: Use the defaults** — components use English (Canada) strings out of the box with no setup:
-
-```vue
-<NsButton>Add to cart</NsButton>
-<!-- internal labels like loading text already default to English -->
-```
-
-**Option 2: Switch locale globally** — provide a locale pack at the app root:
-
-```ts
-import { createApp } from 'vue'
-import { provideNsLocale, nsLocaleFrCA } from '@nonsuch/component-library'
-
-const app = createApp(App)
-
-// Inside your root component's setup():
-provideNsLocale(nsLocaleFrCA)
-```
-
-**Option 3: Custom / partial locale** — supply your own translations by implementing the `NsLocaleMessages` interface:
-
-```ts
-import type { NsLocaleMessages } from '@nonsuch/component-library'
-import { nsLocaleEnCA, provideNsLocale } from '@nonsuch/component-library'
-
-const myLocale: NsLocaleMessages = {
-  ...nsLocaleEnCA,
-  product: {
-    ...nsLocaleEnCA.product,
-    addToCart: 'Add to bag', // override just what you need
-  },
-}
-
-provideNsLocale(myLocale)
-```
-
-**Option 4: Override per-component** — pass a string prop directly to bypass the locale:
-
-```vue
-<!-- This label is always "Ajouter" regardless of the active locale -->
-<NsButton label="Ajouter" />
-```
-
-The locale interface covers six sections: `common`, `product`, `media`, `validation`, `navigation`, and `marketing`. See the full type in `NsLocaleMessages`.
-
-### Design Tokens (Optional)
-
-Import CSS custom properties for colours, typography, spacing, border-radius, shadows, and motion:
-
-```ts
-import '@nonsuch/component-library/tokens.css'
-```
-
-All tokens use the `--ns-` prefix and support light/dark mode automatically. Current values are placeholders — token names are stable.
-
-```css
-.my-card {
-  border-radius: var(--ns-radius-sm);
-  box-shadow: var(--ns-shadow-sm);
-  padding: var(--ns-space-4);
-}
-```
-
-Dark mode activates via `class="dark"`, `data-theme="dark"`, Quasar's `.q-dark`, or `prefers-color-scheme: dark`.
-
-### Breakpoints
-
-The library ships Quasar-aligned breakpoint values and media-query helpers:
-
-```ts
-import {
-  nsBreakpoints,
-  nsMediaUp,
-  nsMediaDown,
-  nsMediaOnly,
-  nsMediaBetween,
-} from '@nonsuch/component-library'
-```
-
-| Name | Min-width | Range          | Note  |
-| ---- | --------- | -------------- | ----- |
-| xs   | 0         | 0 – 599 px     |       |
-| sm   | 600       | 600 – 1023 px  |       |
-| md   | 1024      | 1024 – 1439 px |       |
-| lg   | 1440      | 1440 – 1919 px |       |
-| xl   | 1920      | 1920 – 2559 px |       |
-| xxl  | 2560      | 2560 – 3839 px | 1440p |
-| xxxl | 3840      | 3840 px +      | 4K    |
-
-Media-query helpers return `matchMedia()`-ready strings:
-
-```ts
-nsMediaUp('md') // '(min-width: 1024px)'
-nsMediaDown('md') // '(max-width: 1023px)'
-nsMediaOnly('md') // '(min-width: 1024px) and (max-width: 1439px)'
-nsMediaBetween('sm', 'lg') // '(min-width: 600px) and (max-width: 1919px)'
-```
-
-To customize in the future, spread and override:
-
-```ts
-const custom = { ...nsBreakpoints, lg: 1280 }
-```
-
-## Development
-
-```bash
-# Install dependencies
-pnpm install
-
-# Run Storybook (dev mode)
-pnpm dev
-
-# Run tests
-pnpm test
-pnpm test:watch
-
-# Build the library
-pnpm build
-
-# Build Storybook for deployment
-pnpm build:storybook
-```
-
-## Project Structure
-
-```text
-src/
-  index.ts                # Library entry — exports all public API
-  manifest.ts             # Quasar → Ns component mapping for sync enforcement
-  plugin.ts               # createNonsuch() Vue plugin
-  quasarConfig.ts         # createQuasarConfig() helper
-  components/
-    NsAvatar/             # Avatar with size presets
-    NsBadge/              # Styled QBadge wrapper
-    NsBanner/             # Info/positive/warning/negative banners
-    NsBreadcrumbs/        # Breadcrumb navigation
-    NsBreadcrumbElement/  # Individual breadcrumb item
-    NsButton/             # Styled QBtn wrapper
-    NsButtonToggle/       # Toggle between button options
-    NsCard/               # Card with title/subtitle/actions slots
-    NsCardActions/        # Card action bar
-    NsCardSection/        # Card content section
-    NsCheckbox/           # Styled QCheckbox wrapper
-    NsChip/               # Tag/filter chip
-    NsDialog/             # Modal dialog with header/body/actions
-    NsDrawer/             # Side drawer (within NsLayout)
-    NsExpansionItem/      # Collapsible list item
-    NsFooter/             # App footer (within NsLayout)
-    NsForm/               # Form wrapper with validation
-    NsHeader/             # App header (within NsLayout)
-    NsIcon/               # Styled QIcon wrapper
-    NsImage/              # Styled QImg wrapper
-    NsInnerLoading/       # Overlay loading indicator
-    NsInput/              # Styled QInput wrapper
-    NsItem/               # List item
-    NsItemLabel/          # List item label
-    NsItemSection/        # List item section
-    NsLayout/             # App layout container
-    NsLinearProgress/     # Linear progress bar
-    NsList/               # List with separator defaults
-    NsMenu/               # Dropdown/context menu
-    NsPage/               # Page content area
-    NsPageContainer/      # Page container (within NsLayout)
-    NsPagination/         # Page navigation controls
-    NsSelect/             # Styled QSelect dropdown
-    NsSeparator/          # Horizontal/vertical separator
-    NsSkeleton/           # Loading skeleton with animation
-    NsSpace/              # Flex spacer
-    NsSpinner/            # Circular spinner
-    NsSpinnerDots/        # Dot-style spinner
-    NsTab/                # Tab item (within NsTabs)
-    NsTabPanel/           # Tab panel content
-    NsTabPanels/          # Tab panels container
-    NsTable/              # Data table
-    NsTableCell/          # Table cell
-    NsTabs/               # Tab navigation bar
-    NsThemeProvider/      # Renderless locale provider
-    NsTimeline/           # Timeline container
-    NsTimelineEntry/      # Timeline entry item
-    NsToggle/             # Styled QToggle switch
-    NsToolbar/            # Toolbar container
-    NsToolbarTitle/       # Toolbar title
-    NsTooltip/            # Tooltip with consistent delays
-  composables/
-    useNsLocale.ts        # Locale injection/provision
-    useNsDarkMode.ts      # Dark mode with persistence
-    useNsDefaults.ts      # Default value helper
-  locale/                 # en-CA, fr-CA string packs
-  breakpoints/            # Breakpoint values + media query helpers
-  tokens/                 # Design token CSS + TS helpers
-  fonts/                  # Fixel font files + CSS
-```
-
-Each custom component lives in its own directory with co-located story and test files. The `Ns` prefix distinguishes library components from Quasar's `Q` prefix.
-
-## Adding a New Component
-
-1. Create `src/components/NsMyComponent/NsMyComponent.vue`
-2. Add a story: `NsMyComponent.stories.ts`
-3. Add tests: `NsMyComponent.test.ts`
-4. Add a re-export: `index.ts`
-5. Export from `src/index.ts`
-
-## Architecture
-
-- **Quasar is a peer dependency** — consumers install it normally; this library's `dist/` is pre-built and does not need `@quasar/vite-plugin` to consume (only your own app's raw Quasar usage would)
-- **Custom components compose Quasar** — they wrap or extend Quasar components with opinionated defaults
-- **Vite library mode** — builds to ES modules with externalized `vue` and `quasar`
-- **TypeScript** — strict mode with emitted `.d.ts` declarations
-
-## Contributing
-
-Want to add or improve components? Check out [CONTRIBUTING.md](./CONTRIBUTING.md) for a friendly step-by-step guide — no deep Vue experience required!
+# @nonsuch/component-library — archived
+
+> [!IMPORTANT]
+> **This repository is archived and read-only as of 2026-10-14. Do not open issues or pull requests here.**
+>
+> The library now lives in the [butiq](https://github.com/Nonsuch-io/butiq) monorepo at
+> **`packages/uniq`**, published under the name **`@nonsuch/uniq`** and consumed by the
+> apps with `workspace:*`. All development, issues and review happen there.
+
+## Why this moved
+
+The library was developed here as a standalone package and consumed by butiq as a pinned
+npm release. That boundary cost real time: every defect found by a consumer became a
+report → fix → publish → bump → verify round trip, 1–2 days apiece. Moving the source into
+the monorepo collapses that loop, at the price of the version boundary that had caught
+things — notably the 0.53.1 SSR regression, which butiq diagnosed in minutes by A/B-ing
+0.53.0 against it on one tree.
+
+The trade was made deliberately rather than by drift, and the gates that the boundary used
+to provide were re-homed into butiq's CI as part of the move: SSR render, SSR component
+smoke, unit + coverage, bundle size, and the Chromium story suite.
+
+## What was here
+
+94 `Ns*` components for Vue 3 on top of [Quasar](https://quasar.dev), with Storybook
+stories, a token system, and an `en-CA`/`fr-CA` locale layer. The final version released
+from this repo was **0.55.1**.
+
+Publishing was removed before the move, so this package is not maintained and should not be
+added as a dependency. Consumers inside the monorepo use `@nonsuch/uniq` by workspace link
+instead.
+
+Usage, setup, i18n, token and contribution documentation moved with the code — see
+`packages/uniq/README.md` and `packages/uniq/CONTRIBUTING.md` in butiq. The versions that
+used to live in this file remain in this repository's git history.
+
+## Where the history went, and one wrinkle worth knowing
+
+The move preserved this repository's commit history into butiq, but not on the first
+attempt. butiq
+[#540](https://github.com/Nonsuch-io/butiq/pull/540) landed as a **squash**, so the
+ancestry was not on `main` at all;
+[#543](https://github.com/Nonsuch-io/butiq/pull/543) restored it with an additive
+`-s ours` merge, merged as a merge commit. The rename to `@nonsuch/uniq` followed in
+[#539](https://github.com/Nonsuch-io/butiq/pull/539).
+
+History is reachable in butiq today — `git log --follow packages/uniq/src/...` walks back
+to this repo's scaffold commit of 2026-02-08 — **but the SHAs were rewritten by the
+import**, because every path moved from `src/` to `packages/uniq/src/`. Commit messages,
+authors and dates carry over; the hashes do not. So a SHA from this repository is _not_ an
+ancestor of butiq's `main`, and `git merge-base --is-ancestor` against one will tell you
+the history is missing when it is merely renumbered. Match on message and date instead.
+
+One further caveat: anything concluded about butiq's `main` between the #540 and #543
+merges was true of a tree that no longer exists.
+
+## State at archive time
+
+All 12 open pull requests were closed, none merged:
+
+- Two dependabot bumps (a `testing` group carrying vitest 5, and a `quasar` group). Both
+  are covered by butiq's dependabot, which watches `packages/uniq` with the same group
+  rules, so neither was dropped — just handled where the code lives.
+- Ten stacked feature PRs (#410–#419: a Figma alignment pass over NsButton, NsChip,
+  NsBadge, NsNumberBadge, NsAvatar, NsTooltip, NsBanner, NsCheckbox, NsToggle and
+  NsRadio), each superseded by its counterpart in butiq
+  [#574–#583](https://github.com/Nonsuch-io/butiq/pulls). Verified rather than assumed
+  before closing: the butiq versions are either byte-identical to these heads or further
+  developed.
+
+Their branches were deliberately left in place, so the commits stay readable after
+archiving.
 
 ## Credits
 

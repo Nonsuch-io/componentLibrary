@@ -1,5 +1,12 @@
 # Contributing to @nonsuch/component-library
 
+> [!IMPORTANT]
+> **This repository is archived and read-only as of 2026-10-14.** Contributions are no
+> longer accepted here. The library moved to the
+> [butiq](https://github.com/Nonsuch-io/butiq) monorepo at `packages/uniq`; the current
+> version of this guide is `packages/uniq/CONTRIBUTING.md` there. The rest of this file
+> is kept for historical reference and describes a workflow that no longer runs.
+
 Welcome! Whether you're a developer, designer, or just getting started with code — we're glad you're here. This guide will walk you through everything you need to add or update components in this library.
 
 ## Getting Started
